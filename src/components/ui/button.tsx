@@ -18,13 +18,23 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
+        // Luxury variants
+        gold: "bg-gold text-primary font-medium tracking-wide hover:bg-gold-light hover:shadow-[var(--shadow-gold)]",
+        goldOutline: "border-2 border-gold text-gold bg-transparent hover:bg-gold hover:text-primary font-medium tracking-wide transition-colors",
+        navy: "bg-navy text-white font-medium tracking-wide hover:bg-navy-light",
+        navyOutline: "border-2 border-navy text-navy bg-transparent hover:bg-navy hover:text-white font-medium tracking-wide transition-colors",
+        hero: "bg-gold text-primary font-semibold tracking-wide hover:bg-gold-light hover:shadow-[var(--shadow-gold)] hover:-translate-y-0.5",
+        heroOutline: "border-2 border-white/80 text-white bg-transparent hover:bg-white hover:text-primary backdrop-blur-sm font-medium tracking-wide transition-colors",
+        white: "bg-white text-primary font-medium hover:bg-secondary hover:-translate-y-0.5 shadow-[var(--shadow-elegant)]",
+        whiteOutline: "border-2 border-white text-white bg-transparent hover:bg-white hover:text-primary transition-colors",
       },
       size: {
         default:
           "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
         xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
         sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        lg: "h-9 gap-1.5 px-4 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        xl: "h-14 gap-2 px-10 text-base",
         icon: "size-8",
         "icon-xs":
           "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
