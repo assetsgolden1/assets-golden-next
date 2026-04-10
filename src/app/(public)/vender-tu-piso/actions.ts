@@ -47,5 +47,20 @@ export async function submitLeadAction(
     return { error: 'No se pudo enviar la solicitud. Inténtelo de nuevo.' }
   }
 
+  // Notificación email + n8n — fire and forget
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  fetch(`${siteUrl}/api/leads`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name,
+      email,
+      phone,
+      interest: 'sell',
+      message: `Barrio: ${neighborhood || 'N/A'}. Valor: ${property_value_range || 'N/A'}. Plazo: ${sale_timeline || 'N/A'}. Propietario: ${is_owner ? 'Sí' : 'No'}.`,
+      source: 'sell-property-form',
+    }),
+  }).catch(() => {})
+
   return { success: true }
 }

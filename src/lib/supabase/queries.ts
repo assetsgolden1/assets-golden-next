@@ -20,6 +20,8 @@ export interface GetPropertiesFilters {
   bedrooms?: number
   limit?: number
   offset?: number
+  isDevelopment?: boolean
+  country?: string
 }
 
 export async function getProperties(filters?: GetPropertiesFilters) {
@@ -35,6 +37,8 @@ export async function getProperties(filters?: GetPropertiesFilters) {
   if (filters?.maxPrice) query = query.lte('price', filters.maxPrice)
   if (filters?.location) query = query.ilike('location', `%${filters.location}%`)
   if (filters?.bedrooms) query = query.eq('bedrooms', filters.bedrooms)
+  if (filters?.isDevelopment !== undefined) query = query.eq('is_development', filters.isDevelopment)
+  if (filters?.country) query = query.ilike('country', `%${filters.country}%`)
 
   const limit = filters?.limit ?? 12
   const offset = filters?.offset ?? 0
@@ -129,6 +133,25 @@ export async function getAllBlogSlugs() {
 }
 
 // ─── Destinations ──────────────────────────────────────────────
+
+export async function getAllDestinationSlugs() {
+  const supabase = createStaticClient()
+  const { data } = await supabase
+    .from('country_destinations')
+    .select('slug')
+    .not('slug', 'is', null)
+  return (data ?? []).map((d) => d.slug as string)
+}
+
+export async function getDestinationBySlug(slug: string) {
+  const supabase = createStaticClient()
+  const { data, error } = await supabase
+    .from('country_destinations')
+    .select('*')
+    .eq('slug', slug)
+    .single()
+  return { data: data as CountryDestination | null, error }
+}
 
 export async function getDestinations() {
   const supabase = await createClient()
