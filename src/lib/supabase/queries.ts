@@ -86,7 +86,29 @@ export async function getAllPropertySlugs() {
   return (data ?? []).map((p) => p.slug as string)
 }
 
-// ─── Team ──────────────────────────────────────────────────────
+// ─── Team / Partners ───────────────────────────────────────────
+
+export async function getPartners() {
+  const supabase = createStaticClient()
+  const { data, error } = await supabase
+    .from('team_members')
+    .select('*')
+    .eq('active', true)
+    .eq('member_type', 'partner')
+    .order('order_index', { ascending: true })
+  return { data: (data ?? []) as TeamMember[], error }
+}
+
+export async function getPartnerById(id: string) {
+  const supabase = createStaticClient()
+  const { data, error } = await supabase
+    .from('team_members')
+    .select('*')
+    .eq('id', id)
+    .eq('member_type', 'partner')
+    .single()
+  return { data: data as TeamMember | null, error }
+}
 
 export async function getTeamMembers() {
   const supabase = await createClient()
@@ -106,6 +128,18 @@ export async function getBlogPosts(limit = 12) {
     .from('blog_posts')
     .select('*')
     .eq('published', true)
+    .order('published_at', { ascending: false })
+    .limit(limit)
+  return { data: (data ?? []) as BlogPost[], error }
+}
+
+export async function getBlogPostsByCategory(category: string, limit = 20) {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select('*')
+    .eq('published', true)
+    .eq('category', category)
     .order('published_at', { ascending: false })
     .limit(limit)
   return { data: (data ?? []) as BlogPost[], error }
