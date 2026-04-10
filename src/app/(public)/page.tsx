@@ -3,8 +3,10 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { MapPin } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
-import PropertyCard from '@/components/properties/PropertyCard'
 import HomeSidebar from '@/components/HomeSidebar'
+import HomePropertiesCarousel from '@/components/HomePropertiesCarousel'
+import HomeTeamSection from '@/components/HomeTeamSection'
+
 import {
   getFeaturedProperties,
   getTeamMembers,
@@ -120,7 +122,7 @@ export default async function HomePage() {
       </section>
 
       {/* ─── 3. PROPIEDADES DESTACADAS ────────────────────────── */}
-      <section className="section-padding bg-background">
+      <section className="section-padding bg-background overflow-hidden">
         <div className="container-luxury">
           <div className="mb-12 text-center">
             <p className="text-xs tracking-[0.25em] text-gold uppercase mb-3">
@@ -134,25 +136,7 @@ export default async function HomePage() {
 
           {featured.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {featured.map((property) => (
-                  <PropertyCard
-                    key={property.id}
-                    id={property.id}
-                    title={property.title}
-                    slug={property.slug ?? property.id}
-                    location={property.location ?? property.province ?? 'España'}
-                    price={property.price}
-                    currency={property.currency}
-                    area_sqm={property.area_sqm}
-                    bedrooms={property.bedrooms}
-                    bathrooms={property.bathrooms}
-                    property_type={property.property_type}
-                    image_url={property.image_url}
-                    featured={property.featured}
-                  />
-                ))}
-              </div>
+              <HomePropertiesCarousel properties={featured} />
               <div className="mt-12 text-center">
                 <Link
                   href="/propiedades"
@@ -164,9 +148,7 @@ export default async function HomePage() {
             </>
           ) : (
             <div className="text-center py-12 text-muted-foreground">
-              <p className="text-sm">
-                Propiedades disponibles próximamente.
-              </p>
+              <p className="text-sm">Propiedades disponibles próximamente.</p>
               <Link
                 href="/vender-tu-piso"
                 className={buttonVariants({ variant: 'gold', size: 'lg', className: 'mt-4' })}
@@ -248,7 +230,7 @@ export default async function HomePage() {
                 <Link
                   key={dest.id}
                   href={`/destinos/${dest.slug ?? dest.id}`}
-                  className="group relative overflow-hidden rounded-xl aspect-[4/3] bg-muted"
+                  className="group relative overflow-hidden rounded-xl aspect-[3/4] bg-muted"
                 >
                   {dest.card_image_url ? (
                     <Image
@@ -289,64 +271,7 @@ export default async function HomePage() {
       )}
 
       {/* ─── 6. EQUIPO ────────────────────────────────────────── */}
-      {team.length > 0 && (
-        <section className="section-padding bg-secondary">
-          <div className="container-luxury">
-            <div className="mb-12 text-center">
-              <p className="text-xs tracking-[0.25em] text-gold uppercase mb-3">
-                Nuestros especialistas
-              </p>
-              <h2 className="font-display text-3xl font-semibold text-foreground md:text-4xl">
-                El equipo
-              </h2>
-              <div className="divider-gold mx-auto mt-4" />
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-              {team.slice(0, 8).map((member) => (
-                <div key={member.id} className="group text-center">
-                  <div className="relative mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full border-2 border-gold/20 bg-muted">
-                    {member.photo_url ? (
-                      <Image
-                        src={member.photo_url}
-                        alt={member.name}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        sizes="96px"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center gradient-navy">
-                        <span className="font-display text-2xl text-gold">
-                          {member.name.charAt(0)}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="font-display text-sm font-semibold text-foreground group-hover:text-gold transition-colors">
-                    {member.name}
-                  </h3>
-                  {member.role_es && (
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {member.role_es}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {team.length > 0 && (
-              <div className="mt-10 text-center">
-                <Link
-                  href="/equipo"
-                  className={buttonVariants({ variant: 'goldOutline', size: 'lg' })}
-                >
-                  Conocer al equipo completo
-                </Link>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
+      <HomeTeamSection team={team} />
 
       {/* ─── 7. PARTNERS ──────────────────────────────────────── */}
       {partners.length > 0 && (

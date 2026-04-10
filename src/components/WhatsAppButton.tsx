@@ -1,6 +1,6 @@
 'use client'
 
-const WHATSAPP_NUMBER = '34XXXXXXXXX' // Atilio confirmará el número
+const WHATSAPP_NUMBER = '34611853001'
 
 export default function WhatsAppButton() {
   return (
