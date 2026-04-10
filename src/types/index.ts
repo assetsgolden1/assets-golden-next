@@ -1,12 +1,18 @@
+// ─── Property ────────────────────────────────────────────────
 export interface Property {
   id: string
   created_at: string
   updated_at: string
   title: string
+  slug: string | null
+  external_id: string | null
   description: string | null
+  description_en: string | null
   price: number | null
   currency: string | null
   location: string | null
+  province: string | null
+  country: string | null
   destination_id: string | null
   bedrooms: number | null
   bathrooms: number | null
@@ -15,34 +21,39 @@ export interface Property {
   gallery_urls: string[] | null
   features: string[] | null
   property_type: string | null
-  status: 'active' | 'inactive' | 'sold'
+  classification: string | null
+  status: 'active' | 'inactive' | 'sold' | 'available' | 'reserved'
+  is_development: boolean
   featured: boolean
   created_by: string | null
   idealista_url: string | null
+  nestseekers_url: string | null
 }
 
+// ─── TeamMember ───────────────────────────────────────────────
 export interface TeamMember {
   id: string
+  created_at: string
   name: string
   role_es: string | null
   role_en: string | null
-  title_es: string | null
-  title_en: string | null
   bio_es: string | null
   bio_en: string | null
-  specialties_es: string[] | null
-  specialties_en: string[] | null
-  image_url: string | null
+  specialties: string[] | null
+  photo_url: string | null
   linkedin_url: string | null
-  member_type: 'founder' | 'partner' | 'team'
-  sort_order: number
-  visible: boolean
   country: string | null
+  member_type: 'founder' | 'partner' | 'team'
+  order_index: number
+  active: boolean
 }
 
+// ─── CountryDestination ───────────────────────────────────────
 export interface CountryDestination {
   id: string
+  created_at: string
   country_name: string
+  slug: string | null
   tagline: string | null
   tagline_en: string | null
   description: string | null
@@ -53,29 +64,47 @@ export interface CountryDestination {
   highlights_en: Record<string, unknown>[] | null
   market_info: Record<string, unknown> | null
   market_info_en: Record<string, unknown> | null
+  sort_order: number
+  active: boolean
 }
 
+// ─── BlogPost ─────────────────────────────────────────────────
 export interface BlogPost {
   id: string
   created_at: string
-  title: string | null
+  updated_at: string
+  title: string
   title_en: string | null
+  slug: string | null
   content: string | null
   content_en: string | null
   excerpt: string | null
   excerpt_en: string | null
-  image_url: string | null
-  slug: string | null
-  published: boolean
+  cover_image: string | null
   category: string | null
+  published: boolean
+  published_at: string | null
 }
 
+// ─── Lead ─────────────────────────────────────────────────────
 export interface Lead {
   name: string
   email: string
   phone?: string
   interest?: string
-  message: string
+  message?: string
   location?: string
+  source?: string
+}
+
+// ─── LeadData (form captación vender-tu-piso) ─────────────────
+export interface LeadData {
+  name: string
+  email: string
+  phone: string
+  is_owner: boolean
+  neighborhood: string
+  property_value_range: string
+  sale_timeline: string
   source?: string
 }
