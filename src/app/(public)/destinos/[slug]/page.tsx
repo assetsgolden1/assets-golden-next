@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { MapPin } from 'lucide-react'
+import { MapPin, ChevronRight, ArrowLeft } from 'lucide-react'
 import { getAllDestinationSlugs, getDestinationBySlug, getProperties } from '@/lib/supabase/queries'
 import PropertyCard from '@/components/properties/PropertyCard'
 import { buttonVariants } from '@/components/ui/button'
@@ -57,8 +57,28 @@ export default async function DestinoPage({ params }: Props) {
     bestAreas?: string
   }
 
+  // Group properties by city/location
+  const byCity: Record<string, typeof properties> = {}
+  for (const p of properties) {
+    const city = p.location ?? p.province ?? destination.country_name
+    if (!byCity[city]) byCity[city] = []
+    byCity[city].push(p)
+  }
+  const cities = Object.entries(byCity)
+
   return (
     <>
+      {/* Breadcrumb */}
+      <section className="bg-secondary border-b border-border">
+        <div className="container-luxury py-3 flex items-center gap-2 text-xs text-muted-foreground">
+          <Link href="/" className="hover:text-gold transition-colors">Inicio</Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <Link href="/destinos" className="hover:text-gold transition-colors">Destinos</Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <span className="text-foreground font-medium">{destination.country_name}</span>
+        </div>
+      </section>
+
       {/* Hero */}
       <section className="relative h-72 md:h-96 overflow-hidden">
         {destination.hero_image_url ? (
@@ -74,6 +94,12 @@ export default async function DestinoPage({ params }: Props) {
         )}
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative container-luxury h-full flex flex-col justify-end pb-10">
+          <Link
+            href="/destinos"
+            className="mb-4 inline-flex items-center gap-1.5 text-xs text-white/50 hover:text-gold transition-colors"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> Volver a Destinos
+          </Link>
           <div className="flex items-center gap-2 text-gold text-xs tracking-widest uppercase mb-3">
             <MapPin className="h-4 w-4" />
             <span>Destino</span>
@@ -153,33 +179,47 @@ export default async function DestinoPage({ params }: Props) {
         </section>
       )}
 
-      {/* Propiedades en este destino */}
+      {/* Propiedades agrupadas por ciudad */}
       {properties.length > 0 && (
         <section className="section-padding bg-muted/30">
           <div className="container-luxury">
-            <h2 className="font-display text-2xl font-semibold mb-8">
+            <h2 className="font-display text-2xl font-semibold mb-10">
               Propiedades en {destination.country_name}
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {properties.map((p) => (
-                <PropertyCard
-                  key={p.id}
-                  id={p.id}
-                  title={p.title}
-                  slug={p.slug ?? p.id}
-                  location={p.location ?? destination.country_name}
-                  price={p.price}
-                  currency={p.currency}
-                  area_sqm={p.area_sqm}
-                  bedrooms={p.bedrooms}
-                  bathrooms={p.bathrooms}
-                  property_type={p.property_type}
-                  image_url={p.image_url}
-                  featured={p.featured}
-                />
-              ))}
-            </div>
-            <div className="mt-10 text-center">
+
+            {cities.map(([city, cityProps]) => (
+              <div key={city} className="mb-12">
+                <div className="flex items-center gap-3 mb-6">
+                  <MapPin className="h-4 w-4 text-gold shrink-0" />
+                  <h3 className="font-display text-lg font-semibold">{city}</h3>
+                  <div className="flex-1 h-px bg-border" />
+                  <span className="text-xs text-muted-foreground">
+                    {cityProps.length} {cityProps.length === 1 ? 'propiedad' : 'propiedades'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {cityProps.map((p) => (
+                    <PropertyCard
+                      key={p.id}
+                      id={p.id}
+                      title={p.title}
+                      slug={p.slug ?? p.id}
+                      location={p.location ?? destination.country_name}
+                      price={p.price}
+                      currency={p.currency}
+                      area_sqm={p.area_sqm}
+                      bedrooms={p.bedrooms}
+                      bathrooms={p.bathrooms}
+                      property_type={p.property_type}
+                      image_url={p.image_url}
+                      featured={p.featured}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            <div className="mt-4 text-center">
               <Link
                 href={`/propiedades?ubicacion=${encodeURIComponent(destination.country_name)}`}
                 className={buttonVariants({ variant: 'goldOutline' })}

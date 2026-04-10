@@ -197,6 +197,24 @@ export async function getDestinations() {
   return { data: (data ?? []) as CountryDestination[], error }
 }
 
+// ─── Property counts by country ────────────────────────────────
+
+export async function getPropertyCountsByCountry(): Promise<Record<string, number>> {
+  const supabase = createStaticClient()
+  const { data } = await supabase
+    .from('properties')
+    .select('country')
+    .in('status', ['active', 'available'])
+    .not('country', 'is', null)
+
+  const counts: Record<string, number> = {}
+  for (const row of data ?? []) {
+    const c = (row.country as string).trim()
+    counts[c] = (counts[c] ?? 0) + 1
+  }
+  return counts
+}
+
 // ─── Leads ────────────────────────────────────────────────────
 
 export async function createLead(leadData: LeadData) {

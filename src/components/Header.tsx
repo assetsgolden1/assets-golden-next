@@ -9,10 +9,10 @@ import { cn } from "@/lib/utils";
 import DemandDialog from "@/components/DemandDialog";
 
 const navLinks = [
-  { label: "Inicio", labelEn: "Home", href: "/" },
   { label: "Propiedades", labelEn: "Properties", href: "/propiedades" },
   { label: "Destinos", labelEn: "Destinations", href: "/destinos" },
-  { label: "Equipo", labelEn: "Team", href: "/equipo" },
+  { label: "Servicios", labelEn: "Services", href: "/servicios" },
+  { label: "Inversiones", labelEn: "Investments", href: "/inversiones" },
   { label: "Blog", labelEn: "Blog", href: "/blog" },
   { label: "Contacto", labelEn: "Contact", href: "/contacto" },
 ];
