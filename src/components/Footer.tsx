@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin, Phone, Mail } from "lucide-react";
 
 const footerLinks = {
@@ -11,8 +12,8 @@ const footerLinks = {
   servicios: [
     { label: "Compra de propiedades", href: "/propiedades" },
     { label: "Inversión internacional", href: "/destinos" },
-    { label: "Asesoría fiscal", href: "/contacto" },
-    { label: "Gestión patrimonial", href: "/contacto" },
+    { label: "Asesoría fiscal", href: "/servicios" },
+    { label: "Gestión patrimonial", href: "/servicios" },
   ],
   destinos: [
     { label: "España", href: "/destinos/espana" },
@@ -30,13 +31,7 @@ export default function Footer() {
           {/* Brand column (spans 2 on large) */}
           <div className="lg:col-span-2">
             <Link href="/" className="inline-block mb-4">
-              <span className="font-display text-2xl font-semibold text-primary-foreground">
-                Assets Golden
-              </span>
-              <br />
-              <span className="text-[10px] tracking-[0.2em] text-gold uppercase">
-                International Real Estate Consulting
-              </span>
+              <Image src="/logo.png" alt="Assets Golden" height={112} width={280} className="h-28 w-auto" />
             </Link>
             <p className="text-primary-foreground/60 text-sm leading-relaxed max-w-xs mb-6">
               Expertos en inmobiliaria de lujo internacional. Conectamos
@@ -110,7 +105,7 @@ export default function Footer() {
       <div className="container-luxury py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-primary-foreground/40">
         <p>© {new Date().getFullYear()} CFG Global Investment S.L. Todos los derechos reservados.</p>
         <div className="flex items-center gap-4">
-          <Link href="/privacidad" className="hover:text-gold transition-colors">
+          <Link href="/politica-de-privacidad" className="hover:text-gold transition-colors">
             Política de privacidad
           </Link>
           <span className="opacity-50">·</span>

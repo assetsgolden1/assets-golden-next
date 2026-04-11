@@ -4,8 +4,10 @@ import Image from 'next/image'
 import { MapPin } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import HomeSidebar from '@/components/HomeSidebar'
+import HeroImageCarousel from '@/components/HeroImageCarousel'
 import HomePropertiesCarousel from '@/components/HomePropertiesCarousel'
 import HomeTeamSection from '@/components/HomeTeamSection'
+import DestinationCard3D from '@/components/DestinationCard3D'
 
 import {
   getFeaturedProperties,
@@ -23,6 +25,27 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600
 
+// 9 países reales de Assets Golden
+const VALID_COUNTRIES = [
+  'españa', 'spain',
+  'méxico', 'mexico',
+  'emiratos', 'eau', 'dubai', 'united arab',
+  'argentina',
+  'estados unidos', 'eeuu', 'usa', 'united states',
+  'costa rica',
+  'reino unido', 'uk', 'united kingdom',
+  'ecuador',
+  'grecia', 'greece',
+]
+
+function isValidCountry(name: string): boolean {
+  const lower = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  return VALID_COUNTRIES.some((kw) => {
+    const kwNorm = kw.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    return lower.includes(kwNorm)
+  })
+}
+
 export default async function HomePage() {
   const [{ data: featured }, { data: team }, { data: destinations }, propertyCounts, { data: partners }] =
     await Promise.all([
@@ -33,70 +56,34 @@ export default async function HomePage() {
       getPartners(),
     ])
 
+  function countFor(countryName: string): number {
+    const key = Object.keys(propertyCounts).find(
+      (k) => k.toLowerCase().trim() === countryName.toLowerCase().trim()
+    )
+    return key ? propertyCounts[key] : 0
+  }
+
+  // Filtrar a 9 países reales y ordenar: España primero, luego por cantidad descendente
+  const filteredDestinations = destinations
+    .filter((d) => isValidCountry(d.country_name))
+    .sort((a, b) => {
+      const aIsSpain = a.country_name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes('espana')
+      const bIsSpain = b.country_name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes('espana')
+      if (aIsSpain) return -1
+      if (bIsSpain) return 1
+      return countFor(b.country_name) - countFor(a.country_name)
+    })
+
   return (
     <>
-      {/* Sidebar lateral */}
-      <HomeSidebar destinations={destinations} propertyCounts={propertyCounts} />
-
-      {/* ─── 1. HERO ───────────────────────────────────────────── */}
-      <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
-        {/* Background gradient luxury */}
-        <div className="absolute inset-0 gradient-elegant" />
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 20% 50%, var(--gold) 0%, transparent 50%), radial-gradient(circle at 80% 20%, var(--gold-light) 0%, transparent 40%)',
-          }}
+      {/* ─── 1. HERO: Sidebar + Crossfade images ──────────────── */}
+      <section className="relative min-h-screen flex pt-20">
+        <HomeSidebar
+          destinations={destinations}
+          propertyCounts={propertyCounts}
+          partners={partners ?? []}
         />
-        {/* Grid pattern overlay */}
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage:
-              'linear-gradient(var(--gold) 1px, transparent 1px), linear-gradient(90deg, var(--gold) 1px, transparent 1px)',
-            backgroundSize: '80px 80px',
-          }}
-        />
-
-        <div className="container-luxury relative z-10 py-32 text-center">
-          <p className="mb-6 text-xs tracking-[0.3em] text-gold uppercase animate-[fade-in_0.6s_ease-out_both]">
-            Barcelona · International Real Estate
-          </p>
-          <h1 className="font-display text-4xl font-semibold leading-tight text-white md:text-5xl lg:text-6xl xl:text-7xl animate-[fade-in-up_0.7s_ease-out_both] animation-delay-200">
-            Vende tu piso en Barcelona
-            <br />
-            <span className="text-gradient-gold">con la discreción</span>
-            <br />
-            que merece
-          </h1>
-          <p className="mx-auto mt-6 max-w-xl text-lg text-white/70 leading-relaxed animate-[fade-in-up_0.7s_ease-out_both] animation-delay-400">
-            Tasación gratuita y confidencial en 24 horas.
-            <br className="hidden sm:block" />
-            Sin compromiso.
-          </p>
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-[fade-in-up_0.7s_ease-out_both] animation-delay-600">
-            <Link
-              href="/vender-tu-piso"
-              className={buttonVariants({ variant: 'hero', size: 'xl' })}
-            >
-              Solicitar tasación gratuita
-            </Link>
-            <Link
-              href="/propiedades"
-              className={buttonVariants({ variant: 'heroOutline', size: 'xl' })}
-            >
-              Ver propiedades
-            </Link>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-[float_3s_ease-in-out_infinite]">
-          <div className="flex h-8 w-5 items-start justify-center rounded-full border-2 border-white/30 p-1">
-            <div className="h-1.5 w-1 rounded-full bg-gold animate-[fade-in-up_1s_ease-in-out_infinite]" />
-          </div>
-        </div>
+        <HeroImageCarousel />
       </section>
 
       {/* ─── 2. STATS BAR ─────────────────────────────────────── */}
@@ -212,7 +199,7 @@ export default async function HomePage() {
       </section>
 
       {/* ─── 5. DESTINOS ──────────────────────────────────────── */}
-      {destinations.length > 0 && (
+      {filteredDestinations.length > 0 && (
         <section className="section-padding bg-background">
           <div className="container-luxury">
             <div className="mb-12 text-center">
@@ -225,36 +212,13 @@ export default async function HomePage() {
               <div className="divider-gold mx-auto mt-4" />
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {destinations.map((dest) => (
-                <Link
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {filteredDestinations.map((dest) => (
+                <DestinationCard3D
                   key={dest.id}
-                  href={`/destinos/${dest.slug ?? dest.id}`}
-                  className="group relative overflow-hidden rounded-xl aspect-[3/4] bg-muted"
-                >
-                  {dest.card_image_url ? (
-                    <Image
-                      src={dest.card_image_url}
-                      alt={dest.country_name}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 gradient-navy" />
-                  )}
-                  <div className="overlay-dark" />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-                    <span className="font-display text-lg font-semibold text-white group-hover:text-gold transition-colors">
-                      {dest.country_name}
-                    </span>
-                    {dest.tagline && (
-                      <span className="mt-1 text-xs text-white/70 line-clamp-2">
-                        {dest.tagline}
-                      </span>
-                    )}
-                  </div>
-                </Link>
+                  dest={dest}
+                  count={countFor(dest.country_name)}
+                />
               ))}
             </div>
 
@@ -274,7 +238,7 @@ export default async function HomePage() {
       <HomeTeamSection team={team} />
 
       {/* ─── 7. PARTNERS ──────────────────────────────────────── */}
-      {partners.length > 0 && (
+      {partners && partners.length > 0 && (
         <section className="section-padding bg-background overflow-hidden">
           <div className="container-luxury">
             <div className="mb-10 text-center">
@@ -292,7 +256,7 @@ export default async function HomePage() {
                   href={`/partners/${partner.id}`}
                   className="group shrink-0 snap-start text-center w-32"
                 >
-                  <div className="relative mx-auto mb-3 h-20 w-20 overflow-hidden rounded-full border-2 border-gold/20 bg-muted">
+                  <div className="relative mx-auto mb-3 h-20 w-20 overflow-hidden rounded-xl border-2 border-gold/20 bg-muted">
                     {partner.photo_url ? (
                       <Image
                         src={partner.photo_url}
@@ -308,7 +272,7 @@ export default async function HomePage() {
                     )}
                   </div>
                   <p className="font-display text-xs font-semibold text-foreground group-hover:text-gold transition-colors leading-tight">
-                    {partner.name}
+                    {partner.name.split(' ').slice(0, 2).join(' ')}
                   </p>
                   {partner.country && (
                     <p className="mt-0.5 text-[10px] text-muted-foreground">{partner.country}</p>

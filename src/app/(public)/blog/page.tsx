@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
+import { Coffee } from 'lucide-react'
 import { getBlogPosts } from '@/lib/supabase/queries'
 
 export const metadata: Metadata = {
@@ -28,13 +29,16 @@ export default async function BlogPage() {
 
   return (
     <>
-      {/* Header */}
-      <section className="gradient-navy py-24">
+      {/* Hero */}
+      <section className="py-20 md:py-28 bg-gradient-to-br from-primary via-primary to-primary/90">
         <div className="container-luxury text-center">
-          <p className="text-xs tracking-[0.25em] text-gold uppercase mb-3">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gold/10 border border-gold/30">
+            <Coffee className="h-8 w-8 text-gold" />
+          </div>
+          <p className="text-xs tracking-[0.25em] text-gold uppercase mb-4">
             Análisis y tendencias
           </p>
-          <h1 className="font-display text-4xl font-semibold text-white md:text-5xl">
+          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold text-white">
             Blog inmobiliario
           </h1>
           <div className="h-px w-12 bg-gold mx-auto mt-6" />
@@ -49,14 +53,15 @@ export default async function BlogPage() {
             </p>
           ) : (
             <>
-              {/* Post destacado */}
+              {/* Post destacado — layout 50/50 */}
               {featured && (
                 <Link
                   href={`/blog/${featured.slug ?? featured.id}`}
-                  className="group mb-16 block"
+                  className="group mb-16 block rounded-2xl border border-border hover:border-gold/30 overflow-hidden transition-colors"
                 >
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 card-premium rounded-2xl overflow-hidden">
-                    <div className="relative aspect-video lg:aspect-auto min-h-64 bg-muted">
+                  <article className="grid lg:grid-cols-2 gap-0">
+                    {/* Imagen izquierda */}
+                    <div className="relative h-64 lg:min-h-[400px] bg-muted overflow-hidden">
                       {featured.cover_image ? (
                         <Image
                           src={featured.cover_image}
@@ -72,9 +77,16 @@ export default async function BlogPage() {
                         </div>
                       )}
                     </div>
-                    <div className="p-8 lg:p-10 flex flex-col justify-center">
+
+                    {/* Contenido derecho */}
+                    <div className="p-8 lg:p-12 flex flex-col justify-center bg-card">
+                      <div className="mb-4">
+                        <span className="inline-block bg-gold text-primary text-xs px-3 py-1 rounded-full font-semibold">
+                          Destacado
+                        </span>
+                      </div>
                       {featured.category && (
-                        <span className="text-xs tracking-[0.2em] text-gold uppercase mb-3">
+                        <span className="text-xs tracking-[0.2em] text-gold uppercase mb-3 block">
                           {featured.category}
                         </span>
                       )}
@@ -90,13 +102,13 @@ export default async function BlogPage() {
                         {formatDate(featured.published_at ?? featured.created_at)}
                       </p>
                     </div>
-                  </div>
+                  </article>
                 </Link>
               )}
 
-              {/* Grid de posts */}
+              {/* Grid de posts restantes */}
               {rest.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {rest.map((post) => (
                     <Link
                       key={post.id}

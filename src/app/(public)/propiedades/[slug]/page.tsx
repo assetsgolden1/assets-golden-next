@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Maximize, BedDouble, Bath, MapPin, ExternalLink } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { getPropertyBySlug, getAllPropertySlugs } from '@/lib/supabase/queries'
+import PropertyGalleryClient from '@/components/PropertyGalleryClient'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -56,6 +56,7 @@ const typeLabels: Record<string, string> = {
   townhouse: 'Adosado',
   warehouse: 'Local / Nave',
   business: 'Traspaso',
+  other: 'Otro',
 }
 
 export default async function PropertyDetailPage({ params }: Props) {
@@ -98,42 +99,16 @@ export default async function PropertyDetailPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Galería hero */}
-      <section className="bg-muted">
-        {allImages.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-1 max-h-[70vh]">
-            <div className="relative aspect-[4/3] md:aspect-auto">
-              <Image
-                src={allImages[0]}
-                alt={property.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                priority
-              />
-            </div>
-            {allImages.length > 1 && (
-              <div className="hidden md:grid grid-cols-2 gap-1">
-                {allImages.slice(1, 5).map((img, i) => (
-                  <div key={i} className="relative">
-                    <Image
-                      src={img}
-                      alt={`${property.title} — imagen ${i + 2}`}
-                      fill
-                      className="object-cover"
-                      sizes="25vw"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
+      {/* Galería con hero + thumbnails + lightbox */}
+      {allImages.length > 0 ? (
+        <PropertyGalleryClient images={allImages} title={property.title} />
+      ) : (
+        <section className="bg-muted">
           <div className="h-64 gradient-navy flex items-center justify-center">
             <span className="font-display text-2xl text-gold/40">Assets Golden</span>
           </div>
-        )}
-      </section>
+        </section>
+      )}
 
       {/* Contenido */}
       <section className="section-padding bg-background">
@@ -167,32 +142,33 @@ export default async function PropertyDetailPage({ params }: Props) {
                 {formatPrice(property.price, property.currency)}
               </div>
 
-              {/* Stats */}
-              <div className="mt-6 flex flex-wrap gap-6 py-6 border-y border-border">
-                {property.area_sqm && (
-                  <div className="flex items-center gap-2 text-foreground">
-                    <Maximize className="h-5 w-5 text-gold" />
-                    <span className="font-medium">{property.area_sqm} m²</span>
-                  </div>
-                )}
-                {property.bedrooms && (
-                  <div className="flex items-center gap-2 text-foreground">
-                    <BedDouble className="h-5 w-5 text-gold" />
-                    <span className="font-medium">
-                      {property.bedrooms}{' '}
-                      {property.bedrooms === 1 ? 'habitación' : 'habitaciones'}
-                    </span>
-                  </div>
-                )}
-                {property.bathrooms && (
-                  <div className="flex items-center gap-2 text-foreground">
-                    <Bath className="h-5 w-5 text-gold" />
-                    <span className="font-medium">
-                      {property.bathrooms}{' '}
-                      {property.bathrooms === 1 ? 'baño' : 'baños'}
-                    </span>
-                  </div>
-                )}
+              {/* Stats — 3 columnas */}
+              <div className="grid grid-cols-3 gap-4 py-6 border-y border-border mt-6">
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <BedDouble className="h-6 w-6 text-gold" />
+                  <span className="text-2xl font-display font-semibold text-foreground">
+                    {property.bedrooms ?? '—'}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {property.bedrooms === 1 ? 'Habitación' : 'Habitaciones'}
+                  </span>
+                </div>
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <Bath className="h-6 w-6 text-gold" />
+                  <span className="text-2xl font-display font-semibold text-foreground">
+                    {property.bathrooms ?? '—'}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {property.bathrooms === 1 ? 'Baño' : 'Baños'}
+                  </span>
+                </div>
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <Maximize className="h-6 w-6 text-gold" />
+                  <span className="text-2xl font-display font-semibold text-foreground">
+                    {property.area_sqm ?? '—'}
+                  </span>
+                  <span className="text-xs text-muted-foreground">m²</span>
+                </div>
               </div>
 
               {/* Descripción */}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X, Globe, Search } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
@@ -28,13 +29,8 @@ export default function Header() {
       <header className="fixed top-0 left-0 right-0 z-40 h-20 bg-primary/95 backdrop-blur-md border-b border-primary-foreground/10">
         <div className="container-luxury flex h-full items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex flex-col leading-none group">
-            <span className="font-display text-xl font-semibold text-primary-foreground group-hover:text-gold transition-colors">
-              Assets Golden
-            </span>
-            <span className="text-[10px] tracking-[0.2em] text-gold uppercase">
-              International Real Estate
-            </span>
+          <Link href="/" className="flex items-center">
+            <Image src="/logo.png" alt="Assets Golden" height={80} width={200} className="h-20 w-auto" />
           </Link>
 
           {/* Desktop nav */}

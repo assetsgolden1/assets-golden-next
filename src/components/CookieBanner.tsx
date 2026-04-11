@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { Cookie } from 'lucide-react'
 
 const STORAGE_KEY = 'ag_cookie_consent'
 
@@ -10,7 +11,10 @@ export default function CookieBanner() {
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY)
-    if (!stored) setVisible(true)
+    if (!stored) {
+      const timer = setTimeout(() => setVisible(true), 1000)
+      return () => clearTimeout(timer)
+    }
   }, [])
 
   function accept() {
@@ -26,29 +30,32 @@ export default function CookieBanner() {
   if (!visible) return null
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[60] border-t border-border bg-background/98 shadow-xl backdrop-blur-sm">
-      <div className="container-luxury flex flex-col gap-4 py-5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
-          Utilizamos cookies propias y de terceros para mejorar su experiencia y analizar el tráfico.{' '}
+    <div className="fixed bottom-20 left-4 z-50 max-w-sm bg-card/95 backdrop-blur-md border border-border rounded-xl shadow-xl p-4">
+      <div className="flex gap-3 mb-3">
+        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center">
+          <Cookie className="h-4 w-4 text-gold" />
+        </div>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          Utilizamos cookies para mejorar su experiencia.{' '}
           <Link href="/politica-de-privacidad" className="text-gold hover:underline">
             Más información
           </Link>
           .
         </p>
-        <div className="flex shrink-0 gap-3">
-          <button
-            onClick={necessary}
-            className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:border-gold hover:text-foreground"
-          >
-            Solo necesarias
-          </button>
-          <button
-            onClick={accept}
-            className="btn-gold rounded-lg px-5 py-2 text-xs font-semibold"
-          >
-            Aceptar todas
-          </button>
-        </div>
+      </div>
+      <div className="flex gap-2 justify-end">
+        <button
+          onClick={necessary}
+          className="h-8 px-3 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Rechazar
+        </button>
+        <button
+          onClick={accept}
+          className="h-8 px-4 rounded-lg bg-gold text-navy text-xs font-semibold hover:bg-gold/90 transition-colors"
+        >
+          Aceptar
+        </button>
       </div>
     </div>
   )
