@@ -197,6 +197,20 @@ export async function getDestinations() {
   return { data: (data ?? []) as CountryDestination[], error }
 }
 
+// ─── Properties by country (for drill-down LocationBrowser) ────
+
+export async function getPropertiesByCountry(country: string) {
+  const supabase = createStaticClient()
+  const { data, error } = await supabase
+    .from('properties')
+    .select('*')
+    .in('status', ['active', 'available'])
+    .eq('country', country)
+    .order('province', { ascending: true, nullsFirst: false })
+    .order('location', { ascending: true })
+  return { data: (data ?? []) as Property[], error }
+}
+
 // ─── Property counts by country ────────────────────────────────
 
 export async function getPropertyCountsByCountry(): Promise<Record<string, number>> {

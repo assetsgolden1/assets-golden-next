@@ -3,9 +3,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { MapPin, ChevronRight, ArrowLeft } from 'lucide-react'
-import { getAllDestinationSlugs, getDestinationBySlug, getProperties } from '@/lib/supabase/queries'
-import PropertyCard from '@/components/properties/PropertyCard'
 import { buttonVariants } from '@/components/ui/button'
+import {
+  getAllDestinationSlugs,
+  getDestinationBySlug,
+  getPropertiesByCountry,
+} from '@/lib/supabase/queries'
+import LocationBrowser from '@/components/LocationBrowser'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -30,19 +34,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description:
       data.description?.slice(0, 160) ??
       `Descubra las mejores propiedades de lujo en ${data.country_name} con Assets Golden International.`,
+    openGraph: {
+      images: data.hero_image_url ? [{ url: data.hero_image_url }] : [],
+    },
   }
 }
 
 export default async function DestinoPage({ params }: Props) {
   const { slug } = await params
-  const { data: destination } = await getDestinationBySlug(slug)
 
+  const { data: destination } = await getDestinationBySlug(slug)
   if (!destination) notFound()
 
-  const { data: properties } = await getProperties({
-    country: destination.country_name,
-    limit: 6,
-  })
+  const { data: countryProperties } = await getPropertiesByCountry(destination.country_name)
+  const allProperties = countryProperties ?? []
 
   const highlights = (destination.highlights ?? []) as Array<{
     icon?: string
@@ -57,30 +62,27 @@ export default async function DestinoPage({ params }: Props) {
     bestAreas?: string
   }
 
-  // Group properties by city/location
-  const byCity: Record<string, typeof properties> = {}
-  for (const p of properties) {
-    const city = p.location ?? p.province ?? destination.country_name
-    if (!byCity[city]) byCity[city] = []
-    byCity[city].push(p)
-  }
-  const cities = Object.entries(byCity)
+  const hasMarketInfo = Object.values(marketInfo).some(Boolean)
 
   return (
     <>
       {/* Breadcrumb */}
       <section className="bg-secondary border-b border-border">
         <div className="container-luxury py-3 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/" className="hover:text-gold transition-colors">Inicio</Link>
+          <Link href="/" className="hover:text-gold transition-colors">
+            Inicio
+          </Link>
           <ChevronRight className="h-3.5 w-3.5" />
-          <Link href="/destinos" className="hover:text-gold transition-colors">Destinos</Link>
+          <Link href="/destinos" className="hover:text-gold transition-colors">
+            Destinos
+          </Link>
           <ChevronRight className="h-3.5 w-3.5" />
           <span className="text-foreground font-medium">{destination.country_name}</span>
         </div>
       </section>
 
       {/* Hero */}
-      <section className="relative h-72 md:h-96 overflow-hidden">
+      <section className="relative h-80 md:h-[420px] overflow-hidden">
         {destination.hero_image_url ? (
           <Image
             src={destination.hero_image_url}
@@ -88,54 +90,81 @@ export default async function DestinoPage({ params }: Props) {
             fill
             className="object-cover"
             priority
+            sizes="100vw"
           />
         ) : (
           <div className="absolute inset-0 gradient-navy" />
         )}
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative container-luxury h-full flex flex-col justify-end pb-10">
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-primary/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-transparent" />
+
+        {/* Content */}
+        <div className="relative container-luxury h-full flex flex-col justify-end pb-12">
           <Link
             href="/destinos"
-            className="mb-4 inline-flex items-center gap-1.5 text-xs text-white/50 hover:text-gold transition-colors"
+            className="mb-6 inline-flex items-center gap-1.5 text-xs text-white/50 hover:text-gold transition-colors w-fit"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Volver a Destinos
           </Link>
           <div className="flex items-center gap-2 text-gold text-xs tracking-widest uppercase mb-3">
             <MapPin className="h-4 w-4" />
-            <span>Destino</span>
+            <span>Destino de inversión</span>
           </div>
-          <h1 className="font-display text-4xl font-semibold text-white md:text-5xl">
+          <h1 className="font-display text-4xl font-semibold text-white md:text-5xl lg:text-6xl leading-tight">
             {destination.country_name}
           </h1>
           {destination.tagline && (
-            <p className="mt-2 text-white/70 text-sm max-w-xl">{destination.tagline}</p>
+            <p className="mt-3 text-white/70 text-base max-w-xl leading-relaxed">
+              {destination.tagline}
+            </p>
+          )}
+          {allProperties.length > 0 && (
+            <p className="mt-4 inline-flex items-center gap-2 text-gold text-sm font-medium">
+              <span className="h-px w-8 bg-gold" />
+              {allProperties.length} {allProperties.length === 1 ? 'propiedad disponible' : 'propiedades disponibles'}
+            </p>
           )}
         </div>
       </section>
 
       {/* Descripción */}
       {destination.description && (
-        <section className="section-padding bg-background">
+        <section className="py-12 bg-background">
           <div className="container-luxury max-w-3xl">
-            <p className="text-muted-foreground leading-relaxed text-base">{destination.description}</p>
+            <p className="text-muted-foreground leading-relaxed text-base">
+              {destination.description}
+            </p>
           </div>
         </section>
       )}
 
       {/* Highlights */}
       {highlights.length > 0 && (
-        <section className="py-12 bg-muted/30">
+        <section className="py-12 bg-secondary">
           <div className="container-luxury">
-            <h2 className="font-display text-2xl font-semibold mb-8 text-center">Por qué {destination.country_name}</h2>
+            <div className="mb-8 text-center">
+              <h2 className="font-display text-2xl font-semibold">
+                Por qué {destination.country_name}
+              </h2>
+              <div className="divider-gold mx-auto mt-4" />
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {highlights.map((h, i) => (
-                <div key={i} className="text-center">
-                  {h.icon && <div className="text-3xl mb-2">{h.icon}</div>}
+                <div
+                  key={i}
+                  className="card-premium rounded-xl p-6 text-center"
+                >
+                  {h.icon && <div className="text-3xl mb-3">{h.icon}</div>}
                   {h.value && (
-                    <p className="font-display text-2xl font-semibold text-gold">{h.value}</p>
+                    <p className="font-display text-2xl font-semibold text-gold">
+                      {h.value}
+                    </p>
                   )}
                   {h.title && (
-                    <p className="text-xs text-muted-foreground mt-1">{h.title}</p>
+                    <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                      {h.title}
+                    </p>
                   )}
                 </div>
               ))}
@@ -144,33 +173,50 @@ export default async function DestinoPage({ params }: Props) {
         </section>
       )}
 
-      {/* Info de mercado */}
-      {Object.keys(marketInfo).length > 0 && (
+      {/* Mercado inmobiliario */}
+      {hasMarketInfo && (
         <section className="py-12 bg-background">
           <div className="container-luxury">
-            <h2 className="font-display text-2xl font-semibold mb-8">Mercado inmobiliario</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="mb-8">
+              <p className="text-xs tracking-[0.25em] text-gold uppercase mb-2">Datos del mercado</p>
+              <h2 className="font-display text-2xl font-semibold">Mercado inmobiliario</h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {marketInfo.avgPrice && (
-                <div className="rounded-xl border border-border p-5">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Precio medio</p>
-                  <p className="font-display text-xl font-semibold text-gold">{marketInfo.avgPrice}</p>
+                <div className="rounded-xl border border-border bg-card p-5">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">
+                    Precio medio
+                  </p>
+                  <p className="font-display text-xl font-semibold text-gold">
+                    {marketInfo.avgPrice}
+                  </p>
                 </div>
               )}
               {marketInfo.rentalYield && (
-                <div className="rounded-xl border border-border p-5">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Rentabilidad</p>
-                  <p className="font-display text-xl font-semibold text-gold">{marketInfo.rentalYield}</p>
+                <div className="rounded-xl border border-border bg-card p-5">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">
+                    Rentabilidad
+                  </p>
+                  <p className="font-display text-xl font-semibold text-gold">
+                    {marketInfo.rentalYield}
+                  </p>
                 </div>
               )}
               {marketInfo.priceGrowth && (
-                <div className="rounded-xl border border-border p-5">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Crecimiento</p>
-                  <p className="font-display text-xl font-semibold text-gold">{marketInfo.priceGrowth}</p>
+                <div className="rounded-xl border border-border bg-card p-5">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">
+                    Crecimiento
+                  </p>
+                  <p className="font-display text-xl font-semibold text-gold">
+                    {marketInfo.priceGrowth}
+                  </p>
                 </div>
               )}
               {marketInfo.bestAreas && (
-                <div className="rounded-xl border border-border p-5">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Mejores zonas</p>
+                <div className="rounded-xl border border-border bg-card p-5">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">
+                    Mejores zonas
+                  </p>
                   <p className="text-sm font-medium">{marketInfo.bestAreas}</p>
                 </div>
               )}
@@ -179,54 +225,14 @@ export default async function DestinoPage({ params }: Props) {
         </section>
       )}
 
-      {/* Propiedades agrupadas por ciudad */}
-      {properties.length > 0 && (
-        <section className="section-padding bg-muted/30">
+      {/* LocationBrowser — drill-down jerárquico */}
+      {allProperties.length > 0 && (
+        <section className="section-padding bg-background">
           <div className="container-luxury">
-            <h2 className="font-display text-2xl font-semibold mb-10">
-              Propiedades en {destination.country_name}
-            </h2>
-
-            {cities.map(([city, cityProps]) => (
-              <div key={city} className="mb-12">
-                <div className="flex items-center gap-3 mb-6">
-                  <MapPin className="h-4 w-4 text-gold shrink-0" />
-                  <h3 className="font-display text-lg font-semibold">{city}</h3>
-                  <div className="flex-1 h-px bg-border" />
-                  <span className="text-xs text-muted-foreground">
-                    {cityProps.length} {cityProps.length === 1 ? 'propiedad' : 'propiedades'}
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {cityProps.map((p) => (
-                    <PropertyCard
-                      key={p.id}
-                      id={p.id}
-                      title={p.title}
-                      slug={p.slug ?? p.id}
-                      location={p.location ?? destination.country_name}
-                      price={p.price}
-                      currency={p.currency}
-                      area_sqm={p.area_sqm}
-                      bedrooms={p.bedrooms}
-                      bathrooms={p.bathrooms}
-                      property_type={p.property_type}
-                      image_url={p.image_url}
-                      featured={p.featured}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-
-            <div className="mt-4 text-center">
-              <Link
-                href={`/propiedades?ubicacion=${encodeURIComponent(destination.country_name)}`}
-                className={buttonVariants({ variant: 'goldOutline' })}
-              >
-                Ver todas las propiedades en {destination.country_name}
-              </Link>
-            </div>
+            <LocationBrowser
+              properties={allProperties}
+              countryName={destination.country_name}
+            />
           </div>
         </section>
       )}
@@ -234,13 +240,14 @@ export default async function DestinoPage({ params }: Props) {
       {/* CTA */}
       <section className="gradient-navy py-16">
         <div className="container-luxury text-center">
-          <h2 className="font-display text-2xl font-semibold text-white mb-4">
-            ¿Le interesa {destination.country_name}?
+          <p className="text-xs tracking-[0.25em] text-gold uppercase mb-4">Asesoría gratuita</p>
+          <h2 className="font-display text-2xl font-semibold text-white mb-4 md:text-3xl">
+            ¿Le interesa invertir en {destination.country_name}?
           </h2>
-          <p className="text-white/60 text-sm mb-8 max-w-md mx-auto">
+          <p className="text-white/60 text-sm mb-8 max-w-md mx-auto leading-relaxed">
             Nuestros especialistas le asesorarán sobre las mejores oportunidades y aspectos legales para invertir en {destination.country_name}.
           </p>
-          <Link href="/contacto" className={buttonVariants({ variant: 'gold' })}>
+          <Link href="/contacto" className={buttonVariants({ variant: 'gold', size: 'lg' })}>
             Solicitar información
           </Link>
         </div>
