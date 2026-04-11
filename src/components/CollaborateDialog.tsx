@@ -105,7 +105,7 @@ export default function CollaborateDialog({ open, initialType = null, onClose }:
               <div className="text-4xl mb-4">✦</div>
               <h3 className="font-display text-xl font-semibold mb-2">¡Gracias!</h3>
               <p className="text-muted-foreground text-sm">
-                Hemos recibido tu solicitud. Te contactaremos a la brevedad.
+                Hemos recibido su solicitud. Le contactaremos a la brevedad.
               </p>
               <button onClick={handleClose} className="mt-6 text-sm text-gold hover:underline">
                 Cerrar
@@ -114,7 +114,7 @@ export default function CollaborateDialog({ open, initialType = null, onClose }:
           ) : !selectedType ? (
             <>
               <p className="text-muted-foreground text-sm mb-4">
-                Selecciona el tipo de colaboración que mejor se adapte a tu perfil:
+                Seleccione el tipo de colaboración que mejor se adapte a su perfil:
               </p>
               <div className="space-y-3">
                 {TYPES.map((t) => (

@@ -116,7 +116,7 @@ export default function DemandDialog({ open, onClose }: DemandDialogProps) {
               <div className="mb-4 text-5xl">✓</div>
               <h3 className="font-display text-xl font-semibold mb-2">¡Gracias!</h3>
               <p className="text-sm text-muted-foreground">
-                Hemos recibido tu demanda. Te contactaremos cuando tengamos propiedades que coincidan con tu búsqueda.
+                Hemos recibido su demanda. Le contactaremos cuando tengamos propiedades que coincidan con su búsqueda.
               </p>
               <button onClick={handleClose} className="btn-gold mt-6 rounded-lg px-6 py-2.5 text-sm font-semibold">
                 Cerrar
@@ -125,7 +125,7 @@ export default function DemandDialog({ open, onClose }: DemandDialogProps) {
           ) : (
             <>
               <p className="text-sm text-muted-foreground mb-5">
-                ¿No encuentras lo que buscas? Cuéntanos qué tipo de propiedad necesitas y te ayudaremos a encontrarla.
+                ¿No encuentra lo que busca? Cuéntenos qué tipo de propiedad necesita y le ayudaremos a encontrarla.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">

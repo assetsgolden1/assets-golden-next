@@ -7,7 +7,7 @@ import { buttonVariants } from '@/components/ui/button'
 export const metadata: Metadata = {
   title: 'Propiedades de Lujo en Barcelona | Assets Golden',
   description:
-    'Encuentra tu propiedad ideal entre nuestra selección exclusiva de pisos, áticos, villas y casas de lujo en Barcelona y todo el mundo.',
+    'Encuentre su propiedad ideal entre nuestra selección exclusiva de pisos, áticos, villas y casas de lujo en Barcelona y todo el mundo.',
 }
 
 export const revalidate = 3600
@@ -15,6 +15,7 @@ export const revalidate = 3600
 interface Props {
   searchParams: Promise<{
     tipo?: string
+    precio?: string
     minPrecio?: string
     maxPrecio?: string
     ubicacion?: string
@@ -32,6 +33,16 @@ const PROPERTY_TYPES = [
   { value: 'townhouse', label: 'Adosado' },
   { value: 'land', label: 'Terreno' },
   { value: 'building', label: 'Edificio' },
+  { value: 'rural', label: 'Finca rural' },
+  { value: 'ground_floor', label: 'Planta baja' },
+]
+
+const PRICE_RANGES = [
+  { value: '', label: 'Cualquier precio' },
+  { value: '0-500000', label: 'Hasta 500.000€' },
+  { value: '500000-1000000', label: '500.000€ - 1.000.000€' },
+  { value: '1000000-3000000', label: '1.000.000€ - 3.000.000€' },
+  { value: '3000000-', label: 'Más de 3.000.000€' },
 ]
 
 const PAGE_SIZE = 12
@@ -41,10 +52,22 @@ export default async function PropiedadesPage({ searchParams }: Props) {
   const page = Math.max(1, parseInt(params.pagina ?? '1', 10))
   const offset = (page - 1) * PAGE_SIZE
 
+  // Parse price range: "500000-1000000" or "3000000-" (no max)
+  let minPrice: number | undefined
+  let maxPrice: number | undefined
+  if (params.precio) {
+    const [minStr, maxStr] = params.precio.split('-')
+    if (minStr) minPrice = parseInt(minStr, 10) || undefined
+    if (maxStr) maxPrice = parseInt(maxStr, 10) || undefined
+  } else {
+    if (params.minPrecio) minPrice = parseInt(params.minPrecio, 10)
+    if (params.maxPrecio) maxPrice = parseInt(params.maxPrecio, 10)
+  }
+
   const { data: properties, count } = await getProperties({
     type: params.tipo || undefined,
-    minPrice: params.minPrecio ? parseInt(params.minPrecio, 10) : undefined,
-    maxPrice: params.maxPrecio ? parseInt(params.maxPrecio, 10) : undefined,
+    minPrice,
+    maxPrice,
     location: params.ubicacion || undefined,
     bedrooms: params.habitaciones ? parseInt(params.habitaciones, 10) : undefined,
     limit: PAGE_SIZE,
@@ -57,8 +80,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
     const merged = {
       tipo: params.tipo,
       ubicacion: params.ubicacion,
-      minPrecio: params.minPrecio,
-      maxPrecio: params.maxPrecio,
+      precio: params.precio,
       habitaciones: params.habitaciones,
       ...overrides,
     }
@@ -105,23 +127,18 @@ export default async function PropiedadesPage({ searchParams }: Props) {
               ))}
             </select>
 
-            {/* Precio min */}
-            <input
-              name="minPrecio"
-              type="number"
-              placeholder="Precio min €"
-              defaultValue={params.minPrecio ?? ''}
-              className="w-32 rounded-lg border border-border bg-background px-3 py-2 text-xs focus:ring-2 focus:ring-gold/50 focus:border-gold"
-            />
-
-            {/* Precio max */}
-            <input
-              name="maxPrecio"
-              type="number"
-              placeholder="Precio max €"
-              defaultValue={params.maxPrecio ?? ''}
-              className="w-32 rounded-lg border border-border bg-background px-3 py-2 text-xs focus:ring-2 focus:ring-gold/50 focus:border-gold"
-            />
+            {/* Precio */}
+            <select
+              name="precio"
+              defaultValue={params.precio ?? ''}
+              className="rounded-lg border border-border bg-background px-3 py-2 text-xs focus:ring-2 focus:ring-gold/50 focus:border-gold"
+            >
+              {PRICE_RANGES.map((r) => (
+                <option key={r.value} value={r.value}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
 
             {/* Ubicación */}
             <input
@@ -153,7 +170,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
               Buscar
             </button>
 
-            {(params.tipo || params.minPrecio || params.maxPrecio || params.ubicacion || params.habitaciones) && (
+            {(params.tipo || params.precio || params.minPrecio || params.maxPrecio || params.ubicacion || params.habitaciones) && (
               <Link
                 href="/propiedades"
                 className="text-xs text-muted-foreground hover:text-gold transition-colors"

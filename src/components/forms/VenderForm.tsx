@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState, useState } from 'react'
+import Link from 'next/link'
 import { submitLeadAction, type ActionState } from '@/app/(public)/vender-tu-piso/actions'
 
 const BARRIOS = [
@@ -218,14 +219,14 @@ export default function VenderForm() {
             />
             <label htmlFor="gdpr" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
               Acepto la{' '}
-              <a
-                href="/privacidad"
+              <Link
+                href="/politica-de-privacidad"
                 className="text-gold hover:underline"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 política de privacidad
-              </a>{' '}
+              </Link>{' '}
               y el tratamiento de mis datos para la gestión de mi solicitud.{' '}
               <span className="text-gold">*</span>
             </label>

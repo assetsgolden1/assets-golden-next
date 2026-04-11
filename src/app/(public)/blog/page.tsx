@@ -12,6 +12,18 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600
 
+const categoryLabels: Record<string, string> = {
+  article: 'Artículo',
+  tip: 'Consejo',
+  news: 'Noticias',
+  market: 'Mercado',
+  investment: 'Inversión',
+  consejos: 'Consejos',
+  inversiones: 'Inversión',
+  mercado: 'Mercado',
+  noticias: 'Noticias',
+}
+
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return ''
   return new Date(dateStr).toLocaleDateString('es-ES', {
@@ -87,7 +99,7 @@ export default async function BlogPage() {
                       </div>
                       {featured.category && (
                         <span className="text-xs tracking-[0.2em] text-gold uppercase mb-3 block">
-                          {featured.category}
+                          {categoryLabels[featured.category] ?? featured.category}
                         </span>
                       )}
                       <h2 className="font-display text-2xl font-semibold text-foreground md:text-3xl group-hover:text-gold transition-colors leading-tight">
@@ -134,7 +146,7 @@ export default async function BlogPage() {
                       <div className="p-6">
                         {post.category && (
                           <span className="text-[10px] tracking-[0.2em] text-gold uppercase mb-2 block">
-                            {post.category}
+                            {categoryLabels[post.category] ?? post.category}
                           </span>
                         )}
                         <h3 className="font-display text-lg font-semibold text-foreground group-hover:text-gold transition-colors line-clamp-2">

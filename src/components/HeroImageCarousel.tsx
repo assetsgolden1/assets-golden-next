@@ -51,7 +51,7 @@ export default function HeroImageCarousel() {
             Barcelona · International Real Estate
           </p>
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-primary-foreground mb-8 leading-[1.1]">
-            Vende tu piso en Barcelona
+            Venda su piso en Barcelona
             <br />
             <span className="text-gradient-gold">con la discreción</span>
             <br />

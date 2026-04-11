@@ -50,7 +50,7 @@ export default function ColaboraContent() {
           </h1>
           <div className="mt-6 h-px w-12 bg-gold mx-auto" />
           <p className="mt-6 text-white/60 max-w-xl mx-auto text-sm leading-relaxed">
-            Selecciona el tipo de colaboración que mejor se adapte a tu perfil y únete a nuestra red internacional.
+            Seleccione el tipo de colaboración que mejor se adapte a su perfil y únase a nuestra red internacional.
           </p>
         </div>
       </section>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Maximize, Building2, BedDouble, Bath } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { translatePropertyType, translatePropertyTitle } from "@/lib/propertyTypes";
 
 interface PropertyCardProps {
   id: string;
@@ -18,20 +19,6 @@ interface PropertyCardProps {
   featured?: boolean;
   className?: string;
 }
-
-const typeLabels: Record<string, string> = {
-  villa: "Villa",
-  apartment: "Apartamento",
-  house: "Casa",
-  penthouse: "Ático",
-  land: "Terreno",
-  building: "Edificio",
-  hotel: "Hotel",
-  rural: "Finca rural",
-  townhouse: "Adosado",
-  warehouse: "Local / Nave",
-  business: "Traspaso",
-};
 
 function formatPrice(price: number | null, currency: string | null): string {
   if (!price) return "Precio a consultar";
@@ -87,7 +74,7 @@ export default function PropertyCard({
         {/* Type badge */}
         {property_type && (
           <span className="absolute top-4 left-4 rounded-full bg-gold px-3 py-1 text-xs font-semibold text-primary shadow-lg">
-            {typeLabels[property_type] ?? property_type}
+            {translatePropertyType(property_type)}
           </span>
         )}
 
@@ -109,7 +96,7 @@ export default function PropertyCard({
       {/* Content */}
       <div className="p-5">
         <h3 className="font-display text-lg text-foreground mb-2 line-clamp-1 group-hover:text-gold transition-colors">
-          {title}
+          {translatePropertyTitle(title)}
         </h3>
 
         <div className="flex items-center gap-2 text-muted-foreground text-sm mb-3">
@@ -119,19 +106,19 @@ export default function PropertyCard({
 
         {/* Stats */}
         <div className="flex items-center gap-4 text-muted-foreground text-sm border-t border-border pt-3">
-          {area_sqm && (
+          {area_sqm != null && (
             <span className="flex items-center gap-1">
               <Maximize className="h-3.5 w-3.5" />
               {area_sqm} m²
             </span>
           )}
-          {bedrooms && (
+          {bedrooms != null && (
             <span className="flex items-center gap-1">
               <BedDouble className="h-3.5 w-3.5" />
               {bedrooms}
             </span>
           )}
-          {bathrooms && (
+          {bathrooms != null && (
             <span className="flex items-center gap-1">
               <Bath className="h-3.5 w-3.5" />
               {bathrooms}

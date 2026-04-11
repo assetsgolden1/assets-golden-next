@@ -17,6 +17,18 @@ export async function generateStaticParams() {
 export const dynamicParams = true
 export const revalidate = 3600
 
+const categoryLabels: Record<string, string> = {
+  article: 'Artículo',
+  tip: 'Consejo',
+  news: 'Noticias',
+  market: 'Mercado',
+  investment: 'Inversión',
+  consejos: 'Consejos',
+  inversiones: 'Inversión',
+  mercado: 'Mercado',
+  noticias: 'Noticias',
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const { data: post } = await getBlogPostBySlug(slug)
@@ -87,7 +99,7 @@ export default async function BlogPostPage({ params }: Props) {
         <div className="container-luxury max-w-3xl">
           {post.category && (
             <span className="text-xs tracking-[0.2em] text-gold uppercase mb-4 block">
-              {post.category}
+              {categoryLabels[post.category] ?? post.category}
             </span>
           )}
           <h1 className="font-display text-3xl font-semibold text-white leading-tight md:text-4xl">
@@ -100,6 +112,9 @@ export default async function BlogPostPage({ params }: Props) {
           )}
           <p className="mt-6 text-white/40 text-sm">
             {formatDate(post.published_at ?? post.created_at)}
+          </p>
+          <p className="mt-2 text-white/50 text-sm">
+            Por {(post as { author?: string }).author ?? 'Assets Golden'}
           </p>
         </div>
       </section>

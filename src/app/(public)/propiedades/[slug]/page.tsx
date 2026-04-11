@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Maximize, BedDouble, Bath, MapPin, ExternalLink } from 'lucide-react'
+import { Maximize, BedDouble, Bath, MapPin, ExternalLink, ChevronRight } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { getPropertyBySlug, getAllPropertySlugs } from '@/lib/supabase/queries'
 import PropertyGalleryClient from '@/components/PropertyGalleryClient'
+import PropertyDescriptionExpand from '@/components/properties/PropertyDescriptionExpand'
+import { translatePropertyType, translatePropertyTitle } from '@/lib/propertyTypes'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -42,21 +44,6 @@ function formatPrice(price: number | null, currency: string | null): string {
     currency: currency ?? 'EUR',
     maximumFractionDigits: 0,
   })
-}
-
-const typeLabels: Record<string, string> = {
-  villa: 'Villa',
-  apartment: 'Apartamento',
-  house: 'Casa',
-  penthouse: 'Ático',
-  land: 'Terreno',
-  building: 'Edificio',
-  hotel: 'Hotel',
-  rural: 'Finca rural',
-  townhouse: 'Adosado',
-  warehouse: 'Local / Nave',
-  business: 'Traspaso',
-  other: 'Otro',
 }
 
 export default async function PropertyDetailPage({ params }: Props) {
@@ -99,6 +86,17 @@ export default async function PropertyDetailPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
+      {/* Breadcrumb */}
+      <nav className="container-luxury py-4">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Link href="/" className="hover:text-gold transition-colors">Inicio</Link>
+          <ChevronRight className="w-4 h-4" />
+          <Link href="/propiedades" className="hover:text-gold transition-colors">Propiedades</Link>
+          <ChevronRight className="w-4 h-4" />
+          <span className="text-foreground line-clamp-1">{property.title}</span>
+        </div>
+      </nav>
+
       {/* Galería con hero + thumbnails + lightbox */}
       {allImages.length > 0 ? (
         <PropertyGalleryClient images={allImages} title={property.title} />
@@ -120,7 +118,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               <div className="flex flex-wrap items-center gap-3 mb-4">
                 {property.property_type && (
                   <span className="rounded-full bg-gold/10 px-3 py-1 text-xs font-medium text-gold">
-                    {typeLabels[property.property_type] ?? property.property_type}
+                    {translatePropertyType(property.property_type)}
                   </span>
                 )}
                 {(property.location || property.province) && (
@@ -134,7 +132,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               </div>
 
               <h1 className="font-display text-3xl font-semibold text-foreground md:text-4xl leading-tight">
-                {property.title}
+                {translatePropertyTitle(property.title)}
               </h1>
 
               {/* Precio */}
@@ -177,9 +175,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                   <h2 className="font-display text-xl font-semibold text-foreground mb-4">
                     Descripción
                   </h2>
-                  <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                    {property.description}
-                  </p>
+                  <PropertyDescriptionExpand description={property.description} />
                 </div>
               )}
 
@@ -243,7 +239,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 
                 <div className="mt-6 pt-6 border-t border-border">
                   <p className="text-xs text-muted-foreground text-center">
-                    Referencia: {property.external_id ?? property.id.slice(0, 8).toUpperCase()}
+                    Referencia: {property.external_id ?? 'AG-' + property.id.slice(0, 8).toUpperCase()}
                   </p>
                 </div>
               </div>

@@ -153,7 +153,7 @@ export default function ContactForm() {
           <a href="/politica-de-privacidad" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">
             política de privacidad
           </a>{' '}
-          y el tratamiento de mis datos para gestionar mi consulta.{' '}
+          y el tratamiento de mis datos para la gestión de mi solicitud.{' '}
           <span className="text-gold">*</span>
         </label>
       </div>

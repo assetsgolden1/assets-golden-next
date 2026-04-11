@@ -51,7 +51,7 @@ const SERVICES = [
       'Valoraciones independientes',
       'Estructuración de la inversión',
       'Gestión de activos',
-      'Reporting periódico',
+      'Informes periódicos',
     ],
   },
   {

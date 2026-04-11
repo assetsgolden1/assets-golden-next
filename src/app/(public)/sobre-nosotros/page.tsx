@@ -14,8 +14,8 @@ export const revalidate = 3600
 
 const STATS = [
   { value: '15+', label: 'Años de experiencia' },
-  { value: '500+', label: 'Propiedades vendidas' },
-  { value: '15', label: 'Países de operación' },
+  { value: '500+', label: 'Propiedades gestionadas' },
+  { value: '9', label: 'Países de operación' },
   { value: '98%', label: 'Clientes satisfechos' },
 ]
 

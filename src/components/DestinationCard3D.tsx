@@ -73,7 +73,9 @@ export default function DestinationCard3D({ dest, count }: Props) {
           {dest.country_name}
         </span>
         {count > 0 && (
-          <span className="mt-1 text-xs text-white/60">{count} propiedades</span>
+          <span className="mt-1 text-xs text-white/60">
+            {count} {count === 1 ? 'propiedad' : 'propiedades'}
+          </span>
         )}
         {dest.tagline && (
           <span className="mt-1 text-xs text-white/70 line-clamp-2">{dest.tagline}</span>

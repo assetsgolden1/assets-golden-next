@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { ChevronLeft, ArrowRight, MapPin, BedDouble, Bath, Maximize, Building2 } from 'lucide-react'
 import Link from 'next/link'
 import type { Property } from '@/types'
+import { translatePropertyType, translatePropertyTitle } from '@/lib/propertyTypes'
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -33,7 +34,9 @@ function toTitleCase(s: string): string {
   return s
     .trim()
     .toLowerCase()
-    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 }
 
 function formatPrice(price: number | null, currency: string | null): string {
@@ -156,21 +159,6 @@ function LocationCard({ displayName, imageKey, count, index, onClick }: Location
 // ─── PropertyMiniCard ─────────────────────────────────────────────
 
 function PropertyMiniCard({ property }: { property: Property }) {
-  const typeLabels: Record<string, string> = {
-    villa: 'Villa',
-    apartment: 'Apartamento',
-    house: 'Casa',
-    penthouse: 'Ático',
-    land: 'Terreno',
-    building: 'Edificio',
-    hotel: 'Hotel',
-    rural: 'Finca rural',
-    townhouse: 'Adosado',
-    warehouse: 'Local / Nave',
-    business: 'Traspaso',
-    other: 'Otro',
-  }
-
   return (
     <Link
       href={`/propiedades/${property.slug ?? property.id}`}
@@ -193,7 +181,7 @@ function PropertyMiniCard({ property }: { property: Property }) {
         <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
         {property.property_type && (
           <span className="absolute top-3 left-3 rounded-full bg-gold px-2.5 py-0.5 text-xs font-semibold text-primary shadow">
-            {typeLabels[property.property_type] ?? property.property_type}
+            {translatePropertyType(property.property_type)}
           </span>
         )}
         {property.featured && (
@@ -209,24 +197,24 @@ function PropertyMiniCard({ property }: { property: Property }) {
       </div>
       <div className="p-4">
         <h3 className="font-display text-base text-foreground mb-1.5 line-clamp-1 group-hover:text-gold transition-colors">
-          {property.title}
+          {translatePropertyTitle(property.title)}
         </h3>
         <div className="flex items-center gap-1.5 text-muted-foreground text-xs mb-3">
           <MapPin className="h-3.5 w-3.5 text-gold shrink-0" />
           <span className="line-clamp-1">{property.location ?? property.province}</span>
         </div>
         <div className="flex items-center gap-4 text-muted-foreground text-xs border-t border-border pt-3">
-          {property.area_sqm && (
+          {property.area_sqm != null && (
             <span className="flex items-center gap-1">
               <Maximize className="h-3.5 w-3.5" /> {property.area_sqm} m²
             </span>
           )}
-          {property.bedrooms && (
+          {property.bedrooms != null && (
             <span className="flex items-center gap-1">
               <BedDouble className="h-3.5 w-3.5" /> {property.bedrooms}
             </span>
           )}
-          {property.bathrooms && (
+          {property.bathrooms != null && (
             <span className="flex items-center gap-1">
               <Bath className="h-3.5 w-3.5" /> {property.bathrooms}
             </span>

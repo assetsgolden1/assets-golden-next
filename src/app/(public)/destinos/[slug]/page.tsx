@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { MapPin, ChevronRight, ArrowLeft } from 'lucide-react'
+import type { ElementType } from 'react'
+import { MapPin, ChevronRight, ArrowLeft, Sun, TrendingUp, Building2, Star, Globe, Shield, BarChart3 } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import {
   getAllDestinationSlugs,
@@ -22,6 +23,18 @@ export async function generateStaticParams() {
 
 export const dynamicParams = true
 export const revalidate = 3600
+
+const ICON_MAP: Record<string, ElementType> = {
+  Sun,
+  TrendingUp,
+  Building: Building2,
+  Building2,
+  Star,
+  Globe,
+  Shield,
+  BarChart3,
+  MapPin,
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
@@ -155,7 +168,12 @@ export default async function DestinoPage({ params }: Props) {
                   key={i}
                   className="card-premium rounded-xl p-6 text-center"
                 >
-                  {h.icon && <div className="text-3xl mb-3">{h.icon}</div>}
+                  {h.icon && (() => {
+                    const Icon = ICON_MAP[h.icon!]
+                    return Icon
+                      ? <Icon className="w-8 h-8 text-gold mx-auto mb-3" />
+                      : <div className="text-3xl mb-3">{h.icon}</div>
+                  })()}
                   {h.value && (
                     <p className="font-display text-2xl font-semibold text-gold">
                       {h.value}
@@ -217,7 +235,11 @@ export default async function DestinoPage({ params }: Props) {
                   <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">
                     Mejores zonas
                   </p>
-                  <p className="text-sm font-medium">{marketInfo.bestAreas}</p>
+                  <p className="text-sm font-medium">
+                    {Array.isArray(marketInfo.bestAreas)
+                      ? (marketInfo.bestAreas as string[]).join(', ')
+                      : marketInfo.bestAreas}
+                  </p>
                 </div>
               )}
             </div>

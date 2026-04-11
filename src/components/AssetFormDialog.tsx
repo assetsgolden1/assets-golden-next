@@ -107,7 +107,7 @@ export default function AssetFormDialog({ open, onClose }: Props) {
             <div className="py-8 text-center">
               <div className="text-4xl mb-4">✦</div>
               <h3 className="font-display text-xl font-semibold mb-2">¡Gracias!</h3>
-              <p className="text-muted-foreground text-sm">Hemos recibido tu información. Te contactaremos pronto.</p>
+              <p className="text-muted-foreground text-sm">Hemos recibido su información. Le contactaremos pronto.</p>
               <button onClick={handleClose} className="mt-6 text-sm text-gold hover:underline">Cerrar</button>
             </div>
           ) : (
@@ -115,7 +115,7 @@ export default function AssetFormDialog({ open, onClose }: Props) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Nombre *</label>
-                  <input required maxLength={100} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClass} placeholder="Tu nombre" />
+                  <input required maxLength={100} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClass} placeholder="Su nombre" />
                 </div>
                 <div>
                   <label className={labelClass}>Email *</label>
