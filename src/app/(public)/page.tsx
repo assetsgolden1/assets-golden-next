@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import Image from 'next/image'
 import { MapPin } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import HomeSidebar from '@/components/HomeSidebar'
@@ -86,29 +85,7 @@ export default async function HomePage() {
         <HeroImageCarousel />
       </section>
 
-      {/* ─── 2. STATS BAR ─────────────────────────────────────── */}
-      <section className="bg-gold">
-        <div className="container-luxury py-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-            {[
-              { stat: '-15%', label: 'Stock disponible en Barcelona' },
-              { stat: '+9,4%', label: 'Precio medio anual en BCN' },
-              { stat: 'Máx. histórico', label: 'Septiembre 2024 — 18 años' },
-            ].map((item) => (
-              <div key={item.label} className="flex flex-col items-center">
-                <span className="font-display text-3xl font-bold text-navy">
-                  {item.stat}
-                </span>
-                <span className="mt-1 text-xs tracking-wide text-navy/70 uppercase">
-                  {item.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── 3. PROPIEDADES DESTACADAS ────────────────────────── */}
+      {/* ─── 2. PROPIEDADES DESTACADAS ────────────────────────── */}
       <section className="section-padding bg-background overflow-hidden">
         <div className="container-luxury">
           <div className="mb-12 text-center">
@@ -237,60 +214,7 @@ export default async function HomePage() {
       {/* ─── 6. EQUIPO ────────────────────────────────────────── */}
       <HomeTeamSection team={team} />
 
-      {/* ─── 7. PARTNERS ──────────────────────────────────────── */}
-      {partners && partners.length > 0 && (
-        <section className="section-padding bg-background overflow-hidden">
-          <div className="container-luxury">
-            <div className="mb-10 text-center">
-              <p className="text-xs tracking-[0.25em] text-gold uppercase mb-3">Red global</p>
-              <h2 className="font-display text-3xl font-semibold text-foreground md:text-4xl">
-                Nuestros Partners
-              </h2>
-              <div className="divider-gold mx-auto mt-4" />
-            </div>
-
-            <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory">
-              {partners.map((partner) => (
-                <Link
-                  key={partner.id}
-                  href={`/partners/${partner.id}`}
-                  className="group shrink-0 snap-start text-center w-32"
-                >
-                  <div className="relative mx-auto mb-3 h-20 w-20 overflow-hidden rounded-xl border-2 border-gold/20 bg-muted">
-                    {partner.photo_url ? (
-                      <Image
-                        src={partner.photo_url}
-                        alt={partner.name}
-                        fill
-                        className="object-cover object-top transition-transform duration-500 group-hover:scale-110"
-                        sizes="80px"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center gradient-navy">
-                        <span className="font-display text-xl text-gold">{partner.name.charAt(0)}</span>
-                      </div>
-                    )}
-                  </div>
-                  <p className="font-display text-xs font-semibold text-foreground group-hover:text-gold transition-colors leading-tight">
-                    {partner.name.split(' ').slice(0, 2).join(' ')}
-                  </p>
-                  {partner.country && (
-                    <p className="mt-0.5 text-[10px] text-muted-foreground">{partner.country}</p>
-                  )}
-                </Link>
-              ))}
-            </div>
-
-            <div className="mt-8 text-center">
-              <Link href="/partners" className={buttonVariants({ variant: 'goldOutline', size: 'sm' })}>
-                Ver todos los partners
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ─── 8. CTA FINAL ─────────────────────────────────────── */}
+      {/* ─── 7. CTA FINAL ─────────────────────────────────────── */}
       <section className="section-padding gradient-navy">
         <div className="container-luxury text-center">
           <p className="text-xs tracking-[0.25em] text-gold uppercase mb-4">

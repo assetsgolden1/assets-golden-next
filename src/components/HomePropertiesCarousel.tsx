@@ -49,20 +49,20 @@ export default function HomePropertiesCarousel({ properties }: Props) {
       >
         <CarouselContent className="-ml-4">
           {properties.map((property) => (
-            <CarouselItem key={property.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+            <CarouselItem key={property.id} className="pl-4 md:basis-1/2 lg:basis-1/2">
               <Link
                 href={`/propiedades/${property.slug ?? property.id}`}
                 className="group block card-premium rounded-xl overflow-hidden"
               >
                 {/* Image */}
-                <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                <div className="relative aspect-[3/2] overflow-hidden bg-muted">
                   {property.image_url ? (
                     <Image
                       src={property.image_url}
                       alt={property.title}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      sizes="(max-width: 768px) 100vw, 50vw"
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center gradient-navy">
@@ -82,7 +82,7 @@ export default function HomePropertiesCarousel({ properties }: Props) {
 
                   {/* Price overlay */}
                   <div className="absolute bottom-4 left-4 right-4">
-                    <span className="text-primary-foreground font-display text-2xl font-medium drop-shadow-lg">
+                    <span className="text-primary-foreground font-display text-3xl font-medium drop-shadow-lg">
                       {formatPrice(property.price, property.currency)}
                     </span>
                   </div>
@@ -90,7 +90,7 @@ export default function HomePropertiesCarousel({ properties }: Props) {
 
                 {/* Content */}
                 <div className="p-5">
-                  <h3 className="font-display text-lg text-foreground mb-2 group-hover:text-gold transition-colors line-clamp-1">
+                  <h3 className="font-display text-xl text-foreground mb-2 group-hover:text-gold transition-colors line-clamp-1">
                     {property.title}
                   </h3>
                   <div className="flex items-center justify-between">

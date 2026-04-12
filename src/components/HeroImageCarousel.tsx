@@ -25,7 +25,7 @@ export default function HeroImageCarousel() {
   }, [])
 
   return (
-    <div className="flex-1 relative flex items-center justify-center overflow-hidden">
+    <div className="flex-1 relative flex items-center justify-center overflow-hidden min-h-[calc(100vh-80px)]">
       {/* Background images with crossfade */}
       <div className="absolute inset-0">
         {heroImages.map((img, index) => (

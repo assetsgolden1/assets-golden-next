@@ -141,6 +141,34 @@ export default async function DestinoPage({ params }: Props) {
         </div>
       </section>
 
+      {/* Stats compactas del mercado local — debajo del hero */}
+      {(marketInfo.avgPrice || marketInfo.rentalYield || marketInfo.priceGrowth) && (
+        <section className="bg-gold py-6">
+          <div className="container-luxury">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+              {marketInfo.avgPrice && (
+                <div>
+                  <span className="font-display text-2xl font-bold text-navy">{marketInfo.avgPrice}</span>
+                  <p className="text-xs text-navy/70 mt-1 uppercase tracking-wide">Precio medio</p>
+                </div>
+              )}
+              {marketInfo.rentalYield && (
+                <div>
+                  <span className="font-display text-2xl font-bold text-navy">{marketInfo.rentalYield}</span>
+                  <p className="text-xs text-navy/70 mt-1 uppercase tracking-wide">Rentabilidad</p>
+                </div>
+              )}
+              {marketInfo.priceGrowth && (
+                <div>
+                  <span className="font-display text-2xl font-bold text-navy">{marketInfo.priceGrowth}</span>
+                  <p className="text-xs text-navy/70 mt-1 uppercase tracking-wide">Crecimiento</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Descripción */}
       {destination.description && (
         <section className="py-12 bg-background">

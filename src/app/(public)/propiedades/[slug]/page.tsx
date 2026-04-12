@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Maximize, BedDouble, Bath, MapPin, ExternalLink, ChevronRight } from 'lucide-react'
+import { Maximize, BedDouble, Bath, MapPin, ExternalLink, ChevronRight, ArrowLeft } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { getPropertyBySlug, getAllPropertySlugs } from '@/lib/supabase/queries'
 import PropertyGalleryClient from '@/components/PropertyGalleryClient'
@@ -96,6 +96,17 @@ export default async function PropertyDetailPage({ params }: Props) {
           <span className="text-foreground line-clamp-1">{property.title}</span>
         </div>
       </nav>
+
+      {/* Botón volver */}
+      <div className="container-luxury pb-2">
+        <Link
+          href="/propiedades"
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-gold transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Volver a propiedades
+        </Link>
+      </div>
 
       {/* Galería con hero + thumbnails + lightbox */}
       {allImages.length > 0 ? (

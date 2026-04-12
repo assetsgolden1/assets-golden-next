@@ -44,6 +44,7 @@ export default function PropertyCard({
   featured,
   className,
 }: PropertyCardProps) {
+  void id;
   return (
     <Link
       href={`/propiedades/${slug}`}
@@ -68,15 +69,8 @@ export default function PropertyCard({
           </div>
         )}
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
-
-        {/* Type badge */}
-        {property_type && (
-          <span className="absolute top-4 left-4 rounded-full bg-gold px-3 py-1 text-xs font-semibold text-primary shadow-lg">
-            {translatePropertyType(property_type)}
-          </span>
-        )}
+        {/* Gradient overlay — ligero, solo para legibilidad del badge */}
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent opacity-40" />
 
         {/* Featured badge */}
         {featured && (
@@ -84,25 +78,32 @@ export default function PropertyCard({
             Destacada
           </span>
         )}
-
-        {/* Price */}
-        <div className="absolute bottom-4 left-4 right-4">
-          <span className="font-display text-2xl font-medium text-white drop-shadow-lg">
-            {formatPrice(price, currency)}
-          </span>
-        </div>
       </div>
 
       {/* Content */}
       <div className="p-5">
-        <h3 className="font-display text-lg text-foreground mb-2 line-clamp-1 group-hover:text-gold transition-colors">
+        {/* Tipo de inmueble */}
+        {property_type && (
+          <p className="text-sm text-gold font-medium mb-0.5">
+            {translatePropertyType(property_type)}
+          </p>
+        )}
+
+        {/* Título */}
+        <h3 className="font-display text-base text-foreground mb-1 line-clamp-1 group-hover:text-gold transition-colors">
           {translatePropertyTitle(title)}
         </h3>
 
+        {/* Ubicación */}
         <div className="flex items-center gap-2 text-muted-foreground text-sm mb-3">
           <MapPin className="h-4 w-4 shrink-0 text-gold" />
           <span className="line-clamp-1">{location}</span>
         </div>
+
+        {/* Precio — prominente en gold */}
+        <p className="font-display text-xl font-medium text-gold mb-3">
+          {formatPrice(price, currency)}
+        </p>
 
         {/* Stats */}
         <div className="flex items-center gap-4 text-muted-foreground text-sm border-t border-border pt-3">

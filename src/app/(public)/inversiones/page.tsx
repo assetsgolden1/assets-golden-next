@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getProperties, getDestinations } from '@/lib/supabase/queries'
+import { getProperties, getDestinations, getPropertyCountsByCountry } from '@/lib/supabase/queries'
 import PropertyCard from '@/components/properties/PropertyCard'
 import { buttonVariants } from '@/components/ui/button'
 import { TrendingUp, Globe, Shield, BarChart3 } from 'lucide-react'
@@ -47,20 +47,23 @@ export default async function InversionesPage({ searchParams }: Props) {
   const page = Math.max(1, parseInt(params.pagina ?? '1', 10))
   const offset = (page - 1) * PAGE_SIZE
 
-  const [{ data: destinations }, { data: properties, count }] = await Promise.all([
+  const [{ data: destinations }, { data: properties, count }, propertyCounts] = await Promise.all([
     getDestinations(),
     getProperties({
       country: params.pais || undefined,
       limit: PAGE_SIZE,
       offset,
     }),
+    getPropertyCountsByCountry(),
   ])
+
+  void destinations
 
   const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
 
-  const countries = destinations
-    .map((d) => d.country_name)
-    .filter(Boolean)
+  // Solo países que tienen propiedades reales en Supabase
+  const countries = Object.keys(propertyCounts)
+    .filter((c) => propertyCounts[c] > 0)
     .sort()
 
   return (

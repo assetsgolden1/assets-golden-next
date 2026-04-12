@@ -3,16 +3,53 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { X, ExternalLink } from 'lucide-react'
+import { X } from 'lucide-react'
 import type { TeamMember } from '@/types'
 import { buttonVariants } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+
+// Icono LinkedIn SVG inline (Lucide no incluye Linkedin)
+function LinkedinIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+    </svg>
+  )
+}
+
+const linkedinMap: Record<string, string> = {
+  'Irmaris Cuza': 'https://www.linkedin.com/in/irmaris-cuza-91ab423a8/',
+  'NÚRIA CORTÉS': 'https://www.linkedin.com/in/nuriacortesf/',
+  'Nuria Cortes': 'https://www.linkedin.com/in/nuriacortesf/',
+  'Zaira Fortoul': 'https://www.linkedin.com/in/zaira-fortoul-777a9760/',
+  'Carmen Artero': 'https://www.linkedin.com/in/carmenarteroagenteinmobiliaria/',
+  'Meritxell Mont': 'https://www.linkedin.com/in/meritxellmont/',
+  'Bianca David': 'https://www.linkedin.com/in/bianca-david-62a0a6111/',
+  'Joan Daunis': 'https://www.linkedin.com/in/joandaunis/',
+  'Philip Seifert': 'https://www.linkedin.com/in/philipseifert/',
+  'Antonio Cilea': 'https://www.linkedin.com/in/antoniocilea/',
+  'Antonio Pastor Perez': 'https://www.linkedin.com/in/antonio-pastor-p%C3%A9rez-17047677/',
+  'Amir Kudary': 'https://www.linkedin.com/in/amir-kudary-423069163/',
+  'Liliana Lucero': 'https://www.linkedin.com/in/lilianalucero/?locale=es',
+  'Iveta Jankovska': 'https://www.linkedin.com/in/iveta-jankovska/',
+}
+
+function getLinkedin(member: TeamMember): string | undefined {
+  return linkedinMap[member.name] || member.linkedin_url || undefined
+}
 
 interface Props {
   team: TeamMember[]
 }
 
 function MemberCard({ member, onClick }: { member: TeamMember; onClick: () => void }) {
+  const linkedinUrl = getLinkedin(member)
+
   return (
     <div
       className="group cursor-pointer shrink-0 w-[260px]"
@@ -20,7 +57,7 @@ function MemberCard({ member, onClick }: { member: TeamMember; onClick: () => vo
     >
       <div className="card-premium rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
         {/* Portrait image */}
-        <div className="relative h-[320px] overflow-hidden bg-muted">
+        <div className="relative h-[320px] overflow-hidden bg-muted flex-shrink-0">
           {member.photo_url ? (
             <Image
               src={member.photo_url}
@@ -41,16 +78,29 @@ function MemberCard({ member, onClick }: { member: TeamMember; onClick: () => vo
           </div>
         </div>
 
-        {/* Info */}
-        <div className="p-5">
-          <h3 className="font-display text-lg text-foreground mb-1 group-hover:text-gold transition-colors">
+        {/* Info — altura fija para uniformidad */}
+        <div className="p-5 overflow-hidden">
+          <h3 className="font-display text-lg text-foreground mb-1 group-hover:text-gold transition-colors line-clamp-1">
             {member.name}
           </h3>
           {member.role_es && (
-            <p className="text-gold text-sm font-medium mb-0.5">{member.role_es}</p>
+            <p className="text-gold text-sm font-medium mb-0.5 line-clamp-1">{member.role_es}</p>
           )}
           {member.country && (
-            <p className="text-muted-foreground text-xs">{member.country}</p>
+            <p className="text-muted-foreground text-xs line-clamp-1">{member.country}</p>
+          )}
+          {linkedinUrl && (
+            <a
+              href={linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="mt-2 inline-flex items-center gap-1 text-[10px] text-gold/70 hover:text-gold transition-colors"
+              aria-label={`LinkedIn de ${member.name}`}
+            >
+              <LinkedinIcon className="h-3 w-3" />
+              LinkedIn
+            </a>
           )}
         </div>
       </div>
@@ -59,6 +109,8 @@ function MemberCard({ member, onClick }: { member: TeamMember; onClick: () => vo
 }
 
 function BioModal({ member, onClose }: { member: TeamMember; onClose: () => void }) {
+  const linkedinUrl = getLinkedin(member)
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
@@ -106,14 +158,14 @@ function BioModal({ member, onClose }: { member: TeamMember; onClose: () => void
               <p className="text-muted-foreground text-sm mb-4">{member.country}</p>
             )}
 
-            {member.linkedin_url && (
+            {linkedinUrl && (
               <a
-                href={member.linkedin_url}
+                href={linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-gold hover:text-gold/80 transition-colors mb-6 text-sm"
               >
-                <ExternalLink className="h-4 w-4" />
+                <LinkedinIcon className="h-4 w-4" />
                 Ver perfil en LinkedIn
               </a>
             )}
