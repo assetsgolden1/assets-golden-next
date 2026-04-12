@@ -14,7 +14,12 @@ const heroImages = [
   { src: '/hero/hero-modern.jpg', alt: 'Propiedad moderna' },
 ]
 
+// Blur placeholder navy para evitar flash blanco
+const BLUR_DATA_URL =
+  'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzBhMTYyOCIvPjwvc3ZnPg=='
+
 export default function HeroImageCarousel() {
+  // Estado inicial = 0 → primera imagen visible desde SSR sin JS
   const [current, setCurrent] = useState(0)
 
   useEffect(() => {
@@ -25,19 +30,28 @@ export default function HeroImageCarousel() {
   }, [])
 
   return (
-    <div className="flex-1 relative flex items-center justify-center overflow-hidden min-h-[calc(100vh-80px)]">
-      {/* Background images with crossfade */}
+    // Altura explícita definida en el HTML — garantiza tamaño antes de hidratación
+    <div
+      className="flex-1 relative overflow-hidden"
+      style={{ minHeight: '100%' }}
+    >
+      {/* Imágenes con crossfade — la primera visible sin JS (index 0 === current 0) */}
       <div className="absolute inset-0">
         {heroImages.map((img, index) => (
-          <Image
-            key={index}
-            src={img.src}
-            alt={img.alt}
-            fill
-            priority={index === 0}
-            className={`object-cover transition-opacity duration-1000 ${index === current ? 'opacity-100' : 'opacity-0'}`}
-            sizes="(max-width: 1024px) 100vw, calc(100vw - 288px)"
-          />
+          <div key={index} className="absolute inset-0">
+            <Image
+              src={img.src}
+              alt={img.alt}
+              fill
+              priority={index === 0}
+              placeholder={index === 0 ? 'blur' : 'empty'}
+              blurDataURL={index === 0 ? BLUR_DATA_URL : undefined}
+              className={`object-cover object-center transition-opacity duration-1000 ${
+                index === current ? 'opacity-100' : 'opacity-0'
+              }`}
+              sizes="(max-width: 1024px) 100vw, calc(100vw - 288px)"
+            />
+          </div>
         ))}
         {/* Double overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-primary/60 via-primary/30 to-transparent" />
@@ -45,7 +59,7 @@ export default function HeroImageCarousel() {
       </div>
 
       {/* Hero content */}
-      <div className="relative z-10 px-8 md:px-16 lg:px-20 py-20 w-full">
+      <div className="relative z-10 px-8 md:px-16 lg:px-20 py-20 w-full h-full flex flex-col justify-center">
         <div className="max-w-3xl">
           <p className="inline-block bg-gold text-primary px-5 py-2 text-xs sm:text-sm mb-8 font-semibold tracking-wider">
             Barcelona · International Real Estate

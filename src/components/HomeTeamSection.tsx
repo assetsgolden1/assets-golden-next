@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { X } from 'lucide-react'
 import type { TeamMember } from '@/types'
 import { buttonVariants } from '@/components/ui/button'
+import { getLinkedin } from '@/lib/constants/linkedinMap'
 
 // Icono LinkedIn SVG inline (Lucide no incluye Linkedin)
 function LinkedinIcon({ className }: { className?: string }) {
@@ -22,25 +23,8 @@ function LinkedinIcon({ className }: { className?: string }) {
   )
 }
 
-const linkedinMap: Record<string, string> = {
-  'Irmaris Cuza': 'https://www.linkedin.com/in/irmaris-cuza-91ab423a8/',
-  'NÚRIA CORTÉS': 'https://www.linkedin.com/in/nuriacortesf/',
-  'Nuria Cortes': 'https://www.linkedin.com/in/nuriacortesf/',
-  'Zaira Fortoul': 'https://www.linkedin.com/in/zaira-fortoul-777a9760/',
-  'Carmen Artero': 'https://www.linkedin.com/in/carmenarteroagenteinmobiliaria/',
-  'Meritxell Mont': 'https://www.linkedin.com/in/meritxellmont/',
-  'Bianca David': 'https://www.linkedin.com/in/bianca-david-62a0a6111/',
-  'Joan Daunis': 'https://www.linkedin.com/in/joandaunis/',
-  'Philip Seifert': 'https://www.linkedin.com/in/philipseifert/',
-  'Antonio Cilea': 'https://www.linkedin.com/in/antoniocilea/',
-  'Antonio Pastor Perez': 'https://www.linkedin.com/in/antonio-pastor-p%C3%A9rez-17047677/',
-  'Amir Kudary': 'https://www.linkedin.com/in/amir-kudary-423069163/',
-  'Liliana Lucero': 'https://www.linkedin.com/in/lilianalucero/?locale=es',
-  'Iveta Jankovska': 'https://www.linkedin.com/in/iveta-jankovska/',
-}
-
-function getLinkedin(member: TeamMember): string | undefined {
-  return linkedinMap[member.name] || member.linkedin_url || undefined
+function getMemberLinkedin(member: TeamMember): string | undefined {
+  return getLinkedin(member.name) || member.linkedin_url || undefined
 }
 
 interface Props {
@@ -48,7 +32,7 @@ interface Props {
 }
 
 function MemberCard({ member, onClick }: { member: TeamMember; onClick: () => void }) {
-  const linkedinUrl = getLinkedin(member)
+  const linkedinUrl = getMemberLinkedin(member)
 
   return (
     <div
@@ -109,7 +93,7 @@ function MemberCard({ member, onClick }: { member: TeamMember; onClick: () => vo
 }
 
 function BioModal({ member, onClose }: { member: TeamMember; onClose: () => void }) {
-  const linkedinUrl = getLinkedin(member)
+  const linkedinUrl = getMemberLinkedin(member)
 
   return (
     <div

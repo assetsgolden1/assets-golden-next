@@ -76,7 +76,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ─── 1. HERO: Sidebar + Crossfade images ──────────────── */}
-      <section className="relative min-h-screen flex pt-20">
+      <section className="relative flex w-full" style={{ height: 'calc(100vh - 80px)', marginTop: '80px' }}>
         <HomeSidebar
           destinations={destinations}
           propertyCounts={propertyCounts}
