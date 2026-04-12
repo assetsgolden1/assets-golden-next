@@ -55,7 +55,6 @@ export default function HeroImageCarousel() {
             style={{
               position: 'absolute',
               inset: 0,
-              opacity: index === 0 ? 1 : 0,
               willChange: 'opacity',
             }}
           >
