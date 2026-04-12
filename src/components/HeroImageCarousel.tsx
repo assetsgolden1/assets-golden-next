@@ -41,8 +41,14 @@ export default function HeroImageCarousel() {
           <img
             src={img.src}
             alt={img.alt}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
-            loading={index === 0 ? 'eager' : 'lazy'}
+            loading="eager"
+            fetchPriority={index <= 1 ? 'high' : 'auto'}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center'
+            }}
           />
         </div>
       ))}
