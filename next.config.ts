@@ -41,6 +41,25 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // CSP — permite imágenes desde Supabase CDN e inline styles del hero
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "img-src 'self' blob: data: https://mromkwpqrxpxbbxhdofs.supabase.co https://wloneprkibfjioxwypaw.supabase.co https://images.unsplash.com https://*.supabase.co",
+              "connect-src 'self' https://*.supabase.co https://api.anthropic.com",
+              "media-src 'self'",
+              "frame-src 'none'",
+            ].join("; "),
+          },
+        ],
+      },
+      {
         // Home page: no cache para evitar versión obsoleta en CDN
         source: "/",
         headers: [
