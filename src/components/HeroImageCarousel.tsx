@@ -15,7 +15,6 @@ const heroImages = [
 ]
 
 export default function HeroImageCarousel() {
-  // Estado inicial 0 → primera imagen visible sin JS (SSR-safe)
   const [current, setCurrent] = useState(0)
   const [mounted, setMounted] = useState(false)
 
@@ -28,20 +27,28 @@ export default function HeroImageCarousel() {
   }, [])
 
   return (
-    // Ocupa absolute inset-0 del contenedor flex-1 del padre
-    <div className="relative w-full h-full">
-
+    /*
+     * TODOS los estilos de la cadena de altura son inline → aplican ANTES
+     * de que el navegador procese el stylesheet de Tailwind.
+     * position:absolute + inset:0 + w:100% + h:100% = ocupa todo el padre
+     */
+    <div
+      className="hero-carousel"
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+    >
       {/* ── Imágenes en crossfade ───────────────────────────── */}
       {heroImages.map((img, i) => (
         <div
           key={i}
-          className={`absolute inset-0 transition-opacity duration-1000 ${
-            // Antes de montar: primera imagen visible, resto ocultas (sin transición)
-            // Después de montar: crossfade controlado por current
-            mounted
-              ? i === current ? 'opacity-100' : 'opacity-0'
-              : i === 0 ? 'opacity-100' : 'opacity-0'
-          }`}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            // Primera imagen: opacity 1 desde el primer render (sin JS, sin CSS)
+            // Resto: opacity 0 inicialmente
+            // Después de montar: controlled por current con transición
+            opacity: mounted ? (i === current ? 1 : 0) : (i === 0 ? 1 : 0),
+            transition: mounted ? 'opacity 1s ease-in-out' : 'none',
+          }}
         >
           <Image
             src={img.src}
@@ -59,8 +66,20 @@ export default function HeroImageCarousel() {
       <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-transparent to-primary/10" />
 
       {/* ── Contenido: texto y botones ─────────────────────── */}
-      {/* pt-20 compensa el header fixed de 80px */}
-      <div className="absolute inset-0 flex flex-col justify-center pt-20 px-8 md:px-12 lg:px-16">
+      {/* paddingTop:80px (h-20) compensa el header fixed — inline para SSR */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          paddingTop: '80px',
+          paddingLeft: '2rem',
+          paddingRight: '2rem',
+        }}
+        className="md:px-12 lg:px-16"
+      >
         <div className="max-w-2xl">
           <p className="inline-block bg-gold text-primary px-5 py-2 text-xs sm:text-sm mb-8 font-semibold tracking-wider">
             Barcelona · International Real Estate

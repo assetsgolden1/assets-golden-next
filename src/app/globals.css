@@ -279,3 +279,28 @@
 .gradient-elegant {
   background: linear-gradient(135deg, var(--navy), oklch(0.265 0.03 260));
 }
+
+/* ─── Hero section — CSS puro, sin dependencia de Tailwind ─── */
+/* Estos estilos se aplican en el primer paint, antes de JS     */
+.hero-section {
+  height: 100vh;
+  height: 100dvh; /* dynamic viewport height para móvil */
+  min-height: 600px;
+  position: relative;
+  display: flex;
+  overflow: hidden;
+}
+
+.hero-carousel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-carousel img {
+  object-fit: cover;
+  object-position: center;
+  width: 100%;
+  height: 100%;
+}

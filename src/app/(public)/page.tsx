@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 }
 
 export const revalidate = 3600
+export const dynamic = 'force-dynamic'
 
 // 9 países reales de Assets Golden
 const VALID_COUNTRIES = [
@@ -76,14 +77,18 @@ export default async function HomePage() {
   return (
     <>
       {/* ─── 1. HERO: Sidebar + Crossfade images ──────────────── */}
-      {/* La section empieza en top:0 (behind fixed header) — sin marginTop */}
-      <section className="relative flex" style={{ height: '100vh', minHeight: '600px' }}>
+      {/* Todos los estilos críticos de altura en inline style — independientes del CSS */}
+      <section
+        className="hero-section"
+        style={{ height: '100vh', minHeight: '600px', display: 'flex', position: 'relative', overflow: 'hidden' }}
+      >
         <HomeSidebar
           destinations={destinations}
           propertyCounts={propertyCounts}
           partners={partners ?? []}
         />
-        <div className="flex-1 relative overflow-hidden">
+        {/* flex-1 inline para que no dependa de Tailwind */}
+        <div style={{ flex: '1 1 0%', position: 'relative', overflow: 'hidden' }}>
           <HeroImageCarousel />
         </div>
       </section>
