@@ -37,6 +37,15 @@ export default function RootLayout({
       lang="es"
       className={`${playfair.variable} ${dmSans.variable} h-full antialiased`}
     >
+      <head>
+        {/* Preload primera imagen del hero — descarga prioritaria antes del render */}
+        <link
+          rel="preload"
+          href="/hero/hero-villa.jpg"
+          as="image"
+          type="image/jpeg"
+        />
+      </head>
       <body className="flex min-h-full flex-col bg-background text-foreground">
         {children}
       </body>
