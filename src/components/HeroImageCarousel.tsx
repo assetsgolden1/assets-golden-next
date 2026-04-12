@@ -2,63 +2,30 @@
 
 import { useState, useEffect } from 'react'
 
+const CDN = 'https://mromkwpqrxpxbbxhdofs.supabase.co/storage/v1/object/public/hero-images'
+
 const images = [
-  { src: '/hero/hero-villa.jpg',       alt: 'Villa de lujo con piscina' },
-  { src: '/hero/hero-beach-villa.jpg', alt: 'Villa en primera línea de playa' },
-  { src: '/hero/hero-penthouse.jpg',   alt: 'Ático de lujo en ciudad' },
-  { src: '/hero/hero-mansion.jpg',     alt: 'Mansión exclusiva' },
-  { src: '/hero/hero-modern.jpg',      alt: 'Propiedad moderna de diseño' },
+  { src: `${CDN}/hero-villa.jpg`,       alt: 'Villa de lujo con piscina' },
+  { src: `${CDN}/hero-beach-villa.jpg`, alt: 'Villa en primera línea de playa' },
+  { src: `${CDN}/hero-penthouse.jpg`,   alt: 'Ático de lujo en ciudad' },
+  { src: `${CDN}/hero-mansion.jpg`,     alt: 'Mansión exclusiva' },
+  { src: `${CDN}/hero-modern.jpg`,      alt: 'Propiedad moderna de diseño' },
 ]
 
 export default function HeroImageCarousel() {
   const [current, setCurrent] = useState(0)
-  const [loaded, setLoaded] = useState<boolean[]>(
-    new Array(images.length).fill(false)
-  )
-  const [allLoaded, setAllLoaded] = useState(false)
 
-  // Precargar todas las imágenes antes de arrancar
   useEffect(() => {
-    let loadedCount = 0
-
-    images.forEach((img, index) => {
-      const image = new window.Image()
-      image.onload = () => {
-        loadedCount++
-        setLoaded(prev => {
-          const next = [...prev]
-          next[index] = true
-          return next
-        })
-        if (loadedCount === images.length) {
-          setAllLoaded(true)
-        }
-      }
-      image.onerror = () => {
-        // Si falla, igual contar como "cargada"
-        // para no bloquear el carrusel
-        loadedCount++
-        if (loadedCount === images.length) {
-          setAllLoaded(true)
-        }
-      }
-      image.src = img.src
-    })
-  }, [])
-
-  // Arrancar el intervalo SOLO cuando todo esté cargado
-  useEffect(() => {
-    if (!allLoaded) return
     const interval = setInterval(() => {
       setCurrent(prev => (prev + 1) % images.length)
     }, 5000)
     return () => clearInterval(interval)
-  }, [allLoaded])
+  }, [])
 
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
 
-      {/* Imágenes */}
+      {/* Imágenes desde Supabase CDN */}
       {images.map((img, index) => (
         <div
           key={index}
@@ -66,9 +33,7 @@ export default function HeroImageCarousel() {
             position: 'absolute',
             inset: 0,
             opacity: current === index ? 1 : 0,
-            transition: allLoaded
-              ? 'opacity 1s ease-in-out'
-              : 'none',
+            transition: 'opacity 1s ease-in-out',
             zIndex: current === index ? 1 : 0,
           }}
         >
@@ -163,7 +128,7 @@ export default function HeroImageCarousel() {
         </div>
       </div>
 
-      {/* Indicadores */}
+      {/* Indicadores laterales */}
       <div style={{
         position: 'absolute', right: '1.5rem',
         top: '50%', transform: 'translateY(-50%)',
@@ -179,40 +144,13 @@ export default function HeroImageCarousel() {
               width: '8px',
               height: current === i ? '32px' : '8px',
               borderRadius: '999px',
-              backgroundColor: current === i
-                ? '#D4AF37'
-                : 'rgba(255,255,255,0.4)',
+              backgroundColor: current === i ? '#D4AF37' : 'rgba(255,255,255,0.4)',
               border: 'none', cursor: 'pointer',
               transition: 'all 0.3s ease', padding: 0,
             }}
           />
         ))}
       </div>
-
-      {/* Indicador de carga (solo mientras cargan) */}
-      {!allLoaded && (
-        <div style={{
-          position: 'absolute',
-          bottom: '2rem', left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 5,
-          display: 'flex', gap: '6px',
-        }}>
-          {images.map((_, i) => (
-            <div
-              key={i}
-              style={{
-                width: '6px', height: '6px',
-                borderRadius: '50%',
-                backgroundColor: loaded[i]
-                  ? '#D4AF37'
-                  : 'rgba(255,255,255,0.3)',
-                transition: 'background-color 0.3s',
-              }}
-            />
-          ))}
-        </div>
-      )}
     </div>
   )
 }
