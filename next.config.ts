@@ -41,6 +41,16 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Home page: no cache para evitar versión obsoleta en CDN
+        source: "/",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-store, must-revalidate",
+          },
+        ],
+      },
+      {
         source: "/:path*",
         headers: [
           {

@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
 
+// Imágenes verificadas en public/hero/
 const images = [
   { src: '/hero/hero-villa.jpg',       alt: 'Villa de lujo con piscina' },
   { src: '/hero/hero-beach-villa.jpg', alt: 'Villa en primera línea de playa' },
@@ -12,7 +12,7 @@ const images = [
 ]
 
 export default function HeroImageCarousel() {
-  // Opacidad controlada SOLO por current — sin mounted, sin condicionales extra
+  // Opacidad controlada únicamente por current — sin mounted, sin condicionales
   const [current, setCurrent] = useState(0)
 
   useEffect(() => {
@@ -23,11 +23,9 @@ export default function HeroImageCarousel() {
   }, [])
 
   return (
-    <div
-      className="hero-carousel"
-      style={{ position: 'absolute', inset: 0 }}
-    >
-      {/* ── Imágenes en crossfade ───────────────────────────── */}
+    <div style={{ position: 'absolute', inset: 0 }}>
+
+      {/* ── Imágenes con <img> nativo ── sin problema de hidratación ── */}
       {images.map((img, index) => (
         <div
           key={index}
@@ -39,13 +37,12 @@ export default function HeroImageCarousel() {
             zIndex: current === index ? 1 : 0,
           }}
         >
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={img.src}
             alt={img.alt}
-            fill
-            priority={index === 0}
-            sizes="(max-width: 1024px) 100vw, calc(100vw - 288px)"
-            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+            loading={index === 0 ? 'eager' : 'lazy'}
           />
         </div>
       ))}
@@ -63,6 +60,11 @@ export default function HeroImageCarousel() {
       }} />
 
       {/* ── Contenido hero ──────────────────────────────────── */}
+      {/*
+        paddingTop:80px compensa el header fixed de 80px.
+        El hero section empieza en y=0 (marginTop:-80px en page.tsx),
+        así el contenido arranca en y=80 (justo bajo el header).
+      */}
       <div style={{
         position: 'absolute', inset: 0, zIndex: 3,
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -73,8 +75,7 @@ export default function HeroImageCarousel() {
         {/* Badge */}
         <div style={{
           display: 'inline-flex', alignItems: 'center',
-          backgroundColor: 'rgba(212,175,55,0.9)',
-          color: '#131D2E',
+          backgroundColor: 'rgba(212,175,55,0.9)', color: '#131D2E',
           fontSize: '0.75rem', fontWeight: 600,
           letterSpacing: '0.15em', textTransform: 'uppercase',
           padding: '6px 14px', borderRadius: '4px',

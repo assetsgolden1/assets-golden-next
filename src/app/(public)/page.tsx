@@ -78,9 +78,14 @@ export default async function HomePage() {
     <>
       {/* ─── 1. HERO: Sidebar + Crossfade images ──────────────── */}
       {/* Todos los estilos críticos de altura en inline style — independientes del CSS */}
+      {/*
+        marginTop:-80px contrarresta el pt-20 del <main> del layout,
+        así el hero empieza en y=0 (detrás del header fixed).
+        height:100vh cubre exactamente la viewport completa.
+      */}
       <section
         className="hero-section"
-        style={{ height: '100vh', minHeight: '600px', display: 'flex', position: 'relative', overflow: 'hidden' }}
+        style={{ height: '100vh', minHeight: '600px', display: 'flex', position: 'relative', overflow: 'hidden', marginTop: '-80px' }}
       >
         <HomeSidebar
           destinations={destinations}
