@@ -14,15 +14,13 @@ const heroImages = [
   { src: '/hero/hero-modern.jpg', alt: 'Propiedad moderna' },
 ]
 
-// Blur placeholder navy para evitar flash blanco
-const BLUR_DATA_URL =
-  'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzBhMTYyOCIvPjwvc3ZnPg=='
-
 export default function HeroImageCarousel() {
-  // Estado inicial = 0 → primera imagen visible desde SSR sin JS
+  // Estado inicial 0 → primera imagen visible sin JS (SSR-safe)
   const [current, setCurrent] = useState(0)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % heroImages.length)
     }, 5000)
@@ -30,37 +28,40 @@ export default function HeroImageCarousel() {
   }, [])
 
   return (
-    // Altura explícita definida en el HTML — garantiza tamaño antes de hidratación
-    <div
-      className="flex-1 relative overflow-hidden"
-      style={{ minHeight: '100%' }}
-    >
-      {/* Imágenes con crossfade — la primera visible sin JS (index 0 === current 0) */}
-      <div className="absolute inset-0">
-        {heroImages.map((img, index) => (
-          <div key={index} className="absolute inset-0">
-            <Image
-              src={img.src}
-              alt={img.alt}
-              fill
-              priority={index === 0}
-              placeholder={index === 0 ? 'blur' : 'empty'}
-              blurDataURL={index === 0 ? BLUR_DATA_URL : undefined}
-              className={`object-cover object-center transition-opacity duration-1000 ${
-                index === current ? 'opacity-100' : 'opacity-0'
-              }`}
-              sizes="(max-width: 1024px) 100vw, calc(100vw - 288px)"
-            />
-          </div>
-        ))}
-        {/* Double overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/60 via-primary/30 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-transparent to-primary/10" />
-      </div>
+    // Ocupa absolute inset-0 del contenedor flex-1 del padre
+    <div className="relative w-full h-full">
 
-      {/* Hero content */}
-      <div className="relative z-10 px-8 md:px-16 lg:px-20 py-20 w-full h-full flex flex-col justify-center">
-        <div className="max-w-3xl">
+      {/* ── Imágenes en crossfade ───────────────────────────── */}
+      {heroImages.map((img, i) => (
+        <div
+          key={i}
+          className={`absolute inset-0 transition-opacity duration-1000 ${
+            // Antes de montar: primera imagen visible, resto ocultas (sin transición)
+            // Después de montar: crossfade controlado por current
+            mounted
+              ? i === current ? 'opacity-100' : 'opacity-0'
+              : i === 0 ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <Image
+            src={img.src}
+            alt={img.alt}
+            fill
+            priority={i === 0}
+            sizes="(max-width: 1024px) 100vw, calc(100vw - 288px)"
+            className="object-cover object-center"
+          />
+        </div>
+      ))}
+
+      {/* ── Overlays de gradiente ───────────────────────────── */}
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/60 via-primary/30 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-transparent to-primary/10" />
+
+      {/* ── Contenido: texto y botones ─────────────────────── */}
+      {/* pt-20 compensa el header fixed de 80px */}
+      <div className="absolute inset-0 flex flex-col justify-center pt-20 px-8 md:px-12 lg:px-16">
+        <div className="max-w-2xl">
           <p className="inline-block bg-gold text-primary px-5 py-2 text-xs sm:text-sm mb-8 font-semibold tracking-wider">
             Barcelona · International Real Estate
           </p>
@@ -85,24 +86,22 @@ export default function HeroImageCarousel() {
         </div>
       </div>
 
-      {/* Image indicators — right side */}
-      <div className="absolute bottom-24 right-8 flex flex-col gap-2 z-20">
-        {heroImages.map((_, index) => (
+      {/* ── Indicadores laterales ───────────────────────────── */}
+      <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20">
+        {heroImages.map((_, i) => (
           <button
-            key={index}
-            onClick={() => setCurrent(index)}
-            aria-label={`Imagen ${index + 1}`}
-            className={`w-2 rounded-full transition-all duration-300 ${
-              index === current
-                ? 'h-8 bg-gold'
-                : 'h-2 bg-white/40 hover:bg-white/60'
+            key={i}
+            onClick={() => setCurrent(i)}
+            aria-label={`Imagen ${i + 1}`}
+            className={`rounded-full transition-all duration-300 ${
+              i === current ? 'w-2 h-8 bg-gold' : 'w-2 h-2 bg-white/40 hover:bg-white/60'
             }`}
           />
         ))}
       </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-primary-foreground/60 animate-bounce">
+      {/* ── Scroll indicator ────────────────────────────────── */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-primary-foreground/60 animate-bounce z-20">
         <ChevronDown className="w-8 h-8" />
       </div>
     </div>

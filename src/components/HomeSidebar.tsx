@@ -55,7 +55,7 @@ export default function HomeSidebar({ destinations, propertyCounts, partners }: 
   return (
     <>
       {/* Sidebar — visible solo en desktop, columna fija izquierda del hero */}
-      <div className="hidden lg:flex flex-col w-64 xl:w-72 bg-primary shrink-0 relative z-10">
+      <div className="hidden lg:flex flex-col w-64 xl:w-72 bg-primary shrink-0 relative z-10 pt-20">
         <div className="flex flex-col h-full">
 
           {/* 1. Brand Section */}

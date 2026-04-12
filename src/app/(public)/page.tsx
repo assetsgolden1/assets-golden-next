@@ -76,13 +76,16 @@ export default async function HomePage() {
   return (
     <>
       {/* ─── 1. HERO: Sidebar + Crossfade images ──────────────── */}
-      <section className="relative flex w-full" style={{ height: 'calc(100vh - 80px)', marginTop: '80px' }}>
+      {/* La section empieza en top:0 (behind fixed header) — sin marginTop */}
+      <section className="relative flex" style={{ height: '100vh', minHeight: '600px' }}>
         <HomeSidebar
           destinations={destinations}
           propertyCounts={propertyCounts}
           partners={partners ?? []}
         />
-        <HeroImageCarousel />
+        <div className="flex-1 relative overflow-hidden">
+          <HeroImageCarousel />
+        </div>
       </section>
 
       {/* ─── 2. PROPIEDADES DESTACADAS ────────────────────────── */}
