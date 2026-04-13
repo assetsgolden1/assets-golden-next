@@ -45,8 +45,28 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // CSP — permite imágenes desde Supabase CDN e inline styles del hero
-        source: "/(.*)",
+        // 1. Hero images: cache inmutable en edge CDN — DEBE ir primero
+        source: '/hero/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        // 2. Home page: no cache para evitar versión obsoleta en CDN
+        source: "/",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-store, must-revalidate",
+          },
+        ],
+      },
+      {
+        // 3. CSP — excluye /hero/ para evitar interferencias con caché
+        source: "/((?!hero/).*)",
         headers: [
           {
             key: "Content-Security-Policy",
@@ -64,26 +84,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Hero images: cache inmutable en edge CDN
-        source: '/hero/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        // Home page: no cache para evitar versión obsoleta en CDN
-        source: "/",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "no-store, must-revalidate",
-          },
-        ],
-      },
-      {
+        // 4. Security headers globales
         source: "/:path*",
         headers: [
           {

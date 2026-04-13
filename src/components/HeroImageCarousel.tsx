@@ -28,6 +28,20 @@ export default function HeroImageCarousel() {
       {/* CSS keyframes inyectado una sola vez */}
       <style>{`
         ${images.map((_, i) => {
+          if (i === 0) {
+            // Primera imagen: empieza visible para evitar flash negro al cargar
+            const fadeOut = ((((i + 1) * DURATION) - 0.5) / TOTAL * 100).toFixed(1)
+            const end     = (((i + 1) * DURATION) / TOTAL * 100).toFixed(1)
+            return `
+          @keyframes hero-fade-0 {
+            0%            { opacity: 1; }
+            ${fadeOut}%   { opacity: 1; }
+            ${end}%, 100% { opacity: 0; }
+          }
+          .hero-img-0 {
+            animation: hero-fade-0 ${TOTAL}s linear infinite;
+          }`
+          }
           const start    = ((i * DURATION) / TOTAL * 100).toFixed(1)
           const fadeIn   = (((i * DURATION) + 0.5) / TOTAL * 100).toFixed(1)
           const fadeOut  = ((((i + 1) * DURATION) - 0.5) / TOTAL * 100).toFixed(1)
