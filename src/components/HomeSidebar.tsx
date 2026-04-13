@@ -55,11 +55,14 @@ export default function HomeSidebar({ destinations, propertyCounts, partners }: 
   return (
     <>
       {/* Sidebar — visible solo en desktop, columna fija izquierda del hero */}
-      <div className="hidden lg:flex flex-col w-64 xl:w-72 bg-primary shrink-0 relative z-10 pt-20">
+      <div
+        className="hidden lg:flex flex-col w-64 xl:w-72 bg-primary shrink-0 relative z-10 pt-20"
+        style={{ height: '100%', overflow: 'hidden' }}
+      >
         <div className="flex flex-col h-full">
 
           {/* 1. Brand Section */}
-          <div className="p-8 border-b border-primary-foreground/10">
+          <div className="p-8 border-b border-primary-foreground/10" style={{ flexShrink: 0 }}>
             <h2 className="font-display text-2xl text-primary-foreground leading-tight">
               Assets Golden
             </h2>
@@ -69,7 +72,7 @@ export default function HomeSidebar({ destinations, propertyCounts, partners }: 
           </div>
 
           {/* 2. Navigation */}
-          <nav className="flex-1 py-6 overflow-y-auto">
+          <nav className="flex-1 py-6 overflow-y-auto" style={{ overflowX: 'hidden' }}>
 
             {/* Países dropdown */}
             {countriesWithProps.length > 0 && (
@@ -172,7 +175,7 @@ export default function HomeSidebar({ destinations, propertyCounts, partners }: 
 
           {/* 4. Partners carousel */}
           {partners.length > 0 && (
-            <div className="border-t border-primary-foreground/10">
+            <div className="border-t border-primary-foreground/10" style={{ flexShrink: 0 }}>
               <Link
                 href="/partners"
                 className="block w-full p-6 text-left hover:bg-primary-foreground/5 transition-colors group"

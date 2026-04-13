@@ -78,7 +78,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' blob: data: https://mromkwpqrxpxbbxhdofs.supabase.co https://wloneprkibfjioxwypaw.supabase.co https://images.unsplash.com https://*.supabase.co",
               "connect-src 'self' https://*.supabase.co https://api.anthropic.com",
               "media-src 'self'",
-              "frame-src 'none'",
+              "frame-src 'self'",
             ].join("; "),
           },
         ],
@@ -106,6 +106,16 @@ const nextConfig: NextConfig = {
           {
             key: "Strict-Transport-Security",
             value: "max-age=63072000; includeSubDomains; preload",
+          },
+        ],
+      },
+      {
+        // 5. hero.html: permite ser embebido como iframe desde mismo origen
+        source: '/hero.html',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
           },
         ],
       },

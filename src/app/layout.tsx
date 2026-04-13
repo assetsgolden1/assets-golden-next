@@ -37,14 +37,7 @@ export default function RootLayout({
       lang="es"
       className={`${playfair.variable} ${dmSans.variable} h-full antialiased`}
     >
-      <head>
-        {/* Preload todas las imágenes hero — máxima prioridad antes de ejecutar JS */}
-        <link rel="preload" as="image" href="/hero/hero-villa.jpg" fetchPriority="high" />
-        <link rel="preload" as="image" href="/hero/hero-beach-villa.jpg" />
-        <link rel="preload" as="image" href="/hero/hero-penthouse.jpg" />
-        <link rel="preload" as="image" href="/hero/hero-mansion.jpg" />
-        <link rel="preload" as="image" href="/hero/hero-modern.jpg" />
-      </head>
+      <head />
       <body className="flex min-h-full flex-col bg-background text-foreground">
         {children}
       </body>

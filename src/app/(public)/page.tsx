@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { MapPin } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import HomeSidebar from '@/components/HomeSidebar'
-import HeroImageCarousel from '@/components/HeroImageCarousel'
 import HomePropertiesCarousel from '@/components/HomePropertiesCarousel'
 import HomeTeamSection from '@/components/HomeTeamSection'
 import DestinationCard3D from '@/components/DestinationCard3D'
@@ -94,7 +93,19 @@ export default async function HomePage() {
         />
         {/* flex-1 inline para que no dependa de Tailwind */}
         <div style={{ flex: 1, position: 'relative', overflow: 'hidden', minHeight: 0 }}>
-          <HeroImageCarousel />
+          <iframe
+            src="/hero.html"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              border: 'none',
+              display: 'block',
+            }}
+            title="Hero Assets Golden"
+            scrolling="no"
+          />
         </div>
       </section>
 

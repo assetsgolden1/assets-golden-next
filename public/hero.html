@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background: #131D2E;
+    font-family: 'DM Sans', system-ui, sans-serif;
+  }
+
+  .slides {
+    position: absolute;
+    inset: 0;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+
+  .slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  .slide:nth-child(1) { animation: fade 25s infinite 0s; }
+  .slide:nth-child(2) { animation: fade 25s infinite 5s; }
+  .slide:nth-child(3) { animation: fade 25s infinite 10s; }
+  .slide:nth-child(4) { animation: fade 25s infinite 15s; }
+  .slide:nth-child(5) { animation: fade 25s infinite 20s; }
+
+  @keyframes fade {
+    0%   { opacity: 0; }
+    4%   { opacity: 1; }
+    20%  { opacity: 1; }
+    24%  { opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  .overlay-left {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      rgba(19,29,46,0.75) 0%,
+      rgba(19,29,46,0.4) 40%,
+      transparent 70%
+    );
+    z-index: 2;
+  }
+
+  .overlay-bottom {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(19,29,46,0.8) 0%,
+      transparent 50%
+    );
+    z-index: 2;
+  }
+
+  .content {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 48px 48px 48px;
+    max-width: 680px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(212,175,55,0.95);
+    color: #131D2E;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    border-radius: 4px;
+    margin-bottom: 24px;
+    width: fit-content;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+
+  h1 em {
+    color: #D4AF37;
+    font-style: italic;
+  }
+
+  .subtitle {
+    color: rgba(255,255,255,0.8);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 32px;
+    max-width: 420px;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: #D4AF37;
+    color: #131D2E;
+    padding: 15px 32px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: #E5C158; }
+
+  .btn-secondary {
+    background: transparent;
+    color: #ffffff;
+    padding: 15px 32px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: inline-block;
+    border: 1.5px solid rgba(255,255,255,0.5);
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .btn-secondary:hover {
+    border-color: #D4AF37;
+    color: #D4AF37;
+  }
+
+  .dots {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.4);
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .dot.active {
+    height: 32px;
+    background: #D4AF37;
+  }
+</style>
+</head>
+<body>
+
+<div class="slides">
+  <div class="slide">
+    <img src="/hero/hero-villa.jpg"
+      alt="Villa de lujo" fetchpriority="high">
+  </div>
+  <div class="slide">
+    <img src="/hero/hero-beach-villa.jpg"
+      alt="Villa playa" loading="lazy">
+  </div>
+  <div class="slide">
+    <img src="/hero/hero-penthouse.jpg"
+      alt="Ático de lujo" loading="lazy">
+  </div>
+  <div class="slide">
+    <img src="/hero/hero-mansion.jpg"
+      alt="Mansión exclusiva" loading="lazy">
+  </div>
+  <div class="slide">
+    <img src="/hero/hero-modern.jpg"
+      alt="Propiedad moderna" loading="lazy">
+  </div>
+</div>
+
+<div class="overlay-left"></div>
+<div class="overlay-bottom"></div>
+
+<div class="content">
+  <div class="badge">
+    Barcelona · International Real Estate
+  </div>
+  <h1>
+    Venda su piso en Barcelona
+    <em>con la discreción</em>
+    que merece
+  </h1>
+  <p class="subtitle">
+    Tasación gratuita y confidencial en 24 horas.
+    Sin compromiso.
+  </p>
+  <div class="buttons">
+    <a href="/vender-tu-piso"
+      class="btn-primary"
+      target="_parent">
+      Solicitar tasación gratuita
+    </a>
+    <a href="/propiedades"
+      class="btn-secondary"
+      target="_parent">
+      Ver propiedades
+    </a>
+  </div>
+</div>
+
+<div class="dots">
+  <button class="dot active"></button>
+  <button class="dot"></button>
+  <button class="dot"></button>
+  <button class="dot"></button>
+  <button class="dot"></button>
+</div>
+
+<script>
+  const duration = 5000
+  let current = 0
+  const dots = document.querySelectorAll('.dot')
+
+  function updateDots(i) {
+    dots.forEach((d, idx) =>
+      d.classList.toggle('active', idx === i))
+  }
+
+  setInterval(() => {
+    current = (current + 1) % 5
+    updateDots(current)
+  }, duration)
+
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      current = i
+      updateDots(i)
+    })
+  })
+</script>
+
+</body>
+</html>
