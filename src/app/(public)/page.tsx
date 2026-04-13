@@ -85,14 +85,15 @@ export default async function HomePage() {
       */}
       <section
         className="hero-section"
-        style={{ position: 'relative', height: '100vh', minHeight: '600px', display: 'flex', overflow: 'hidden', width: '100%', marginTop: '-80px' }}
+        style={{ height: '100vh', minHeight: '600px', display: 'flex', position: 'relative', overflow: 'hidden', marginTop: '-80px', width: '100%' }}
       >
         <HomeSidebar
           destinations={destinations}
           propertyCounts={propertyCounts}
           partners={partners ?? []}
         />
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+        {/* flex-1 inline para que no dependa de Tailwind */}
+        <div style={{ flex: 1, position: 'relative', overflow: 'hidden', minHeight: 0 }}>
           <HeroImageCarousel />
         </div>
       </section>

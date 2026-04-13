@@ -34,8 +34,9 @@ export default function HeroImageCarousel() {
       {images.map((img, index) => (
         <div
           key={index}
-          className="hero-slide"
           style={{
+            position: 'absolute',
+            inset: 0,
             transition: 'opacity 1000ms ease-in-out',
             opacity: index === current ? 1 : 0,
             zIndex: index === current ? 1 : 0,
