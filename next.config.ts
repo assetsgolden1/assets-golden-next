@@ -55,7 +55,17 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // 2. Home page: no cache para evitar versión obsoleta en CDN
+        // 2. hero.html: permite ser embebido como iframe desde mismo origen
+        source: '/hero.html',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+        ],
+      },
+      {
+        // 3. Home page: no cache para evitar versión obsoleta en CDN
         source: "/",
         headers: [
           {
@@ -65,7 +75,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // 3. CSP — excluye /hero/ para evitar interferencias con caché
+        // 4. CSP — excluye /hero/ para evitar interferencias con caché
         source: "/((?!hero/).*)",
         headers: [
           {
@@ -84,7 +94,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // 4. Security headers globales
+        // 5. Security headers globales
         source: "/:path*",
         headers: [
           {
@@ -106,16 +116,6 @@ const nextConfig: NextConfig = {
           {
             key: "Strict-Transport-Security",
             value: "max-age=63072000; includeSubDomains; preload",
-          },
-        ],
-      },
-      {
-        // 5. hero.html: permite ser embebido como iframe desde mismo origen
-        source: '/hero.html',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
           },
         ],
       },
