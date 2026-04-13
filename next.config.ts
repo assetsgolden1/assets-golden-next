@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   // Eliminar header X-Powered-By
   poweredByHeader: false,
 
+  experimental: {
+    optimizeCss: true,
+  },
+
   // Dominios permitidos para next/image
   images: {
     remotePatterns: [
@@ -56,6 +60,16 @@ const nextConfig: NextConfig = {
               "media-src 'self'",
               "frame-src 'none'",
             ].join("; "),
+          },
+        ],
+      },
+      {
+        // Hero images: cache inmutable en edge CDN
+        source: '/hero/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
