@@ -55,17 +55,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // 2. hero.html: permite ser embebido como iframe desde mismo origen
-        source: '/hero.html',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          },
-        ],
-      },
-      {
-        // 3. Home page: no cache para evitar versión obsoleta en CDN
+        // 2. Home page: no cache para evitar versión obsoleta en CDN
         source: "/",
         headers: [
           {
@@ -75,8 +65,8 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // 4. CSP — excluye /hero/ para evitar interferencias con caché
-        source: "/((?!hero/).*)",
+        // 3. CSP global
+        source: "/(.*)",
         headers: [
           {
             key: "Content-Security-Policy",
@@ -88,13 +78,13 @@ const nextConfig: NextConfig = {
               "img-src 'self' blob: data: https://mromkwpqrxpxbbxhdofs.supabase.co https://wloneprkibfjioxwypaw.supabase.co https://images.unsplash.com https://*.supabase.co",
               "connect-src 'self' https://*.supabase.co https://api.anthropic.com",
               "media-src 'self'",
-              "frame-src 'self'",
+              "frame-src 'none'",
             ].join("; "),
           },
         ],
       },
       {
-        // 5. Security headers globales
+        // 4. Security headers globales
         source: "/:path*",
         headers: [
           {
