@@ -19,11 +19,6 @@ const images = [
 
 export default function HeroImageCarousel() {
   const [current, setCurrent] = useState(0)
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -131,61 +126,6 @@ export default function HeroImageCarousel() {
             Ver propiedades
           </a>
         </div>
-      </div>
-
-      {/* Splash — visible durante SSR y primer render, fade out al hidratar */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          zIndex: 10,
-          background: '#131D2E',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '24px',
-          opacity: mounted ? 0 : 1,
-          transition: 'opacity 800ms ease-in-out',
-          pointerEvents: mounted ? 'none' : 'all',
-        }}
-      >
-        {/* Logo AG */}
-        <div style={{
-          fontFamily: '"Playfair Display", Georgia, serif',
-          fontSize: '3rem',
-          fontWeight: 600,
-          color: '#D4AF37',
-          letterSpacing: '0.1em',
-          lineHeight: 1,
-        }}>
-          AG
-        </div>
-        <div style={{
-          fontSize: '0.65rem',
-          fontWeight: 600,
-          letterSpacing: '0.25em',
-          textTransform: 'uppercase',
-          color: 'rgba(212,175,55,0.6)',
-        }}>
-          Assets Golden
-        </div>
-
-        {/* Spinner dorado */}
-        <div style={{
-          width: '32px',
-          height: '32px',
-          borderRadius: '50%',
-          border: '2px solid rgba(212,175,55,0.2)',
-          borderTopColor: '#D4AF37',
-          animation: 'ag-spin 0.8s linear infinite',
-        }} />
-
-        <style>{`
-          @keyframes ag-spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
       </div>
 
       {/* Indicadores */}

@@ -62,24 +62,24 @@ export default function HomeSidebar({ destinations, propertyCounts, partners }: 
         <div className="flex flex-col h-full">
 
           {/* 1. Brand Section */}
-          <div className="p-8 border-b border-primary-foreground/10" style={{ flexShrink: 0 }}>
-            <h2 className="font-display text-2xl text-primary-foreground leading-tight">
+          <div className="p-4 lg:p-6 border-b border-primary-foreground/10" style={{ flexShrink: 0 }}>
+            <h2 className="font-display text-xl lg:text-2xl text-primary-foreground leading-tight">
               Assets Golden
             </h2>
-            <p className="text-xs tracking-widest text-gold mt-2 uppercase">
+            <p className="text-xs tracking-widest text-gold mt-1 uppercase">
               International Real Estate Consulting
             </p>
           </div>
 
           {/* 2. Navigation */}
-          <nav className="flex-1 py-6 overflow-y-auto" style={{ overflowX: 'hidden' }}>
+          <nav className="flex-1 py-3 overflow-hidden" style={{ display: 'flex', flexDirection: 'column' }}>
 
             {/* Países dropdown */}
             {countriesWithProps.length > 0 && (
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setCountriesOpen(!countriesOpen)}
-                  className="group flex items-center justify-between w-full py-5 px-8 bg-gold/10 hover:bg-gold/20 border-l-4 border-gold transition-all duration-300"
+                  className="group flex items-center justify-between w-full py-3 px-6 bg-gold/10 hover:bg-gold/20 border-l-4 border-gold transition-all duration-300"
                 >
                   <span className="font-semibold text-lg flex items-center gap-3 text-gold">
                     <Globe className="w-6 h-6" />
@@ -127,48 +127,48 @@ export default function HomeSidebar({ destinations, propertyCounts, partners }: 
             {/* Coffee Break | Blog */}
             <Link
               href="/blog"
-              className="group flex items-center justify-between py-5 px-8 text-base text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/5 transition-all duration-300"
+              className="group flex items-center justify-between py-3 px-6 text-sm text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/5 transition-all duration-300"
             >
               <span className="font-medium">Coffee Break | Blog</span>
-              <ArrowRight className="w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+              <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
             </Link>
 
             {/* Sobre Nosotros */}
             <Link
               href="/sobre-nosotros"
-              className="group flex items-center justify-between py-5 px-8 text-base text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/5 transition-all duration-300"
+              className="group flex items-center justify-between py-3 px-6 text-sm text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/5 transition-all duration-300"
             >
               <span className="font-medium">Sobre Nosotros</span>
-              <ArrowRight className="w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+              <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
             </Link>
 
             {/* Tengo un Activo */}
             <button
               onClick={() => setAssetFormOpen(true)}
-              className="group flex items-center justify-between w-full py-5 px-8 text-base text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/5 transition-all duration-300"
+              className="group flex items-center justify-between w-full py-3 px-6 text-sm text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/5 transition-all duration-300"
             >
               <span className="font-medium">Tengo un Activo</span>
-              <ArrowRight className="w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+              <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
             </button>
 
             {/* Separador */}
-            <div className="mt-4 pt-4 border-t border-primary-foreground/10">
+            <div className="mt-2 pt-2 border-t border-primary-foreground/10">
               {/* Colabora */}
               <button
                 onClick={() => setCollaborateOpen(true)}
-                className="group flex items-center justify-between w-full py-5 px-8 text-base text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/5 transition-all duration-300"
+                className="group flex items-center justify-between w-full py-3 px-6 text-sm text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/5 transition-all duration-300"
               >
                 <span className="font-medium">Colabora</span>
-                <ArrowRight className="w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
               </button>
 
               {/* Mi Demanda */}
               <button
                 onClick={() => setDemandOpen(true)}
-                className="group flex items-center justify-between w-full py-5 px-8 text-base text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/5 transition-all duration-300"
+                className="group flex items-center justify-between w-full py-3 px-6 text-sm text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/5 transition-all duration-300"
               >
                 <span className="font-medium">Mi Demanda</span>
-                <ArrowRight className="w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
               </button>
             </div>
           </nav>
@@ -178,7 +178,7 @@ export default function HomeSidebar({ destinations, propertyCounts, partners }: 
             <div className="border-t border-primary-foreground/10" style={{ flexShrink: 0 }}>
               <Link
                 href="/partners"
-                className="block w-full p-6 text-left hover:bg-primary-foreground/5 transition-colors group"
+                className="block w-full p-4 text-left hover:bg-primary-foreground/5 transition-colors group"
               >
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs tracking-widest text-primary-foreground/40 uppercase">
@@ -186,7 +186,7 @@ export default function HomeSidebar({ destinations, propertyCounts, partners }: 
                   </p>
                   <ArrowRight className="w-4 h-4 text-gold opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                 </div>
-                <div className="relative h-36">
+                <div className="relative h-28">
                   {partners.map((partner, index) => (
                     <div
                       key={partner.id}
