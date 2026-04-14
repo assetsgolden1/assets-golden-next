@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getProperties } from '@/lib/supabase/queries'
+import { getProperties, getPropertyCountsByCountry } from '@/lib/supabase/queries'
 import PropertyCard from '@/components/properties/PropertyCard'
 import { buttonVariants } from '@/components/ui/button'
 
@@ -20,6 +20,7 @@ interface Props {
     maxPrecio?: string
     ubicacion?: string
     habitaciones?: string
+    pais?: string
     pagina?: string
   }>
 }
@@ -64,15 +65,23 @@ export default async function PropiedadesPage({ searchParams }: Props) {
     if (params.maxPrecio) maxPrice = parseInt(params.maxPrecio, 10)
   }
 
-  const { data: properties, count } = await getProperties({
-    type: params.tipo || undefined,
-    minPrice,
-    maxPrice,
-    location: params.ubicacion || undefined,
-    bedrooms: params.habitaciones ? parseInt(params.habitaciones, 10) : undefined,
-    limit: PAGE_SIZE,
-    offset,
-  })
+  const [{ data: properties, count }, propertyCounts] = await Promise.all([
+    getProperties({
+      type: params.tipo || undefined,
+      minPrice,
+      maxPrice,
+      location: params.ubicacion || undefined,
+      bedrooms: params.habitaciones ? parseInt(params.habitaciones, 10) : undefined,
+      country: params.pais || undefined,
+      limit: PAGE_SIZE,
+      offset,
+    }),
+    getPropertyCountsByCountry(),
+  ])
+
+  const countries = Object.keys(propertyCounts)
+    .filter((c) => propertyCounts[c] > 0)
+    .sort()
 
   const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
 
@@ -82,6 +91,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
       ubicacion: params.ubicacion,
       precio: params.precio,
       habitaciones: params.habitaciones,
+      pais: params.pais,
       ...overrides,
     }
     const qs = Object.entries(merged)
@@ -170,7 +180,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
               Buscar
             </button>
 
-            {(params.tipo || params.precio || params.minPrecio || params.maxPrecio || params.ubicacion || params.habitaciones) && (
+            {(params.tipo || params.precio || params.minPrecio || params.maxPrecio || params.ubicacion || params.habitaciones || params.pais) && (
               <Link
                 href="/propiedades"
                 className="text-xs text-muted-foreground hover:text-gold transition-colors"
@@ -181,6 +191,37 @@ export default async function PropiedadesPage({ searchParams }: Props) {
           </form>
         </div>
       </section>
+
+      {/* Filtro por país */}
+      {countries.length > 0 && (
+        <section className="border-b border-border bg-background/80">
+          <div className="container-luxury py-3 flex flex-wrap gap-2 items-center">
+            <Link
+              href={buildUrl({ pais: undefined, pagina: undefined })}
+              className={`rounded-full px-4 py-1.5 text-xs font-medium border transition-colors ${
+                !params.pais
+                  ? 'bg-gold text-navy border-gold'
+                  : 'border-border text-muted-foreground hover:border-gold hover:text-foreground'
+              }`}
+            >
+              Todos los países
+            </Link>
+            {countries.map((c) => (
+              <Link
+                key={c}
+                href={buildUrl({ pais: c, pagina: undefined })}
+                className={`rounded-full px-4 py-1.5 text-xs font-medium border transition-colors ${
+                  params.pais === c
+                    ? 'bg-gold text-navy border-gold'
+                    : 'border-border text-muted-foreground hover:border-gold hover:text-foreground'
+                }`}
+              >
+                {c}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Grid */}
       <section className="section-padding bg-background">

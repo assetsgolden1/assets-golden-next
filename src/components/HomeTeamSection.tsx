@@ -7,6 +7,7 @@ import { X } from 'lucide-react'
 import type { TeamMember } from '@/types'
 import { buttonVariants } from '@/components/ui/button'
 import { getLinkedin } from '@/lib/constants/linkedinMap'
+import { getLocalPhoto } from '@/lib/constants/photoMap'
 
 // Icono LinkedIn SVG inline (Lucide no incluye Linkedin)
 function LinkedinIcon({ className }: { className?: string }) {
@@ -27,6 +28,10 @@ function getMemberLinkedin(member: TeamMember): string | undefined {
   return getLinkedin(member.name) || member.linkedin_url || undefined
 }
 
+function getMemberPhoto(member: TeamMember): string | null {
+  return member.photo_url || getLocalPhoto(member.name) || null
+}
+
 interface Props {
   team: TeamMember[]
 }
@@ -42,9 +47,9 @@ function MemberCard({ member, onClick }: { member: TeamMember; onClick: () => vo
       <div className="card-premium rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
         {/* Portrait image */}
         <div className="relative h-[320px] overflow-hidden bg-muted flex-shrink-0">
-          {member.photo_url ? (
+          {getMemberPhoto(member) ? (
             <Image
-              src={member.photo_url}
+              src={getMemberPhoto(member)!}
               alt={member.name}
               fill
               className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
@@ -116,9 +121,9 @@ function BioModal({ member, onClose }: { member: TeamMember; onClose: () => void
           {/* Photo */}
           <div className="shrink-0 mx-auto sm:mx-0">
             <div className="relative w-40 h-52 sm:w-48 sm:h-64 overflow-hidden rounded-xl bg-muted">
-              {member.photo_url ? (
+              {getMemberPhoto(member) ? (
                 <Image
-                  src={member.photo_url}
+                  src={getMemberPhoto(member)!}
                   alt={member.name}
                   fill
                   className="object-cover object-top"

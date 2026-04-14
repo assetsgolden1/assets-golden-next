@@ -6,6 +6,7 @@ import { ChevronLeft, ArrowRight, MapPin, BedDouble, Bath, Maximize, Building2 }
 import Link from 'next/link'
 import type { Property } from '@/types'
 import { translatePropertyType, translatePropertyTitle } from '@/lib/propertyTypes'
+import { getCityImage } from '@/lib/constants/cityImages'
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -48,27 +49,6 @@ function formatPrice(price: number | null, currency: string | null): string {
   return `${fmt} ${currency ?? ''}`
 }
 
-const REGION_IMAGES: Record<string, string> = {
-  málaga: 'https://images.unsplash.com/photo-1559553793-ef43b8c9d05e?w=600&q=80',
-  almería: 'https://images.unsplash.com/photo-1586595290686-4b31e9cfa487?w=600&q=80',
-  cádiz: 'https://images.unsplash.com/photo-1534258936925-c58bed479fcb?w=600&q=80',
-  granada: 'https://images.unsplash.com/photo-1509840841025-9088ba78a826?w=600&q=80',
-  barcelona: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=600&q=80',
-  madrid: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&q=80',
-  dubai: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&q=80',
-  tulum: 'https://images.unsplash.com/photo-1605300030985-e3ca0f8b7e4e?w=600&q=80',
-  miami: 'https://images.unsplash.com/photo-1535498730771-e735b998cd64?w=600&q=80',
-  'new york': 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=600&q=80',
-  londres: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600&q=80',
-  guanacaste: 'https://images.unsplash.com/photo-1566438480900-0609be27a4be?w=600&q=80',
-  córdoba: 'https://images.unsplash.com/photo-1609619385002-f40f1df9b7eb?w=600&q=80',
-  cuenca: 'https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=600&q=80',
-  default: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80',
-}
-
-function getRegionImage(key: string): string {
-  return REGION_IMAGES[key] ?? REGION_IMAGES.default
-}
 
 const ITEMS_PER_PAGE = 12
 
@@ -118,7 +98,7 @@ function LocationCard({ displayName, imageKey, count, index, onClick }: Location
     >
       {/* Background image */}
       <Image
-        src={getRegionImage(imageKey)}
+        src={getCityImage(imageKey)}
         alt={displayName}
         fill
         className="object-cover transition-transform duration-500 group-hover:scale-110"

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { getTeamMembers } from '@/lib/supabase/queries'
 import { getLinkedin } from '@/lib/constants/linkedinMap'
+import { getLocalPhoto } from '@/lib/constants/photoMap'
 
 export const metadata: Metadata = {
   title: 'Equipo | Assets Golden',
@@ -90,9 +91,9 @@ function TeamGroup({
           <div key={member.id} className="group">
             {/* Foto */}
             <div className="relative mb-5 aspect-[3/4] overflow-hidden rounded-xl bg-muted">
-              {member.photo_url ? (
+              {(member.photo_url || getLocalPhoto(member.name)) ? (
                 <Image
-                  src={member.photo_url}
+                  src={member.photo_url || getLocalPhoto(member.name)!}
                   alt={member.name}
                   fill
                   className="object-cover object-top transition-transform duration-500 group-hover:scale-105"

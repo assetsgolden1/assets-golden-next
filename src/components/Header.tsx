@@ -13,6 +13,7 @@ const navLinks = [
   { label: "Propiedades", labelEn: "Properties", href: "/propiedades" },
   { label: "Destinos", labelEn: "Destinations", href: "/destinos" },
   { label: "Servicios", labelEn: "Services", href: "/servicios" },
+  { label: "Nosotros", labelEn: "About us", href: "/sobre-nosotros" },
   { label: "Inversiones", labelEn: "Investments", href: "/inversiones" },
   { label: "Blog", labelEn: "Blog", href: "/blog" },
   { label: "Contacto", labelEn: "Contact", href: "/contacto" },
