@@ -54,6 +54,7 @@ export default function AdminLoginPage() {
     }
 
     router.push('/admin')
+    router.refresh()
   }
 
   return (

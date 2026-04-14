@@ -9,16 +9,16 @@ export default async function AdminProtectedLayout({
 }) {
   const supabase = await createClient()
 
-  const { data: { session } } = await supabase.auth.getSession()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-  if (!session) {
+  if (!user || authError) {
     redirect('/admin/login')
   }
 
   const { data: roleData } = await supabase
     .from('user_roles')
     .select('role')
-    .eq('user_id', session.user.id)
+    .eq('user_id', user.id)
     .eq('role', 'admin')
     .maybeSingle()
 
@@ -28,7 +28,7 @@ export default async function AdminProtectedLayout({
 
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
-      <AdminSidebar userEmail={session.user.email ?? ''} />
+      <AdminSidebar userEmail={user.email ?? ''} />
       <main className="flex-1 overflow-auto">
         {children}
       </main>
