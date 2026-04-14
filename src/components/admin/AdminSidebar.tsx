@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
@@ -13,10 +14,6 @@ import {
   Settings,
 } from 'lucide-react'
 
-interface AdminSidebarProps {
-  userEmail: string
-}
-
 const navLinks = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/propiedades', label: 'Propiedades', icon: Building2 },
@@ -28,9 +25,17 @@ const navLinks = [
   { href: '/admin/settings', label: 'Ajustes', icon: Settings },
 ]
 
-export default function AdminSidebar({ userEmail }: AdminSidebarProps) {
+export default function AdminSidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const [userEmail, setUserEmail] = useState('')
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      setUserEmail(data.user?.email ?? '')
+    })
+  }, [])
 
   async function handleSignOut() {
     const supabase = createClient()
