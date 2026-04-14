@@ -1,13 +1,13 @@
 import AdminSidebar from '@/components/admin/AdminSidebar'
 
-export default async function AdminProtectedLayout({
+// DEBUG TEMPORAL: auth check desactivado para aislar el problema.
+// La ruta /admin/login tiene su propio layout en login/layout.tsx
+// que sobreescribe este sidebar.
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  // DEBUG TEMPORAL: auth check desactivado para aislar el problema.
-  // Si el dashboard se ve → el problema está en getUser() / user_roles.
-  // Restaurar auth check una vez confirmado.
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       <AdminSidebar userEmail="debug@test.com" />
