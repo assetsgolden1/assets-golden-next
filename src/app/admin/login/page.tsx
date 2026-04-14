@@ -20,37 +20,34 @@ export default function AdminLoginPage() {
 
     const supabase = createClient()
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
+    console.log('Auth result:', { data, error: authError })
+
     if (authError) {
-      setError('Email o contraseña incorrectos')
+      setError(`Error de auth: ${authError.message}`)
       setLoading(false)
       return
     }
 
-    // Verificar rol admin
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
-      setError('No se pudo iniciar sesión')
-      setLoading(false)
-      return
-    }
+    if (data?.user) {
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .single()
 
-    const { data: roleData } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', session.user.id)
-      .eq('role', 'admin')
-      .maybeSingle()
+      console.log('Role check:', { roleData, roleError })
 
-    if (!roleData) {
-      await supabase.auth.signOut()
-      setError('No tienes acceso de administrador')
-      setLoading(false)
-      return
+      if (roleError || !roleData) {
+        await supabase.auth.signOut()
+        setError(`Sin rol admin: ${roleError?.message ?? 'no encontrado'}`)
+        setLoading(false)
+        return
+      }
     }
 
     router.push('/admin')

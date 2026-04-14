@@ -1,5 +1,3 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 
 export default async function AdminProtectedLayout({
@@ -7,28 +5,12 @@ export default async function AdminProtectedLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-  if (!user || authError) {
-    redirect('/admin/login')
-  }
-
-  const { data: roleData } = await supabase
-    .from('user_roles')
-    .select('role')
-    .eq('user_id', user.id)
-    .eq('role', 'admin')
-    .maybeSingle()
-
-  if (!roleData) {
-    redirect('/')
-  }
-
+  // DEBUG TEMPORAL: auth check desactivado para aislar el problema.
+  // Si el dashboard se ve → el problema está en getUser() / user_roles.
+  // Restaurar auth check una vez confirmado.
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
-      <AdminSidebar userEmail={user.email ?? ''} />
+      <AdminSidebar userEmail="debug@test.com" />
       <main className="flex-1 overflow-auto">
         {children}
       </main>
