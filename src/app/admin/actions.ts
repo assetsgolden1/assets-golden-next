@@ -21,6 +21,18 @@ export async function deleteProperty(id: string) {
   revalidatePath('/propiedades')
 }
 
+export async function bulkHideProperties(ids: string[]) {
+  await supabaseAdmin.from('properties').update({ hidden: true }).in('id', ids)
+  revalidatePath('/admin/propiedades')
+  revalidatePath('/propiedades')
+}
+
+export async function bulkDeleteProperties(ids: string[]) {
+  await supabaseAdmin.from('properties').delete().in('id', ids)
+  revalidatePath('/admin/propiedades')
+  revalidatePath('/propiedades')
+}
+
 export async function updateFeaturedOrder(id: string, order: number) {
   await supabaseAdmin.from('properties').update({ featured_order: order }).eq('id', id)
   revalidatePath('/admin/destacadas')
