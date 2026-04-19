@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { ExternalLink } from 'lucide-react'
 import { bulkHideProperties, bulkDeleteProperties } from '@/app/admin/actions'
+import { translatePropertyType } from '@/lib/propertyTypes'
 import { FeaturedToggleButton } from './FeaturedToggleButton'
 import { PropertyVisibilityToggle } from './PropertyVisibilityToggle'
 import { DeletePropertyButton } from './DeletePropertyButton'
@@ -30,6 +31,15 @@ export function PropiedadesTable({
   filter,
   search,
   pais,
+  ciudad,
+  tipo,
+  precioMin,
+  precioMax,
+  countries,
+  cities,
+  types,
+  minPrice,
+  maxPrice,
 }: {
   properties: PropertyRow[]
   totalCount: number
@@ -38,11 +48,19 @@ export function PropiedadesTable({
   filter: string
   search: string
   pais: string
+  ciudad: string
+  tipo: string
+  precioMin: string
+  precioMax: string
+  countries: string[]
+  cities: string[]
+  types: string[]
+  minPrice: number
+  maxPrice: number
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [pending, startTransition] = useTransition()
 
-  const totalPages = Math.ceil(totalCount / pageSize)
   const start = totalCount === 0 ? 0 : page * pageSize + 1
   const end = Math.min((page + 1) * pageSize, totalCount)
 
@@ -50,6 +68,10 @@ export function PropiedadesTable({
     const p = new URLSearchParams()
     if (search) p.set('search', search)
     if (pais) p.set('pais', pais)
+    if (ciudad) p.set('ciudad', ciudad)
+    if (tipo) p.set('tipo', tipo)
+    if (precioMin) p.set('precio_min', precioMin)
+    if (precioMax) p.set('precio_max', precioMax)
     if (filter) p.set('filter', filter)
     p.set('page', String(page))
     Object.entries(overrides).forEach(([k, v]) => {
@@ -94,13 +116,128 @@ export function PropiedadesTable({
     })
   }
 
+  const hasActiveFilters = search || pais || ciudad || tipo || precioMin || precioMax
+
   return (
     <div>
-      {/* Barra de acciones / contador */}
-      <div className={`flex items-center gap-3 mb-4 px-4 py-3 rounded-lg border text-sm ${
-        selected.size > 0
-          ? 'bg-amber-50 border-amber-200'
-          : 'bg-gray-50 border-gray-200'
+      {/* Panel de filtros */}
+      <form
+        method="GET"
+        action="/admin/propiedades"
+        className="bg-white rounded-xl shadow-sm p-4 mb-4 flex flex-wrap gap-3 items-end"
+      >
+        <input type="hidden" name="filter" value={filter} />
+        <input type="hidden" name="page" value="0" />
+
+        {/* Búsqueda */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-gray-500 font-medium">Título</label>
+          <input
+            type="text"
+            name="search"
+            defaultValue={search}
+            placeholder="Buscar..."
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
+          />
+        </div>
+
+        {/* País */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-gray-500 font-medium">País</label>
+          <select
+            name="pais"
+            defaultValue={pais}
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white w-44"
+          >
+            <option value="">Todos los países</option>
+            {countries.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Ciudad */}
+        {cities.length > 0 && (
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-gray-500 font-medium">Ciudad</label>
+            <select
+              name="ciudad"
+              defaultValue={ciudad}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white w-44"
+            >
+              <option value="">Todas las ciudades</option>
+              {cities.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Tipo */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-gray-500 font-medium">Tipo</label>
+          <select
+            name="tipo"
+            defaultValue={tipo}
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white w-44"
+          >
+            <option value="">Todos los tipos</option>
+            {types.map((t) => (
+              <option key={t} value={t}>{translatePropertyType(t)}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Precio mín */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-gray-500 font-medium">
+            Precio mín {minPrice > 0 && <span className="text-gray-400">({minPrice.toLocaleString('es-ES')}€)</span>}
+          </label>
+          <input
+            type="number"
+            name="precio_min"
+            defaultValue={precioMin}
+            placeholder="Mínimo"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-36"
+          />
+        </div>
+
+        {/* Precio máx */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-gray-500 font-medium">
+            Precio máx {maxPrice > 0 && <span className="text-gray-400">({maxPrice.toLocaleString('es-ES')}€)</span>}
+          </label>
+          <input
+            type="number"
+            name="precio_max"
+            defaultValue={precioMax}
+            placeholder="Máximo"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-36"
+          />
+        </div>
+
+        {/* Acciones */}
+        <div className="flex gap-2 items-end">
+          <button
+            type="submit"
+            className="bg-[#0a1628] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#1a2638] transition-colors"
+          >
+            Filtrar
+          </button>
+          {hasActiveFilters && (
+            <a
+              href={`/admin/propiedades${filter ? `?filter=${filter}` : ''}`}
+              className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm hover:bg-gray-200 transition-colors"
+            >
+              Limpiar
+            </a>
+          )}
+        </div>
+      </form>
+
+      {/* Barra de acciones bulk / contador */}
+      <div className={`flex items-center gap-3 mb-3 px-4 py-2.5 rounded-lg border text-sm ${
+        selected.size > 0 ? 'bg-amber-50 border-amber-200' : 'bg-gray-50 border-gray-200'
       }`}>
         <span className="text-gray-600">
           {selected.size > 0
@@ -211,7 +348,9 @@ export function PropiedadesTable({
                     </td>
                     <td className="px-4 py-2">
                       {prop.property_type
-                        ? <span className="bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded-full">{prop.property_type}</span>
+                        ? <span className="bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded-full">
+                            {translatePropertyType(prop.property_type)}
+                          </span>
                         : '—'}
                     </td>
                     <td className="px-4 py-2 text-center">
@@ -253,7 +392,9 @@ export function PropiedadesTable({
         >
           ← Anterior
         </a>
-        <span className="text-sm text-gray-500">Página {page + 1} de {Math.max(1, totalPages)}</span>
+        <span className="text-sm text-gray-500">
+          Página {page + 1} de {Math.max(1, Math.ceil(totalCount / pageSize))}
+        </span>
         <a
           href={end < totalCount ? buildUrl({ page: String(page + 1) }) : '#'}
           aria-disabled={end >= totalCount}

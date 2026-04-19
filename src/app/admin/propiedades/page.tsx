@@ -13,36 +13,113 @@ const TABS = [
 export default async function PropiedadesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; search?: string; pais?: string; filter?: string }>
+  searchParams: Promise<{
+    page?: string
+    search?: string
+    pais?: string
+    ciudad?: string
+    tipo?: string
+    precio_min?: string
+    precio_max?: string
+    filter?: string
+  }>
 }) {
   const params = await searchParams
   const page = Math.max(0, parseInt(params.page ?? '0') || 0)
   const search = params.search ?? ''
   const pais = params.pais ?? ''
+  const ciudad = params.ciudad ?? ''
+  const tipo = params.tipo ?? ''
+  const precioMin = params.precio_min ?? ''
+  const precioMax = params.precio_max ?? ''
   const filter = params.filter ?? ''
   const offset = page * PAGE_SIZE
 
-  let query = supabaseAdmin
-    .from('properties')
-    .select(
-      'id,title,location,country,price,currency,property_type,featured,hidden,status,image_url,slug',
-      { count: 'exact' }
-    )
-    .order('created_at', { ascending: false })
-    .range(offset, offset + PAGE_SIZE - 1)
+  // Queries de opciones y principal en paralelo
+  const [
+    { data: countriesData },
+    { data: citiesData },
+    { data: typesData },
+    { data: priceData },
+    mainResult,
+  ] = await Promise.all([
+    // Países únicos
+    supabaseAdmin
+      .from('properties')
+      .select('country')
+      .not('country', 'is', null)
+      .order('country'),
 
-  if (search) query = query.ilike('title', `%${search}%`)
-  if (pais) query = query.eq('country', pais)
+    // Ciudades (filtradas por país si hay uno activo)
+    pais
+      ? supabaseAdmin
+          .from('properties')
+          .select('location')
+          .not('location', 'is', null)
+          .eq('country', pais)
+          .order('location')
+      : supabaseAdmin
+          .from('properties')
+          .select('location')
+          .not('location', 'is', null)
+          .order('location'),
 
-  if (filter === 'visible') {
-    query = query.or('hidden.is.null,hidden.eq.false')
-  } else if (filter === 'hidden') {
-    query = query.eq('hidden', true)
-  } else if (filter === 'featured') {
-    query = query.eq('featured', true)
-  }
+    // Tipos únicos
+    supabaseAdmin
+      .from('properties')
+      .select('property_type')
+      .not('property_type', 'is', null),
 
-  const { data, count, error } = await query
+    // Rango de precios
+    supabaseAdmin
+      .from('properties')
+      .select('price')
+      .not('price', 'is', null)
+      .order('price', { ascending: true }),
+
+    // Query principal con todos los filtros
+    (() => {
+      let q = supabaseAdmin
+        .from('properties')
+        .select(
+          'id,title,location,country,price,currency,property_type,featured,hidden,status,image_url,slug',
+          { count: 'exact' }
+        )
+        .order('created_at', { ascending: false })
+        .range(offset, offset + PAGE_SIZE - 1)
+
+      if (search) q = q.ilike('title', `%${search}%`)
+      if (pais) q = q.eq('country', pais)
+      if (ciudad) q = q.eq('location', ciudad)
+      if (tipo) q = q.eq('property_type', tipo)
+      if (precioMin) q = q.gte('price', parseInt(precioMin))
+      if (precioMax) q = q.lte('price', parseInt(precioMax))
+
+      if (filter === 'visible') q = q.or('hidden.is.null,hidden.eq.false')
+      else if (filter === 'hidden') q = q.eq('hidden', true)
+      else if (filter === 'featured') q = q.eq('featured', true)
+
+      return q
+    })(),
+  ])
+
+  const uniqueCountries = [...new Set(
+    (countriesData ?? []).map((p) => p.country as string).filter(Boolean)
+  )].sort()
+
+  const uniqueCities = [...new Set(
+    (citiesData ?? []).map((p) => p.location as string).filter(Boolean)
+  )].sort()
+
+  const uniqueTypes = [...new Set(
+    (typesData ?? []).map((p) => p.property_type as string).filter(Boolean)
+  )].sort()
+
+  const prices = (priceData ?? []).map((p) => p.price as number)
+  const minPrice = prices[0] ?? 0
+  const maxPrice = prices[prices.length - 1] ?? 0
+
+  const { data, count, error } = mainResult
 
   if (error) {
     return (
@@ -76,6 +153,10 @@ export default async function PropiedadesPage({
           const p = new URLSearchParams()
           if (search) p.set('search', search)
           if (pais) p.set('pais', pais)
+          if (ciudad) p.set('ciudad', ciudad)
+          if (tipo) p.set('tipo', tipo)
+          if (precioMin) p.set('precio_min', precioMin)
+          if (precioMax) p.set('precio_max', precioMax)
           if (tab.key) p.set('filter', tab.key)
           p.set('page', '0')
           return (
@@ -94,32 +175,6 @@ export default async function PropiedadesPage({
         })}
       </div>
 
-      {/* Filtros */}
-      <form method="GET" action="/admin/propiedades" className="bg-white rounded-xl shadow-sm p-4 mb-5 flex flex-wrap gap-3">
-        <input
-          type="text"
-          name="search"
-          defaultValue={search}
-          placeholder="Buscar por título..."
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 min-w-[200px]"
-        />
-        <input
-          type="text"
-          name="pais"
-          defaultValue={pais}
-          placeholder="País (ej: España)"
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <input type="hidden" name="filter" value={filter} />
-        <input type="hidden" name="page" value="0" />
-        <button
-          type="submit"
-          className="bg-[#0a1628] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#1a2638] transition-colors"
-        >
-          Filtrar
-        </button>
-      </form>
-
       <PropiedadesTable
         properties={(data as PropertyRow[]) ?? []}
         totalCount={count ?? 0}
@@ -128,6 +183,15 @@ export default async function PropiedadesPage({
         filter={filter}
         search={search}
         pais={pais}
+        ciudad={ciudad}
+        tipo={tipo}
+        precioMin={precioMin}
+        precioMax={precioMax}
+        countries={uniqueCountries}
+        cities={uniqueCities}
+        types={uniqueTypes}
+        minPrice={minPrice}
+        maxPrice={maxPrice}
       />
     </div>
   )
