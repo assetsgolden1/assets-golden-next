@@ -8,7 +8,6 @@ interface Property {
   id: string
   title: string
   location: string | null
-  province: string | null
   country: string | null
   price: number | null
   currency: string | null
@@ -17,7 +16,6 @@ interface Property {
   hidden: boolean | null
   status: string
   image_url: string | null
-  featured_order: number | null
   slug: string | null
 }
 
@@ -40,13 +38,12 @@ export default async function PropiedadesPage({
   const search = params.search ?? ''
   const pais = params.pais ?? ''
   const filter = params.filter ?? ''
-
   const offset = page * PAGE_SIZE
 
   let query = supabaseAdmin
     .from('properties')
     .select(
-      'id,title,location,province,country,price,currency,property_type,featured,hidden,status,image_url,featured_order,slug',
+      'id,title,location,country,price,currency,property_type,featured,hidden,status,image_url,slug',
       { count: 'exact' }
     )
     .order('created_at', { ascending: false })
@@ -56,17 +53,39 @@ export default async function PropiedadesPage({
   if (pais) query = query.eq('country', pais)
 
   if (filter === 'visible') {
-    query = query.neq('hidden', true)
+    query = query.or('hidden.is.null,hidden.eq.false')
   } else if (filter === 'hidden') {
     query = query.eq('hidden', true)
   } else if (filter === 'featured') {
     query = query.eq('featured', true)
   }
 
-  const { data, count } = await query
+  const { data, count, error } = await query
+
+  if (error) {
+    return (
+      <div className="p-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Propiedades</h1>
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-red-700">
+          <p className="font-semibold mb-1">Error al cargar propiedades</p>
+          <p className="text-sm font-mono">{error.message}</p>
+          {error.message.includes('hidden') && (
+            <p className="mt-3 text-sm text-red-600">
+              La columna <code className="bg-red-100 px-1 rounded">hidden</code> no existe en la tabla.
+              Ejecuta en Supabase SQL Editor:
+              <br />
+              <code className="bg-red-100 px-1 rounded mt-1 inline-block">
+                ALTER TABLE properties ADD COLUMN IF NOT EXISTS hidden boolean DEFAULT false;
+              </code>
+            </p>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   const properties = (data as Property[]) ?? []
   const total = count ?? 0
-
   const start = total === 0 ? 0 : page * PAGE_SIZE + 1
   const end = Math.min((page + 1) * PAGE_SIZE, total)
 
@@ -114,7 +133,7 @@ export default async function PropiedadesPage({
         })}
       </div>
 
-      {/* Filtros — formulario GET puro */}
+      {/* Filtros */}
       <form method="GET" action="/admin/propiedades" className="bg-white rounded-xl shadow-sm p-4 mb-5 flex flex-wrap gap-3">
         <input
           type="text"
@@ -171,9 +190,8 @@ export default async function PropiedadesPage({
                     <td className="px-4 py-2">
                       <img
                         src={prop.image_url ?? '/placeholder-property.svg'}
-                        alt={prop.title}
+                        alt=""
                         className="w-10 h-10 object-cover rounded-lg"
-                        onError={(e) => { e.currentTarget.src = '/placeholder-property.svg' }}
                       />
                     </td>
                     <td className="px-4 py-2 max-w-[200px]">
@@ -206,9 +224,7 @@ export default async function PropiedadesPage({
                         <span className="bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded-full">
                           {prop.property_type}
                         </span>
-                      ) : (
-                        '—'
-                      )}
+                      ) : '—'}
                     </td>
                     <td className="px-4 py-2 text-center">
                       <FeaturedToggleButton id={prop.id} featured={prop.featured} />
