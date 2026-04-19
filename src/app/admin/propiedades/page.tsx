@@ -43,12 +43,14 @@ export default async function PropiedadesPage({
     { data: priceData },
     mainResult,
   ] = await Promise.all([
-    // Países únicos
+    // Países únicos — limit alto para superar el default 1000 de PostgREST
     supabaseAdmin
       .from('properties')
       .select('country')
       .not('country', 'is', null)
-      .order('country'),
+      .not('country', 'eq', '')
+      .order('country')
+      .limit(10000),
 
     // Ciudades (filtradas por país si hay uno activo)
     pais
@@ -56,26 +58,33 @@ export default async function PropiedadesPage({
           .from('properties')
           .select('location')
           .not('location', 'is', null)
+          .not('location', 'eq', '')
           .eq('country', pais)
           .order('location')
+          .limit(10000)
       : supabaseAdmin
           .from('properties')
           .select('location')
           .not('location', 'is', null)
-          .order('location'),
+          .not('location', 'eq', '')
+          .order('location')
+          .limit(10000),
 
     // Tipos únicos
     supabaseAdmin
       .from('properties')
       .select('property_type')
-      .not('property_type', 'is', null),
+      .not('property_type', 'is', null)
+      .not('property_type', 'eq', '')
+      .limit(10000),
 
     // Rango de precios
     supabaseAdmin
       .from('properties')
       .select('price')
       .not('price', 'is', null)
-      .order('price', { ascending: true }),
+      .order('price', { ascending: true })
+      .limit(10000),
 
     // Query principal con todos los filtros
     (() => {
