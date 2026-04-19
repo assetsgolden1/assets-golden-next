@@ -36,24 +36,12 @@ export default async function PropiedadesPage({
   const filter = params.filter ?? ''
   const offset = page * PAGE_SIZE
 
-  // Queries de opciones y principal en paralelo
-  const [
-    { data: countriesData },
-    { data: citiesData },
-    { data: typesData },
-    { data: priceData },
-    mainResult,
-  ] = await Promise.all([
-    // Países únicos — limit alto para superar el default 1000 de PostgREST
-    supabaseAdmin
-      .from('properties')
-      .select('country')
-      .not('country', 'is', null)
-      .not('country', 'eq', '')
-      .order('country')
-      .limit(10000),
+  // Queries en paralelo: filtros vía RPC (DISTINCT server-side) + principal
+  const [filtersResult, citiesResult, priceResult, mainResult] = await Promise.all([
+    // Países y tipos únicos — GROUP BY en la DB, sin límite de rows
+    supabaseAdmin.rpc('get_property_filters'),
 
-    // Ciudades (filtradas por país si hay uno activo)
+    // Ciudades filtradas por país si hay uno activo
     pais
       ? supabaseAdmin
           .from('properties')
@@ -62,22 +50,14 @@ export default async function PropiedadesPage({
           .not('location', 'eq', '')
           .eq('country', pais)
           .order('location')
-          .limit(10000)
+          .limit(5000)
       : supabaseAdmin
           .from('properties')
           .select('location')
           .not('location', 'is', null)
           .not('location', 'eq', '')
           .order('location')
-          .limit(10000),
-
-    // Tipos únicos
-    supabaseAdmin
-      .from('properties')
-      .select('property_type')
-      .not('property_type', 'is', null)
-      .not('property_type', 'eq', '')
-      .limit(10000),
+          .limit(5000),
 
     // Rango de precios
     supabaseAdmin
@@ -114,19 +94,20 @@ export default async function PropiedadesPage({
     })(),
   ])
 
-  const uniqueCountries = [...new Set(
-    (countriesData ?? []).map((p) => p.country as string).filter(Boolean)
-  )].sort()
+  // Si el RPC aún no existe, caer de vuelta a listas vacías (no rompe la UI)
+  const rpcFilters = filtersResult.data as {
+    countries: string[] | null
+    types: string[] | null
+  } | null
+
+  const uniqueCountries: string[] = (rpcFilters?.countries ?? []).sort()
+  const uniqueTypes: string[] = (rpcFilters?.types ?? []).sort()
 
   const uniqueCities = [...new Set(
-    (citiesData ?? []).map((p) => p.location as string).filter(Boolean)
+    (citiesResult.data ?? []).map((p) => p.location as string).filter(Boolean)
   )].sort()
 
-  const uniqueTypes = [...new Set(
-    (typesData ?? []).map((p) => p.property_type as string).filter(Boolean)
-  )].sort()
-
-  const prices = (priceData ?? []).map((p) => p.price as number)
+  const prices = (priceResult.data ?? []).map((p) => p.price as number)
   const minPrice = prices[0] ?? 0
   const maxPrice = prices[prices.length - 1] ?? 0
 

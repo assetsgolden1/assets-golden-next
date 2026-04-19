@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { createProperty } from '@/app/admin/actions'
 import { propertyTypeMap } from '@/lib/propertyTypes'
 
 const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF']
@@ -34,17 +33,63 @@ export default function NuevaPropiedadPage() {
     setStatus('loading')
     setErrorMsg('')
 
-    const form = e.currentTarget
-    const formData = new FormData(form)
-    formData.set('is_development', isDev ? 'true' : 'false')
-    formData.set('featured', isFeatured ? 'true' : 'false')
+    try {
+      const form = e.currentTarget
+      const rawData = new FormData(form)
 
-    const result = await createProperty(formData)
-    if (result.success) {
-      setStatus('success')
-      setTimeout(() => router.push('/admin/propiedades'), 1500)
-    } else {
-      setErrorMsg(result.error ?? 'Error desconocido')
+      // Subir imagen si hay una
+      let imageUrl: string | null = null
+      const file = rawData.get('image') as File | null
+      if (file && file.size > 0) {
+        const fd = new FormData()
+        fd.append('file', file)
+        const uploadRes = await fetch('/api/admin/upload-image', {
+          method: 'POST',
+          body: fd,
+        })
+        const uploadData = await uploadRes.json()
+        if (!uploadRes.ok) {
+          setErrorMsg(uploadData.error ?? 'Error subiendo imagen')
+          setStatus('error')
+          return
+        }
+        imageUrl = uploadData.url
+      }
+
+      // Crear la propiedad
+      const res = await fetch('/api/admin/create-property', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: rawData.get('title'),
+          description: rawData.get('description'),
+          price: rawData.get('price'),
+          currency: rawData.get('currency'),
+          location: rawData.get('location'),
+          province: rawData.get('province'),
+          country: rawData.get('country'),
+          bedrooms: rawData.get('bedrooms'),
+          bathrooms: rawData.get('bathrooms'),
+          area_sqm: rawData.get('area_sqm'),
+          property_type: rawData.get('property_type'),
+          status: rawData.get('status'),
+          idealista_url: rawData.get('idealista_url'),
+          is_development: isDev,
+          featured: isFeatured,
+          image_url: imageUrl,
+        }),
+      })
+
+      const result = await res.json()
+      if (!res.ok) {
+        setErrorMsg(result.error ?? 'Error desconocido')
+        setStatus('error')
+      } else {
+        setStatus('success')
+        setTimeout(() => router.push('/admin/propiedades'), 1500)
+      }
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Error inesperado')
       setStatus('error')
     }
   }
