@@ -33,6 +33,20 @@ export async function bulkDeleteProperties(ids: string[]) {
   revalidatePath('/propiedades')
 }
 
+export async function togglePropertySold(id: string, sold: boolean) {
+  const update: Record<string, unknown> = { sold }
+  if (sold) update.hidden = true
+  await supabaseAdmin.from('properties').update(update).eq('id', id)
+  revalidatePath('/admin/propiedades')
+  revalidatePath('/propiedades')
+}
+
+export async function bulkMarkAsSold(ids: string[]) {
+  await supabaseAdmin.from('properties').update({ sold: true, hidden: true }).in('id', ids)
+  revalidatePath('/admin/propiedades')
+  revalidatePath('/propiedades')
+}
+
 export async function updateFeaturedOrder(id: string, order: number) {
   await supabaseAdmin.from('properties').update({ featured_order: order }).eq('id', id)
   revalidatePath('/admin/destacadas')

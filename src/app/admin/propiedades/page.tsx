@@ -7,6 +7,7 @@ const TABS = [
   { key: '', label: 'Todas' },
   { key: 'visible', label: 'Visibles' },
   { key: 'hidden', label: 'Ocultas' },
+  { key: 'sold', label: 'Vendidas' },
   { key: 'featured', label: 'Destacadas' },
 ]
 
@@ -91,7 +92,7 @@ export default async function PropiedadesPage({
       let q = supabaseAdmin
         .from('properties')
         .select(
-          'id,title,location,country,price,currency,property_type,featured,hidden,status,image_url,slug',
+          'id,title,location,country,price,currency,property_type,featured,hidden,sold,status,image_url,slug',
           { count: 'exact' }
         )
         .order('created_at', { ascending: false })
@@ -104,8 +105,9 @@ export default async function PropiedadesPage({
       if (precioMin) q = q.gte('price', parseInt(precioMin))
       if (precioMax) q = q.lte('price', parseInt(precioMax))
 
-      if (filter === 'visible') q = q.or('hidden.is.null,hidden.eq.false')
-      else if (filter === 'hidden') q = q.eq('hidden', true)
+      if (filter === 'visible') q = q.or('hidden.is.null,hidden.eq.false').or('sold.is.null,sold.eq.false')
+      else if (filter === 'hidden') q = q.eq('hidden', true).or('sold.is.null,sold.eq.false')
+      else if (filter === 'sold') q = q.eq('sold', true)
       else if (filter === 'featured') q = q.eq('featured', true)
 
       return q

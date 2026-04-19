@@ -2,11 +2,11 @@
 
 import { useState, useTransition } from 'react'
 import { ExternalLink } from 'lucide-react'
-import { bulkHideProperties, bulkDeleteProperties } from '@/app/admin/actions'
+import { bulkHideProperties, bulkDeleteProperties, bulkMarkAsSold } from '@/app/admin/actions'
 import { translatePropertyType } from '@/lib/propertyTypes'
 import { FeaturedToggleButton } from './FeaturedToggleButton'
 import { PropertyVisibilityToggle } from './PropertyVisibilityToggle'
-import { DeletePropertyButton } from './DeletePropertyButton'
+import { SoldToggleButton } from './SoldToggleButton'
 
 export interface PropertyRow {
   id: string
@@ -18,6 +18,7 @@ export interface PropertyRow {
   property_type: string | null
   featured: boolean
   hidden: boolean | null
+  sold: boolean | null
   status: string
   image_url: string | null
   slug: string | null
@@ -112,6 +113,15 @@ export function PropiedadesTable({
     if (!window.confirm(`¿ELIMINAR PERMANENTEMENTE ${selected.size} propiedades? Esta acción no se puede deshacer.`)) return
     startTransition(async () => {
       await bulkDeleteProperties(Array.from(selected))
+      setSelected(new Set())
+    })
+  }
+
+  function handleBulkSold() {
+    if (selected.size === 0) return
+    if (!window.confirm(`¿Marcar ${selected.size} propiedades como vendidas? Se ocultarán de la web.`)) return
+    startTransition(async () => {
+      await bulkMarkAsSold(Array.from(selected))
       setSelected(new Set())
     })
   }
@@ -254,11 +264,11 @@ export function PropiedadesTable({
               Ocultar ({selected.size})
             </button>
             <button
-              onClick={handleBulkDelete}
+              onClick={handleBulkSold}
               disabled={pending}
-              className="px-3 py-1.5 bg-red-600 text-white rounded-md text-xs font-semibold hover:bg-red-700 disabled:opacity-50"
+              className="px-3 py-1.5 bg-green-600 text-white rounded-md text-xs font-semibold hover:bg-green-700 disabled:opacity-50"
             >
-              Eliminar ({selected.size})
+              Vendidas ({selected.size})
             </button>
             <button
               onClick={() => setSelected(new Set())}
@@ -291,7 +301,8 @@ export function PropiedadesTable({
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Tipo</th>
                 <th className="text-center px-4 py-3 text-gray-600 font-medium">Destacada</th>
                 <th className="text-center px-4 py-3 text-gray-600 font-medium">Visible</th>
-                <th className="text-center px-4 py-3 text-gray-600 font-medium">Acciones</th>
+                <th className="text-center px-4 py-3 text-gray-600 font-medium">Vendida</th>
+                <th className="text-center px-4 py-3 text-gray-600 font-medium">Ver</th>
               </tr>
             </thead>
             <tbody>
@@ -360,20 +371,20 @@ export function PropiedadesTable({
                       <PropertyVisibilityToggle id={prop.id} hidden={prop.hidden ?? false} />
                     </td>
                     <td className="px-4 py-2 text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        {prop.slug && (
-                          <a
-                            href={`/propiedades/${prop.slug}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-blue-500 hover:text-blue-700 p-1"
-                            title="Ver en sitio"
-                          >
-                            <ExternalLink size={15} />
-                          </a>
-                        )}
-                        <DeletePropertyButton id={prop.id} title={prop.title} />
-                      </div>
+                      <SoldToggleButton id={prop.id} sold={prop.sold ?? false} />
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {prop.slug && (
+                        <a
+                          href={`/propiedades/${prop.slug}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-blue-500 hover:text-blue-700 p-1"
+                          title="Ver en sitio"
+                        >
+                          <ExternalLink size={15} />
+                        </a>
+                      )}
                     </td>
                   </tr>
                 ))
