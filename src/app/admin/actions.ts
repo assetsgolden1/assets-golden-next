@@ -9,6 +9,18 @@ export async function toggleFeatured(id: string, featured: boolean) {
   revalidatePath('/admin/destacadas')
 }
 
+export async function togglePropertyVisibility(id: string, hidden: boolean) {
+  await supabaseAdmin.from('properties').update({ hidden }).eq('id', id)
+  revalidatePath('/admin/propiedades')
+  revalidatePath('/propiedades')
+}
+
+export async function deleteProperty(id: string) {
+  await supabaseAdmin.from('properties').delete().eq('id', id)
+  revalidatePath('/admin/propiedades')
+  revalidatePath('/propiedades')
+}
+
 export async function updateFeaturedOrder(id: string, order: number) {
   await supabaseAdmin.from('properties').update({ featured_order: order }).eq('id', id)
   revalidatePath('/admin/destacadas')

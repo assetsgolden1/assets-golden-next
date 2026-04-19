@@ -88,15 +88,12 @@ export function DestacadasManager({
                 key={prop.id}
                 className="flex items-center gap-4 px-4 py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50"
               >
-                {prop.image_url ? (
-                  <img
-                    src={prop.image_url}
-                    alt={prop.title}
-                    className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
-                  />
-                ) : (
-                  <div className="w-12 h-12 bg-gray-200 rounded-lg flex-shrink-0" />
-                )}
+                <img
+                  src={prop.image_url ?? '/placeholder-property.svg'}
+                  alt={prop.title}
+                  className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
+                  onError={(e) => { e.currentTarget.src = '/placeholder-property.svg' }}
+                />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-gray-800 truncate">{prop.title}</p>
                   <p className="text-xs text-gray-400">{prop.location ?? '—'}</p>

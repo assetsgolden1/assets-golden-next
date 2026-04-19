@@ -31,6 +31,7 @@ export async function getProperties(filters?: GetPropertiesFilters) {
     .from('properties')
     .select('*', { count: 'exact' })
     .in('status', ['active', 'available'])
+    .neq('hidden', true)
 
   if (filters?.type) query = query.eq('property_type', filters.type)
   if (filters?.minPrice) query = query.gte('price', filters.minPrice)
@@ -71,6 +72,7 @@ export async function getFeaturedProperties(limit = 6) {
     .select('*')
     .eq('featured', true)
     .in('status', ['active', 'available'])
+    .neq('hidden', true)
     .limit(limit)
     .order('created_at', { ascending: false })
   return { data: (data ?? []) as Property[], error }
@@ -82,6 +84,7 @@ export async function getAllPropertySlugs() {
     .from('properties')
     .select('slug')
     .in('status', ['active', 'available'])
+    .neq('hidden', true)
     .not('slug', 'is', null)
   return (data ?? []).map((p) => p.slug as string)
 }
@@ -205,6 +208,7 @@ export async function getPropertiesByCountry(country: string) {
     .from('properties')
     .select('*')
     .in('status', ['active', 'available'])
+    .neq('hidden', true)
     .eq('country', country)
     .order('province', { ascending: true, nullsFirst: false })
     .order('location', { ascending: true })
@@ -219,6 +223,7 @@ export async function getPropertyCountsByCountry(): Promise<Record<string, numbe
     .from('properties')
     .select('country')
     .in('status', ['active', 'available'])
+    .neq('hidden', true)
     .not('country', 'is', null)
 
   const counts: Record<string, number> = {}
