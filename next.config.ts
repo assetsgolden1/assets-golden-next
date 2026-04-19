@@ -75,7 +75,7 @@ const nextConfig: NextConfig = {
               "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' blob: data: https://mromkwpqrxpxbbxhdofs.supabase.co https://wloneprkibfjioxwypaw.supabase.co https://images.unsplash.com https://*.supabase.co",
+              "img-src 'self' blob: data: https://mromkwpqrxpxbbxhdofs.supabase.co https://wloneprkibfjioxwypaw.supabase.co https://images.unsplash.com https://*.supabase.co https://medianewbuild.com",
               "connect-src 'self' https://*.supabase.co https://api.anthropic.com",
               "media-src 'self'",
               "frame-src 'none'",

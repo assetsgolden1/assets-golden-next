@@ -110,7 +110,7 @@ export default async function PropiedadesPage({
           placeholder="País (ej: España)"
           className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        {filter && <input type="hidden" name="filter" value={filter} />}
+        <input type="hidden" name="filter" value={filter} />
         <input type="hidden" name="page" value="0" />
         <button
           type="submit"
