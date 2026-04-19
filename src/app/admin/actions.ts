@@ -52,6 +52,71 @@ export async function updateFeaturedOrder(id: string, order: number) {
   revalidatePath('/admin/destacadas')
 }
 
+// Nueva propiedad
+export async function createProperty(formData: FormData) {
+  const title = (formData.get('title') as string).trim()
+  if (!title) return { success: false, error: 'Título obligatorio' }
+
+  // Slug único a partir del título
+  const baseSlug = title
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+  const slug = `${baseSlug}-${Date.now().toString(36)}`
+
+  // Subir imagen si viene una
+  let imageUrl: string | null = null
+  const file = formData.get('image') as File | null
+  if (file && file.size > 0) {
+    const ext = file.name.split('.').pop() ?? 'jpg'
+    const path = `properties/${slug}.${ext}`
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from('property-images')
+      .upload(path, file, { upsert: true })
+    if (!uploadError) {
+      const { data: urlData } = supabaseAdmin.storage
+        .from('property-images')
+        .getPublicUrl(path)
+      imageUrl = urlData.publicUrl
+    }
+  }
+
+  const price = formData.get('price') ? Number(formData.get('price')) : null
+  const bedrooms = formData.get('bedrooms') ? Number(formData.get('bedrooms')) : null
+  const bathrooms = formData.get('bathrooms') ? Number(formData.get('bathrooms')) : null
+  const area = formData.get('area_sqm') ? Number(formData.get('area_sqm')) : null
+
+  const { error } = await supabaseAdmin.from('properties').insert({
+    title,
+    slug,
+    description: (formData.get('description') as string)?.trim() || null,
+    price,
+    currency: (formData.get('currency') as string) || 'EUR',
+    location: (formData.get('location') as string)?.trim() || null,
+    province: (formData.get('province') as string)?.trim() || null,
+    country: (formData.get('country') as string)?.trim() || null,
+    bedrooms,
+    bathrooms,
+    area_sqm: area,
+    property_type: (formData.get('property_type') as string) || null,
+    status: (formData.get('status') as string) || 'active',
+    is_development: formData.get('is_development') === 'true',
+    featured: formData.get('featured') === 'true',
+    idealista_url: (formData.get('idealista_url') as string)?.trim() || null,
+    image_url: imageUrl,
+    hidden: false,
+    sold: false,
+  })
+
+  if (error) return { success: false, error: error.message }
+  revalidatePath('/admin/propiedades')
+  revalidatePath('/propiedades')
+  return { success: true, slug }
+}
+
 // Leads
 export async function updateLeadStatus(id: string, status: string) {
   await supabaseAdmin.from('leads').update({ status }).eq('id', id)

@@ -76,7 +76,7 @@ ${data.message ? `<div class="lbl">Mensaje</div><div class="msg">${data.message}
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { name, email, phone, interest, message, location, source } = body
+    const { name, email, phone, interest, message, location, source, property_id, property_title, property_url } = body
 
     if (!name?.trim() || !email?.trim()) {
       return NextResponse.json({ error: 'Nombre y email son obligatorios' }, { status: 400 })
@@ -97,6 +97,9 @@ export async function POST(req: NextRequest) {
       location: location?.trim() || null,
       source: source || 'website',
       status: 'new',
+      property_id: property_id || null,
+      property_title: property_title || null,
+      property_url: property_url || null,
     })
 
     if (dbError) {

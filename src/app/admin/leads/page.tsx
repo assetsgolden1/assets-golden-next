@@ -14,6 +14,9 @@ interface Lead {
   created_at: string
   interest: string | null
   location: string | null
+  property_id: string | null
+  property_title: string | null
+  property_url: string | null
 }
 
 const SOURCE_CONFIG: Record<string, { label: string; color: string }> = {
@@ -121,6 +124,7 @@ export default async function LeadsPage({
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Email</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Teléfono</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Origen</th>
+                <th className="text-left px-4 py-3 text-gray-600 font-medium">Propiedad</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Mensaje</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Estado</th>
                 <th className="text-right px-4 py-3 text-gray-600 font-medium">Acc.</th>
@@ -129,7 +133,7 @@ export default async function LeadsPage({
             <tbody>
               {leads.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-8 text-gray-400">
+                  <td colSpan={9} className="text-center py-8 text-gray-400">
                     No se encontraron leads
                   </td>
                 </tr>
@@ -148,6 +152,25 @@ export default async function LeadsPage({
                         <span className={`text-xs px-2 py-0.5 rounded-full ${src.color}`}>
                           {src.label}
                         </span>
+                      </td>
+                      <td className="px-4 py-2.5 max-w-[180px]">
+                        {lead.property_title ? (
+                          lead.property_url ? (
+                            <a
+                              href={lead.property_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-xs text-blue-600 hover:underline line-clamp-2"
+                              title={lead.property_title}
+                            >
+                              {lead.property_title}
+                            </a>
+                          ) : (
+                            <span className="text-xs text-gray-600 line-clamp-2">{lead.property_title}</span>
+                          )
+                        ) : (
+                          <span className="text-gray-300">—</span>
+                        )}
                       </td>
                       <td className="px-4 py-2.5 text-gray-500 max-w-[200px]">
                         <span className="truncate block">

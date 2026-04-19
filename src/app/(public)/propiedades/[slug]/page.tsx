@@ -7,6 +7,7 @@ import { getPropertyBySlug, getAllPropertySlugs } from '@/lib/supabase/queries'
 import PropertyGalleryClient from '@/components/PropertyGalleryClient'
 import PropertyDescriptionExpand from '@/components/properties/PropertyDescriptionExpand'
 import { translatePropertyType, translatePropertyTitle } from '@/lib/propertyTypes'
+import PropertyContactModal from '@/components/PropertyContactModal'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -234,12 +235,11 @@ export default async function PropertyDetailPage({ params }: Props) {
                 </p>
 
                 <div className="space-y-3">
-                  <Link
-                    href={`/contacto?propiedad=${encodeURIComponent(property.title)}`}
-                    className={buttonVariants({ variant: 'gold', size: 'lg', className: 'w-full' })}
-                  >
-                    Solicitar información
-                  </Link>
+                  <PropertyContactModal
+                    propertyId={property.id}
+                    propertyTitle={property.title}
+                    propertySlug={property.slug ?? ''}
+                  />
                   <a
                     href="tel:+34611853001"
                     className={buttonVariants({ variant: 'navyOutline', size: 'lg', className: 'w-full' })}

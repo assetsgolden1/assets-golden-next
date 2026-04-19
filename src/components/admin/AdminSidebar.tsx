@@ -12,11 +12,13 @@ import {
   RefreshCw,
   UserCircle,
   Settings,
+  PlusCircle,
 } from 'lucide-react'
 
 const navLinks = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/propiedades', label: 'Propiedades', icon: Building2 },
+  { href: '/admin/nueva-propiedad', label: 'Nueva propiedad', icon: PlusCircle },
   { href: '/admin/destacadas', label: 'Destacadas', icon: Star },
   { href: '/admin/blog', label: 'Blog', icon: Newspaper },
   { href: '/admin/leads', label: 'Leads', icon: Users },
