@@ -20,34 +20,15 @@ export default function AdminLoginPage() {
 
     const supabase = createClient()
 
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
+    const { error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
-    console.log('Auth result:', { data, error: authError })
-
     if (authError) {
-      setError(`Error de auth: ${authError.message}`)
+      setError('Email o contraseña incorrectos')
       setLoading(false)
       return
-    }
-
-    if (data?.user) {
-      const { data: roleData, error: roleError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', data.user.id)
-        .single()
-
-      console.log('Role check:', { roleData, roleError })
-
-      if (roleError || !roleData) {
-        await supabase.auth.signOut()
-        setError(`Sin rol admin: ${roleError?.message ?? 'no encontrado'}`)
-        setLoading(false)
-        return
-      }
     }
 
     router.push('/admin')
