@@ -18,19 +18,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 })
     }
 
+    const bucket = (formData.get('bucket') as string) || 'property-images'
     const ext = file.name.split('.').pop() ?? 'jpg'
-    const fileName = `properties/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+    const folder = bucket === 'destination-images' ? '' : 'properties/'
+    const fileName = `${folder}${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
     const buffer = Buffer.from(await file.arrayBuffer())
 
     const { error: uploadError } = await supabaseAdmin.storage
-      .from('property-images')
+      .from(bucket)
       .upload(fileName, buffer, { contentType: file.type, upsert: false })
 
     if (uploadError) {
       return NextResponse.json({ error: uploadError.message }, { status: 500 })
     }
 
-    const { data } = supabaseAdmin.storage.from('property-images').getPublicUrl(fileName)
+    const { data } = supabaseAdmin.storage.from(bucket).getPublicUrl(fileName)
     return NextResponse.json({ url: data.publicUrl })
 
   } catch (error) {

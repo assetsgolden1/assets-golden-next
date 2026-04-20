@@ -152,9 +152,9 @@ export default async function SobreNosotrosPage() {
         <section className="section-padding bg-muted/30">
           <div className="container-luxury">
             <h2 className="font-display text-3xl font-semibold mb-10 text-center">Nuestro equipo</h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="flex flex-wrap justify-center gap-8">
               {founders.map((m) => (
-                <div key={m.id} className="text-center">
+                <div key={m.id} className="text-center w-64">
                   {m.photo_url && (
                     <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full border-2 border-gold/20">
                       <img
