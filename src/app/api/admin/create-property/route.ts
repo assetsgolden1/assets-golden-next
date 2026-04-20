@@ -67,10 +67,10 @@ export async function POST(request: NextRequest) {
 
     if (!existing) {
       await supabaseAdmin.from('country_destinations').insert({
-        name: country,
+        country_name: country,
         slug: countrySlug,
         description: `Propiedades en ${country}`,
-        image_url: null,
+        active: true,
       })
     }
   }

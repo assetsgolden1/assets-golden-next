@@ -226,7 +226,7 @@ export async function getPropertiesByCountry(slug: string) {
     .in('status', ['active', 'available'])
     .or('hidden.is.null,hidden.eq.false')
     .or('sold.is.null,sold.eq.false')
-    .eq('country', countryName)
+    .ilike('country', countryName)
     .order('province', { ascending: true, nullsFirst: false })
     .order('location', { ascending: true })
   return { data: (data ?? []) as Property[], error }

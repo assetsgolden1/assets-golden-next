@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { propertyTypeMap } from '@/lib/propertyTypes'
 
 const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF']
@@ -30,8 +30,9 @@ interface FormState {
 export default function EditPropertyPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const { id } = use(params)
   const [form, setForm] = useState<FormState>({
     title: '',
     country: '',
@@ -56,7 +57,7 @@ export default function EditPropertyPage({
 
   useEffect(() => {
     async function loadProperty() {
-      const res = await fetch(`/api/admin/get-property/${params.id}`)
+      const res = await fetch(`/api/admin/get-property/${id}`)
       const data = await res.json()
       if (data.property) {
         const p = data.property
@@ -81,7 +82,7 @@ export default function EditPropertyPage({
       setLoading(false)
     }
     loadProperty()
-  }, [params.id])
+  }, [id])
 
   function set(field: keyof FormState, value: string | boolean) {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -112,7 +113,7 @@ export default function EditPropertyPage({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: params.id,
+          id: id,
           ...form,
           images: allImages,
           image_url: allImages[0] ?? null,
