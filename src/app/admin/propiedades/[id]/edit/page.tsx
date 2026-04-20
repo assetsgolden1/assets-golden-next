@@ -77,7 +77,14 @@ export default function EditPropertyPage({
           hidden: p.hidden ?? false,
           status: p.status ?? 'active',
         })
-        setExistingImages(p.gallery_urls ?? (p.image_url ? [p.image_url] : []))
+        const imgs = p.gallery_urls ?? []
+        if (imgs.length > 0) {
+          setExistingImages(imgs)
+        } else if (p.image_url) {
+          setExistingImages([p.image_url])
+        } else {
+          setExistingImages([])
+        }
       }
       setLoading(false)
     }
@@ -88,50 +95,53 @@ export default function EditPropertyPage({
     setForm((prev) => ({ ...prev, [field]: value }))
   }
 
-  function removeExistingImage(url: string) {
-    setExistingImages((prev) => prev.filter((u) => u !== url))
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
     setError('')
 
-    try {
-      const newImageUrls: string[] = []
-      for (const file of newImages) {
-        const fd = new FormData()
-        fd.append('file', file)
-        const res = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
-        const data = await res.json()
-        if (data.url) newImageUrls.push(data.url)
-      }
-
-      const allImages = [...existingImages, ...newImageUrls]
-
-      const res = await fetch('/api/admin/update-property', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: id,
-          ...form,
-          gallery_urls: allImages,
-          image_url: allImages[0] ?? null,
-        }),
-      })
-
-      const result = await res.json()
+    const newImageUrls: string[] = []
+    for (const file of newImages) {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
       if (!res.ok) {
-        setError(result.error ?? 'Error al guardar')
+        const text = await res.text()
+        console.error('Upload failed:', text)
+        setError('Error subiendo imagen')
         setSaving(false)
         return
       }
-
-      window.location.href = '/admin/propiedades'
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error inesperado')
-      setSaving(false)
+      const data = await res.json()
+      if (data.error) {
+        setError(data.error)
+        setSaving(false)
+        return
+      }
+      if (data.url) newImageUrls.push(data.url)
     }
+
+    const allImages = [...existingImages, ...newImageUrls]
+
+    const res = await fetch('/api/admin/update-property', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id,
+        ...form,
+        gallery_urls: allImages,
+        image_url: allImages[0] ?? null,
+      }),
+    })
+
+    if (!res.ok) {
+      const data = await res.json()
+      setError(data.error ?? 'Error guardando')
+      setSaving(false)
+      return
+    }
+
+    window.location.href = '/admin/propiedades'
   }
 
   if (loading) {
@@ -154,24 +164,52 @@ export default function EditPropertyPage({
         <div className="bg-white rounded-xl shadow-sm p-5">
           <h2 className="font-semibold text-gray-800 mb-4">Imágenes</h2>
           {existingImages.length > 0 && (
-            <div className="flex flex-wrap gap-3 mb-4">
-              {existingImages.map((url) => (
-                <div key={url} className="relative">
-                  <img
-                    src={url}
-                    alt=""
-                    className="w-24 h-20 object-cover rounded-lg border border-gray-200"
-                    onError={(e) => { e.currentTarget.src = '/placeholder-property.svg' }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeExistingImage(url)}
-                    className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold leading-none"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
+            <div>
+              <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 8 }}>
+                Imágenes actuales:
+              </p>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: 8,
+                marginBottom: 12,
+              }}>
+                {existingImages.map((url, i) => (
+                  <div key={i} style={{ position: 'relative' }}>
+                    <img
+                      src={url}
+                      alt={`Imagen ${i + 1}`}
+                      style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: 6 }}
+                      onError={(e) => { e.currentTarget.src = '/placeholder-property.svg' }}
+                    />
+                    {i === 0 && (
+                      <span style={{
+                        position: 'absolute', top: 4, left: 4,
+                        backgroundColor: '#D4AF37', color: '#131D2E',
+                        fontSize: 10, fontWeight: 700,
+                        padding: '2px 6px', borderRadius: 4,
+                      }}>
+                        Principal
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setExistingImages(prev => prev.filter((_, idx) => idx !== i))}
+                      style={{
+                        position: 'absolute', top: 4, right: 4,
+                        backgroundColor: '#dc2626', color: 'white',
+                        border: 'none', borderRadius: '50%',
+                        width: 20, height: 20, fontSize: 14,
+                        cursor: 'pointer', display: 'flex',
+                        alignItems: 'center', justifyContent: 'center',
+                        padding: 0, lineHeight: 1,
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           <input
