@@ -302,7 +302,7 @@ export function PropiedadesTable({
                 <th className="text-center px-4 py-3 text-gray-600 font-medium">Destacada</th>
                 <th className="text-center px-4 py-3 text-gray-600 font-medium">Visible</th>
                 <th className="text-center px-4 py-3 text-gray-600 font-medium">Vendida</th>
-                <th className="text-center px-4 py-3 text-gray-600 font-medium">Ver</th>
+                <th className="text-center px-4 py-3 text-gray-600 font-medium">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -374,17 +374,33 @@ export function PropiedadesTable({
                       <SoldToggleButton id={prop.id} sold={prop.sold ?? false} />
                     </td>
                     <td className="px-4 py-2 text-center">
-                      {prop.slug && (
+                      <div className="flex items-center justify-center gap-2">
                         <a
-                          href={`/propiedades/${prop.slug}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-blue-500 hover:text-blue-700 p-1"
-                          title="Ver en sitio"
+                          href={`/admin/propiedades/${prop.id}/edit`}
+                          style={{
+                            fontSize: 12,
+                            color: '#131D2E',
+                            textDecoration: 'none',
+                            padding: '3px 8px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: 4,
+                            backgroundColor: '#f9fafb',
+                          }}
                         >
-                          <ExternalLink size={15} />
+                          ✏️ Editar
                         </a>
-                      )}
+                        {prop.slug && (
+                          <a
+                            href={`/propiedades/${prop.slug}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-blue-500 hover:text-blue-700 p-1"
+                            title="Ver en sitio"
+                          >
+                            <ExternalLink size={15} />
+                          </a>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))

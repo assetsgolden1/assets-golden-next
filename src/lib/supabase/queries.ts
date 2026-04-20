@@ -205,7 +205,20 @@ export async function getDestinations() {
 
 // ─── Properties by country (for drill-down LocationBrowser) ────
 
-export async function getPropertiesByCountry(country: string) {
+const countryBySlug: Record<string, string> = {
+  'espana': 'España',
+  'mexico': 'México',
+  'emiratos-arabes-unidos': 'Emiratos Árabes Unidos',
+  'argentina': 'Argentina',
+  'estados-unidos': 'Estados Unidos',
+  'costa-rica': 'Costa Rica',
+  'ecuador': 'Ecuador',
+  'grecia': 'Grecia',
+  'reino-unido': 'Reino Unido',
+}
+
+export async function getPropertiesByCountry(slug: string) {
+  const countryName = countryBySlug[slug] ?? slug
   const supabase = createStaticClient()
   const { data, error } = await supabase
     .from('properties')
@@ -213,7 +226,7 @@ export async function getPropertiesByCountry(country: string) {
     .in('status', ['active', 'available'])
     .or('hidden.is.null,hidden.eq.false')
     .or('sold.is.null,sold.eq.false')
-    .eq('country', country)
+    .eq('country', countryName)
     .order('province', { ascending: true, nullsFirst: false })
     .order('location', { ascending: true })
   return { data: (data ?? []) as Property[], error }

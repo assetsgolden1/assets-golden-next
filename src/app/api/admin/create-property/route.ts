@@ -19,6 +19,10 @@ export async function POST(request: NextRequest) {
     .replace(/\s+/g, '-')
   const slug = `${baseSlug}-${Date.now().toString(36)}`
 
+  const country = data.country === 'Otro'
+    ? (data.customCountry as string)?.trim() || null
+    : data.country?.trim() || null
+
   const { error } = await supabaseAdmin.from('properties').insert({
     title,
     slug,
@@ -27,7 +31,7 @@ export async function POST(request: NextRequest) {
     currency: data.currency || 'EUR',
     location: data.location?.trim() || null,
     province: data.province?.trim() || null,
-    country: data.country?.trim() || null,
+    country,
     bedrooms: data.bedrooms ? Number(data.bedrooms) : null,
     bathrooms: data.bathrooms ? Number(data.bathrooms) : null,
     area_sqm: data.area_sqm ? Number(data.area_sqm) : null,
@@ -43,6 +47,32 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  // Auto-crear entrada en country_destinations si el país no existe
+  if (country) {
+    const countrySlug = country
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .trim()
+
+    const { data: existing } = await supabaseAdmin
+      .from('country_destinations')
+      .select('id')
+      .eq('slug', countrySlug)
+      .single()
+
+    if (!existing) {
+      await supabaseAdmin.from('country_destinations').insert({
+        name: country,
+        slug: countrySlug,
+        description: `Propiedades en ${country}`,
+        image_url: null,
+      })
+    }
   }
 
   revalidatePath('/admin/propiedades')

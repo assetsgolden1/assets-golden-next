@@ -59,7 +59,7 @@ export default async function DestinoPage({ params }: Props) {
   const { data: destination } = await getDestinationBySlug(slug)
   if (!destination) notFound()
 
-  const { data: countryProperties } = await getPropertiesByCountry(destination.country_name)
+  const { data: countryProperties } = await getPropertiesByCountry(slug)
   const allProperties = countryProperties ?? []
 
   const highlights = (destination.highlights ?? []) as Array<{
