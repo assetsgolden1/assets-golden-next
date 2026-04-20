@@ -282,6 +282,7 @@ export default async function DestinoPage({ params }: Props) {
             <LocationBrowser
               properties={allProperties}
               countryName={destination.country_name}
+              cityImages={destination.city_images}
             />
           </div>
         </section>

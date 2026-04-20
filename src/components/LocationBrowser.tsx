@@ -60,9 +60,10 @@ interface LocationCardProps {
   count: number
   index: number
   onClick: () => void
+  overrideImageUrl?: string
 }
 
-function LocationCard({ displayName, imageKey, count, index, onClick }: LocationCardProps) {
+function LocationCard({ displayName, imageKey, count, index, onClick, overrideImageUrl }: LocationCardProps) {
   const ref = useRef<HTMLButtonElement>(null)
   const [rotate, setRotate] = useState({ x: 0, y: 0 })
   const [hovered, setHovered] = useState(false)
@@ -98,7 +99,7 @@ function LocationCard({ displayName, imageKey, count, index, onClick }: Location
     >
       {/* Background image */}
       <Image
-        src={getCityImage(imageKey)}
+        src={overrideImageUrl ?? getCityImage(imageKey)}
         alt={displayName}
         fill
         className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -210,9 +211,10 @@ function PropertyMiniCard({ property }: { property: Property }) {
 interface Props {
   properties: Property[]
   countryName: string
+  cityImages?: Record<string, string> | null
 }
 
-export default function LocationBrowser({ properties, countryName }: Props) {
+export default function LocationBrowser({ properties, countryName, cityImages }: Props) {
   const [state, setState] = useState<LocationState>({ level: 'country' })
   const [page, setPage] = useState(0)
 
@@ -370,6 +372,7 @@ export default function LocationBrowser({ properties, countryName }: Props) {
               count={rd.count}
               index={i}
               onClick={() => goToRegion(rd)}
+              overrideImageUrl={cityImages?.[rd.displayName] ?? cityImages?.[rd.key] ?? undefined}
             />
           ))}
         </div>
@@ -390,6 +393,7 @@ export default function LocationBrowser({ properties, countryName }: Props) {
                 count={city.count}
                 index={i}
                 onClick={() => goToCity(state.region, city)}
+                overrideImageUrl={cityImages?.[city.displayName] ?? cityImages?.[city.key] ?? undefined}
               />
             ))}
           </div>

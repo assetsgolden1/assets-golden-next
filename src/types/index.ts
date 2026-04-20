@@ -66,6 +66,7 @@ export interface CountryDestination {
   market_info_en: Record<string, unknown> | null
   sort_order: number
   active: boolean
+  city_images: Record<string, string> | null
 }
 
 // ─── BlogPost ─────────────────────────────────────────────────
