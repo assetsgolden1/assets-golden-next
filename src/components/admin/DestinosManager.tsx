@@ -44,12 +44,18 @@ export function DestinosManager({
     }
 
     if (isCity) {
-      await fetch('/api/admin/update-destino', {
+      const res = await fetch('/api/admin/update-destino', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: selectedCountry?.id, cityName: targetId, cityImageUrl: url }),
       })
-      setCityImages((prev) => ({ ...prev, [targetId]: url }))
+      if (!res.ok) {
+        const d = await res.json()
+        alert('Error guardando: ' + (d.error ?? 'desconocido'))
+        setUploadingFor(null)
+        return
+      }
+      window.location.reload()
     } else {
       await fetch('/api/admin/update-destino', {
         method: 'POST',

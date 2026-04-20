@@ -218,6 +218,14 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
   const [state, setState] = useState<LocationState>({ level: 'country' })
   const [page, setPage] = useState(0)
 
+  // Normalizar claves a minúsculas para lookup case-insensitive
+  const normalizedCityImages = useMemo(() => {
+    if (!cityImages) return null
+    return Object.fromEntries(
+      Object.entries(cityImages).map(([k, v]) => [k.toLowerCase(), v])
+    )
+  }, [cityImages])
+
   // Build hierarchy: province → (cities → properties)
   const hierarchy = useMemo(() => {
     const map = new Map<string, RegionData>()
@@ -372,7 +380,7 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
               count={rd.count}
               index={i}
               onClick={() => goToRegion(rd)}
-              overrideImageUrl={cityImages?.[rd.displayName] ?? cityImages?.[rd.key] ?? undefined}
+              overrideImageUrl={normalizedCityImages?.[rd.displayName.toLowerCase()] ?? normalizedCityImages?.[rd.key] ?? undefined}
             />
           ))}
         </div>
@@ -393,7 +401,7 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
                 count={city.count}
                 index={i}
                 onClick={() => goToCity(state.region, city)}
-                overrideImageUrl={cityImages?.[city.displayName] ?? cityImages?.[city.key] ?? undefined}
+                overrideImageUrl={normalizedCityImages?.[city.displayName.toLowerCase()] ?? normalizedCityImages?.[city.key] ?? undefined}
               />
             ))}
           </div>
