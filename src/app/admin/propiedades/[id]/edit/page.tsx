@@ -77,7 +77,7 @@ export default function EditPropertyPage({
           hidden: p.hidden ?? false,
           status: p.status ?? 'active',
         })
-        setExistingImages(p.images ?? (p.image_url ? [p.image_url] : []))
+        setExistingImages(p.gallery_urls ?? (p.image_url ? [p.image_url] : []))
       }
       setLoading(false)
     }
@@ -115,7 +115,7 @@ export default function EditPropertyPage({
         body: JSON.stringify({
           id: id,
           ...form,
-          images: allImages,
+          gallery_urls: allImages,
           image_url: allImages[0] ?? null,
         }),
       })

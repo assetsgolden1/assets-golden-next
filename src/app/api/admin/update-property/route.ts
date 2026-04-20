@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       bathrooms: updates.bathrooms ? parseInt(updates.bathrooms) : null,
       description: updates.description || null,
       image_url: updates.image_url ?? null,
-      images: updates.images ?? [],
+      gallery_urls: updates.gallery_urls ?? [],
       featured: updates.featured,
       hidden: updates.hidden,
       status: updates.status,
