@@ -9,6 +9,7 @@ interface Destino {
   hero_image_url: string | null
   description: string | null
   city_images: Record<string, string> | null
+  active: boolean
 }
 
 export function DestinosManager({
@@ -21,6 +22,8 @@ export function DestinosManager({
   const [selectedCountry, setSelectedCountry] = useState<Destino | null>(null)
   const [cityImages, setCityImages] = useState<Record<string, string>>({})
   const [uploadingFor, setUploadingFor] = useState<string | null>(null)
+  const [fileInputKey, setFileInputKey] = useState(0)
+  const [togglingId, setTogglingId] = useState<string | null>(null)
 
   async function uploadPhoto(
     file: File,
@@ -57,15 +60,32 @@ export function DestinosManager({
       }
       window.location.reload()
     } else {
-      await fetch('/api/admin/update-destino', {
+      const res = await fetch('/api/admin/update-destino', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: targetId, hero_image_url: url }),
       })
+      if (!res.ok) {
+        const d = await res.json()
+        alert('Error guardando: ' + (d.error ?? 'desconocido'))
+        setUploadingFor(null)
+        return
+      }
       window.location.reload()
     }
 
+    setFileInputKey((k) => k + 1)
     setUploadingFor(null)
+  }
+
+  async function toggleActive(destino: Destino) {
+    setTogglingId(destino.id)
+    await fetch('/api/admin/update-destino', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: destino.id, active: destino.active === false ? true : false }),
+    })
+    window.location.reload()
   }
 
   // ── VISTA DETALLE ────────────────────────────────────────────────
@@ -127,6 +147,7 @@ export function DestinosManager({
                 <input
                   type="file" accept="image/*" style={{ display: 'none' }}
                   disabled={!!uploadingFor}
+                  key={fileInputKey}
                   onChange={(e) => {
                     const file = e.target.files?.[0]
                     if (file) uploadPhoto(file, 'destination-images', selectedCountry.id, false)
@@ -197,6 +218,7 @@ export function DestinosManager({
                         <input
                           type="file" accept="image/*" style={{ display: 'none' }}
                           disabled={!!uploadingFor}
+                          key={fileInputKey}
                           onChange={(e) => {
                             const file = e.target.files?.[0]
                             if (file) uploadPhoto(file, 'destination-images', city, true)
@@ -265,9 +287,23 @@ export function DestinosManager({
                   {stats?.total ?? 0} props
                 </span>
               </div>
-              <p style={{ fontSize: 12, color: '#9ca3af', margin: 0 }}>
-                {Object.keys(stats?.cities ?? {}).length} ciudades · Clic para gestionar →
-              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
+                <p style={{ fontSize: 12, color: '#9ca3af', margin: 0 }}>
+                  {Object.keys(stats?.cities ?? {}).length} ciudades
+                </p>
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleActive(destino) }}
+                  disabled={togglingId === destino.id}
+                  style={{
+                    padding: '3px 10px', fontSize: 11, fontWeight: 600,
+                    borderRadius: 20, border: 'none', cursor: togglingId === destino.id ? 'wait' : 'pointer',
+                    backgroundColor: (destino.active !== false) ? '#dcfce7' : '#fee2e2',
+                    color: (destino.active !== false) ? '#16a34a' : '#dc2626',
+                  }}
+                >
+                  {togglingId === destino.id ? '...' : (destino.active !== false) ? '● Activo' : '○ Inactivo'}
+                </button>
+              </div>
             </div>
           </div>
         )
