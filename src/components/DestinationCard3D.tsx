@@ -46,9 +46,9 @@ export default function DestinationCard3D({ dest, count }: Props) {
       }}
       className="group relative overflow-hidden rounded-xl aspect-[3/4] bg-muted block"
     >
-      {dest.card_image_url ? (
+      {(dest.card_image_url ?? dest.hero_image_url) ? (
         <Image
-          src={dest.card_image_url}
+          src={dest.card_image_url ?? dest.hero_image_url!}
           alt={dest.country_name}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-110"

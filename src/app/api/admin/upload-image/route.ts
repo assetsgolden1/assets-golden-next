@@ -3,6 +3,10 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
   try {
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    console.log('[upload] service key exists:', !!serviceKey)
+    console.log('[upload] service key length:', serviceKey?.length)
+
     const formData = await request.formData()
     const file = formData.get('file') as File | null
     const bucket = (formData.get('bucket') as string) ?? 'property-images'

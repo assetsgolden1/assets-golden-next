@@ -63,7 +63,7 @@ export function DestinosManager({
       const res = await fetch('/api/admin/update-destino', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: targetId, hero_image_url: url }),
+        body: JSON.stringify({ id: targetId, hero_image_url: url, card_image_url: url }),
       })
       if (!res.ok) {
         const d = await res.json()
@@ -80,11 +80,18 @@ export function DestinosManager({
 
   async function toggleActive(destino: Destino) {
     setTogglingId(destino.id)
-    await fetch('/api/admin/update-destino', {
+    const newActive = destino.active === false ? true : false
+    const res = await fetch('/api/admin/update-destino', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: destino.id, active: destino.active === false ? true : false }),
+      body: JSON.stringify({ id: destino.id, active: newActive }),
     })
+    if (!res.ok) {
+      const data = await res.json()
+      alert('Error: ' + (data.error ?? 'desconocido'))
+      setTogglingId(null)
+      return
+    }
     window.location.reload()
   }
 
@@ -292,16 +299,20 @@ export function DestinosManager({
                   {Object.keys(stats?.cities ?? {}).length} ciudades
                 </p>
                 <button
-                  onClick={(e) => { e.stopPropagation(); toggleActive(destino) }}
-                  disabled={togglingId === destino.id}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (togglingId === destino.id) return
+                    toggleActive(destino)
+                  }}
                   style={{
-                    padding: '3px 10px', fontSize: 11, fontWeight: 600,
-                    borderRadius: 20, border: 'none', cursor: togglingId === destino.id ? 'wait' : 'pointer',
+                    padding: '4px 12px', fontSize: 11, fontWeight: 600,
+                    borderRadius: 20, border: 'none', cursor: 'pointer',
                     backgroundColor: (destino.active !== false) ? '#dcfce7' : '#fee2e2',
                     color: (destino.active !== false) ? '#16a34a' : '#dc2626',
+                    opacity: togglingId === destino.id ? 0.5 : 1,
                   }}
                 >
-                  {togglingId === destino.id ? '...' : (destino.active !== false) ? '● Activo' : '○ Inactivo'}
+                  {togglingId === destino.id ? '...' : (destino.active !== false) ? '● Visible' : '○ Oculto'}
                 </button>
               </div>
             </div>
