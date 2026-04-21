@@ -90,7 +90,7 @@ export function DestinosManager({
 
   // ── VISTA DETALLE ────────────────────────────────────────────────
   if (selectedCountry) {
-    const stats = countryStats[selectedCountry.country_name]
+    const stats = countryStats[selectedCountry.country_name] ?? countryStats[selectedCountry.country_name.toLowerCase()] ?? { total: 0, cities: {} }
     const cities = Object.entries(stats?.cities ?? {}).sort((a, b) => b[1] - a[1])
     const existingCityImages = { ...(selectedCountry.city_images ?? {}), ...cityImages }
 
@@ -244,7 +244,7 @@ export function DestinosManager({
       gap: 16,
     }}>
       {destinos.map((destino) => {
-        const stats = countryStats[destino.country_name]
+        const stats = countryStats[destino.country_name] ?? countryStats[destino.country_name.toLowerCase()] ?? { total: 0, cities: {} }
 
         return (
           <div

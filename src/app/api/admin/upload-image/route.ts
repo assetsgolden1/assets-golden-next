@@ -5,6 +5,10 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File | null
+    const bucket = (formData.get('bucket') as string) ?? 'property-images'
+
+    console.log('[upload-image] bucket:', bucket)
+    console.log('[upload-image] file:', file?.name, file?.size, file?.type)
 
     if (!file || file.size === 0) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
@@ -18,27 +22,37 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 })
     }
 
-    const bucket = (formData.get('bucket') as string) || 'property-images'
     const ext = file.name.split('.').pop() ?? 'jpg'
     const folder = bucket === 'destination-images' ? '' : 'properties/'
     const fileName = `${folder}${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+
+    console.log('[upload-image] uploading as:', fileName)
+
     const buffer = Buffer.from(await file.arrayBuffer())
 
-    const { error: uploadError } = await supabaseAdmin.storage
+    console.log('[upload-image] buffer size:', buffer.length)
+
+    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
       .from(bucket)
-      .upload(fileName, buffer, { contentType: file.type, upsert: false })
+      .upload(fileName, buffer, { contentType: file.type, upsert: true })
+
+    console.log('[upload-image] upload result:', { uploadData, uploadError })
 
     if (uploadError) {
+      console.error('[upload-image] error:', uploadError)
       return NextResponse.json({ error: uploadError.message }, { status: 500 })
     }
 
-    const { data } = supabaseAdmin.storage.from(bucket).getPublicUrl(fileName)
-    return NextResponse.json({ url: data.publicUrl })
+    const { data: urlData } = supabaseAdmin.storage.from(bucket).getPublicUrl(fileName)
 
-  } catch (error) {
-    console.error('Upload error:', error)
+    console.log('[upload-image] public URL:', urlData.publicUrl)
+
+    return NextResponse.json({ url: urlData.publicUrl })
+
+  } catch (err) {
+    console.error('[upload-image] exception:', err)
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Upload failed' },
+      { error: err instanceof Error ? err.message : 'Unknown error' },
       { status: 500 }
     )
   }

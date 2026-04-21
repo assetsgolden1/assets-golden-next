@@ -5,7 +5,7 @@ export default async function AdminDestinos() {
   const [{ data: destinos }, { data: propsByCountry }] = await Promise.all([
     supabaseAdmin
       .from('country_destinations')
-      .select('id, country_name, slug, hero_image_url, description, city_images')
+      .select('id, country_name, slug, hero_image_url, description, city_images, active')
       .order('country_name'),
     supabaseAdmin
       .from('properties')
@@ -16,8 +16,9 @@ export default async function AdminDestinos() {
   const countryStats: Record<string, { total: number; cities: Record<string, number> }> = {}
 
   propsByCountry?.forEach((p) => {
-    const country = (p.country as string).trim()
-    const city = ((p.location as string | null) ?? 'Sin ciudad').trim()
+    const country = (p.country as string ?? '').trim().toLowerCase()
+    const city = ((p.location as string | null) ?? '').trim()
+    if (!country || !city) return
     if (!countryStats[country]) countryStats[country] = { total: 0, cities: {} }
     countryStats[country].total++
     countryStats[country].cities[city] = (countryStats[country].cities[city] ?? 0) + 1
