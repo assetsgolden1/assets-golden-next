@@ -153,3 +153,24 @@ export function getSpainZone(city: string, province?: string | null): string {
   if (province) return province
   return 'Otras zonas de España'
 }
+
+export const ZONE_SLUGS: Record<string, string> = {
+  'costa-del-sol':    'Costa del Sol',
+  'costa-blanca':     'Costa Blanca',
+  'costa-calida':     'Costa Cálida',
+  'costa-de-almeria': 'Costa de Almería',
+  'costa-de-la-luz':  'Costa de la Luz',
+  'costa-tropical':   'Costa Tropical',
+  'cataluna':         'Cataluña',
+  'madrid':           'Madrid',
+  'islas-baleares':   'Islas Baleares',
+}
+
+export const ZONE_SLUG_REVERSE: Record<string, string> =
+  Object.fromEntries(Object.entries(ZONE_SLUGS).map(([k, v]) => [v, k]))
+
+export function getCitiesInZone(zoneName: string): string[] {
+  return Object.entries(CITY_TO_ZONE)
+    .filter(([, zone]) => zone === zoneName)
+    .map(([city]) => city)
+}

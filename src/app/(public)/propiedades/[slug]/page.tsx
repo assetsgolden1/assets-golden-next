@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { Maximize, BedDouble, Bath, MapPin, ExternalLink, ChevronRight, ArrowLeft } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { getPropertyBySlug, getAllPropertySlugs } from '@/lib/supabase/queries'
@@ -8,6 +8,7 @@ import PropertyGalleryClient from '@/components/PropertyGalleryClient'
 import PropertyDescriptionExpand from '@/components/properties/PropertyDescriptionExpand'
 import { translatePropertyType, translatePropertyTitle } from '@/lib/propertyTypes'
 import PropertyContactModal from '@/components/PropertyContactModal'
+import { ZONE_SLUGS } from '@/lib/constants/spainZones'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -49,6 +50,12 @@ function formatPrice(price: number | null, currency: string | null): string {
 
 export default async function PropertyDetailPage({ params }: Props) {
   const { slug } = await params
+
+  // Redirigir rutas SEO de zona a la página de España con filtros
+  if (slug in ZONE_SLUGS) {
+    redirect(`/destinos/espana?zona=${slug}`)
+  }
+
   const { data: property } = await getPropertyBySlug(slug)
 
   if (!property) notFound()

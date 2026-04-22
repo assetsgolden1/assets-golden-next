@@ -22,6 +22,7 @@ interface Props {
     habitaciones?: string
     pais?: string
     pagina?: string
+    orden?: string
   }>
 }
 
@@ -65,6 +66,8 @@ export default async function PropiedadesPage({ searchParams }: Props) {
     if (params.maxPrecio) maxPrice = parseInt(params.maxPrecio, 10)
   }
 
+  const orden = params.orden as 'reciente' | 'precio_asc' | 'precio_desc' | undefined
+
   const [{ data: properties, count }, propertyCounts] = await Promise.all([
     getProperties({
       type: params.tipo || undefined,
@@ -73,6 +76,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
       location: params.ubicacion || undefined,
       bedrooms: params.habitaciones ? parseInt(params.habitaciones, 10) : undefined,
       country: params.pais || undefined,
+      orden,
       limit: PAGE_SIZE,
       offset,
     }),
@@ -92,6 +96,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
       precio: params.precio,
       habitaciones: params.habitaciones,
       pais: params.pais,
+      orden: params.orden,
       ...overrides,
     }
     const qs = Object.entries(merged)
@@ -173,6 +178,17 @@ export default async function PropiedadesPage({ searchParams }: Props) {
               ))}
             </select>
 
+            {/* Ordenar */}
+            <select
+              name="orden"
+              defaultValue={params.orden ?? ''}
+              className="rounded-lg border border-border bg-background px-3 py-2 text-xs focus:ring-2 focus:ring-gold/50 focus:border-gold"
+            >
+              <option value="">Más reciente</option>
+              <option value="precio_asc">Precio ↑</option>
+              <option value="precio_desc">Precio ↓</option>
+            </select>
+
             <button
               type="submit"
               className="btn-gold rounded-lg px-4 py-2 text-xs font-medium"
@@ -180,7 +196,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
               Buscar
             </button>
 
-            {(params.tipo || params.precio || params.minPrecio || params.maxPrecio || params.ubicacion || params.habitaciones || params.pais) && (
+            {(params.tipo || params.precio || params.minPrecio || params.maxPrecio || params.ubicacion || params.habitaciones || params.pais || params.orden) && (
               <Link
                 href="/propiedades"
                 className="text-xs text-muted-foreground hover:text-gold transition-colors"

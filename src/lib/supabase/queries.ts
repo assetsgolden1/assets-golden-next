@@ -1,6 +1,8 @@
 import { createClient } from './server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import type { Property, TeamMember, BlogPost, CountryDestination, LeadData } from '@/types'
+import { supabaseAdmin } from './admin'
+import { getCitiesInZone } from '@/lib/constants/spainZones'
 
 // Client without cookies — only for generateStaticParams (build time)
 export function createStaticClient() {
@@ -22,6 +24,7 @@ export interface GetPropertiesFilters {
   offset?: number
   isDevelopment?: boolean
   country?: string
+  orden?: 'reciente' | 'precio_asc' | 'precio_desc'
 }
 
 export async function getProperties(filters?: GetPropertiesFilters) {
@@ -45,15 +48,72 @@ export async function getProperties(filters?: GetPropertiesFilters) {
   const limit = filters?.limit ?? 12
   const offset = filters?.offset ?? 0
 
-  const { data, error, count } = await query
-    .range(offset, offset + limit - 1)
-    .order('created_at', { ascending: false })
+  if (filters?.orden === 'precio_asc') query = query.order('price', { ascending: true })
+  else if (filters?.orden === 'precio_desc') query = query.order('price', { ascending: false })
+  else query = query.order('created_at', { ascending: false })
+
+  const { data, error, count } = await query.range(offset, offset + limit - 1)
 
   return {
     data: (data ?? []) as Property[],
     error,
     count: count ?? 0,
   }
+}
+
+// ─── Spain-specific queries ────────────────────────────────────
+
+export interface GetSpainPropertiesFilters {
+  zona?: string
+  ciudad?: string
+  tipo?: string
+  precioMin?: number | null
+  precioMax?: number | null
+  habitaciones?: number | null
+  orden?: 'reciente' | 'precio_asc' | 'precio_desc'
+  limit?: number
+  offset?: number
+}
+
+export async function getPropertiesForSpain(filters: GetSpainPropertiesFilters = {}) {
+  let query = supabaseAdmin
+    .from('properties')
+    .select('*', { count: 'exact' })
+    .or('country.ilike.%España%,country.ilike.%Spain%,country.ilike.%espana%')
+    .or('hidden.is.null,hidden.eq.false')
+    .or('sold.is.null,sold.eq.false')
+
+  if (filters.zona) {
+    const cities = getCitiesInZone(filters.zona)
+    if (cities.length > 0) query = query.in('location', cities)
+  }
+  if (filters.ciudad) query = query.ilike('location', `%${filters.ciudad}%`)
+  if (filters.tipo)   query = query.eq('property_type', filters.tipo)
+  if (filters.precioMin) query = query.gte('price', filters.precioMin)
+  if (filters.precioMax) query = query.lte('price', filters.precioMax)
+  if (filters.habitaciones) query = query.gte('bedrooms', filters.habitaciones)
+
+  const limit  = filters.limit  ?? 24
+  const offset = filters.offset ?? 0
+
+  if (filters.orden === 'precio_asc')       query = query.order('price', { ascending: true })
+  else if (filters.orden === 'precio_desc') query = query.order('price', { ascending: false })
+  else                                      query = query.order('created_at', { ascending: false })
+
+  const { data, error, count } = await query.range(offset, offset + limit - 1)
+  return { data: (data ?? []) as Property[], error, count: count ?? 0 }
+}
+
+export async function getPropertyTypesForSpain(): Promise<string[]> {
+  const { data } = await supabaseAdmin
+    .from('properties')
+    .select('property_type')
+    .or('country.ilike.%España%,country.ilike.%Spain%')
+    .or('hidden.is.null,hidden.eq.false')
+  const types = [
+    ...new Set((data ?? []).map((d: { property_type: string | null }) => d.property_type).filter(Boolean)),
+  ] as string[]
+  return types.sort()
 }
 
 export async function getPropertyBySlug(slug: string) {
