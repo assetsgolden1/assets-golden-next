@@ -37,6 +37,7 @@ interface CityData {
   displayName: string
   key: string
   count: number
+  province: string | null
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────
@@ -249,9 +250,10 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
     for (const p of properties) {
       const loc = p.location?.trim() || null
       if (!loc) continue
+      const province = p.province?.trim() || null
       const normalizedCity = normalizeLocation(loc)
       const cityKey = normalizedCity.toLowerCase()
-      const zoneName = getSpainZone(normalizedCity) ?? 'Otras zonas'
+      const zoneName = getSpainZone(normalizedCity, province)
       const zoneKey = zoneName.toLowerCase()
 
       if (!map.has(zoneKey)) {
@@ -263,8 +265,9 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
       const existing = zd.cities.find((c) => c.key === cityKey)
       if (existing) {
         existing.count++
+        if (!existing.province && province) existing.province = province
       } else {
-        zd.cities.push({ displayName: normalizedCity, key: cityKey, count: 1 })
+        zd.cities.push({ displayName: normalizedCity, key: cityKey, count: 1, province })
       }
     }
 
@@ -312,7 +315,7 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
       if (existingCity) {
         existingCity.count++
       } else {
-        rd.cities.push({ displayName: cityDisplay, key: cityKey, count: 1 })
+        rd.cities.push({ displayName: cityDisplay, key: cityKey, count: 1, province: null })
       }
     }
 

@@ -1,56 +1,155 @@
-export const SPAIN_COASTAL_ZONES: Record<string, string> = {
-  // Costa del Sol
-  'Málaga': 'Costa del Sol',
-  'Marbella': 'Costa del Sol',
+export const CITY_TO_ZONE: Record<string, string> = {
+  // ── COSTA DEL SOL (Málaga) ──────────────────
   'Estepona': 'Costa del Sol',
+  'Marbella': 'Costa del Sol',
+  'Las Lagunas de Mijas': 'Costa del Sol',
   'Fuengirola': 'Costa del Sol',
-  'Torremolinos': 'Costa del Sol',
-  'Nerja': 'Costa del Sol',
-  'Benalmádena': 'Costa del Sol',
   'Mijas': 'Costa del Sol',
+  'Benahavís': 'Costa del Sol',
+  'La Cala de Mijas': 'Costa del Sol',
+  'Benalmádena': 'Costa del Sol',
+  'Casares': 'Costa del Sol',
+  'Málaga': 'Costa del Sol',
   'Manilva': 'Costa del Sol',
-  'Sotogrande': 'Costa del Sol',
-  // Costa Cálida
-  'Almería': 'Costa Cálida',
-  'Cartagena': 'Costa Cálida',
+  'Casares Costa': 'Costa del Sol',
+  'Torrox': 'Costa del Sol',
+  'Torremolinos': 'Costa del Sol',
+  'Buenas Noches': 'Costa del Sol',
+  'Vélez-Málaga': 'Costa del Sol',
+  'San Pedro Alcántara': 'Costa del Sol',
+  'Rincón de la Victoria': 'Costa del Sol',
+  'La Gaspara': 'Costa del Sol',
+  'Torre de Benagalbón': 'Costa del Sol',
+  'Torre del Mar': 'Costa del Sol',
+  'Cancelada': 'Costa del Sol',
+  'Ojén': 'Costa del Sol',
+  'La Chullera': 'Costa del Sol',
+  'Chaparral': 'Costa del Sol',
+  'Reinoso': 'Costa del Sol',
+  'Almayate': 'Costa del Sol',
+  'La Capellania': 'Costa del Sol',
+  'Urbanización Riviera Sol': 'Costa del Sol',
+  'Algarrobo': 'Costa del Sol',
+
+  // ── COSTA CÁLIDA (Murcia) ───────────────────
+  'Los Alcázares': 'Costa Cálida',
+  'San Pedro del Pinatar': 'Costa Cálida',
+  'Torre-Pacheco': 'Costa Cálida',
   'Murcia': 'Costa Cálida',
-  'Mojácar': 'Costa Cálida',
-  'Vera': 'Costa Cálida',
-  'Pulpí': 'Costa Cálida',
-  // Costa Blanca
-  'Alicante': 'Costa Blanca',
-  'Valencia': 'Costa Blanca',
-  'Benidorm': 'Costa Blanca',
+  'Cartagena': 'Costa Cálida',
+  'San Javier': 'Costa Cálida',
+  'Águilas': 'Costa Cálida',
+  'La Manga del Mar Menor': 'Costa Cálida',
+  'Santa Rosalía': 'Costa Cálida',
+  'Islas Menores': 'Costa Cálida',
+  'Los Nietos': 'Costa Cálida',
+  'Jerónimo y Avileses': 'Costa Cálida',
+  'Playa Paraiso': 'Costa Cálida',
+  'Purias': 'Costa Cálida',
+
+  // ── COSTA BLANCA (Alicante/Valencia) ────────
   'Torrevieja': 'Costa Blanca',
-  'Denia': 'Costa Blanca',
+  'Pilar de la Horadada': 'Costa Blanca',
+  'Guardamar del Segura': 'Costa Blanca',
+  'Finestrat': 'Costa Blanca',
+  'La Nucía': 'Costa Blanca',
+  'Calpe': 'Costa Blanca',
+  'Polop': 'Costa Blanca',
+  'La Finca Golf': 'Costa Blanca',
+  'Alfaz del Pi': 'Costa Blanca',
+  'Ciudad Quesada': 'Costa Blanca',
+  'Orihuela Costa': 'Costa Blanca',
+  'Dolores': 'Costa Blanca',
+  'Benitachell': 'Costa Blanca',
   'Jávea': 'Costa Blanca',
   'Altea': 'Costa Blanca',
-  'Calpe': 'Costa Blanca',
-  'Castellón': 'Costa Blanca',
-  // Cataluña
+  'Benijófar': 'Costa Blanca',
+  'San Fulgencio': 'Costa Blanca',
+  'Algorfa': 'Costa Blanca',
+  'Mutxamel': 'Costa Blanca',
+  'El Verger': 'Costa Blanca',
+  'Cox': 'Costa Blanca',
+  'Hondón de las Nieves': 'Costa Blanca',
+  'Santa Pola': 'Costa Blanca',
+  'Relleu': 'Costa Blanca',
+  'Benissa': 'Costa Blanca',
+  'Las Colinas Golf': 'Costa Blanca',
+  'Bigastro': 'Costa Blanca',
+  'Benferri': 'Costa Blanca',
+  'Los Montesinos': 'Costa Blanca',
+  'Cumbre del Sol': 'Costa Blanca',
+  'Moraira': 'Costa Blanca',
+  'La Sella': 'Costa Blanca',
+  'Monforte del Cid': 'Costa Blanca',
+  'Alicante': 'Costa Blanca',
+  'Alicante (Alacant)': 'Costa Blanca',
+  'Valencia': 'Costa Blanca',
+  'La Canalosa': 'Costa Blanca',
+  'Dehesa de Campoamor': 'Costa Blanca',
+  'San Miguel de Salinas': 'Costa Blanca',
+
+  // ── ALMERÍA / COSTA DE ALMERÍA ───────────────
+  'Vera': 'Costa de Almería',
+  'Cuevas del Almanzora': 'Costa de Almería',
+  'San Juan de los Terreros': 'Costa de Almería',
+  'Pulpí': 'Costa de Almería',
+  'Macenas': 'Costa de Almería',
+
+  // ── CÁDIZ / COSTA DE LA LUZ ─────────────────
+  'La Alcaidesa': 'Costa de la Luz',
+  'San Roque': 'Costa de la Luz',
+  'Pueblo Nuevo': 'Costa de la Luz',
+
+  // ── GRANADA / COSTA TROPICAL ────────────────
+  'Almuñécar': 'Costa Tropical',
+  'Monachil': 'Costa Tropical',
+
+  // ── CATALUÑA ────────────────────────────────
   'Barcelona': 'Cataluña',
-  'Girona': 'Cataluña',
   'Sitges': 'Cataluña',
+  'SITGES': 'Cataluña',
+  'Girona': 'Cataluña',
   'Tarragona': 'Cataluña',
-  'Lloret de Mar': 'Cataluña',
-  'Castelldefels': 'Cataluña',
-  // Madrid
+
+  // ── MADRID ──────────────────────────────────
   'Madrid': 'Madrid',
-  // Islas Baleares
+
+  // ── ISLAS BALEARES ──────────────────────────
   'Mallorca': 'Islas Baleares',
   'Ibiza': 'Islas Baleares',
   'Menorca': 'Islas Baleares',
-  'Formentera': 'Islas Baleares',
-  // Granada / Costa Tropical
-  'Granada': 'Costa Tropical',
-  'Motril': 'Costa Tropical',
-  // Cádiz / Costa de la Luz
-  'Cádiz': 'Costa de la Luz',
-  'Jerez': 'Costa de la Luz',
-  'Chiclana': 'Costa de la Luz',
-  'Conil': 'Costa de la Luz',
+  'Palma': 'Islas Baleares',
 }
 
-export function getSpainZone(city: string): string | null {
-  return SPAIN_COASTAL_ZONES[city] ?? null
+export const PROVINCE_TO_ZONE: Record<string, string> = {
+  'Málaga': 'Costa del Sol',
+  'Almería': 'Costa de Almería',
+  'Cádiz': 'Costa de la Luz',
+  'Granada': 'Costa Tropical',
+  'Murcia': 'Costa Cálida',
+  'Alicante': 'Costa Blanca',
+  'Valencia': 'Costa Blanca',
+  'Barcelona': 'Cataluña',
+  'Girona': 'Cataluña',
+  'Madrid': 'Madrid',
+  'Islas Baleares': 'Islas Baleares',
+  'Baleares': 'Islas Baleares',
+}
+
+export function getSpainZone(city: string, province?: string | null): string {
+  // 1. Provincia primero (más fiable)
+  if (province && PROVINCE_TO_ZONE[province]) {
+    return PROVINCE_TO_ZONE[province]
+  }
+  // 2. Ciudad exacta
+  if (CITY_TO_ZONE[city]) {
+    return CITY_TO_ZONE[city]
+  }
+  // 3. Ciudad normalizada (case-insensitive)
+  const cityLower = city.toLowerCase()
+  const match = Object.entries(CITY_TO_ZONE).find(([k]) => k.toLowerCase() === cityLower)
+  if (match) return match[1]
+  // 4. Fallback: provincia como zona o genérico
+  if (province) return province
+  return 'Otras zonas de España'
 }
