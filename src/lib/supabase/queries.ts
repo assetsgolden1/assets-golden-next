@@ -116,6 +116,73 @@ export async function getPropertyTypesForSpain(): Promise<string[]> {
   return types.sort()
 }
 
+// ─── Generic destination queries ──────────────────────────────
+
+export interface GetDestinationPropertiesFilters {
+  ciudad?: string
+  tipo?: string
+  precioMin?: number | null
+  precioMax?: number | null
+  habitaciones?: number | null
+  orden?: 'reciente' | 'precio_asc' | 'precio_desc'
+  limit?: number
+  offset?: number
+}
+
+export async function getPropertiesForDestination(
+  countryName: string,
+  filters: GetDestinationPropertiesFilters = {}
+) {
+  let query = supabaseAdmin
+    .from('properties')
+    .select('*', { count: 'exact' })
+    .ilike('country', `%${countryName}%`)
+    .or('hidden.is.null,hidden.eq.false')
+    .or('sold.is.null,sold.eq.false')
+
+  if (filters.ciudad)      query = query.ilike('location', `%${filters.ciudad}%`)
+  if (filters.tipo)        query = query.eq('property_type', filters.tipo)
+  if (filters.precioMin)   query = query.gte('price', filters.precioMin)
+  if (filters.precioMax)   query = query.lte('price', filters.precioMax)
+  if (filters.habitaciones) query = query.gte('bedrooms', filters.habitaciones)
+
+  const limit  = filters.limit  ?? 24
+  const offset = filters.offset ?? 0
+
+  if (filters.orden === 'precio_asc')       query = query.order('price', { ascending: true })
+  else if (filters.orden === 'precio_desc') query = query.order('price', { ascending: false })
+  else                                      query = query.order('created_at', { ascending: false })
+
+  const { data, error, count } = await query.range(offset, offset + limit - 1)
+  return { data: (data ?? []) as Property[], error, count: count ?? 0 }
+}
+
+export async function getCitiesForDestination(countryName: string): Promise<string[]> {
+  const { data } = await supabaseAdmin
+    .from('properties')
+    .select('location')
+    .ilike('country', `%${countryName}%`)
+    .or('hidden.is.null,hidden.eq.false')
+    .not('location', 'is', null)
+  const cities = [
+    ...new Set((data ?? []).map((d: { location: string | null }) => d.location).filter(Boolean)),
+  ] as string[]
+  return cities.sort()
+}
+
+export async function getPropertyTypesForDestination(countryName: string): Promise<string[]> {
+  const { data } = await supabaseAdmin
+    .from('properties')
+    .select('property_type')
+    .ilike('country', `%${countryName}%`)
+    .or('hidden.is.null,hidden.eq.false')
+    .not('property_type', 'is', null)
+  const types = [
+    ...new Set((data ?? []).map((d: { property_type: string | null }) => d.property_type).filter(Boolean)),
+  ] as string[]
+  return types.sort()
+}
+
 export async function getPropertyBySlug(slug: string) {
   const supabase = await createClient()
   const { data, error } = await supabase
