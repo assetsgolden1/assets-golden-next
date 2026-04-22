@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useEffect, useState } from 'react'
+import { use, useEffect, useState, useRef } from 'react'
 import { propertyTypeMap } from '@/lib/propertyTypes'
 import { toSentenceCase } from '@/lib/utils/normalizeText'
 
@@ -55,6 +55,21 @@ export default function EditPropertyPage({
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [availableCities, setAvailableCities] = useState<string[]>([])
+  const [useCustomCity, setUseCustomCity] = useState(false)
+  const initialLoadDone = useRef(false)
+
+  // Cargar ciudades cuando cambia el país (no en la carga inicial para no resetear)
+  useEffect(() => {
+    if (!initialLoadDone.current) return
+    if (!form.country) { setAvailableCities([]); return }
+    fetch(`/api/admin/get-cities?country=${encodeURIComponent(form.country)}`)
+      .then((r) => r.json())
+      .then((d) => {
+        setAvailableCities(d.cities ?? [])
+        setUseCustomCity(false)
+      })
+  }, [form.country])
 
   useEffect(() => {
     async function loadProperty() {
@@ -86,8 +101,18 @@ export default function EditPropertyPage({
         } else {
           setExistingImages([])
         }
+        // Cargar ciudades del país actual al iniciar
+        if (p.country) {
+          fetch(`/api/admin/get-cities?country=${encodeURIComponent(p.country)}`)
+            .then((r) => r.json())
+            .then((d) => {
+              setAvailableCities(d.cities ?? [])
+              setUseCustomCity(!d.cities?.includes(p.location ?? ''))
+            })
+        }
       }
       setLoading(false)
+      initialLoadDone.current = true
     }
     loadProperty()
   }, [id])
@@ -334,12 +359,52 @@ export default function EditPropertyPage({
             </div>
             <div className="col-span-2">
               <label className="block text-xs font-medium text-gray-600 mb-1">Ciudad / Zona</label>
-              <input
-                value={form.location}
-                onChange={(e) => set('location', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Marbella"
-              />
+
+              {availableCities.length > 0 && !useCustomCity ? (
+                <select
+                  value={form.location}
+                  onChange={(e) => {
+                    if (e.target.value === '__nueva__') {
+                      setUseCustomCity(true)
+                      set('location', '')
+                    } else {
+                      set('location', e.target.value)
+                    }
+                  }}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
+                  <option value="">Seleccionar ciudad</option>
+                  {availableCities.map((city) => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                  <option value="__nueva__">➕ Añadir nueva ciudad...</option>
+                </select>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    value={form.location}
+                    onChange={(e) => set('location', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1"
+                    placeholder="Marbella"
+                  />
+                  {availableCities.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => { setUseCustomCity(false); set('location', '') }}
+                      className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-200 whitespace-nowrap"
+                    >
+                      ← Ver existentes
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {form.location && !useCustomCity && availableCities.length > 0 && (
+                <p className="text-xs text-green-600 mt-1">✓ Ciudad existente — aparecerá en los filtros</p>
+              )}
+              {useCustomCity && form.location && (
+                <p className="text-xs text-amber-500 mt-1">✓ Nueva ciudad — se creará automáticamente</p>
+              )}
             </div>
           </div>
         </div>
