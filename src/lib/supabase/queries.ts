@@ -2,7 +2,7 @@ import { createClient } from './server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import type { Property, TeamMember, BlogPost, CountryDestination, LeadData } from '@/types'
 import { supabaseAdmin } from './admin'
-import { getCitiesInZone } from '@/lib/constants/spainZones'
+import { getCitiesInZone, ZONE_SLUGS } from '@/lib/constants/spainZones'
 import { normalizeLocation } from '@/lib/utils/normalizeLocation'
 
 // Client without cookies — only for generateStaticParams (build time)
@@ -25,6 +25,7 @@ export interface GetPropertiesFilters {
   offset?: number
   isDevelopment?: boolean
   country?: string
+  zona?: string
   orden?: 'reciente' | 'precio_asc' | 'precio_desc'
 }
 
@@ -45,6 +46,13 @@ export async function getProperties(filters?: GetPropertiesFilters) {
   if (filters?.bedrooms) query = query.eq('bedrooms', filters.bedrooms)
   if (filters?.isDevelopment !== undefined) query = query.eq('is_development', filters.isDevelopment)
   if (filters?.country) query = query.ilike('country', `%${filters.country}%`)
+  if (filters?.zona && filters?.country?.toLowerCase().includes('espa')) {
+    const zoneName = ZONE_SLUGS[filters.zona]
+    if (zoneName) {
+      const citiesInZone = getCitiesInZone(zoneName)
+      if (citiesInZone.length > 0) query = query.in('location', citiesInZone)
+    }
+  }
 
   const limit = filters?.limit ?? 12
   const offset = filters?.offset ?? 0

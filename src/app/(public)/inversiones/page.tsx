@@ -1,8 +1,14 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getProperties, getDestinations, getPropertyCountsByCountry } from '@/lib/supabase/queries'
+import {
+  getProperties,
+  getPropertyCountsByCountry,
+  getCitiesForDestination,
+} from '@/lib/supabase/queries'
 import PropertyCard from '@/components/properties/PropertyCard'
 import { buttonVariants } from '@/components/ui/button'
+import { PropiedadesFilters } from '@/components/PropiedadesFilters'
+import { PaginationBar } from '@/components/PaginationBar'
 import { TrendingUp, Globe, Shield, BarChart3 } from 'lucide-react'
 
 export const metadata: Metadata = {
@@ -36,35 +42,81 @@ const WHY_INVEST = [
   },
 ]
 
+const PROPERTY_TYPES = [
+  'apartment', 'penthouse', 'villa', 'house',
+  'townhouse', 'land', 'building', 'rural', 'ground_floor',
+]
+
 interface Props {
-  searchParams: Promise<{ pais?: string; pagina?: string }>
+  searchParams: Promise<{
+    tipo?: string
+    precio_min?: string
+    precio_max?: string
+    ciudad?: string
+    habitaciones?: string
+    pais?: string
+    zona?: string
+    orden?: string
+    pagina?: string
+  }>
 }
 
-const PAGE_SIZE = 12
+const PAGE_SIZE = 24
 
 export default async function InversionesPage({ searchParams }: Props) {
   const params = await searchParams
-  const page = Math.max(1, parseInt(params.pagina ?? '1', 10))
+  const page   = Math.max(1, parseInt(params.pagina ?? '1', 10))
   const offset = (page - 1) * PAGE_SIZE
 
-  const [{ data: destinations }, { data: properties, count }, propertyCounts] = await Promise.all([
-    getDestinations(),
+  const precioMin     = params.precio_min   ? parseInt(params.precio_min, 10)   : undefined
+  const precioMax     = params.precio_max   ? parseInt(params.precio_max, 10)   : undefined
+  const habitaciones  = params.habitaciones ? parseInt(params.habitaciones, 10) : undefined
+  const orden         = params.orden as 'reciente' | 'precio_asc' | 'precio_desc' | undefined
+
+  const [{ data: properties, count }, propertyCounts, cities] = await Promise.all([
     getProperties({
-      country: params.pais || undefined,
-      limit: PAGE_SIZE,
+      type:     params.tipo    || undefined,
+      minPrice: precioMin,
+      maxPrice: precioMax,
+      location: params.ciudad  || undefined,
+      bedrooms: habitaciones,
+      country:  params.pais    || undefined,
+      zona:     params.zona    || undefined,
+      orden,
+      limit:    PAGE_SIZE,
       offset,
     }),
     getPropertyCountsByCountry(),
+    params.pais ? getCitiesForDestination(params.pais) : Promise.resolve([] as string[]),
   ])
 
-  void destinations
-
-  const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
-
-  // Solo países que tienen propiedades reales en Supabase
   const countries = Object.keys(propertyCounts)
     .filter((c) => propertyCounts[c] > 0)
     .sort()
+
+  const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
+
+  const pageParams: Record<string, string | undefined> = {
+    tipo:         params.tipo         || undefined,
+    precio_min:   params.precio_min   || undefined,
+    precio_max:   params.precio_max   || undefined,
+    ciudad:       params.ciudad       || undefined,
+    habitaciones: params.habitaciones || undefined,
+    pais:         params.pais         || undefined,
+    zona:         params.zona         || undefined,
+    orden:        params.orden        || undefined,
+  }
+
+  const currentFilters = {
+    pais:         params.pais         || undefined,
+    zona:         params.zona         || undefined,
+    ciudad:       params.ciudad       || undefined,
+    tipo:         params.tipo         || undefined,
+    precioMin:    precioMin ?? null,
+    precioMax:    precioMax ?? null,
+    habitaciones: habitaciones ?? null,
+    orden:        params.orden        || undefined,
+  }
 
   return (
     <>
@@ -78,6 +130,11 @@ export default async function InversionesPage({ searchParams }: Props) {
           <p className="mt-4 text-white/60 max-w-xl mx-auto text-sm">
             Acceda a los mercados inmobiliarios más rentables del mundo con el respaldo de nuestro equipo de expertos.
           </p>
+          {(count ?? 0) > 0 && (
+            <p className="mt-3 text-white/40 text-sm">
+              {(count ?? 0).toLocaleString('es-ES')} propiedades disponibles
+            </p>
+          )}
         </div>
       </section>
 
@@ -98,90 +155,75 @@ export default async function InversionesPage({ searchParams }: Props) {
         </div>
       </section>
 
-      {/* Filtro por país + propiedades */}
-      <section className="section-padding bg-background">
+      {/* Layout filtros + grid */}
+      <section className="bg-background py-12">
         <div className="container-luxury">
-          {/* Filtro países */}
-          {countries.length > 0 && (
-            <div className="mb-8 flex flex-wrap gap-2 items-center">
-              <Link
-                href="/inversiones"
-                className={`rounded-full px-4 py-1.5 text-xs font-medium border transition-colors ${
-                  !params.pais
-                    ? 'bg-gold text-navy border-gold'
-                    : 'border-border text-muted-foreground hover:border-gold hover:text-foreground'
-                }`}
-              >
-                Todos los países
-              </Link>
-              {countries.map((c) => (
-                <Link
-                  key={c}
-                  href={`/inversiones?pais=${encodeURIComponent(c)}`}
-                  className={`rounded-full px-4 py-1.5 text-xs font-medium border transition-colors ${
-                    params.pais === c
-                      ? 'bg-gold text-navy border-gold'
-                      : 'border-border text-muted-foreground hover:border-gold hover:text-foreground'
-                  }`}
-                >
-                  {c}
-                </Link>
-              ))}
-            </div>
-          )}
+          <div className="flex gap-8 items-start">
+            <PropiedadesFilters
+              countries={countries}
+              cities={cities}
+              types={PROPERTY_TYPES}
+              currentFilters={currentFilters}
+              totalCount={count ?? 0}
+              basePath="/inversiones"
+            />
 
-          {/* Grid propiedades */}
-          {properties.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {properties.map((p) => (
-                  <PropertyCard
-                    key={p.id}
-                    id={p.id}
-                    title={p.title}
-                    slug={p.slug ?? p.id}
-                    location={p.location ?? p.country ?? 'Internacional'}
-                    price={p.price}
-                    currency={p.currency}
-                    area_sqm={p.area_sqm}
-                    bedrooms={p.bedrooms}
-                    bathrooms={p.bathrooms}
-                    property_type={p.property_type}
-                    image_url={p.image_url}
-                    featured={p.featured}
-                  />
-                ))}
+            <div className="flex-1 min-w-0">
+              {/* Contador */}
+              <div className="mb-6 flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-semibold text-foreground">
+                    {(count ?? 0).toLocaleString('es-ES')}
+                  </span>{' '}
+                  {(count ?? 0) === 1 ? 'propiedad encontrada' : 'propiedades encontradas'}
+                  {params.pais && ` en ${params.pais}`}
+                  {params.ciudad && `, ${params.ciudad}`}
+                </p>
               </div>
 
-              {totalPages > 1 && (
-                <div className="mt-12 flex items-center justify-center gap-2">
-                  {page > 1 && (
-                    <Link
-                      href={`/inversiones?${params.pais ? `pais=${params.pais}&` : ''}pagina=${page - 1}`}
-                      className={buttonVariants({ variant: 'outline', size: 'sm' })}
-                    >
-                      ← Anterior
-                    </Link>
+              {(properties ?? []).length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {(properties ?? []).map((p) => (
+                      <PropertyCard
+                        key={p.id}
+                        id={p.id}
+                        title={p.title}
+                        slug={p.slug ?? p.id}
+                        location={p.location ?? p.country ?? 'Internacional'}
+                        price={p.price}
+                        currency={p.currency}
+                        area_sqm={p.area_sqm}
+                        bedrooms={p.bedrooms}
+                        bathrooms={p.bathrooms}
+                        property_type={p.property_type}
+                        image_url={p.image_url}
+                        featured={p.featured}
+                      />
+                    ))}
+                  </div>
+
+                  {totalPages > 1 && (
+                    <PaginationBar
+                      currentPage={page}
+                      totalPages={totalPages}
+                      basePath="/inversiones"
+                      currentParams={{ ...pageParams, pagina: undefined }}
+                    />
                   )}
-                  <span className="text-sm text-muted-foreground px-4">
-                    Página {page} de {totalPages}
-                  </span>
-                  {page < totalPages && (
-                    <Link
-                      href={`/inversiones?${params.pais ? `pais=${params.pais}&` : ''}pagina=${page + 1}`}
-                      className={buttonVariants({ variant: 'outline', size: 'sm' })}
-                    >
-                      Siguiente →
-                    </Link>
-                  )}
+                </>
+              ) : (
+                <div className="py-24 text-center">
+                  <p className="text-muted-foreground text-lg mb-4">
+                    No hay propiedades disponibles con los filtros seleccionados.
+                  </p>
+                  <Link href="/inversiones" className={buttonVariants({ variant: 'goldOutline' })}>
+                    Ver todas las oportunidades
+                  </Link>
                 </div>
               )}
-            </>
-          ) : (
-            <p className="py-24 text-center text-muted-foreground">
-              No hay propiedades disponibles con los filtros seleccionados.
-            </p>
-          )}
+            </div>
+          </div>
         </div>
       </section>
 

@@ -18,6 +18,11 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600
 
+const PROPERTY_TYPES = [
+  'apartment', 'penthouse', 'villa', 'house',
+  'townhouse', 'land', 'building', 'rural', 'ground_floor',
+]
+
 interface Props {
   searchParams: Promise<{
     tipo?: string
@@ -26,6 +31,7 @@ interface Props {
     ciudad?: string
     habitaciones?: string
     pais?: string
+    zona?: string
     orden?: string
     pagina?: string
   }>
@@ -51,6 +57,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
       location: params.ciudad  || undefined,
       bedrooms: habitaciones,
       country:  params.pais    || undefined,
+      zona:     params.zona    || undefined,
       orden,
       limit:  PAGE_SIZE,
       offset,
@@ -66,17 +73,19 @@ export default async function PropiedadesPage({ searchParams }: Props) {
   const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
 
   const pageParams: Record<string, string | undefined> = {
-    tipo:        params.tipo    || undefined,
-    precio_min:  params.precio_min  || undefined,
-    precio_max:  params.precio_max  || undefined,
-    ciudad:      params.ciudad  || undefined,
+    tipo:         params.tipo         || undefined,
+    precio_min:   params.precio_min   || undefined,
+    precio_max:   params.precio_max   || undefined,
+    ciudad:       params.ciudad       || undefined,
     habitaciones: params.habitaciones || undefined,
-    pais:        params.pais    || undefined,
-    orden:       params.orden   || undefined,
+    pais:         params.pais         || undefined,
+    zona:         params.zona         || undefined,
+    orden:        params.orden        || undefined,
   }
 
   const currentFilters = {
     pais:        params.pais        || undefined,
+    zona:        params.zona        || undefined,
     ciudad:      params.ciudad      || undefined,
     tipo:        params.tipo        || undefined,
     precioMin:   precioMin ?? null,
@@ -109,8 +118,10 @@ export default async function PropiedadesPage({ searchParams }: Props) {
             <PropiedadesFilters
               countries={countries}
               cities={cities}
+              types={PROPERTY_TYPES}
               currentFilters={currentFilters}
               totalCount={count ?? 0}
+              basePath="/propiedades"
             />
 
             <div className="flex-1 min-w-0">
