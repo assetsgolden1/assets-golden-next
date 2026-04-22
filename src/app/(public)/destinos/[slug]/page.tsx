@@ -96,9 +96,9 @@ export default async function DestinoPage({ params }: Props) {
 
       {/* Hero */}
       <section className="relative h-80 md:h-[420px] overflow-hidden">
-        {destination.hero_image_url ? (
+        {(destination.hero_image_url ?? destination.card_image_url) ? (
           <Image
-            src={destination.hero_image_url}
+            src={(destination.hero_image_url ?? destination.card_image_url)!}
             alt={destination.country_name}
             fill
             className="object-cover"

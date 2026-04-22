@@ -265,9 +265,12 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
     return map
   }, [properties])
 
-  // Regions sorted by count descending
+  // Regions sorted by count descending, excluding empty ones
   const sortedRegions = useMemo(
-    () => [...hierarchy.values()].sort((a, b) => b.count - a.count),
+    () =>
+      [...hierarchy.values()]
+        .filter((rd) => rd.count > 0)
+        .sort((a, b) => b.count - a.count),
     [hierarchy]
   )
 
@@ -380,7 +383,12 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
               count={rd.count}
               index={i}
               onClick={() => goToRegion(rd)}
-              overrideImageUrl={normalizedCityImages?.[rd.displayName.toLowerCase()] ?? normalizedCityImages?.[rd.key] ?? undefined}
+              overrideImageUrl={
+                normalizedCityImages?.[rd.displayName.toLowerCase()] ??
+                normalizedCityImages?.[rd.key] ??
+                (cityImages?.[rd.displayName] ?? cityImages?.[rd.key]) ??
+                undefined
+              }
             />
           ))}
         </div>
@@ -390,7 +398,7 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
       {state.level === 'region' && (() => {
         const rd = hierarchy.get(state.region)
         if (!rd) return null
-        const sortedCities = [...rd.cities].sort((a, b) => b.count - a.count)
+        const sortedCities = [...rd.cities].filter((c) => c.count > 0).sort((a, b) => b.count - a.count)
         return (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {sortedCities.map((city, i) => (
@@ -401,7 +409,12 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
                 count={city.count}
                 index={i}
                 onClick={() => goToCity(state.region, city)}
-                overrideImageUrl={normalizedCityImages?.[city.displayName.toLowerCase()] ?? normalizedCityImages?.[city.key] ?? undefined}
+                overrideImageUrl={
+                  normalizedCityImages?.[city.displayName.toLowerCase()] ??
+                  normalizedCityImages?.[city.key] ??
+                  (cityImages?.[city.displayName] ?? cityImages?.[city.key]) ??
+                  undefined
+                }
               />
             ))}
           </div>
