@@ -113,10 +113,39 @@ export function DestinationFilters({
       {/* Ciudad */}
       {cities.length > 0 && (
         <FilterBlock title="Ciudad">
-          <select value={currentFilters.ciudad ?? ''} onChange={e => applyFilter('ciudad', e.target.value)} style={selectStyle}>
-            <option value="">Todas las ciudades</option>
-            {cities.map(city => <option key={city} value={city}>{city}</option>)}
-          </select>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+            maxHeight: cities.length > 15 ? 280 : 'none',
+            overflowY: cities.length > 15 ? 'auto' : 'visible',
+            paddingRight: cities.length > 15 ? 4 : 0,
+          }}>
+            {cities.map(city => {
+              const active = currentFilters.ciudad === city
+              return (
+                <button
+                  key={city}
+                  onClick={() => applyFilter('ciudad', active ? '' : city)}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: 6,
+                    border: '1px solid',
+                    textAlign: 'left',
+                    fontSize: 13,
+                    cursor: isPending ? 'wait' : 'pointer',
+                    backgroundColor: active ? '#131D2E' : 'white',
+                    color: active ? 'white' : '#374151',
+                    borderColor: active ? '#131D2E' : '#e5e7eb',
+                    fontWeight: active ? 600 : 400,
+                    opacity: isPending ? 0.7 : 1,
+                  }}
+                >
+                  {city}
+                </button>
+              )
+            })}
+          </div>
         </FilterBlock>
       )}
 
