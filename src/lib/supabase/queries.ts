@@ -220,16 +220,31 @@ const countryBySlug: Record<string, string> = {
 export async function getPropertiesByCountry(slug: string) {
   const countryName = countryBySlug[slug] ?? slug
   const supabase = createStaticClient()
-  const { data, error } = await supabase
-    .from('properties')
-    .select('*')
-    .in('status', ['active', 'available'])
-    .or('hidden.is.null,hidden.eq.false')
-    .or('sold.is.null,sold.eq.false')
-    .ilike('country', countryName)
-    .order('province', { ascending: true, nullsFirst: false })
-    .order('location', { ascending: true })
-  return { data: (data ?? []) as Property[], error }
+
+  // Supabase PostgREST caps at 1000 rows — fetch in pages
+  const PAGE = 1000
+  const all: Property[] = []
+  let offset = 0
+
+  while (true) {
+    const { data, error } = await supabase
+      .from('properties')
+      .select('*')
+      .in('status', ['active', 'available'])
+      .or('hidden.is.null,hidden.eq.false')
+      .or('sold.is.null,sold.eq.false')
+      .ilike('country', countryName)
+      .order('province', { ascending: true, nullsFirst: false })
+      .order('location', { ascending: true })
+      .range(offset, offset + PAGE - 1)
+
+    if (error || !data || data.length === 0) break
+    all.push(...(data as Property[]))
+    if (data.length < PAGE) break
+    offset += PAGE
+  }
+
+  return { data: all, error: null }
 }
 
 // ─── Property counts by country ────────────────────────────────

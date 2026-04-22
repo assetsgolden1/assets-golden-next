@@ -400,6 +400,10 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
   const isEmpty = isSpain ? sortedZones.length === 0 : hierarchy.size === 0
   if (isEmpty) return null
 
+  if (isSpain) {
+    console.log('Zonas España:', sortedZones.map((z) => ({ name: z.displayName, count: z.count })))
+  }
+
   // ── Breadcrumb ────────────────────────────────────────────────────
   const crumbs: string[] = [countryName]
 
