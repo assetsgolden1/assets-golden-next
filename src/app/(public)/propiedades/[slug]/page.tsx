@@ -7,6 +7,7 @@ import { getPropertyBySlug, getAllPropertySlugs } from '@/lib/supabase/queries'
 import PropertyGalleryClient from '@/components/PropertyGalleryClient'
 import PropertyDescriptionExpand from '@/components/properties/PropertyDescriptionExpand'
 import { translatePropertyType, translatePropertyTitle } from '@/lib/propertyTypes'
+import { toSentenceCase } from '@/lib/utils/normalizeText'
 import PropertyContactModal from '@/components/PropertyContactModal'
 import { ZONE_SLUGS } from '@/lib/constants/spainZones'
 
@@ -151,7 +152,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               </div>
 
               <h1 className="font-display text-3xl font-semibold text-foreground md:text-4xl leading-tight">
-                {translatePropertyTitle(property.title)}
+                {toSentenceCase(translatePropertyTitle(property.title))}
               </h1>
 
               {/* Precio */}

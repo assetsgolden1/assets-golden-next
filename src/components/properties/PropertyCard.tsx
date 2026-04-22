@@ -3,6 +3,7 @@ import Image from "next/image";
 import { MapPin, Maximize, Building2, BedDouble, Bath } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { translatePropertyType, translatePropertyTitle } from "@/lib/propertyTypes";
+import { toSentenceCase } from "@/lib/utils/normalizeText";
 
 interface PropertyCardProps {
   id: string;
@@ -91,7 +92,7 @@ export default function PropertyCard({
 
         {/* Título */}
         <h3 className="font-display text-base text-foreground mb-1 line-clamp-1 group-hover:text-gold transition-colors">
-          {translatePropertyTitle(title)}
+          {toSentenceCase(translatePropertyTitle(title))}
         </h3>
 
         {/* Ubicación */}

@@ -3,6 +3,7 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import type { Property, TeamMember, BlogPost, CountryDestination, LeadData } from '@/types'
 import { supabaseAdmin } from './admin'
 import { getCitiesInZone } from '@/lib/constants/spainZones'
+import { normalizeLocation } from '@/lib/utils/normalizeLocation'
 
 // Client without cookies — only for generateStaticParams (build time)
 export function createStaticClient() {
@@ -165,7 +166,12 @@ export async function getCitiesForDestination(countryName: string): Promise<stri
     .or('hidden.is.null,hidden.eq.false')
     .not('location', 'is', null)
   const cities = [
-    ...new Set((data ?? []).map((d: { location: string | null }) => d.location).filter(Boolean)),
+    ...new Set(
+      (data ?? [])
+        .map((d: { location: string | null }) => d.location)
+        .filter(Boolean)
+        .map((city) => normalizeLocation(city as string))
+    ),
   ] as string[]
   return cities.sort()
 }

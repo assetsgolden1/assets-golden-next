@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from 'react'
 import { propertyTypeMap } from '@/lib/propertyTypes'
+import { toSentenceCase } from '@/lib/utils/normalizeText'
 
 const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF']
 const STATUSES = [
@@ -234,6 +235,11 @@ export default function EditPropertyPage({
                 onChange={(e) => set('title', e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              {toSentenceCase(form.title) !== form.title && (
+                <p className="mt-1 text-xs text-amber-600">
+                  Se mostrará como: <span className="font-medium">{toSentenceCase(form.title)}</span>
+                </p>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
