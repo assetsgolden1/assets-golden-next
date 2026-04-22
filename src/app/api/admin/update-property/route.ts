@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
+import { normalizeLocation } from '@/lib/utils/normalizeLocation'
 
 export async function POST(request: NextRequest) {
   const data = await request.json()
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
       title: updates.title,
       country,
       province: updates.province || null,
-      location: updates.location || null,
+      location: updates.location ? normalizeLocation(updates.location) : null,
       property_type: updates.property_type,
       price: updates.price ? parseInt(updates.price) : null,
       currency: updates.currency,

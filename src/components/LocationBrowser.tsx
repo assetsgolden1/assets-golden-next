@@ -7,13 +7,23 @@ import Link from 'next/link'
 import type { Property } from '@/types'
 import { translatePropertyType, translatePropertyTitle } from '@/lib/propertyTypes'
 import { getCityImage } from '@/lib/constants/cityImages'
+import { normalizeLocation } from '@/lib/utils/normalizeLocation'
+import { getSpainZone } from '@/lib/constants/spainZones'
 
 // ─── Types ────────────────────────────────────────────────────────
 
 type LocationState =
   | { level: 'country' }
+  | { level: 'zone'; zone: string }
   | { level: 'region'; region: string }
   | { level: 'city'; region: string; city: string }
+
+interface ZoneData {
+  displayName: string
+  key: string
+  count: number
+  cities: CityData[]
+}
 
 interface RegionData {
   displayName: string
@@ -49,10 +59,28 @@ function formatPrice(price: number | null, currency: string | null): string {
   return `${fmt} ${currency ?? ''}`
 }
 
+function getCityImageUrl(
+  cityName: string,
+  cityImages: Record<string, string> | null | undefined
+): string {
+  if (!cityImages) return getCityImage(cityName)
+  const attempts = [
+    cityName,
+    cityName.toLowerCase(),
+    cityName.trim(),
+    cityName.toLowerCase().trim(),
+    normalizeLocation(cityName),
+    normalizeLocation(cityName).toLowerCase(),
+  ]
+  for (const attempt of attempts) {
+    if (cityImages[attempt]) return cityImages[attempt]
+  }
+  return getCityImage(cityName)
+}
 
 const ITEMS_PER_PAGE = 12
 
-// ─── LocationCard (animated card for region/city) ─────────────────
+// ─── LocationCard ─────────────────────────────────────────────────
 
 interface LocationCardProps {
   displayName: string
@@ -60,10 +88,10 @@ interface LocationCardProps {
   count: number
   index: number
   onClick: () => void
-  overrideImageUrl?: string
+  cityImages?: Record<string, string> | null
 }
 
-function LocationCard({ displayName, imageKey, count, index, onClick, overrideImageUrl }: LocationCardProps) {
+function LocationCard({ displayName, imageKey, count, index, onClick, cityImages }: LocationCardProps) {
   const ref = useRef<HTMLButtonElement>(null)
   const [rotate, setRotate] = useState({ x: 0, y: 0 })
   const [hovered, setHovered] = useState(false)
@@ -81,6 +109,8 @@ function LocationCard({ displayName, imageKey, count, index, onClick, overrideIm
     setHovered(false)
   }
 
+  const imageSrc = getCityImageUrl(displayName, cityImages) || getCityImageUrl(imageKey, cityImages)
+
   return (
     <button
       ref={ref}
@@ -97,28 +127,19 @@ function LocationCard({ displayName, imageKey, count, index, onClick, overrideIm
       }}
       className="group relative aspect-[3/4] rounded-xl overflow-hidden text-left"
     >
-      {/* Background image */}
       <Image
-        src={overrideImageUrl ?? getCityImage(imageKey)}
+        src={imageSrc}
         alt={displayName}
         fill
         className="object-cover transition-transform duration-500 group-hover:scale-110"
         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
       />
-
-      {/* Radial glow */}
       <div
         className="absolute inset-0 pointer-events-none transition-opacity duration-500 opacity-0 group-hover:opacity-100"
         style={{ background: 'radial-gradient(circle at 50% 80%, rgba(212,175,55,0.35) 0%, transparent 60%)' }}
       />
-
-      {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/30 to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-300" />
-
-      {/* Gold border on hover */}
       <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-gold/40 transition-colors duration-500 pointer-events-none" />
-
-      {/* Content */}
       <div className="absolute inset-0 flex flex-col justify-end p-4 lg:p-5">
         <h3 className="font-display text-base lg:text-lg text-white mb-1 leading-tight">
           {displayName}
@@ -218,16 +239,49 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
   const [state, setState] = useState<LocationState>({ level: 'country' })
   const [page, setPage] = useState(0)
 
-  // Normalizar claves a minúsculas para lookup case-insensitive
-  const normalizedCityImages = useMemo(() => {
-    if (!cityImages) return null
-    return Object.fromEntries(
-      Object.entries(cityImages).map(([k, v]) => [k.toLowerCase(), v])
-    )
-  }, [cityImages])
+  const isSpain = countryName === 'España' || countryName === 'Espana' || countryName === 'espana'
 
-  // Build hierarchy: province → (cities → properties)
+  // ── Spain: build zone → city → properties hierarchy ─────────────
+  const spainZoneMap = useMemo(() => {
+    if (!isSpain) return null
+    const map = new Map<string, ZoneData>()
+
+    for (const p of properties) {
+      const loc = p.location?.trim() || null
+      if (!loc) continue
+      const normalizedCity = normalizeLocation(loc)
+      const cityKey = normalizedCity.toLowerCase()
+      const zoneName = getSpainZone(normalizedCity) ?? 'Otras zonas'
+      const zoneKey = zoneName.toLowerCase()
+
+      if (!map.has(zoneKey)) {
+        map.set(zoneKey, { displayName: zoneName, key: zoneKey, count: 0, cities: [] })
+      }
+      const zd = map.get(zoneKey)!
+      zd.count++
+
+      const existing = zd.cities.find((c) => c.key === cityKey)
+      if (existing) {
+        existing.count++
+      } else {
+        zd.cities.push({ displayName: normalizedCity, key: cityKey, count: 1 })
+      }
+    }
+
+    return map
+  }, [properties, isSpain])
+
+  const sortedZones = useMemo(
+    () =>
+      spainZoneMap
+        ? [...spainZoneMap.values()].filter((z) => z.count > 0).sort((a, b) => b.count - a.count)
+        : [],
+    [spainZoneMap]
+  )
+
+  // ── Non-Spain: build province → city hierarchy ───────────────────
   const hierarchy = useMemo(() => {
+    if (isSpain) return new Map<string, RegionData>()
     const map = new Map<string, RegionData>()
 
     for (const p of properties) {
@@ -236,9 +290,9 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
       if (!location) continue
 
       const regionKey = province ? province.toLowerCase() : location.toLowerCase()
-      const regionDisplay = province ? toTitleCase(province) : toTitleCase(location)
+      const regionDisplay = province ? toTitleCase(province) : normalizeLocation(location)
       const cityKey = location.toLowerCase()
-      const cityDisplay = toTitleCase(location)
+      const cityDisplay = normalizeLocation(location)
 
       if (!map.has(regionKey)) {
         map.set(regionKey, {
@@ -263,9 +317,8 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
     }
 
     return map
-  }, [properties])
+  }, [properties, isSpain])
 
-  // Regions sorted by count descending, excluding empty ones
   const sortedRegions = useMemo(
     () =>
       [...hierarchy.values()]
@@ -274,25 +327,39 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
     [hierarchy]
   )
 
-  // Properties for current city view
+  // ── Properties for current city view ─────────────────────────────
   const cityProperties = useMemo(() => {
     if (state.level !== 'city') return []
+
+    if (isSpain) {
+      return properties.filter((p) => {
+        const loc = p.location?.trim() || ''
+        return normalizeLocation(loc).toLowerCase() === state.city
+      })
+    }
+
     return properties.filter((p) => {
       const rKey = (p.province?.trim() || p.location?.trim() || '').toLowerCase()
       const cKey = p.location?.trim().toLowerCase() || ''
       return rKey === state.region && cKey === state.city
     })
-  }, [state, properties])
+  }, [state, properties, isSpain])
 
   const totalPages = Math.ceil(cityProperties.length / ITEMS_PER_PAGE)
   const pagedProperties = cityProperties.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE)
+
+  // ── Navigation ────────────────────────────────────────────────────
+
+  function goToZone(zd: ZoneData) {
+    setPage(0)
+    setState({ level: 'zone', zone: zd.key })
+  }
 
   function goToRegion(rd: RegionData) {
     setPage(0)
     if (rd.hasCities && rd.cities.length > 1) {
       setState({ level: 'region', region: rd.key })
     } else {
-      // Single city or no province → go to city directly
       const cityKey = rd.cities[0]?.key ?? rd.key
       setState({ level: 'city', region: rd.key, city: cityKey })
     }
@@ -306,31 +373,86 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
   function goBack() {
     setPage(0)
     if (state.level === 'city') {
-      const rd = hierarchy.get(state.region)
-      if (rd?.hasCities && rd.cities.length > 1) {
-        setState({ level: 'region', region: state.region })
+      if (isSpain) {
+        const zd = spainZoneMap?.get(state.region)
+        const activeCities = (zd?.cities ?? []).filter((c) => c.count > 0)
+        if (zd && activeCities.length > 1) {
+          setState({ level: 'zone', zone: state.region })
+        } else {
+          setState({ level: 'country' })
+        }
       } else {
-        setState({ level: 'country' })
+        const rd = hierarchy.get(state.region)
+        if (rd?.hasCities && rd.cities.length > 1) {
+          setState({ level: 'region', region: state.region })
+        } else {
+          setState({ level: 'country' })
+        }
       }
-    } else if (state.level === 'region') {
+    } else if (state.level === 'zone' || state.level === 'region') {
       setState({ level: 'country' })
     }
   }
 
-  if (hierarchy.size === 0) return null
+  const isEmpty = isSpain ? sortedZones.length === 0 : hierarchy.size === 0
+  if (isEmpty) return null
 
-  // ── Breadcrumb trail ──────────────────────────────────────────
+  // ── Breadcrumb ────────────────────────────────────────────────────
   const crumbs: string[] = [countryName]
+
+  if (state.level === 'zone') {
+    crumbs.push(spainZoneMap?.get(state.zone)?.displayName ?? state.zone)
+  }
   if (state.level === 'region') {
     crumbs.push(hierarchy.get(state.region)?.displayName ?? state.region)
   }
   if (state.level === 'city') {
-    if (hierarchy.get(state.region)?.hasCities) {
-      crumbs.push(hierarchy.get(state.region)?.displayName ?? state.region)
+    if (isSpain) {
+      const zd = spainZoneMap?.get(state.region)
+      crumbs.push(zd?.displayName ?? state.region)
+      const cityDisplay = zd?.cities.find((c) => c.key === state.city)?.displayName ?? state.city
+      crumbs.push(cityDisplay)
+    } else {
+      if (hierarchy.get(state.region)?.hasCities) {
+        crumbs.push(hierarchy.get(state.region)?.displayName ?? state.region)
+      }
+      const cityDisplay =
+        hierarchy.get(state.region)?.cities.find((c) => c.key === state.city)?.displayName ?? state.city
+      crumbs.push(cityDisplay)
     }
-    const cityDisplay = hierarchy.get(state.region)?.cities.find((c) => c.key === state.city)?.displayName ?? state.city
-    crumbs.push(cityDisplay)
   }
+
+  // ── Section header label ──────────────────────────────────────────
+  const headerTitle = (() => {
+    if (state.level === 'country') return `Zonas en ${countryName}`
+    if (state.level === 'zone') return spainZoneMap?.get(state.zone)?.displayName ?? ''
+    if (state.level === 'region') return hierarchy.get(state.region)?.displayName ?? ''
+    if (state.level === 'city') {
+      if (isSpain) {
+        return (
+          spainZoneMap?.get(state.region)?.cities.find((c) => c.key === state.city)?.displayName ??
+          state.city
+        )
+      }
+      return (
+        hierarchy.get(state.region)?.cities.find((c) => c.key === state.city)?.displayName ?? state.city
+      )
+    }
+    return ''
+  })()
+
+  // ── City display name for "Ver todas" link ────────────────────────
+  const currentCityDisplayName = (() => {
+    if (state.level !== 'city') return ''
+    if (isSpain) {
+      return (
+        spainZoneMap?.get(state.region)?.cities.find((c) => c.key === state.city)?.displayName ?? state.city
+      )
+    }
+    return (
+      hierarchy.get(state.region)?.cities.find((c) => c.key === state.city)?.displayName ?? state.city
+    )
+  })()
 
   return (
     <div>
@@ -338,13 +460,7 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
       <div className="mb-8 text-center">
         <p className="text-xs tracking-[0.25em] text-gold uppercase mb-3">Explorar por zona</p>
         <h2 className="font-display text-2xl font-semibold text-foreground md:text-3xl">
-          {state.level === 'country' && `Zonas en ${countryName}`}
-          {state.level === 'region' && (hierarchy.get(state.region)?.displayName ?? '')}
-          {state.level === 'city' && (() => {
-            const rd = hierarchy.get(state.region)
-            const cityDisplay = rd?.cities.find((c) => c.key === state.city)?.displayName ?? state.city
-            return cityDisplay
-          })()}
+          {headerTitle}
         </h2>
         <div className="divider-gold mx-auto mt-4" />
       </div>
@@ -372,29 +488,58 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
         </div>
       )}
 
-      {/* ── Level: COUNTRY — show regions ───────────────────────── */}
+      {/* ── COUNTRY level ─────────────────────────────────────────── */}
       {state.level === 'country' && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {sortedRegions.map((rd, i) => (
-            <LocationCard
-              key={rd.key}
-              displayName={rd.displayName}
-              imageKey={rd.key}
-              count={rd.count}
-              index={i}
-              onClick={() => goToRegion(rd)}
-              overrideImageUrl={
-                normalizedCityImages?.[rd.displayName.toLowerCase()] ??
-                normalizedCityImages?.[rd.key] ??
-                (cityImages?.[rd.displayName] ?? cityImages?.[rd.key]) ??
-                undefined
-              }
-            />
-          ))}
+          {isSpain
+            ? sortedZones.map((zd, i) => (
+                <LocationCard
+                  key={zd.key}
+                  displayName={zd.displayName}
+                  imageKey={zd.key}
+                  count={zd.count}
+                  index={i}
+                  onClick={() => goToZone(zd)}
+                  cityImages={cityImages}
+                />
+              ))
+            : sortedRegions.map((rd, i) => (
+                <LocationCard
+                  key={rd.key}
+                  displayName={rd.displayName}
+                  imageKey={rd.key}
+                  count={rd.count}
+                  index={i}
+                  onClick={() => goToRegion(rd)}
+                  cityImages={cityImages}
+                />
+              ))}
         </div>
       )}
 
-      {/* ── Level: REGION — show cities ─────────────────────────── */}
+      {/* ── ZONE level (Spain only) ────────────────────────────────── */}
+      {state.level === 'zone' && (() => {
+        const zd = spainZoneMap?.get(state.zone)
+        if (!zd) return null
+        const sortedCities = [...zd.cities].filter((c) => c.count > 0).sort((a, b) => b.count - a.count)
+        return (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {sortedCities.map((city, i) => (
+              <LocationCard
+                key={city.key}
+                displayName={city.displayName}
+                imageKey={city.key}
+                count={city.count}
+                index={i}
+                onClick={() => goToCity(state.zone, city)}
+                cityImages={cityImages}
+              />
+            ))}
+          </div>
+        )
+      })()}
+
+      {/* ── REGION level (non-Spain) ───────────────────────────────── */}
       {state.level === 'region' && (() => {
         const rd = hierarchy.get(state.region)
         if (!rd) return null
@@ -409,19 +554,14 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
                 count={city.count}
                 index={i}
                 onClick={() => goToCity(state.region, city)}
-                overrideImageUrl={
-                  normalizedCityImages?.[city.displayName.toLowerCase()] ??
-                  normalizedCityImages?.[city.key] ??
-                  (cityImages?.[city.displayName] ?? cityImages?.[city.key]) ??
-                  undefined
-                }
+                cityImages={cityImages}
               />
             ))}
           </div>
         )
       })()}
 
-      {/* ── Level: CITY — show properties ───────────────────────── */}
+      {/* ── CITY level ────────────────────────────────────────────── */}
       {state.level === 'city' && (
         <>
           {pagedProperties.length === 0 ? (
@@ -436,7 +576,6 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
             </div>
           )}
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="mt-10 flex items-center justify-center gap-4">
               <button
@@ -459,12 +598,9 @@ export default function LocationBrowser({ properties, countryName, cityImages }:
             </div>
           )}
 
-          {/* Ver todas */}
           <div className="mt-6 text-center">
             <Link
-              href={`/propiedades?ubicacion=${encodeURIComponent(
-                hierarchy.get(state.region)?.cities.find((c) => c.key === state.city)?.displayName ?? state.city
-              )}`}
+              href={`/propiedades?ubicacion=${encodeURIComponent(currentCityDisplayName)}`}
               className="text-sm text-gold hover:underline"
             >
               Ver todas las propiedades en esta zona →
