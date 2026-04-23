@@ -107,9 +107,17 @@ export const CITY_TO_ZONE: Record<string, string> = {
   // ── CATALUÑA ────────────────────────────────
   'Barcelona': 'Cataluña',
   'Sitges': 'Cataluña',
-  'SITGES': 'Cataluña',
   'Girona': 'Cataluña',
   'Tarragona': 'Cataluña',
+  'Lleida': 'Cataluña',
+  'Lloret de Mar': 'Cataluña',
+  "Platja d'Aro": 'Cataluña',
+  'Tossa de Mar': 'Cataluña',
+  'Blanes': 'Cataluña',
+  'Roses': 'Cataluña',
+  'Empuriabrava': 'Cataluña',
+  'Palafrugell': 'Cataluña',
+  'Cadaqués': 'Cataluña',
 
   // ── MADRID ──────────────────────────────────
   'Madrid': 'Madrid',
@@ -131,6 +139,8 @@ export const PROVINCE_TO_ZONE: Record<string, string> = {
   'Valencia': 'Costa Blanca',
   'Barcelona': 'Cataluña',
   'Girona': 'Cataluña',
+  'Tarragona': 'Cataluña',
+  'Lleida': 'Cataluña',
   'Madrid': 'Madrid',
   'Islas Baleares': 'Islas Baleares',
   'Baleares': 'Islas Baleares',

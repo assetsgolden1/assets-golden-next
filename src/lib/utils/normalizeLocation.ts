@@ -25,6 +25,7 @@ const LOCATION_CORRECTIONS: Record<string, string> = {
   'fuengirola': 'Fuengirola',
   'mallorca': 'Mallorca',
   'ibiza': 'Ibiza',
+  'sitges': 'Sitges',
   // México
   'tulum': 'Tulum',
   'cancun': 'Cancún',
