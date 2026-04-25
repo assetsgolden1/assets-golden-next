@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { appendLeadToSheets } from '@/lib/googleSheets'
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,6 +32,16 @@ export async function POST(req: NextRequest) {
       console.error('[demands API] DB error:', dbError.message)
       return NextResponse.json({ error: 'Error al guardar' }, { status: 500 })
     }
+
+    // Google Sheets — fire and forget
+    appendLeadToSheets({
+      name: body.name,
+      email: body.email,
+      phone: body.phone,
+      type: 'demanda',
+      message: body.features,
+      source: 'demand_form',
+    }).catch((e) => console.error('[demands API] Sheets error:', e.message))
 
     // n8n webhook — fire and forget
     const webhookUrl = process.env.N8N_WEBHOOK_URL

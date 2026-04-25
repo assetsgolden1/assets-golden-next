@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { appendLeadToSheets } from '@/lib/googleSheets'
 
 const SOURCE_LABELS: Record<string, string> = {
   website: 'Formulario Web General',
@@ -107,9 +108,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Error al guardar' }, { status: 500 })
     }
 
+    // 2. Google Sheets — fire and forget
+    appendLeadToSheets({
+      name,
+      email,
+      phone,
+      type: interest,
+      message,
+      property_title,
+      property_url,
+      source,
+    }).catch((e) => console.error('[leads API] Sheets error:', e.message))
+
     const payload = { name, email, phone, interest, message, location, source, timestamp: new Date().toISOString() }
 
-    // 2. n8n webhook — fire and forget
+    // 4. n8n webhook — fire and forget
     const webhookUrl = process.env.N8N_WEBHOOK_URL
     if (webhookUrl && !webhookUrl.includes('your_')) {
       fetch(webhookUrl, {
@@ -120,7 +133,7 @@ export async function POST(req: NextRequest) {
       }).catch((e) => console.error('[leads API] n8n error:', e.message))
     }
 
-    // 3. Email via Resend — fire and forget
+    // 5. Email via Resend — fire and forget
     const resendKey = process.env.RESEND_API_KEY
     if (resendKey && !resendKey.includes('your_')) {
       fetch('https://api.resend.com/emails', {
