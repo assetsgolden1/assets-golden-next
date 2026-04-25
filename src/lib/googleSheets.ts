@@ -11,8 +11,12 @@ export async function appendLeadToSheets(lead: {
   source?: string
 }) {
   try {
+    console.log('[Sheets] Iniciando append...')
     const credentialsJson = process.env.GOOGLE_SHEETS_CREDENTIALS_JSON
     const sheetId = process.env.GOOGLE_SHEETS_LEADS_ID
+    console.log('[Sheets] credentialsJson exists:', !!credentialsJson)
+    console.log('[Sheets] credentialsJson length:', credentialsJson?.length)
+    console.log('[Sheets] sheetId:', sheetId)
 
     if (!credentialsJson || !sheetId) {
       console.error('[Sheets] Missing env vars')
@@ -20,6 +24,7 @@ export async function appendLeadToSheets(lead: {
     }
 
     const credentials = JSON.parse(credentialsJson)
+    console.log('[Sheets] credentials parsed OK, client_email:', credentials.client_email)
 
     const auth = new google.auth.GoogleAuth({
       credentials,
@@ -38,9 +43,9 @@ export async function appendLeadToSheets(lead: {
       minute: '2-digit',
     })
 
-    await sheets.spreadsheets.values.append({
+    const result = await sheets.spreadsheets.values.append({
       spreadsheetId: sheetId,
-      range: 'Sheet1!A:I',
+      range: 'Hoja1!A:I',
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [[
@@ -58,6 +63,7 @@ export async function appendLeadToSheets(lead: {
     })
 
     console.log('[Sheets] Lead añadido:', lead.email)
+    console.log('[Sheets] append result:', JSON.stringify(result.data))
   } catch (error) {
     // No bloquear el flujo principal si Sheets falla
     console.error('[Sheets] Error:', error)
