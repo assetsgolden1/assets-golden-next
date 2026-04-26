@@ -77,6 +77,7 @@ ${data.message ? `<div class="lbl">Mensaje</div><div class="msg">${data.message}
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
+    console.log('[leads] Body recibido:', body)
     const { name, email, phone, interest, message, location, source, property_id, property_title, property_url } = body
 
     if (!name?.trim() || !email?.trim()) {
@@ -89,7 +90,8 @@ export async function POST(req: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    const { error: dbError } = await supabase.from('leads').insert({
+    console.log('[leads] Antes del INSERT Supabase')
+    const { data: insertData, error: dbError } = await supabase.from('leads').insert({
       name: name.trim(),
       email: email.trim(),
       phone: phone?.trim() || null,
@@ -101,24 +103,32 @@ export async function POST(req: NextRequest) {
       property_id: property_id || null,
       property_title: property_title || null,
       property_url: property_url || null,
-    })
+    }).select('id').single()
 
     if (dbError) {
       console.error('[leads API] DB error:', dbError.message)
       return NextResponse.json({ error: 'Error al guardar' }, { status: 500 })
     }
+    console.log('[leads] INSERT result OK, id:', insertData?.id)
 
-    // 2. Google Sheets — fire and forget
-    appendLeadToSheets({
-      name,
-      email,
-      phone,
-      type: interest,
-      message,
-      property_title,
-      property_url,
-      source,
-    }).catch((e) => console.error('[leads API] Sheets error:', e.message))
+    // 2. Google Sheets — awaited para que Vercel no mate la promesa antes de completar
+    console.log('[leads] Antes de appendLeadToSheets')
+    console.log('[leads] Datos enviados a sheets:', { name, email, phone, type: interest, message, property_title, property_url, source })
+    try {
+      await appendLeadToSheets({
+        name,
+        email,
+        phone,
+        type: interest,
+        message,
+        property_title,
+        property_url,
+        source,
+      })
+      console.log('[leads] Sheets append OK')
+    } catch (e) {
+      console.error('[leads] Sheets ERROR:', e)
+    }
 
     const payload = { name, email, phone, interest, message, location, source, timestamp: new Date().toISOString() }
 
@@ -149,6 +159,7 @@ export async function POST(req: NextRequest) {
       }).catch((e) => console.error('[leads API] Resend error:', e.message))
     }
 
+    console.log('[leads] Response final')
     return NextResponse.json({ success: true })
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Unknown error'
