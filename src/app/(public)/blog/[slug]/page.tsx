@@ -57,6 +57,26 @@ function formatDate(dateStr: string | null): string {
   })
 }
 
+function extractFAQs(html: string): Array<{ question: string; answer: string }> {
+  const faqs: Array<{ question: string; answer: string }> = []
+  const lines = html.split('\n')
+  for (let i = 0; i < lines.length; i++) {
+    const h3Match = lines[i].match(/<h3[^>]*>([^<]+\?[^<]*)<\/h3>/i)
+    if (h3Match) {
+      for (let j = i + 1; j < Math.min(i + 4, lines.length); j++) {
+        const pMatch = lines[j].match(/<p[^>]*>(.*?)<\/p>/i)
+        if (pMatch) {
+          const question = h3Match[1].replace(/<[^>]+>/g, '').trim()
+          const answer = pMatch[1].replace(/<[^>]+>/g, '').trim()
+          if (question && answer) faqs.push({ question, answer })
+          break
+        }
+      }
+    }
+  }
+  return faqs
+}
+
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params
   const { data: post } = await getBlogPostBySlug(slug)
@@ -64,6 +84,7 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound()
 
   const heroImage = post.banner_image_url ?? post.cover_image ?? null
+  const faqs = post.content ? extractFAQs(post.content) : []
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -99,6 +120,25 @@ export default async function BlogPostPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {faqs.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'FAQPage',
+              mainEntity: faqs.map((faq) => ({
+                '@type': 'Question',
+                name: faq.question,
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: faq.answer,
+                },
+              })),
+            }),
+          }}
+        />
+      )}
 
       {/* Banner con título overlay — si existe banner_image_url */}
       {post.banner_image_url ? (

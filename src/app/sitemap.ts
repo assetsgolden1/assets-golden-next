@@ -35,6 +35,18 @@ const STATIC_PAGES: MetadataRoute.Sitemap = [
     priority: 0.7,
   },
   {
+    url: `${BASE_URL}/inversiones`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  },
+  {
+    url: `${BASE_URL}/destinos`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  },
+  {
     url: `${BASE_URL}/contacto`,
     lastModified: new Date(),
     changeFrequency: 'yearly',
