@@ -120,6 +120,30 @@ export default async function BlogPostPage({ params }: Props) {
     },
   }
 
+  const backBtn = (
+    <div className="container-luxury" style={{ paddingTop: 24, paddingBottom: 8 }}>
+      <Link
+        href="/blog"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 8,
+          padding: '8px 16px',
+          backgroundColor: 'white',
+          color: '#131D2E',
+          borderRadius: 6,
+          textDecoration: 'none',
+          fontSize: 14,
+          fontWeight: 600,
+          border: '1px solid #e5e7eb',
+          transition: 'all 0.2s',
+        }}
+      >
+        ← {post.language === 'en' ? 'Back to blog' : 'Volver al blog'}
+      </Link>
+    </div>
+  )
+
   return (
     <>
       <script
@@ -148,6 +172,7 @@ export default async function BlogPostPage({ params }: Props) {
 
       {/* Banner con título overlay — si existe banner_image_url */}
       {post.banner_image_url ? (
+        <>
         <section className="relative h-[420px] md:h-[520px] overflow-hidden">
           <Image
             src={post.banner_image_url}
@@ -179,8 +204,11 @@ export default async function BlogPostPage({ params }: Props) {
             </div>
           </div>
         </section>
+        {backBtn}
+        </>
       ) : (
         <>
+          {backBtn}
           {/* Hero sin banner */}
           <section className="gradient-navy pt-16 pb-12">
             <div className="container-luxury max-w-3xl">
