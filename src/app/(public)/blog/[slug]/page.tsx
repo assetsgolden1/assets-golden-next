@@ -4,6 +4,9 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getBlogPostBySlug, getAllBlogSlugs } from '@/lib/supabase/queries'
 import { buttonVariants } from '@/components/ui/button'
+import { getRelatedProperties } from '@/lib/blogProperties'
+import { RelatedProperties } from '@/components/RelatedProperties'
+import { addInternalLinks } from '@/lib/utils/blogInternalLinks'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -85,6 +88,9 @@ export default async function BlogPostPage({ params }: Props) {
 
   const heroImage = post.banner_image_url ?? post.cover_image ?? null
   const faqs = post.content ? extractFAQs(post.content) : []
+  const lang: 'es' | 'en' = post.language === 'en' ? 'en' : 'es'
+  const relatedProperties = await getRelatedProperties(slug, 3)
+  const processedContent = post.content ? addInternalLinks(post.content, lang) : null
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -219,14 +225,16 @@ export default async function BlogPostPage({ params }: Props) {
       {/* Contenido */}
       <section className="section-padding bg-background">
         <div className="container-luxury max-w-3xl">
-          {post.content ? (
+          {processedContent ? (
             <div
               className="prose prose-lg max-w-none text-foreground/80 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              dangerouslySetInnerHTML={{ __html: processedContent }}
             />
           ) : (
             <p className="text-muted-foreground italic">Contenido no disponible.</p>
           )}
+
+          <RelatedProperties properties={relatedProperties} language={lang} />
 
           {/* CTA */}
           <div className="mt-16 rounded-xl gradient-navy p-8 text-center">

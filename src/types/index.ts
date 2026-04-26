@@ -84,6 +84,8 @@ export interface BlogPost {
   cover_image: string | null
   banner_image_url: string | null
   category: string | null
+  language: string | null
+  meta_description: string | null
   published: boolean
   published_at: string | null
   read_time: number | null
