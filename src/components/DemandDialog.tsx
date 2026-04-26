@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Search, X, Loader2 } from 'lucide-react'
+import { PhoneInput } from '@/components/PhoneInput'
 
 const PROPERTY_TYPES = [
   { value: 'apartment', label: 'Apartamento' },
@@ -36,6 +37,9 @@ const INITIAL = {
 
 export default function DemandDialog({ open, onClose }: DemandDialogProps) {
   const [form, setForm] = useState(INITIAL)
+  const [phoneCountry, setPhoneCountry] = useState('España')
+  const [phonePrefix, setPhonePrefix] = useState('+34')
+  const [currency, setCurrency] = useState<'EUR' | 'USD'>('EUR')
   const [accepted, setAccepted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
@@ -52,7 +56,8 @@ export default function DemandDialog({ open, onClose }: DemandDialogProps) {
     setSubmitting(true)
 
     const typeLabel = PROPERTY_TYPES.find((t) => t.value === form.propertyType)?.label ?? form.propertyType
-    const msg = `[DEMANDA] Tipo: ${typeLabel}. Ubicación: ${form.location}. Presupuesto: ${form.budget}. Habitaciones: ${form.bedrooms || 'No especificado'}. Comentarios: ${form.message || 'Sin comentarios'}`
+    const budgetStr = `${currency} ${form.budget}`
+    const msg = `[DEMANDA] Tipo: ${typeLabel}. Ubicación: ${form.location}. Presupuesto: ${budgetStr}. Habitaciones: ${form.bedrooms || 'No especificado'}. Comentarios: ${form.message || 'Sin comentarios'}`
 
     try {
       const res = await fetch('/api/leads', {
@@ -62,7 +67,10 @@ export default function DemandDialog({ open, onClose }: DemandDialogProps) {
           name: form.name.trim(),
           email: form.email.trim(),
           phone: form.phone.trim() || undefined,
+          phone_country: phoneCountry,
+          phone_prefix: phonePrefix,
           interest: 'demanda',
+          budget: budgetStr,
           message: msg,
           location: form.location,
           source: 'demand_form',
@@ -156,12 +164,13 @@ export default function DemandDialog({ open, onClose }: DemandDialogProps) {
 
                   <div>
                     <label className={labelClass}>Teléfono</label>
-                    <input
-                      type="tel"
-                      maxLength={20}
+                    <PhoneInput
                       value={form.phone}
-                      onChange={(e) => set('phone', e.target.value)}
-                      className={inputClass}
+                      onChange={(p, country, prefix) => {
+                        set('phone', p)
+                        setPhoneCountry(country)
+                        setPhonePrefix(prefix)
+                      }}
                     />
                   </div>
 
@@ -209,15 +218,32 @@ export default function DemandDialog({ open, onClose }: DemandDialogProps) {
 
                   <div className="col-span-2">
                     <label className={labelClass}>Presupuesto aproximado *</label>
-                    <input
-                      type="text"
-                      required
-                      maxLength={50}
-                      placeholder="Ej: 500.000€ - 800.000€"
-                      value={form.budget}
-                      onChange={(e) => set('budget', e.target.value)}
-                      className={inputClass}
-                    />
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <select
+                        value={currency}
+                        onChange={(e) => setCurrency(e.target.value as 'EUR' | 'USD')}
+                        style={{
+                          padding: '10px 12px',
+                          borderRadius: 6,
+                          border: '1px solid #e5e7eb',
+                          fontSize: 14,
+                          backgroundColor: 'white',
+                          minWidth: 80,
+                        }}
+                      >
+                        <option value="EUR">€ EUR</option>
+                        <option value="USD">$ USD</option>
+                      </select>
+                      <input
+                        type="text"
+                        required
+                        maxLength={50}
+                        placeholder="Ej: 500.000"
+                        value={form.budget}
+                        onChange={(e) => set('budget', e.target.value)}
+                        className={inputClass}
+                      />
+                    </div>
                   </div>
 
                   <div className="col-span-2">

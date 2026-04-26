@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
+import { PhoneInput } from '@/components/PhoneInput'
 
 const inputClass =
   'w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-colors'
@@ -18,10 +19,19 @@ const INTERESES = [
   { value: 'other', label: 'Otra consulta' },
 ]
 
+const TYPE_MAP: Record<string, string> = {
+  buy: 'comprar',
+  sell: 'vender',
+  invest: 'invertir',
+  other: 'consulta-general',
+}
+
 export default function ContactForm() {
   const [form, setForm] = useState({
     name: '', email: '', phone: '', interest: '', message: '',
   })
+  const [phoneCountry, setPhoneCountry] = useState('España')
+  const [phonePrefix, setPhonePrefix] = useState('+34')
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
   const [error, setError] = useState('')
@@ -43,7 +53,10 @@ export default function ContactForm() {
           name: form.name.trim(),
           email: form.email.trim(),
           phone: form.phone.trim() || undefined,
+          phone_country: phoneCountry,
+          phone_prefix: phonePrefix,
           interest: form.interest || undefined,
+          type: (TYPE_MAP[form.interest] ?? form.interest) || undefined,
           message: form.message.trim(),
           source: 'contacto',
         }),
@@ -100,13 +113,13 @@ export default function ContactForm() {
         </div>
         <div>
           <label className={labelClass}>Teléfono</label>
-          <input
-            type="tel"
-            maxLength={20}
-            placeholder="+34 600 000 000"
+          <PhoneInput
             value={form.phone}
-            onChange={(e) => set('phone', e.target.value)}
-            className={inputClass}
+            onChange={(p, country, prefix) => {
+              set('phone', p)
+              setPhoneCountry(country)
+              setPhonePrefix(prefix)
+            }}
           />
         </div>
       </div>

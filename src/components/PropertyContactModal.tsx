@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
+import { PhoneInput } from '@/components/PhoneInput'
 
 interface Props {
   propertyId: string
@@ -14,20 +15,27 @@ export default function PropertyContactModal({ propertyId, propertyTitle, proper
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const [phone, setPhone] = useState('')
+  const [phoneCountry, setPhoneCountry] = useState('España')
+  const [phonePrefix, setPhonePrefix] = useState('+34')
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setStatus('loading')
     const form = e.currentTarget
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? (typeof window !== 'undefined' ? window.location.origin : '')
     const data = {
       name: (form.elements.namedItem('name') as HTMLInputElement).value.trim(),
       email: (form.elements.namedItem('email') as HTMLInputElement).value.trim(),
-      phone: (form.elements.namedItem('phone') as HTMLInputElement).value.trim() || undefined,
+      phone: phone || undefined,
+      phone_country: phoneCountry,
+      phone_prefix: phonePrefix,
       message: (form.elements.namedItem('message') as HTMLTextAreaElement).value.trim() || undefined,
       source: 'property_contact',
+      type: 'consulta-propiedad',
       property_id: propertyId,
       property_title: propertyTitle,
-      property_url: `/propiedades/${propertySlug}`,
+      property_url: `${baseUrl}/propiedades/${propertySlug}`,
     }
 
     try {
@@ -121,11 +129,13 @@ export default function PropertyContactModal({ propertyId, propertyTitle, proper
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">Teléfono</label>
-                  <input
-                    name="phone"
-                    type="tel"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#d4af37]"
-                    placeholder="+34 600 000 000"
+                  <PhoneInput
+                    value={phone}
+                    onChange={(p, country, prefix) => {
+                      setPhone(p)
+                      setPhoneCountry(country)
+                      setPhonePrefix(prefix)
+                    }}
                   />
                 </div>
                 <div>

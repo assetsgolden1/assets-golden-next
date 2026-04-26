@@ -4,10 +4,13 @@ export async function appendLeadToSheets(lead: {
   name: string
   email: string
   phone?: string
+  phone_country?: string
+  phone_prefix?: string
   type?: string
   message?: string
   property_title?: string
   property_url?: string
+  budget?: string
   source?: string
 }) {
   try {
@@ -45,18 +48,21 @@ export async function appendLeadToSheets(lead: {
 
     const result = await sheets.spreadsheets.values.append({
       spreadsheetId: sheetId,
-      range: "'Hoja 1'!A:I",
+      range: "'Hoja 1'!A:L",
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [[
           fecha,
           lead.name ?? '',
           lead.email ?? '',
+          lead.phone_prefix ?? '',
           lead.phone ?? '',
+          lead.phone_country ?? '',
           lead.type ?? '',
           lead.message ?? '',
           lead.property_title ?? '',
           lead.property_url ?? '',
+          lead.budget ?? '',
           lead.source ?? 'web',
         ]],
       },

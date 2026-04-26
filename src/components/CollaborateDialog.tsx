@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Briefcase, Building2, HardHat, ArrowLeft, Loader2, X } from 'lucide-react'
+import { PhoneInput } from '@/components/PhoneInput'
 
 type CollabType = 'profesional' | 'agencia' | 'promotora'
 
@@ -40,6 +41,8 @@ const EMPTY = { name: '', email: '', phone: '', company: '', specialty: '', mess
 export default function CollaborateDialog({ open, initialType = null, onClose }: Props) {
   const [selectedType, setSelectedType] = useState<CollabType | null>(initialType)
   const [form, setForm] = useState(EMPTY)
+  const [phoneCountry, setPhoneCountry] = useState('España')
+  const [phonePrefix, setPhonePrefix] = useState('+34')
   const [privacy, setPrivacy] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
@@ -70,6 +73,8 @@ export default function CollaborateDialog({ open, initialType = null, onClose }:
           name: form.name,
           email: form.email,
           phone: form.phone,
+          phone_country: phoneCountry,
+          phone_prefix: phonePrefix,
           company: form.company,
           specialty: form.specialty,
           message: form.message,
@@ -167,9 +172,14 @@ export default function CollaborateDialog({ open, initialType = null, onClose }:
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1" htmlFor="cp">Teléfono</label>
-                  <input id="cp" type="tel" maxLength={20} value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-gold focus:outline-none" />
+                  <PhoneInput
+                    value={form.phone}
+                    onChange={(p, country, prefix) => {
+                      setForm({ ...form, phone: p })
+                      setPhoneCountry(country)
+                      setPhonePrefix(prefix)
+                    }}
+                  />
                 </div>
                 {(selectedType === 'agencia' || selectedType === 'promotora') && (
                   <div className="col-span-2">

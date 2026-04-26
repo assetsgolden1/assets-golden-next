@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     console.log('[leads] Body recibido:', body)
-    const { name, email, phone, interest, message, location, source, property_id, property_title, property_url } = body
+    const { name, email, phone, phone_country, phone_prefix, interest, type, message, location, source, property_id, property_title, property_url, budget } = body
 
     if (!name?.trim() || !email?.trim()) {
       return NextResponse.json({ error: 'Nombre y email son obligatorios' }, { status: 400 })
@@ -113,16 +113,19 @@ export async function POST(req: NextRequest) {
 
     // 2. Google Sheets — awaited para que Vercel no mate la promesa antes de completar
     console.log('[leads] Antes de appendLeadToSheets')
-    console.log('[leads] Datos enviados a sheets:', { name, email, phone, type: interest, message, property_title, property_url, source })
+    console.log('[leads] Datos enviados a sheets:', { name, email, phone, phone_country, phone_prefix, type: type ?? interest, message, property_title, property_url, budget, source })
     try {
       await appendLeadToSheets({
         name,
         email,
         phone,
-        type: interest,
+        phone_country,
+        phone_prefix,
+        type: type ?? interest,
         message,
         property_title,
         property_url,
+        budget,
         source,
       })
       console.log('[leads] Sheets append OK')

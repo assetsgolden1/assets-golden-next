@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
+import { PhoneInput } from '@/components/PhoneInput'
 
 const PROPERTY_TYPES = [
   { value: 'piso', label: 'Piso / Apartamento' },
@@ -51,6 +52,8 @@ const EMPTY = {
 
 export default function MiDemandaForm() {
   const [form, setForm] = useState(EMPTY)
+  const [phoneCountry, setPhoneCountry] = useState('España')
+  const [phonePrefix, setPhonePrefix] = useState('+34')
   const [privacy, setPrivacy] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
@@ -66,7 +69,7 @@ export default function MiDemandaForm() {
       const res = await fetch('/api/demands', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, phone_country: phoneCountry, phone_prefix: phonePrefix }),
       })
       if (!res.ok) throw new Error('Error')
       setDone(true)
@@ -114,9 +117,14 @@ export default function MiDemandaForm() {
 
         <div>
           <label className={label} htmlFor="md-phone">Teléfono</label>
-          <input id="md-phone" type="tel" maxLength={20} value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            className={input} />
+          <PhoneInput
+            value={form.phone}
+            onChange={(p, country, prefix) => {
+              setForm({ ...form, phone: p })
+              setPhoneCountry(country)
+              setPhonePrefix(prefix)
+            }}
+          />
         </div>
 
         <div>
