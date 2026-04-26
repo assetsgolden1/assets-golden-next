@@ -45,7 +45,7 @@ export async function appendLeadToSheets(lead: {
 
     const result = await sheets.spreadsheets.values.append({
       spreadsheetId: sheetId,
-      range: 'Hoja1!A:I',
+      range: "'Hoja 1'!A:I",
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [[
