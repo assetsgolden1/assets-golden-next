@@ -170,7 +170,7 @@ export default function CollaborateDialog({ open, initialType = null, onClose }:
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-gold focus:outline-none" />
                 </div>
-                <div>
+                <div className="col-span-2">
                   <label className="block text-sm font-medium mb-1" htmlFor="cp">Teléfono</label>
                   <PhoneInput
                     value={form.phone}

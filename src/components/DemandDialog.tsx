@@ -162,7 +162,7 @@ export default function DemandDialog({ open, onClose }: DemandDialogProps) {
                     />
                   </div>
 
-                  <div>
+                  <div className="col-span-2">
                     <label className={labelClass}>Teléfono</label>
                     <PhoneInput
                       value={form.phone}

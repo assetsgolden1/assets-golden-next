@@ -115,7 +115,7 @@ export default function MiDemandaForm() {
             className={input} />
         </div>
 
-        <div>
+        <div className="sm:col-span-2">
           <label className={label} htmlFor="md-phone">Teléfono</label>
           <PhoneInput
             value={form.phone}

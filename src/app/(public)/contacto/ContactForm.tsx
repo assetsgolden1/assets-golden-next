@@ -98,30 +98,29 @@ export default function ContactForm() {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className={labelClass}>Email <span className="text-gold">*</span></label>
-          <input
-            type="email"
-            required
-            maxLength={255}
-            placeholder="maria@email.com"
-            value={form.email}
-            onChange={(e) => set('email', e.target.value)}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className={labelClass}>Teléfono</label>
-          <PhoneInput
-            value={form.phone}
-            onChange={(p, country, prefix) => {
-              set('phone', p)
-              setPhoneCountry(country)
-              setPhonePrefix(prefix)
-            }}
-          />
-        </div>
+      <div>
+        <label className={labelClass}>Email <span className="text-gold">*</span></label>
+        <input
+          type="email"
+          required
+          maxLength={255}
+          placeholder="maria@email.com"
+          value={form.email}
+          onChange={(e) => set('email', e.target.value)}
+          className={inputClass}
+        />
+      </div>
+
+      <div>
+        <label className={labelClass}>Teléfono</label>
+        <PhoneInput
+          value={form.phone}
+          onChange={(p, country, prefix) => {
+            set('phone', p)
+            setPhoneCountry(country)
+            setPhonePrefix(prefix)
+          }}
+        />
       </div>
 
       <div>
