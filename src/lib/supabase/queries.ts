@@ -37,8 +37,8 @@ export async function getProperties(filters?: GetPropertiesFilters) {
     .from('properties')
     .select('*', { count: 'exact' })
     .in('status', ['active', 'available'])
-    .or('hidden.is.null,hidden.eq.false')
-    .or('sold.is.null,sold.eq.false')
+    .not('hidden', 'eq', true)
+    .not('sold', 'eq', true)
 
   if (filters?.excludeTypes && filters.excludeTypes.length > 0)
     query = query.not('property_type', 'in', `(${filters.excludeTypes.join(',')})`)
@@ -92,8 +92,8 @@ export async function getPropertiesForSpain(filters: GetSpainPropertiesFilters =
     .from('properties')
     .select('*', { count: 'exact' })
     .or('country.ilike.%España%,country.ilike.%Spain%,country.ilike.%espana%')
-    .or('hidden.is.null,hidden.eq.false')
-    .or('sold.is.null,sold.eq.false')
+    .not('hidden', 'eq', true)
+    .not('sold', 'eq', true)
 
   if (filters.zona) {
     const cities = getCitiesInZone(filters.zona)
@@ -121,7 +121,8 @@ export async function getPropertyTypesForSpain(): Promise<string[]> {
     .from('properties')
     .select('property_type')
     .or('country.ilike.%España%,country.ilike.%Spain%')
-    .or('hidden.is.null,hidden.eq.false')
+    .not('hidden', 'eq', true)
+    .not('sold', 'eq', true)
   const types = [
     ...new Set((data ?? []).map((d: { property_type: string | null }) => d.property_type).filter(Boolean)),
   ] as string[]
@@ -149,8 +150,8 @@ export async function getPropertiesForDestination(
     .from('properties')
     .select('*', { count: 'exact' })
     .ilike('country', `%${countryName}%`)
-    .or('hidden.is.null,hidden.eq.false')
-    .or('sold.is.null,sold.eq.false')
+    .not('hidden', 'eq', true)
+    .not('sold', 'eq', true)
 
   if (filters.ciudad)      query = query.ilike('location', `%${filters.ciudad}%`)
   if (filters.tipo)        query = query.eq('property_type', filters.tipo)
@@ -174,7 +175,8 @@ export async function getCitiesForDestination(countryName: string): Promise<stri
     .from('properties')
     .select('location')
     .ilike('country', `%${countryName}%`)
-    .or('hidden.is.null,hidden.eq.false')
+    .not('hidden', 'eq', true)
+    .not('sold', 'eq', true)
     .not('location', 'is', null)
   const cities = [
     ...new Set(
@@ -192,7 +194,8 @@ export async function getPropertyTypesForDestination(countryName: string): Promi
     .from('properties')
     .select('property_type')
     .ilike('country', `%${countryName}%`)
-    .or('hidden.is.null,hidden.eq.false')
+    .not('hidden', 'eq', true)
+    .not('sold', 'eq', true)
     .not('property_type', 'is', null)
   const types = [
     ...new Set((data ?? []).map((d: { property_type: string | null }) => d.property_type).filter(Boolean)),
@@ -217,8 +220,8 @@ export async function getFeaturedProperties(limit = 6) {
     .select('*')
     .eq('featured', true)
     .in('status', ['active', 'available'])
-    .or('hidden.is.null,hidden.eq.false')
-    .or('sold.is.null,sold.eq.false')
+    .not('hidden', 'eq', true)
+    .not('sold', 'eq', true)
     .limit(limit)
     .order('created_at', { ascending: false })
   return { data: (data ?? []) as Property[], error }
@@ -230,8 +233,8 @@ export async function getAllPropertySlugs() {
     .from('properties')
     .select('slug')
     .in('status', ['active', 'available'])
-    .or('hidden.is.null,hidden.eq.false')
-    .or('sold.is.null,sold.eq.false')
+    .not('hidden', 'eq', true)
+    .not('sold', 'eq', true)
     .not('slug', 'is', null)
   return (data ?? []).map((p) => p.slug as string)
 }
@@ -375,8 +378,8 @@ export async function getPropertiesByCountry(slug: string) {
       .from('properties')
       .select('*')
       .in('status', ['active', 'available'])
-      .or('hidden.is.null,hidden.eq.false')
-      .or('sold.is.null,sold.eq.false')
+      .not('hidden', 'eq', true)
+      .not('sold', 'eq', true)
       .ilike('country', countryName)
       .order('province', { ascending: true, nullsFirst: false })
       .order('location', { ascending: true })
@@ -399,8 +402,8 @@ export async function getPropertyCountsByCountry(): Promise<Record<string, numbe
     .from('properties')
     .select('country')
     .in('status', ['active', 'available'])
-    .or('hidden.is.null,hidden.eq.false')
-    .or('sold.is.null,sold.eq.false')
+    .not('hidden', 'eq', true)
+    .not('sold', 'eq', true)
     .not('country', 'is', null)
 
   const counts: Record<string, number> = {}
