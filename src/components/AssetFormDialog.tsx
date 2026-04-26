@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Building2, X, Loader2 } from 'lucide-react'
+import { PhoneInput } from '@/components/PhoneInput'
 
 const ASSET_TYPES = [
   { value: 'apartment', label: 'Apartamento' },
@@ -42,6 +43,8 @@ interface Props {
 
 export default function AssetFormDialog({ open, onClose }: Props) {
   const [form, setForm] = useState(INITIAL)
+  const [phoneCountry, setPhoneCountry] = useState('España')
+  const [phonePrefix, setPhonePrefix] = useState('+34')
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
   const [error, setError] = useState('')
@@ -71,6 +74,8 @@ export default function AssetFormDialog({ open, onClose }: Props) {
           name: form.name.trim(),
           email: form.email.trim(),
           phone: form.phone.trim() || undefined,
+          phone_country: phoneCountry,
+          phone_prefix: phonePrefix,
           interest: form.assetType,
           message,
           location: form.location.trim(),
@@ -123,7 +128,14 @@ export default function AssetFormDialog({ open, onClose }: Props) {
                 </div>
                 <div className="col-span-2">
                   <label className={labelClass}>Teléfono</label>
-                  <input type="tel" maxLength={20} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputClass} placeholder="+34 600 000 000" />
+                  <PhoneInput
+                    value={form.phone}
+                    onChange={(p, country, prefix) => {
+                      setForm({ ...form, phone: p })
+                      setPhoneCountry(country)
+                      setPhonePrefix(prefix)
+                    }}
+                  />
                 </div>
                 <div className="col-span-2">
                   <label className={labelClass}>Tipo de activo *</label>

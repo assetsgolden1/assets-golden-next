@@ -34,12 +34,14 @@ export function PhoneInput({
         value={country.code}
         onChange={(e) => handleCountryChange(e.target.value)}
         style={{
-          padding: '10px 12px',
+          padding: '10px 6px',
           borderRadius: 6,
           border: '1px solid #e5e7eb',
-          fontSize: 14,
+          fontSize: 13,
           backgroundColor: 'white',
-          minWidth: 110,
+          width: 90,
+          minWidth: 90,
+          maxWidth: 90,
         }}
       >
         {PHONE_COUNTRIES.map((c) => (
