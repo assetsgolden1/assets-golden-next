@@ -28,6 +28,44 @@ interface HabiHubProperty {
   images?: { image?: string | string[] } | string[]
 }
 
+const HABIHUB_TYPE_MAPPING: Record<string, string> = {
+  'apartment': 'apartment',
+  'penthouse': 'penthouse',
+  'villa': 'villa',
+  'house': 'house',
+  'building': 'building',
+  'hotel': 'hotel',
+  'rural': 'rural',
+  'land': 'land',
+  'ground-floor': 'apartment',
+  'ground_floor': 'apartment',
+  'groundfloor': 'apartment',
+  'terraced': 'townhouse',
+  'townhouse': 'townhouse',
+  'bungalow': 'villa',
+  'low-bungalow': 'villa',
+  'lowbungalow': 'villa',
+  'duplex': 'apartment',
+  'studio': 'apartment',
+  'loft': 'apartment',
+  'attic': 'penthouse',
+  'finca': 'rural',
+  'cortijo': 'rural',
+  'commercial': 'commercial',
+  'office': 'commercial',
+  'detached': 'villa',
+  'semi-detached': 'townhouse',
+  'semidetached': 'townhouse',
+  'garage': 'other',
+  'storage': 'other',
+}
+
+function mapHabihubType(habihubType: string): string {
+  if (!habihubType) return 'other'
+  const normalized = habihubType.toLowerCase().trim()
+  return HABIHUB_TYPE_MAPPING[normalized] ?? 'other'
+}
+
 function extractProperties(parsed: Record<string, unknown>): HabiHubProperty[] {
   // Intentar distintas rutas comunes de HabiHub
   const tryPaths = [
@@ -153,7 +191,7 @@ export async function POST() {
             title: String(prop.name ?? prop.title ?? 'Sin título'),
             description: prop.description ? String(prop.description) : null,
             price: prop.price ? parseFloat(String(prop.price).replace(/[^0-9.]/g, '')) : null,
-            property_type: String(prop.propertyType ?? prop.property_type ?? ''),
+            property_type: mapHabihubType(String(prop.propertyType ?? prop.property_type ?? '')),
             location: prop.location?.city ? String(prop.location.city) : null,
             province: prop.location?.province ? String(prop.location.province) : null,
             country: prop.location?.country ? String(prop.location.country) : null,
