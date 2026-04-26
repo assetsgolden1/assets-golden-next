@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   // Eliminar header X-Powered-By
   poweredByHeader: false,
 
+  // Puppeteer has native binaries — keep it server-side only, never bundle
+  serverExternalPackages: ['puppeteer', 'puppeteer-core'],
+
   experimental: {
     optimizeCss: true,
   },
