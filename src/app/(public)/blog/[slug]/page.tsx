@@ -227,7 +227,7 @@ export default async function BlogPostPage({ params }: Props) {
         <div className="container-luxury max-w-3xl">
           {processedContent ? (
             <div
-              className="prose prose-lg max-w-none text-foreground/80 leading-relaxed"
+              className="blog-content"
               dangerouslySetInnerHTML={{ __html: processedContent }}
             />
           ) : (

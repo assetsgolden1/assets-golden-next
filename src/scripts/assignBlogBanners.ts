@@ -18,7 +18,7 @@ export async function assignBannersToPosts() {
 
     await supabaseAdmin
       .from('blog_posts')
-      .update({ banner_image_url: banner.imageUrl })
+      .update({ banner_image_url: banner.imageUrl, cover_image: banner.imageUrl })
       .eq('slug', mapping.slug)
 
     results.push({ slug: mapping.slug, status: 'updated', property: banner.title })
