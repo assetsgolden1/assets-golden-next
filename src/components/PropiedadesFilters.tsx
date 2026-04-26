@@ -19,6 +19,7 @@ interface PropiedadesFiltersProps {
     precioMax?: number | null
     habitaciones?: number | null
     orden?: string
+    destacadas?: string
   }
   totalCount: number
   basePath: string
@@ -74,6 +75,7 @@ export function PropiedadesFilters({
     currentFilters.tipo,
     currentFilters.precioMin || currentFilters.precioMax,
     currentFilters.habitaciones,
+    currentFilters.destacadas,
   ].filter(Boolean).length
 
   const panelContent = (
@@ -104,6 +106,27 @@ export function PropiedadesFilters({
           )}
         </div>
       </div>
+
+      {/* DESTACADAS — toggle */}
+      <FilterBlock title="Solo destacadas">
+        <button
+          onClick={() =>
+            applyFilter('destacadas', currentFilters.destacadas === 'true' ? '' : 'true')
+          }
+          style={{
+            padding: '8px 12px', borderRadius: 6, border: '1px solid',
+            width: '100%', textAlign: 'left', fontSize: 13,
+            cursor: isPending ? 'wait' : 'pointer',
+            backgroundColor: currentFilters.destacadas === 'true' ? '#D4AF37' : 'white',
+            color: currentFilters.destacadas === 'true' ? 'white' : '#374151',
+            borderColor: currentFilters.destacadas === 'true' ? '#D4AF37' : '#e5e7eb',
+            fontWeight: currentFilters.destacadas === 'true' ? 600 : 400,
+            opacity: isPending ? 0.7 : 1,
+          }}
+        >
+          ⭐ {currentFilters.destacadas === 'true' ? 'Mostrando destacadas' : 'Solo destacadas'}
+        </button>
+      </FilterBlock>
 
       {/* PAÍS — select */}
       <FilterBlock title="País">

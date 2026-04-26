@@ -49,7 +49,7 @@ function isValidCountry(name: string): boolean {
 export default async function HomePage() {
   const [{ data: featured }, { data: team }, { data: destinations }, propertyCounts, { data: partners }] =
     await Promise.all([
-      getFeaturedProperties(6),
+      getFeaturedProperties(),
       getTeamMembers(),
       getDestinations(),
       getPropertyCountsByCountry(),
@@ -116,10 +116,10 @@ export default async function HomePage() {
               <HomePropertiesCarousel properties={featured} />
               <div className="mt-12 text-center">
                 <Link
-                  href="/propiedades"
+                  href="/propiedades?destacadas=true"
                   className={buttonVariants({ variant: 'goldOutline', size: 'lg' })}
                 >
-                  Ver todas las propiedades
+                  Ver todas las destacadas
                 </Link>
               </div>
             </>

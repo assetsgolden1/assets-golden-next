@@ -34,6 +34,7 @@ interface Props {
     zona?: string
     orden?: string
     pagina?: string
+    destacadas?: string
   }>
 }
 
@@ -49,6 +50,8 @@ export default async function PropiedadesPage({ searchParams }: Props) {
   const habitaciones = params.habitaciones ? parseInt(params.habitaciones, 10) : undefined
   const orden = params.orden as 'reciente' | 'precio_asc' | 'precio_desc' | undefined
 
+  const soloDestacadas = params.destacadas === 'true'
+
   const [{ data: properties, count }, propertyCounts, cities] = await Promise.all([
     getProperties({
       type:     params.tipo    || undefined,
@@ -58,6 +61,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
       bedrooms: habitaciones,
       country:  params.pais    || undefined,
       zona:     params.zona    || undefined,
+      featured: soloDestacadas || undefined,
       orden,
       limit:  PAGE_SIZE,
       offset,
@@ -81,17 +85,19 @@ export default async function PropiedadesPage({ searchParams }: Props) {
     pais:         params.pais         || undefined,
     zona:         params.zona         || undefined,
     orden:        params.orden        || undefined,
+    destacadas:   params.destacadas   || undefined,
   }
 
   const currentFilters = {
-    pais:        params.pais        || undefined,
-    zona:        params.zona        || undefined,
-    ciudad:      params.ciudad      || undefined,
-    tipo:        params.tipo        || undefined,
-    precioMin:   precioMin ?? null,
-    precioMax:   precioMax ?? null,
-    habitaciones: habitaciones ?? null,
-    orden:       params.orden       || undefined,
+    pais:          params.pais        || undefined,
+    zona:          params.zona        || undefined,
+    ciudad:        params.ciudad      || undefined,
+    tipo:          params.tipo        || undefined,
+    precioMin:     precioMin ?? null,
+    precioMax:     precioMax ?? null,
+    habitaciones:  habitaciones ?? null,
+    orden:         params.orden       || undefined,
+    destacadas:    params.destacadas  || undefined,
   }
 
   return (
@@ -125,6 +131,21 @@ export default async function PropiedadesPage({ searchParams }: Props) {
             />
 
             <div className="flex-1 min-w-0">
+              {/* Badge destacadas activo */}
+              {soloDestacadas && (
+                <div className="mb-4 flex items-center gap-3 px-4 py-3 rounded-lg border border-gold/30 bg-gold/5">
+                  <span className="text-sm font-medium text-foreground">
+                    ⭐ Mostrando solo propiedades destacadas
+                  </span>
+                  <Link
+                    href="/propiedades"
+                    className="text-xs text-muted-foreground hover:text-gold transition-colors ml-auto"
+                  >
+                    ✕ Quitar filtro
+                  </Link>
+                </div>
+              )}
+
               {/* Contador */}
               <div className="mb-6 flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">

@@ -24,6 +24,7 @@ export interface GetPropertiesFilters {
   limit?: number
   offset?: number
   isDevelopment?: boolean
+  featured?: boolean
   country?: string
   zona?: string
   orden?: 'reciente' | 'precio_asc' | 'precio_desc'
@@ -48,6 +49,7 @@ export async function getProperties(filters?: GetPropertiesFilters) {
   if (filters?.location) query = query.ilike('location', `%${filters.location}%`)
   if (filters?.bedrooms) query = query.eq('bedrooms', filters.bedrooms)
   if (filters?.isDevelopment !== undefined) query = query.eq('is_development', filters.isDevelopment)
+  if (filters?.featured !== undefined) query = query.eq('featured', filters.featured)
   if (filters?.country) query = query.ilike('country', `%${filters.country}%`)
   if (filters?.zona && filters?.country?.toLowerCase().includes('espa')) {
     const zoneName = ZONE_SLUGS[filters.zona]
@@ -213,7 +215,7 @@ export async function getPropertyBySlug(slug: string) {
   return { data: data as Property | null, error }
 }
 
-export async function getFeaturedProperties(limit = 6) {
+export async function getFeaturedProperties() {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('properties')
@@ -222,7 +224,7 @@ export async function getFeaturedProperties(limit = 6) {
     .in('status', ['active', 'available'])
     .not('hidden', 'eq', true)
     .not('sold', 'eq', true)
-    .limit(limit)
+    .order('featured_order', { ascending: true, nullsFirst: false })
     .order('created_at', { ascending: false })
   return { data: (data ?? []) as Property[], error }
 }
