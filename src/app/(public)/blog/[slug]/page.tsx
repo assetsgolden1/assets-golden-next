@@ -63,14 +63,16 @@ export default async function BlogPostPage({ params }: Props) {
 
   if (!post) notFound()
 
+  const heroImage = post.banner_image_url ?? post.cover_image ?? null
+
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Article',
+    '@type': 'BlogPosting',
     headline: post.title,
     description: post.excerpt ?? undefined,
-    image: post.cover_image ? [post.cover_image] : [],
+    image: heroImage ? [heroImage] : [],
     datePublished: post.published_at ?? post.created_at,
-    dateModified: post.updated_at,
+    dateModified: post.updated_at ?? post.created_at,
     author: {
       '@type': 'Organization',
       name: 'Assets Golden',
@@ -85,6 +87,10 @@ export default async function BlogPostPage({ params }: Props) {
       },
     },
     url: `https://assetsgolden.com/blog/${slug}`,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://assetsgolden.com/blog/${slug}`,
+    },
   }
 
   return (
@@ -94,43 +100,80 @@ export default async function BlogPostPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Hero */}
-      <section className="gradient-navy pt-16 pb-12">
-        <div className="container-luxury max-w-3xl">
-          {post.category && (
-            <span className="text-xs tracking-[0.2em] text-gold uppercase mb-4 block">
-              {categoryLabels[post.category] ?? post.category}
-            </span>
-          )}
-          <h1 className="font-display text-3xl font-semibold text-white leading-tight md:text-4xl">
-            {post.title}
-          </h1>
-          {post.excerpt && (
-            <p className="mt-5 text-white/60 text-lg leading-relaxed">
-              {post.excerpt}
-            </p>
-          )}
-          <p className="mt-6 text-white/40 text-sm">
-            {formatDate(post.published_at ?? post.created_at)}
-          </p>
-          <p className="mt-2 text-white/50 text-sm">
-            Por {(post as { author?: string }).author ?? 'Assets Golden'}
-          </p>
-        </div>
-      </section>
-
-      {/* Cover image */}
-      {post.cover_image && (
-        <div className="relative aspect-video max-h-[60vh] overflow-hidden bg-muted">
+      {/* Banner con título overlay — si existe banner_image_url */}
+      {post.banner_image_url ? (
+        <section className="relative h-[420px] md:h-[520px] overflow-hidden">
           <Image
-            src={post.cover_image}
+            src={post.banner_image_url}
             alt={post.title}
             fill
             className="object-cover"
             sizes="100vw"
             priority
           />
-        </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
+          <div className="absolute bottom-0 left-0 right-0 px-4 pb-12 pt-20">
+            <div className="container-luxury max-w-3xl">
+              {post.category && (
+                <span className="text-xs tracking-[0.2em] text-gold uppercase mb-4 block">
+                  {categoryLabels[post.category] ?? post.category}
+                </span>
+              )}
+              <h1 className="font-display text-3xl font-semibold text-white leading-tight md:text-4xl">
+                {post.title}
+              </h1>
+              {post.excerpt && (
+                <p className="mt-4 text-white/70 text-base leading-relaxed max-w-2xl">
+                  {post.excerpt}
+                </p>
+              )}
+              <p className="mt-5 text-white/50 text-sm">
+                {formatDate(post.published_at ?? post.created_at)} · Por {(post as { author?: string }).author ?? 'Assets Golden'}
+              </p>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <>
+          {/* Hero sin banner */}
+          <section className="gradient-navy pt-16 pb-12">
+            <div className="container-luxury max-w-3xl">
+              {post.category && (
+                <span className="text-xs tracking-[0.2em] text-gold uppercase mb-4 block">
+                  {categoryLabels[post.category] ?? post.category}
+                </span>
+              )}
+              <h1 className="font-display text-3xl font-semibold text-white leading-tight md:text-4xl">
+                {post.title}
+              </h1>
+              {post.excerpt && (
+                <p className="mt-5 text-white/60 text-lg leading-relaxed">
+                  {post.excerpt}
+                </p>
+              )}
+              <p className="mt-6 text-white/40 text-sm">
+                {formatDate(post.published_at ?? post.created_at)}
+              </p>
+              <p className="mt-2 text-white/50 text-sm">
+                Por {(post as { author?: string }).author ?? 'Assets Golden'}
+              </p>
+            </div>
+          </section>
+
+          {/* Cover image (solo si no hay banner) */}
+          {post.cover_image && (
+            <div className="relative aspect-video max-h-[60vh] overflow-hidden bg-muted">
+              <Image
+                src={post.cover_image}
+                alt={post.title}
+                fill
+                className="object-cover"
+                sizes="100vw"
+                priority
+              />
+            </div>
+          )}
+        </>
       )}
 
       {/* Contenido */}

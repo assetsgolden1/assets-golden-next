@@ -131,7 +131,8 @@ export async function deleteLead(id: string) {
 // Blog
 export async function createBlogPost(data: {
   title: string; slug: string; category: string; excerpt: string;
-  content: string; image_url: string; published: boolean; read_time: number
+  content: string; cover_image: string; banner_image_url: string;
+  published: boolean; read_time: number
 }) {
   await supabaseAdmin.from('blog_posts').insert(data)
   revalidatePath('/admin/blog')
@@ -139,7 +140,8 @@ export async function createBlogPost(data: {
 
 export async function updateBlogPost(id: string, data: Partial<{
   title: string; slug: string; category: string; excerpt: string;
-  content: string; image_url: string; published: boolean; read_time: number
+  content: string; cover_image: string; banner_image_url: string;
+  published: boolean; read_time: number
 }>) {
   await supabaseAdmin.from('blog_posts').update(data).eq('id', id)
   revalidatePath('/admin/blog')

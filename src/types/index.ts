@@ -82,9 +82,11 @@ export interface BlogPost {
   excerpt: string | null
   excerpt_en: string | null
   cover_image: string | null
+  banner_image_url: string | null
   category: string | null
   published: boolean
   published_at: string | null
+  read_time: number | null
 }
 
 // ─── Lead ─────────────────────────────────────────────────────
