@@ -16,19 +16,17 @@ export interface RelatedProperty {
   area_sqm: number | null
 }
 
+type RawRow = RelatedProperty & { gallery_urls: string[] | null }
+
 type RawBannerRow = {
   title: string
   image_url: string | null
   gallery_urls: string[] | null
 }
 
-function applyLocationFilter<T extends object>(
-  query: T,
-  mapping: { country?: string; zone?: string; city?: string },
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let q = query as any
+function applyLocationFilter(query: any, mapping: { country?: string; zone?: string; city?: string }): any {
+  let q = query
   if (mapping.country) q = q.ilike('country', `%${mapping.country}%`)
   if (mapping.city) {
     q = q.ilike('location', `%${mapping.city}%`)
@@ -48,17 +46,30 @@ export async function getRelatedProperties(postSlug: string, limit = 3): Promise
 
   const baseQuery = supabaseAdmin
     .from('properties')
-    .select('id, title, slug, location, country, price, currency, image_url, property_type, bedrooms, area_sqm')
+    .select('id, title, slug, location, country, price, currency, image_url, gallery_urls, property_type, bedrooms, area_sqm')
     .in('status', ['active', 'available'])
     .not('hidden', 'eq', true)
     .not('sold', 'eq', true)
     .not('image_url', 'is', null)
-    .order('price', { ascending: false })
-    .limit(limit)
+    .limit(50)
 
-  const query = applyLocationFilter(baseQuery, mapping)
-  const { data } = await query
-  return (data ?? []) as RelatedProperty[]
+  const { data } = await applyLocationFilter(baseQuery, mapping)
+  if (!data || data.length === 0) return []
+
+  // Shuffle and deduplicate by image URL
+  const shuffled = [...(data as RawRow[])].sort(() => Math.random() - 0.5)
+  const seen = new Set<string>()
+  const unique: RelatedProperty[] = []
+
+  for (const prop of shuffled) {
+    const url = prop.image_url ?? prop.gallery_urls?.[0] ?? null
+    if (!url || seen.has(url)) continue
+    seen.add(url)
+    unique.push(prop)
+    if (unique.length >= limit) break
+  }
+
+  return unique
 }
 
 export async function getBannerProperty(postSlug: string): Promise<{ title: string; imageUrl: string } | null> {
@@ -74,8 +85,7 @@ export async function getBannerProperty(postSlug: string): Promise<{ title: stri
     .order('price', { ascending: false })
     .limit(1)
 
-  const query = applyLocationFilter(baseQuery, mapping)
-  const { data } = await query
+  const { data } = await applyLocationFilter(baseQuery, mapping)
   if (!data || data.length === 0) return null
 
   const prop = data[0] as RawBannerRow
