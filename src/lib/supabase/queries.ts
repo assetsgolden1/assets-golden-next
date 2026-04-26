@@ -27,6 +27,7 @@ export interface GetPropertiesFilters {
   country?: string
   zona?: string
   orden?: 'reciente' | 'precio_asc' | 'precio_desc'
+  excludeTypes?: string[]
 }
 
 export async function getProperties(filters?: GetPropertiesFilters) {
@@ -39,6 +40,8 @@ export async function getProperties(filters?: GetPropertiesFilters) {
     .or('hidden.is.null,hidden.eq.false')
     .or('sold.is.null,sold.eq.false')
 
+  if (filters?.excludeTypes && filters.excludeTypes.length > 0)
+    query = query.not('property_type', 'in', `(${filters.excludeTypes.join(',')})`)
   if (filters?.type) query = query.eq('property_type', filters.type)
   if (filters?.minPrice) query = query.gte('price', filters.minPrice)
   if (filters?.maxPrice) query = query.lte('price', filters.maxPrice)

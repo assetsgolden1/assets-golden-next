@@ -42,9 +42,10 @@ const WHY_INVEST = [
   },
 ]
 
+const EXCLUDED_FROM_INVESTMENT = ['hotel', 'building', 'rural', 'house', 'land']
+
 const PROPERTY_TYPES = [
-  'apartment', 'penthouse', 'villa', 'house',
-  'townhouse', 'land', 'building', 'rural', 'ground_floor',
+  'apartment', 'penthouse', 'villa', 'townhouse', 'commercial', 'other',
 ]
 
 interface Props {
@@ -75,16 +76,17 @@ export default async function InversionesPage({ searchParams }: Props) {
 
   const [{ data: properties, count }, propertyCounts, cities] = await Promise.all([
     getProperties({
-      type:     params.tipo    || undefined,
-      minPrice: precioMin,
-      maxPrice: precioMax,
-      location: params.ciudad  || undefined,
-      bedrooms: habitaciones,
-      country:  params.pais    || undefined,
-      zona:     params.zona    || undefined,
+      type:         params.tipo    || undefined,
+      minPrice:     precioMin,
+      maxPrice:     precioMax,
+      location:     params.ciudad  || undefined,
+      bedrooms:     habitaciones,
+      country:      params.pais    || undefined,
+      zona:         params.zona    || undefined,
       orden,
-      limit:    PAGE_SIZE,
+      limit:        PAGE_SIZE,
       offset,
+      excludeTypes: EXCLUDED_FROM_INVESTMENT,
     }),
     getPropertyCountsByCountry(),
     params.pais ? getCitiesForDestination(params.pais) : Promise.resolve([] as string[]),
@@ -128,7 +130,7 @@ export default async function InversionesPage({ searchParams }: Props) {
             Oportunidades de Inversión
           </h1>
           <p className="mt-4 text-white/60 max-w-xl mx-auto text-sm">
-            Acceda a los mercados inmobiliarios más rentables del mundo con el respaldo de nuestro equipo de expertos.
+            Apartamentos, áticos, villas y locales comerciales en los mercados más rentables del mundo, con el respaldo de nuestro equipo de expertos.
           </p>
           {(count ?? 0) > 0 && (
             <p className="mt-3 text-white/40 text-sm">
