@@ -173,7 +173,7 @@ export default async function EspanaPage({ searchParams }: Props) {
 
       {/* Stats mercado */}
       {!zona && (marketInfo.avgPrice || marketInfo.rentalYield || marketInfo.priceGrowth) && (
-        <section className="bg-gold py-6">
+        <section className="bg-gold py-6 w-full overflow-hidden">
           <div className="container-luxury">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
               {marketInfo.avgPrice && (
@@ -201,7 +201,7 @@ export default async function EspanaPage({ searchParams }: Props) {
 
       {/* Layout filtros + grid */}
       <section className="container-luxury py-12">
-        <div className="flex gap-8 items-start">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-start">
           <SpainFilters
             zones={Object.entries(ZONE_SLUGS)}
             cities={citiesForFilter}

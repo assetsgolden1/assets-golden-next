@@ -82,47 +82,47 @@ export default function PropertyCard({
       </div>
 
       {/* Content */}
-      <div className="p-5">
+      <div className="p-3 sm:p-5">
         {/* Tipo de inmueble */}
         {property_type && (
-          <p className="text-sm text-gold font-medium mb-0.5">
+          <p className="text-xs sm:text-sm text-gold font-medium mb-0.5">
             {translatePropertyType(property_type)}
           </p>
         )}
 
         {/* Título */}
-        <h3 className="font-display text-base text-foreground mb-1 line-clamp-1 group-hover:text-gold transition-colors">
+        <h3 className="font-display text-sm sm:text-base text-foreground mb-1 line-clamp-2 leading-tight group-hover:text-gold transition-colors">
           {toSentenceCase(translatePropertyTitle(title))}
         </h3>
 
         {/* Ubicación */}
-        <div className="flex items-center gap-2 text-muted-foreground text-sm mb-3">
-          <MapPin className="h-4 w-4 shrink-0 text-gold" />
-          <span className="line-clamp-1">{location}</span>
+        <div className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3">
+          <MapPin className="h-3 w-3 sm:h-4 sm:w-4 shrink-0 text-gold" />
+          <span className="truncate">{location}</span>
         </div>
 
         {/* Precio — prominente en gold */}
-        <p className="font-display text-xl font-medium text-gold mb-3">
+        <p className="font-display text-lg sm:text-xl font-medium text-gold mb-2 sm:mb-3">
           {formatPrice(price, currency)}
         </p>
 
         {/* Stats */}
-        <div className="flex items-center gap-4 text-muted-foreground text-sm border-t border-border pt-3">
+        <div className="flex items-center gap-2 sm:gap-4 text-muted-foreground text-xs sm:text-sm border-t border-border pt-2 sm:pt-3">
           {area_sqm != null && (
             <span className="flex items-center gap-1">
-              <Maximize className="h-3.5 w-3.5" />
+              <Maximize className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               {area_sqm} m²
             </span>
           )}
           {bedrooms != null && (
             <span className="flex items-center gap-1">
-              <BedDouble className="h-3.5 w-3.5" />
+              <BedDouble className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               {bedrooms}
             </span>
           )}
           {bathrooms != null && (
             <span className="flex items-center gap-1">
-              <Bath className="h-3.5 w-3.5" />
+              <Bath className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               {bathrooms}
             </span>
           )}
