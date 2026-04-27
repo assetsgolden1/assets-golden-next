@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "scrape": "tsx --env-file=.env.local src/scripts/runScraper.ts"
+    "scrape": "tsx --env-file=.env.local src/scripts/runScraper.ts",
+    "sync-destinations": "tsx --env-file=.env.local src/scripts/syncDestinations.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
