@@ -120,7 +120,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
       {/* Layout filtros + grid */}
       <section className="bg-background py-12">
         <div className="container-luxury">
-          <div className="flex gap-8 items-start">
+          <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-start">
             <PropiedadesFilters
               countries={countries}
               cities={cities}
