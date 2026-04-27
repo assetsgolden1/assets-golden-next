@@ -99,18 +99,21 @@ async function scrapeWeb() {
           title,
           priceText,
           description,
-          bedrooms:     bedroomsMatch  ? parseInt(bedroomsMatch[1],  10) : null,
-          bathrooms:    bathroomsMatch ? parseInt(bathroomsMatch[1], 10) : null,
-          area_sqm:     areaMatch      ? parseFloat(areaMatch[1].replace(',', '.')) : null,
+          bedrooms:    bedroomsMatch  ? parseInt(bedroomsMatch[1],  10) : null,
+          bathrooms:   bathroomsMatch ? parseInt(bathroomsMatch[1], 10) : null,
+          area_sqm:    areaMatch      ? parseFloat(areaMatch[1].replace(',', '.')) : null,
           images,
-          countryHint:  countryMatch?.[0] ?? '',
-          cityHint:     cityMatch?.[0]    ?? '',
-          pageTitle:    document.title ?? '',
+          countryHint: countryMatch?.[0] ?? '',
+          cityHint:    cityMatch?.[0]    ?? '',
         }
       })
 
-      const priceClean = data.priceText.replace(/[^\d]/g, '')
-      const price = priceClean ? parseInt(priceClean) : null
+      // Parsear precio
+      const priceClean = data.priceText
+        .replace(/[^\d]/g, '')
+      const price = priceClean
+        ? parseInt(priceClean)
+        : null
 
       const currency = data.priceText.includes('$')
         ? 'USD'
@@ -118,8 +121,10 @@ async function scrapeWeb() {
           ? 'EUR'
           : 'USD'
 
+      // Determinar país
       const country = data.countryHint || 'Indonesia'
 
+      // Extraer external_id de la URL
       const externalId = propUrl.split('/property/')[1] ?? propUrl
 
       allProperties.push({
@@ -153,7 +158,9 @@ async function scrapeWeb() {
   return allProperties
 }
 
-async function importToSupabase(properties: ScrapedProperty[]) {
+async function importToSupabase(
+  properties: ScrapedProperty[]
+) {
   let imported = 0
   let errors = 0
 
