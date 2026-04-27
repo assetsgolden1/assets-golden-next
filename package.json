@@ -9,7 +9,8 @@
     "lint": "eslint",
     "scrape": "tsx --env-file=.env.local src/scripts/runScraper.ts",
     "sync-destinations": "tsx --env-file=.env.local src/scripts/syncDestinations.ts",
-    "rescrape": "tsx --env-file=.env.local src/scripts/rescrapeDetails.ts"
+    "rescrape": "tsx --env-file=.env.local src/scripts/rescrapeDetails.ts",
+    "force-update-destinations": "tsx --env-file=.env.local src/scripts/forceUpdateDestinations.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
