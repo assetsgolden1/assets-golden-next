@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import puppeteer from 'puppeteer'
+import puppeteerCore from 'puppeteer-core'
+import chromium from '@sparticuz/chromium'
 import { createClient } from '@/lib/supabase/server'
 import { getUserRole } from '@/lib/auth/getUserRole'
 import { generatePropertyPdfHtml } from '@/lib/pdf/propertyPdfTemplate'
@@ -7,6 +8,27 @@ import type { Property } from '@/types'
 import type { Agent } from '@/types/agent'
 
 export const maxDuration = 60
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
+const isServerless = !!process.env.VERCEL_ENV || !!process.env.AWS_LAMBDA_FUNCTION_NAME
+
+async function getBrowser() {
+  if (isServerless) {
+    return puppeteerCore.launch({
+      args: chromium.args,
+      defaultViewport: { width: 1280, height: 800 },
+      executablePath: await chromium.executablePath(),
+      headless: true,
+    })
+  }
+  // Local: usar puppeteer completo con su propio Chromium
+  const puppeteer = await import('puppeteer')
+  return puppeteer.default.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+  })
+}
 
 export async function GET(
   request: NextRequest,
@@ -46,16 +68,7 @@ export async function GET(
 
   let browser
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--single-process',
-      ],
-    })
+    browser = await getBrowser()
 
     const page = await browser.newPage()
 
