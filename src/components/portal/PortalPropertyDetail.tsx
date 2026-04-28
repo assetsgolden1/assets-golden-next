@@ -35,7 +35,8 @@ export function PortalPropertyDetail({ property }: Props) {
     try {
       const res = await fetch(`/api/portal/generate-pdf/${property.id}`)
       if (!res.ok) {
-        alert('El PDF estará disponible en el próximo sprint.')
+        const json = await res.json().catch(() => ({}))
+        alert(json.error ?? 'Error generando el PDF')
         return
       }
       const blob = await res.blob()
@@ -45,6 +46,8 @@ export function PortalPropertyDetail({ property }: Props) {
       a.download = `${property.slug ?? property.id}.pdf`
       a.click()
       URL.revokeObjectURL(url)
+    } catch {
+      alert('Error de red al generar el PDF')
     } finally {
       setDownloading(false)
     }
