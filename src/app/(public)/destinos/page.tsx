@@ -13,6 +13,29 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600
 
+// Misma whitelist que la home para mantener paridad
+const VALID_COUNTRIES = [
+  'españa', 'spain',
+  'méxico', 'mexico',
+  'emiratos', 'eau', 'dubai', 'united arab',
+  'argentina',
+  'estados unidos', 'eeuu', 'usa', 'united states',
+  'costa rica',
+  'reino unido', 'uk', 'united kingdom',
+  'ecuador',
+  'grecia', 'greece',
+  'indonesia',
+  'paraguay',
+]
+
+function isValidCountry(name: string): boolean {
+  const lower = name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  return VALID_COUNTRIES.some((kw) => {
+    const kwNorm = kw.normalize('NFD').replace(/[̀-ͯ]/g, '')
+    return lower.includes(kwNorm)
+  })
+}
+
 export default async function DestinosPage() {
   const [{ data: destinations }, propertyCounts] = await Promise.all([
     getDestinations(),
@@ -27,10 +50,16 @@ export default async function DestinosPage() {
     return key ? propertyCounts[key] : 0
   }
 
-  // Only show destinations that have properties or are in the DB
-  const visibleDestinations = destinations.filter(
-    (d) => countFor(d.country_name) > 0 || destinations.length <= 9
-  )
+  // Misma lógica que la home: whitelist de 11 países, España primero + alfabético
+  const visibleDestinations = destinations
+    .filter((d) => isValidCountry(d.country_name))
+    .sort((a, b) => {
+      const aSpain = a.country_name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes('espana')
+      const bSpain = b.country_name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes('espana')
+      if (aSpain) return -1
+      if (bSpain) return 1
+      return a.country_name.localeCompare(b.country_name, 'es')
+    })
 
   return (
     <>
