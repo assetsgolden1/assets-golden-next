@@ -108,10 +108,6 @@ export default function Footer() {
           <Link href="/politica-de-privacidad" className="hover:text-gold transition-colors">
             Política de privacidad
           </Link>
-          <span className="opacity-50">·</span>
-          <span className="text-primary-foreground/30">
-            Partner of Nest Seekers International
-          </span>
         </div>
       </div>
     </footer>

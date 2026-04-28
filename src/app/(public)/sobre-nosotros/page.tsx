@@ -82,9 +82,6 @@ export default async function SobreNosotrosPage() {
           <p className="text-muted-foreground leading-relaxed mb-4">
             En Assets Golden International conectamos a inversores, compradores y vendedores con las mejores oportunidades inmobiliarias del mercado global. Nuestra red de partners en más de 15 países nos permite ofrecer un servicio integral y adaptado a cada perfil de cliente.
           </p>
-          <p className="text-muted-foreground leading-relaxed mb-4">
-            Somos partner oficial de <strong className="text-foreground">Nest Seekers International</strong>, una de las principales agencias inmobiliarias de lujo del mundo, lo que nos da acceso a un portafolio exclusivo de propiedades en los mercados más selectos.
-          </p>
           <p className="text-muted-foreground leading-relaxed">
             Operamos en España, Portugal, Italia, Francia, Grecia, Montenegro, Turquía, Argentina, México, Estados Unidos (Miami, Nueva York) y otros mercados emergentes de alto potencial.
           </p>
@@ -137,10 +134,10 @@ export default async function SobreNosotrosPage() {
               </ul>
             </div>
             <div className="rounded-2xl bg-gradient-to-br from-navy to-navy/70 p-8 text-white">
-              <p className="text-xs tracking-widest text-gold uppercase mb-2">Partner oficial</p>
-              <h3 className="font-display text-2xl font-semibold mb-4">Nest Seekers International</h3>
+              <p className="text-xs tracking-widest text-gold uppercase mb-2">Presencia global</p>
+              <h3 className="font-display text-2xl font-semibold mb-4">Red de partners independientes</h3>
               <p className="text-white/70 text-sm leading-relaxed">
-                Como partner de Nest Seekers, una de las agencias inmobiliarias de lujo más reconocidas a nivel mundial, ofrecemos acceso a un portafolio exclusivo y a una red de compradores e inversores de alto perfil en más de 30 países.
+                Contamos con una red consolidada de agentes y partners en más de 15 países, lo que nos permite ofrecer oportunidades exclusivas y acceso a compradores e inversores de alto perfil en cualquier parte del mundo.
               </p>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { ProfileForm } from '@/components/portal/ProfileForm'
+import { ChangePasswordForm } from '@/components/portal/ChangePasswordForm'
 import type { Agent } from '@/types/agent'
 
 export default async function PerfilPage() {
@@ -38,6 +39,11 @@ export default async function PerfilPage() {
         </p>
       </div>
       <ProfileForm initialData={initialData} userId={user.id} />
+
+      <div className="border-t border-border pt-6 mt-8">
+        <h2 className="font-display text-xl text-primary mb-4">Cambiar contraseña</h2>
+        <ChangePasswordForm />
+      </div>
     </div>
   )
 }

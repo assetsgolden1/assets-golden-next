@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 export const revalidate = 3600
 export const dynamic = 'force-dynamic'
 
-// 9 países reales de Assets Golden
+// 11 países reales de Assets Golden
 const VALID_COUNTRIES = [
   'españa', 'spain',
   'méxico', 'mexico',
@@ -36,6 +36,8 @@ const VALID_COUNTRIES = [
   'reino unido', 'uk', 'united kingdom',
   'ecuador',
   'grecia', 'greece',
+  'indonesia',
+  'paraguay',
 ]
 
 function isValidCountry(name: string): boolean {
@@ -166,9 +168,9 @@ export default async function HomePage() {
               },
               {
                 icon: '⭐',
-                title: 'Expertise local',
+                title: 'Expertos en cada destino',
                 description:
-                  'Especialistas en lujo barcelonés con 18 años de experiencia. Conocemos cada barrio, cada precio, cada oportunidad.',
+                  'Conocimiento profundo de cada mercado donde operamos: del Mediterráneo español a Indonesia, pasando por Latinoamérica y Medio Oriente.',
               },
             ].map((item) => (
               <div

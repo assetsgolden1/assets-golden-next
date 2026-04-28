@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Menu, X, Globe, Search } from "lucide-react";
+import { Menu, X, Globe, Search, Star } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import DemandDialog from "@/components/DemandDialog";
@@ -54,6 +54,15 @@ export default function Header() {
 
           {/* Desktop actions */}
           <div className="hidden lg:flex items-center gap-3">
+            {/* Destacadas chip */}
+            <Link
+              href="/propiedades?destacadas=true"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold/10 hover:bg-gold/20 border border-gold/30 rounded-full text-xs text-gold font-semibold uppercase tracking-wide transition-colors"
+            >
+              <Star className="h-3 w-3 fill-gold" />
+              Destacadas
+            </Link>
+
             {/* Busco propiedad */}
             <button
               onClick={() => setDemandOpen(true)}
@@ -111,6 +120,27 @@ export default function Header() {
                   {lang === "es" ? link.label : link.labelEn}
                 </Link>
               ))}
+              {/* Accesos directos extra (solo mobile) */}
+              <Link
+                href="/propiedades?destacadas=true"
+                onClick={() => setMobileOpen(false)}
+                className="px-4 py-3 text-base font-medium rounded transition-colors text-gold hover:bg-primary-foreground/5 flex items-center gap-2"
+              >
+                <Star className="h-4 w-4 fill-gold" />
+                {lang === "es" ? "Destacadas" : "Featured"}
+              </Link>
+              <Link
+                href="/mi-demanda"
+                onClick={() => setMobileOpen(false)}
+                className={cn(
+                  "px-4 py-3 text-base font-medium rounded transition-colors",
+                  pathname === "/mi-demanda"
+                    ? "text-gold bg-primary-foreground/5"
+                    : "text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/5"
+                )}
+              >
+                {lang === "es" ? "Mi Demanda" : "My Search"}
+              </Link>
               <div className="mt-4 pt-4 border-t border-primary-foreground/10 flex flex-col gap-3">
                 <button
                   onClick={() => { setDemandOpen(true); setMobileOpen(false); }}

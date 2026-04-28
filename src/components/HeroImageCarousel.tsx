@@ -74,37 +74,25 @@ export default function HeroImageCarousel() {
         paddingLeft: '2rem', paddingRight: '2rem',
         maxWidth: '680px',
       }}>
-        <div style={{
-          display: 'inline-flex', alignItems: 'center',
-          background: 'rgba(212,175,55,0.95)',
-          color: '#131D2E', fontSize: '11px',
-          fontWeight: 700, letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-          padding: '7px 16px', borderRadius: '4px',
-          marginBottom: '24px', width: 'fit-content',
-        }}>
-          Barcelona · International Real Estate
-        </div>
-
         <h1 style={{
           fontFamily: '"Playfair Display", Georgia, serif',
-          fontSize: 'clamp(2rem, 4.5vw, 3.5rem)',
-          fontWeight: 600, color: '#ffffff',
-          lineHeight: 1.15, marginBottom: '16px',
+          fontSize: 'clamp(1.8rem, 4vw, 3.2rem)',
+          fontWeight: 700, color: '#D4AF37',
+          lineHeight: 1.1, marginBottom: '20px',
+          textTransform: 'uppercase', letterSpacing: '0.04em',
         }}>
-          Venda su piso en Barcelona{' '}
-          <span style={{ color: '#D4AF37', fontStyle: 'italic' }}>
-            con la discreción
-          </span>
-          {' '}que merece
+          International Real Estate Consulting
         </h1>
 
         <p style={{
-          color: 'rgba(255,255,255,0.8)',
-          fontSize: '1rem', lineHeight: 1.6,
-          marginBottom: '32px', maxWidth: '420px',
+          color: 'rgba(255,255,255,0.85)',
+          fontSize: 'clamp(0.85rem, 1.5vw, 1.1rem)',
+          lineHeight: 1.5,
+          marginBottom: '36px', maxWidth: '480px',
+          textTransform: 'uppercase', letterSpacing: '0.1em',
+          fontWeight: 500,
         }}>
-          Tasación gratuita y confidencial en 24 horas. Sin compromiso.
+          Compraventa de activos inmobiliarios<br />en cualquier parte del mundo
         </p>
 
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
