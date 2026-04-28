@@ -13,6 +13,7 @@ import {
   UserCircle,
   Settings,
   PlusCircle,
+  UserCheck,
 } from 'lucide-react'
 
 const navLinks = [
@@ -22,6 +23,7 @@ const navLinks = [
   { href: '/admin/destacadas', label: 'Destacadas', icon: Star },
   { href: '/admin/blog', label: 'Blog', icon: Newspaper },
   { href: '/admin/leads', label: 'Leads', icon: Users },
+  { href: '/admin/agentes', label: 'Agentes', icon: UserCheck },
   { href: '/admin/sync', label: 'Sincronización', icon: RefreshCw },
   { href: '/admin/equipo', label: 'Equipo', icon: UserCircle },
   { href: '/admin/settings', label: 'Ajustes', icon: Settings },
