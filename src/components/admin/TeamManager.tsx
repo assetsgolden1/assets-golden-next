@@ -1,8 +1,75 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Edit2, Trash2, X } from 'lucide-react'
+import { Plus, Edit2, Trash2, X, Upload } from 'lucide-react'
 import { createTeamMember, updateTeamMember, deleteTeamMember } from '@/app/admin/actions'
+import { createClient } from '@/lib/supabase/client'
+
+function TeamPhotoUploader({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (url: string) => void
+}) {
+  const [uploading, setUploading] = useState(false)
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La imagen no puede superar 5 MB')
+      return
+    }
+    setUploading(true)
+    const supabase = createClient()
+    const ext = file.name.split('.').pop() ?? 'jpg'
+    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+    const { error } = await supabase.storage
+      .from('team-photos')
+      .upload(fileName, file, { cacheControl: '3600', upsert: false })
+    if (error) {
+      alert('Error subiendo foto: ' + error.message)
+      setUploading(false)
+      return
+    }
+    const { data: { publicUrl } } = supabase.storage.from('team-photos').getPublicUrl(fileName)
+    onChange(publicUrl)
+    setUploading(false)
+    // reset input so same file can be re-uploaded
+    e.target.value = ''
+  }
+
+  return (
+    <div className="flex items-center gap-4">
+      {value ? (
+        <img
+          src={value}
+          alt="Foto"
+          className="w-16 h-16 rounded-full object-cover border border-gray-200 flex-shrink-0"
+        />
+      ) : (
+        <div className="w-16 h-16 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center flex-shrink-0">
+          <Upload size={18} className="text-gray-400" />
+        </div>
+      )}
+      <div className="flex-1">
+        <label className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 border rounded-lg cursor-pointer transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 border-gray-300'}`}>
+          <Upload size={13} />
+          {uploading ? 'Subiendo…' : value ? 'Cambiar foto' : 'Subir foto'}
+          <input
+            type="file"
+            accept="image/*"
+            disabled={uploading}
+            onChange={handleFile}
+            className="hidden"
+          />
+        </label>
+        <p className="text-xs text-gray-400 mt-1">JPG/PNG/WEBP · máx 5 MB</p>
+      </div>
+    </div>
+  )
+}
 
 interface TeamMember {
   id: string
@@ -274,13 +341,10 @@ export function TeamManager({ initialMembers }: { initialMembers: TeamMember[] }
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">URL Foto</label>
-                <input
-                  type="text"
+                <label className="block text-sm font-medium text-gray-700 mb-1">Foto</label>
+                <TeamPhotoUploader
                   value={form.photo_url}
-                  onChange={(e) => setForm((f) => ({ ...f, photo_url: e.target.value }))}
-                  placeholder="https://..."
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={(url) => setForm((f) => ({ ...f, photo_url: url }))}
                 />
               </div>
 
