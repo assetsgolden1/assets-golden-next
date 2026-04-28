@@ -342,9 +342,10 @@ export function PortalPropertiesGrid() {
       .then(data => setCities(data.cities ?? []))
   }, [filters.country])
 
-  // Fetch results (debounced for text, immediate for others)
+  // Fetch results con AbortController para cancelar requests stale
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
+    const controller = new AbortController()
 
     const run = () => {
       setLoading(true)
@@ -359,24 +360,39 @@ export function PortalPropertiesGrid() {
       p.set('sort', filters.sort)
       p.set('page', String(page))
 
-      fetch(`/api/portal/search-properties?${p}`)
+      fetch(`/api/portal/search-properties?${p}`, { signal: controller.signal })
         .then(r => r.json())
         .then(data => {
-          setProperties(data.properties ?? [])
-          setTotal(data.total ?? 0)
-          setTotalPages(data.totalPages ?? 1)
+          if (data.error) {
+            console.error('[portal search]', data.error)
+            setProperties([])
+            setTotal(0)
+            setTotalPages(1)
+          } else {
+            setProperties(data.properties ?? [])
+            setTotal(data.total ?? 0)
+            setTotalPages(data.totalPages ?? 1)
+          }
+          setLoading(false)
+        })
+        .catch(err => {
+          if (err.name === 'AbortError') return
+          console.error('[portal search fetch]', err)
           setLoading(false)
         })
     }
 
-    // Debounce only text input
+    // Debounce cuando hay texto; inmediato para cambios de filtro/página
     if (filters.q) {
       debounceRef.current = setTimeout(run, 350)
     } else {
       run()
     }
 
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      controller.abort()
+    }
   }, [filters, page])
 
   function patchFilters(patch: Partial<FilterState>) {

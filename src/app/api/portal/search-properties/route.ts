@@ -4,13 +4,11 @@ import { getUserRole } from '@/lib/auth/getUserRole'
 
 const PAGE_SIZE = 24
 
-// UUID v4 completo
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-// Elimina caracteres que rompen la sintaxis PostgREST or()
 function sanitize(s: string): string {
-  return s.replace(/[,()\[\]]/g, ' ').replace(/\s+/g, ' ').trim()
+  return s.replace(/[,()\[\]%_]/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
 export async function GET(request: NextRequest) {
@@ -32,9 +30,8 @@ export async function GET(request: NextRequest) {
 
   const supabase = await createClient()
 
-  // ── Caso especial: UUID completo → lookup directo por id ──────────
-  // La columna `id` es tipo UUID en Postgres, no se puede ilike sobre ella.
-  // Hacemos .eq() ignorando los demás filtros de texto.
+  // ── UUID exacto → lookup directo por id ──────────────────────────
+  // La columna `id` es tipo UUID en Postgres; no soporta ilike.
   if (UUID_REGEX.test(q)) {
     const { data, error } = await supabase
       .from('properties')
@@ -47,7 +44,6 @@ export async function GET(request: NextRequest) {
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
-
     return NextResponse.json({
       properties: data ?? [],
       total:      data?.length ?? 0,
@@ -63,7 +59,7 @@ export async function GET(request: NextRequest) {
     .not('hidden', 'eq', true)
     .not('sold', 'eq', true)
 
-  // Filtros de dimensión (AND entre sí)
+  // Filtros de dimensión (AND entre sí, aplicados antes del or())
   if (country)  query = query.ilike('country',  `%${country}%`)
   if (city)     query = query.ilike('location', `%${city}%`)
   if (type)     query = query.eq('property_type', type)
@@ -71,20 +67,18 @@ export async function GET(request: NextRequest) {
   if (maxPrice) query = query.lte('price',    parseInt(maxPrice, 10))
   if (bedrooms) query = query.gte('bedrooms', parseInt(bedrooms, 10))
 
-  // Búsqueda de texto libre: se aplica al final para que el or() se
-  // combine correctamente (AND) con los filtros anteriores.
-  // Buscamos en title, location y external_id (código de referencia).
-  // Excluimos description: es texto muy largo y provoca timeouts.
+  // Texto libre: busca en title, location, country y external_id.
+  // Se aplica AL FINAL para que PostgREST lo AND-ee con los filtros previos.
+  // Excluimos `description` (campo muy largo → timeouts).
   if (q.length >= 2) {
     const safe = sanitize(q)
     if (safe.length >= 2) {
       query = query.or(
-        `title.ilike.%${safe}%,location.ilike.%${safe}%,external_id.ilike.%${safe}%`,
+        `title.ilike.%${safe}%,location.ilike.%${safe}%,country.ilike.%${safe}%,external_id.ilike.%${safe}%`,
       )
     }
   }
 
-  // Orden
   if (sort === 'price-asc') {
     query = query.order('price', { ascending: true,  nullsFirst: false })
   } else if (sort === 'price-desc') {
