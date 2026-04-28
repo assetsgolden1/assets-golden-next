@@ -4,6 +4,15 @@ import { getUserRole } from '@/lib/auth/getUserRole'
 
 const PAGE_SIZE = 24
 
+// UUID v4 completo
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+// Elimina caracteres que rompen la sintaxis PostgREST or()
+function sanitize(s: string): string {
+  return s.replace(/[,()\[\]]/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
 export async function GET(request: NextRequest) {
   const role = await getUserRole()
   if (role !== 'agent' && role !== 'admin') {
@@ -11,7 +20,7 @@ export async function GET(request: NextRequest) {
   }
 
   const { searchParams } = new URL(request.url)
-  const q        = searchParams.get('q')?.trim()      ?? ''
+  const q        = searchParams.get('q')?.trim()       ?? ''
   const country  = searchParams.get('country')?.trim() ?? ''
   const city     = searchParams.get('city')?.trim()    ?? ''
   const type     = searchParams.get('type')?.trim()    ?? ''
@@ -23,24 +32,61 @@ export async function GET(request: NextRequest) {
 
   const supabase = await createClient()
 
+  // ── Caso especial: UUID completo → lookup directo por id ──────────
+  // La columna `id` es tipo UUID en Postgres, no se puede ilike sobre ella.
+  // Hacemos .eq() ignorando los demás filtros de texto.
+  if (UUID_REGEX.test(q)) {
+    const { data, error } = await supabase
+      .from('properties')
+      .select('*')
+      .eq('id', q)
+      .not('hidden', 'eq', true)
+      .not('sold', 'eq', true)
+      .limit(1)
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({
+      properties: data ?? [],
+      total:      data?.length ?? 0,
+      page:       1,
+      totalPages: 1,
+    })
+  }
+
+  // ── Búsqueda normal ───────────────────────────────────────────────
   let query = supabase
     .from('properties')
     .select('*', { count: 'exact' })
     .not('hidden', 'eq', true)
     .not('sold', 'eq', true)
 
-  if (q) {
-    query = query.or(`title.ilike.%${q}%,location.ilike.%${q}%,description.ilike.%${q}%`)
-  }
-  if (country)  query = query.ilike('country', `%${country}%`)
+  // Filtros de dimensión (AND entre sí)
+  if (country)  query = query.ilike('country',  `%${country}%`)
   if (city)     query = query.ilike('location', `%${city}%`)
   if (type)     query = query.eq('property_type', type)
-  if (minPrice) query = query.gte('price', parseInt(minPrice, 10))
-  if (maxPrice) query = query.lte('price', parseInt(maxPrice, 10))
+  if (minPrice) query = query.gte('price',    parseInt(minPrice, 10))
+  if (maxPrice) query = query.lte('price',    parseInt(maxPrice, 10))
   if (bedrooms) query = query.gte('bedrooms', parseInt(bedrooms, 10))
 
+  // Búsqueda de texto libre: se aplica al final para que el or() se
+  // combine correctamente (AND) con los filtros anteriores.
+  // Buscamos en title, location y external_id (código de referencia).
+  // Excluimos description: es texto muy largo y provoca timeouts.
+  if (q.length >= 2) {
+    const safe = sanitize(q)
+    if (safe.length >= 2) {
+      query = query.or(
+        `title.ilike.%${safe}%,location.ilike.%${safe}%,external_id.ilike.%${safe}%`,
+      )
+    }
+  }
+
+  // Orden
   if (sort === 'price-asc') {
-    query = query.order('price', { ascending: true, nullsFirst: false })
+    query = query.order('price', { ascending: true,  nullsFirst: false })
   } else if (sort === 'price-desc') {
     query = query.order('price', { ascending: false, nullsFirst: false })
   } else {
@@ -51,6 +97,7 @@ export async function GET(request: NextRequest) {
   const { data, count, error } = await query.range(from, from + PAGE_SIZE - 1)
 
   if (error) {
+    console.error('[search-properties]', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 

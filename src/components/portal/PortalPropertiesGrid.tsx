@@ -11,6 +11,9 @@ import { translatePropertyType, translatePropertyTitle } from '@/lib/propertyTyp
 import { toSentenceCase } from '@/lib/utils/normalizeText'
 import type { Property } from '@/types'
 
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 // ─── Constants ───────────────────────────────────────────────────
 
 const PRICE_RANGES = [
@@ -176,9 +179,14 @@ function FiltersPanel({
             type="text"
             value={filters.q}
             onChange={e => onChange({ q: e.target.value })}
-            placeholder="Título, ubicación..."
+            placeholder="Título, ubicación o código..."
             className="w-full pl-8 pr-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-gold"
           />
+          {UUID_REGEX.test(filters.q) && (
+            <p className="mt-1 text-xs text-gold">
+              Buscando por UUID exacto
+            </p>
+          )}
         </div>
       </FilterBlock>
 
