@@ -11,9 +11,9 @@ export const maxDuration = 60
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-// Binario remoto — versión debe coincidir con @sparticuz/chromium-min instalado (148.0.0)
+// Binario remoto — versión debe coincidir con @sparticuz/chromium-min instalado (143.0.4)
 const CHROMIUM_REMOTE_URL =
-  'https://github.com/Sparticuz/chromium/releases/download/v148.0.0/chromium-v148.0.0-pack.tar'
+  'https://github.com/Sparticuz/chromium/releases/download/v143.0.4/chromium-v143.0.4-pack.x64.tar'
 
 const isServerless = !!process.env.VERCEL_ENV || !!process.env.AWS_LAMBDA_FUNCTION_NAME
 
