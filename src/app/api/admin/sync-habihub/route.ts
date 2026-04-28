@@ -1,317 +1,364 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
+import { requireAdmin } from '@/lib/auth/getUserRole'
 import { createClient } from '@/lib/supabase/server'
 import { XMLParser } from 'fast-xml-parser'
 
-const FEEDS = [
-  'https://medianewbuild.com/file/hh-media-bucket/agents/9e04488b-75ba-4831-b2c9-55e1ad47d4b9/feed_blanca_calida.xml',
-  'https://medianewbuild.com/file/hh-media-bucket/agents/9e04488b-75ba-4831-b2c9-55e1ad47d4b9/feed_sol.xml',
+const supabaseAdmin = createAdminClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
+const FEED_URLS = [
+  process.env.HABIHUB_FEED_BLANCA_CALIDA
+    ?? 'https://medianewbuild.com/file/hh-media-bucket/agents/9e04488b-75ba-4831-b2c9-55e1ad47d4b9/feed_blanca_calida.xml',
+  process.env.HABIHUB_FEED_SOL
+    ?? 'https://medianewbuild.com/file/hh-media-bucket/agents/9e04488b-75ba-4831-b2c9-55e1ad47d4b9/feed_sol.xml',
 ]
 
-// Actual field names from HabiHub XML (Kyero format)
-interface HabiHubProperty {
-  id?: string | number
-  ref?: string
-  price?: string | number
-  currency?: string
-  type?: string
-  town?: string
-  province?: string
-  country?: string
-  location?: {
-    latitude?: string | number
-    longitude?: string | number
-    zipcode?: string
-    address?: string
-  }
-  location_detail?: string
-  beds?: string | number
-  baths?: string | number
-  surface_area?: {
-    built?: string | number
-    plot?: string | number
-  }
-  desc?: Record<string, unknown>
-  images?: {
-    image?: Array<{ _text?: string; _id?: string } | string>
-  }
-  status?: string
-  new_build?: string | number
-}
-
 const HABIHUB_TYPE_MAPPING: Record<string, string> = {
-  'apartment': 'apartment',
-  'penthouse': 'penthouse',
-  'villa': 'villa',
-  'house': 'house',
-  'building': 'building',
-  'hotel': 'hotel',
-  'rural': 'rural',
-  'land': 'land',
-  'ground-floor': 'apartment',
-  'ground_floor': 'apartment',
-  'groundfloor': 'apartment',
-  'terraced': 'townhouse',
-  'townhouse': 'townhouse',
-  'bungalow': 'villa',
-  'low-bungalow': 'villa',
-  'lowbungalow': 'villa',
-  'duplex': 'apartment',
-  'studio': 'apartment',
-  'loft': 'apartment',
-  'attic': 'penthouse',
-  'finca': 'rural',
-  'cortijo': 'rural',
-  'commercial': 'commercial',
-  'office': 'commercial',
-  'detached': 'villa',
-  'semi-detached': 'townhouse',
-  'semidetached': 'townhouse',
-  'garage': 'other',
-  'storage': 'other',
+  apartment: 'apartment', penthouse: 'penthouse', villa: 'villa',
+  house: 'house', building: 'building', hotel: 'hotel', rural: 'rural',
+  land: 'land', 'ground-floor': 'apartment', ground_floor: 'apartment',
+  groundfloor: 'apartment', terraced: 'townhouse', townhouse: 'townhouse',
+  bungalow: 'villa', 'low-bungalow': 'villa', lowbungalow: 'villa',
+  duplex: 'apartment', studio: 'apartment', loft: 'apartment',
+  attic: 'penthouse', finca: 'rural', cortijo: 'rural',
+  commercial: 'commercial', office: 'commercial', detached: 'villa',
+  'semi-detached': 'townhouse', semidetached: 'townhouse',
+  garage: 'other', storage: 'other',
 }
 
 const TYPE_LABEL_ES: Record<string, string> = {
-  'apartment': 'Apartamento',
-  'penthouse': 'Ático',
-  'villa': 'Villa',
-  'house': 'Casa',
-  'townhouse': 'Adosado',
-  'rural': 'Finca',
-  'land': 'Terreno',
-  'commercial': 'Local comercial',
-  'building': 'Edificio',
-  'other': 'Propiedad',
+  apartment: 'Apartamento', penthouse: 'Ático', villa: 'Villa',
+  house: 'Casa', townhouse: 'Adosado', rural: 'Finca', land: 'Terreno',
+  commercial: 'Local comercial', building: 'Edificio', other: 'Propiedad',
 }
 
-function mapHabihubType(habihubType: string): string {
-  if (!habihubType) return 'other'
-  const normalized = habihubType.toLowerCase().trim()
-  return HABIHUB_TYPE_MAPPING[normalized] ?? 'other'
+function mapType(raw: string): string {
+  return HABIHUB_TYPE_MAPPING[raw?.toLowerCase().trim()] ?? 'other'
 }
 
-function buildTitle(prop: HabiHubProperty): string {
-  const mappedType = mapHabihubType(String(prop.type ?? ''))
+interface FeedProp {
+  externalId: string
+  title: string
+  country: string
+  location: string
+  province: string
+  property_type: string
+  price: number
+  bedrooms: number
+  bathrooms: number
+  area_sqm: number
+  description: string | null
+  description_en: string | null
+  image_url: string | null
+  gallery_urls: string[]
+}
+
+interface ExistingProp {
+  id: string
+  external_id: string | null
+  price: number | null
+  status: string | null
+  location: string | null
+  province: string | null
+  property_type: string | null
+  bedrooms: number | null
+  bathrooms: number | null
+  area_sqm: number | null
+}
+
+interface ConflictInfo {
+  externalId: string
+  title: string
+  location: string
+  candidates: number
+}
+
+function parseFeedProp(raw: Record<string, unknown>): FeedProp {
+  const rawType = String(raw.type ?? '')
+  const mappedType = mapType(rawType)
   const typeLabel = TYPE_LABEL_ES[mappedType] ?? 'Propiedad'
-  const city = prop.town ?? prop.location_detail ?? ''
-  if (city) return `${typeLabel} en ${city}`
-  if (prop.ref) return `${typeLabel} ref. ${prop.ref}`
-  return typeLabel
-}
+  const town = String(raw.town ?? raw.location_detail ?? '')
 
-function extractProperties(parsed: Record<string, unknown>): HabiHubProperty[] {
-  const tryPaths = [
-    // Actual HabiHub Kyero format: <root><property>
-    () => {
-      const root = parsed['root'] as Record<string, unknown>
-      if (root && root['property']) {
-        const p = root['property']
-        return Array.isArray(p) ? p : [p]
-      }
-      return null
-    },
-    () => {
-      const pl = parsed['propertyList'] as Record<string, unknown>
-      if (pl && pl['property']) {
-        const p = pl['property']
-        return Array.isArray(p) ? p : [p]
-      }
-      return null
-    },
-    () => {
-      const pl = parsed['properties'] as Record<string, unknown>
-      if (pl && pl['property']) {
-        const p = pl['property']
-        return Array.isArray(p) ? p : [p]
-      }
-      return null
-    },
-    () => {
-      const p = parsed['property']
-      if (p) return Array.isArray(p) ? p : [p]
-      return null
-    },
-  ]
+  const imageList = (raw.images as Record<string, unknown>)?.image
+  const images: string[] = Array.isArray(imageList)
+    ? (imageList as unknown[]).map((i) =>
+        typeof i === 'string' ? i : typeof i === 'object' && i !== null ? String((i as Record<string, unknown>)._text ?? '') : ''
+      ).filter(Boolean)
+    : []
 
-  for (const tryPath of tryPaths) {
-    const result = tryPath()
-    if (result && result.length > 0) return result as HabiHubProperty[]
+  const desc = raw.desc as Record<string, unknown> | undefined
+  const descEs = desc?.es ? String(desc.es) : null
+  const descEn = desc?.en ? String(desc.en) : null
+
+  const surfaceArea = raw.surface_area as Record<string, unknown> | undefined
+
+  return {
+    externalId: String(raw.id ?? '').trim(),
+    title: town ? `${typeLabel} en ${town}` : typeLabel,
+    country: String(raw.country ?? 'España'),
+    location: town,
+    province: String(raw.province ?? ''),
+    property_type: mappedType,
+    price: parseFloat(String(raw.price ?? '0').replace(/[^0-9.]/g, '')) || 0,
+    bedrooms: parseInt(String(raw.beds ?? '0')) || 0,
+    bathrooms: parseInt(String(raw.baths ?? '0')) || 0,
+    area_sqm: parseFloat(String(surfaceArea?.built ?? '0')) || 0,
+    description: descEs,
+    description_en: descEn,
+    image_url: images[0] ?? null,
+    gallery_urls: images,
   }
-  return []
 }
 
-function getFirstImage(prop: HabiHubProperty): string | null {
-  const imageList = prop.images?.image
-  if (!imageList || !Array.isArray(imageList) || imageList.length === 0) return null
+function fingerprintMatch(existing: ExistingProp, feed: FeedProp): boolean {
+  if (!existing.location || !feed.location) return false
+  if (existing.location.toLowerCase().trim() !== feed.location.toLowerCase().trim()) return false
+  if (existing.property_type !== feed.property_type) return false
+  if (existing.bedrooms !== feed.bedrooms) return false
+  if (existing.bathrooms !== feed.bathrooms) return false
 
-  const first = imageList[0]
-  if (typeof first === 'string') return first
-  if (first && typeof first === 'object' && '_text' in first) {
-    return typeof first._text === 'string' ? first._text : null
+  if (existing.price && feed.price) {
+    const diff = Math.abs(existing.price - feed.price) / feed.price
+    if (diff > 0.05) return false
   }
-  return null
+
+  if (existing.area_sqm && feed.area_sqm) {
+    const diff = Math.abs(existing.area_sqm - feed.area_sqm) / feed.area_sqm
+    if (diff > 0.05) return false
+  }
+
+  return true
 }
 
-function getDescriptionEs(prop: HabiHubProperty): string | null {
-  if (!prop.desc) return null
-  const desc = prop.desc as Record<string, unknown>
-  const es = desc['es']
-  if (typeof es === 'string') return es || null
-  return null
-}
-
-function getDescriptionEn(prop: HabiHubProperty): string | null {
-  if (!prop.desc) return null
-  const desc = prop.desc as Record<string, unknown>
-  const en = desc['en']
-  if (typeof en === 'string') return en || null
-  return null
-}
-
-function mapStatus(status?: string): string {
-  if (!status) return 'active'
-  const s = status.toLowerCase()
-  if (s.includes('sold') || s.includes('vendido')) return 'sold'
-  if (s.includes('reserv')) return 'reserved'
-  if (s.includes('available') || s.includes('disponible')) return 'available'
-  return 'active'
-}
-
-export async function POST() {
-  const supabase = await createClient()
-
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) {
+export async function POST(request: NextRequest) {
+  try {
+    await requireAdmin()
+  } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const parser = new XMLParser({
-    ignoreAttributes: false,
-    attributeNamePrefix: '_',
-    textNodeName: '_text',
-    isArray: (name) => ['property', 'image'].includes(name),
-  })
+  const url = new URL(request.url)
+  const dryRun = url.searchParams.get('dry') === 'true'
 
-  let totalInserted = 0
-  let totalUpdated = 0
-  let totalErrors = 0
-  let totalProcessed = 0
-  const feedErrors: string[] = []
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  for (const feedUrl of FEEDS) {
-    try {
-      const res = await fetch(feedUrl, {
-        next: { revalidate: 0 },
-        signal: AbortSignal.timeout(30000),
-      })
+  const { data: logEntry } = await supabaseAdmin
+    .from('sync_logs')
+    .insert({ feed_source: 'habihub_combined', dry_run: dryRun, triggered_by: user?.id ?? null })
+    .select()
+    .single()
 
-      if (!res.ok) {
-        feedErrors.push(`Feed ${feedUrl}: HTTP ${res.status}`)
+  const stats = {
+    total_in_feed: 0,
+    matched_by_external_id: 0,
+    matched_by_fingerprint: 0,
+    inserted_new: 0,
+    conflicts: 0,
+    errors: 0,
+  }
+  const conflictDetails: ConflictInfo[] = []
+  const insertedSample: { externalId: string; title: string }[] = []
+
+  try {
+    // Cargar todas las propiedades existentes una sola vez
+    const { data: existing } = await supabaseAdmin
+      .from('properties')
+      .select('id,external_id,price,status,location,province,property_type,bedrooms,bathrooms,area_sqm')
+
+    const allExisting: ExistingProp[] = existing ?? []
+    const byExternalId = new Map<string, ExistingProp>()
+    for (const p of allExisting) {
+      if (p.external_id) byExternalId.set(p.external_id, p)
+    }
+
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '_',
+      textNodeName: '_text',
+      isArray: (name) => ['property', 'image'].includes(name),
+    })
+
+    const toUpdateById: { id: string; data: Record<string, unknown> }[] = []
+    const toUpdateByFp: { id: string; data: Record<string, unknown> }[] = []
+    const toInsert: Record<string, unknown>[] = []
+
+    for (const feedUrl of FEED_URLS) {
+      let xmlText: string
+      try {
+        const res = await fetch(feedUrl, { signal: AbortSignal.timeout(30000) })
+        if (!res.ok) {
+          stats.errors++
+          continue
+        }
+        xmlText = await res.text()
+      } catch {
+        stats.errors++
         continue
       }
-
-      const xmlText = await res.text()
 
       let parsed: Record<string, unknown>
       try {
         parsed = parser.parse(xmlText) as Record<string, unknown>
-      } catch (parseErr) {
-        feedErrors.push(`Feed ${feedUrl}: Error parsing XML - ${parseErr}`)
+      } catch {
+        stats.errors++
         continue
       }
 
-      const properties = extractProperties(parsed)
+      const root = parsed['root'] as Record<string, unknown> | undefined
+      const rawProps = root?.['property']
+      const propsArray: Record<string, unknown>[] = Array.isArray(rawProps)
+        ? rawProps
+        : rawProps ? [rawProps as Record<string, unknown>] : []
 
-      if (properties.length === 0) {
-        console.warn(`Feed ${feedUrl}: No properties found. Top-level keys:`, Object.keys(parsed))
-        feedErrors.push(`Feed ${feedUrl}: No properties found in XML`)
-        continue
-      }
+      stats.total_in_feed += propsArray.length
 
-      for (const prop of properties) {
-        totalProcessed++
+      for (const raw of propsArray) {
         try {
-          const externalId = String(prop.id ?? '').trim()
-          if (!externalId) {
-            totalErrors++
+          const fp = parseFeedProp(raw)
+          if (!fp.externalId) { stats.errors++; continue }
+
+          // 1 — Match exacto por external_id
+          const exactMatch = byExternalId.get(fp.externalId)
+          if (exactMatch) {
+            stats.matched_by_external_id++
+            toUpdateById.push({
+              id: exactMatch.id,
+              data: {
+                price: fp.price,
+                description: fp.description,
+                description_en: fp.description_en,
+                image_url: fp.image_url,
+                gallery_urls: fp.gallery_urls,
+                last_synced_at: new Date().toISOString(),
+              },
+            })
             continue
           }
 
-          const mapped = {
-            external_id: externalId,
+          // 2 — Match por huella digital
+          const fpCandidates = allExisting.filter((e) => fingerprintMatch(e, fp))
+
+          if (fpCandidates.length === 1) {
+            stats.matched_by_fingerprint++
+            toUpdateByFp.push({
+              id: fpCandidates[0].id,
+              data: {
+                external_id: fp.externalId,
+                external_source: 'habihub',
+                title: fp.title,
+                price: fp.price,
+                province: fp.province,
+                description: fp.description,
+                description_en: fp.description_en,
+                image_url: fp.image_url,
+                gallery_urls: fp.gallery_urls,
+                last_synced_at: new Date().toISOString(),
+              },
+            })
+            // Actualizar mapa para evitar doble match en el mismo run
+            byExternalId.set(fp.externalId, { ...fpCandidates[0], external_id: fp.externalId })
+            continue
+          }
+
+          if (fpCandidates.length > 1) {
+            stats.conflicts++
+            conflictDetails.push({
+              externalId: fp.externalId,
+              title: fp.title,
+              location: fp.location,
+              candidates: fpCandidates.length,
+            })
+            continue
+          }
+
+          // 3 — Nueva propiedad
+          stats.inserted_new++
+          if (insertedSample.length < 50) insertedSample.push({ externalId: fp.externalId, title: fp.title })
+          toInsert.push({
+            external_id: fp.externalId,
             external_source: 'habihub',
-            title: buildTitle(prop),
-            description: getDescriptionEs(prop),
-            description_en: getDescriptionEn(prop),
-            price: prop.price ? parseFloat(String(prop.price).replace(/[^0-9.]/g, '')) : null,
-            property_type: mapHabihubType(String(prop.type ?? '')),
-            location: prop.town ? String(prop.town) : null,
-            province: prop.province ? String(prop.province) : null,
-            country: prop.country ? String(prop.country) : null,
-            bedrooms: prop.beds ? parseInt(String(prop.beds)) : null,
-            bathrooms: prop.baths ? parseInt(String(prop.baths)) : null,
-            area_sqm: prop.surface_area?.built ? parseFloat(String(prop.surface_area.built)) : null,
-            image_url: getFirstImage(prop),
-            status: mapStatus(prop.status) as 'active' | 'inactive' | 'sold' | 'available' | 'reserved',
+            title: fp.title,
+            country: fp.country,
+            location: fp.location,
+            province: fp.province,
+            property_type: fp.property_type,
+            price: fp.price,
+            currency: 'EUR',
+            bedrooms: fp.bedrooms,
+            bathrooms: fp.bathrooms,
+            area_sqm: fp.area_sqm,
+            description: fp.description,
+            description_en: fp.description_en,
+            image_url: fp.image_url,
+            gallery_urls: fp.gallery_urls,
+            status: 'active',
+            featured: false,
             last_synced_at: new Date().toISOString(),
-          }
-
-          const { data: existing } = await supabase
-            .from('properties')
-            .select('id, price, status')
-            .eq('external_id', externalId)
-            .maybeSingle()
-
-          if (!existing) {
-            const { error: insertErr } = await supabase
-              .from('properties')
-              .insert({ ...mapped, currency: 'EUR', featured: false })
-
-            if (insertErr) {
-              console.error('Insert error:', insertErr.message)
-              totalErrors++
-            } else {
-              totalInserted++
-            }
-          } else {
-            const priceChanged = mapped.price !== existing.price
-            const statusChanged = mapped.status !== existing.status
-
-            if (priceChanged || statusChanged) {
-              const { error: updateErr } = await supabase
-                .from('properties')
-                .update({
-                  price: mapped.price,
-                  status: mapped.status,
-                  last_synced_at: mapped.last_synced_at,
-                })
-                .eq('id', existing.id)
-
-              if (updateErr) {
-                console.error('Update error:', updateErr.message)
-                totalErrors++
-              } else {
-                totalUpdated++
-              }
-            }
-          }
-        } catch (propErr) {
-          console.error('Property processing error:', propErr)
-          totalErrors++
+          })
+        } catch {
+          stats.errors++
         }
       }
-    } catch (feedErr) {
-      feedErrors.push(`Feed ${feedUrl}: ${feedErr instanceof Error ? feedErr.message : String(feedErr)}`)
     }
+
+    // Aplicar cambios si no es dry-run
+    if (!dryRun) {
+      // Updates por external_id — lotes de 50 en paralelo
+      for (let i = 0; i < toUpdateById.length; i += 50) {
+        const batch = toUpdateById.slice(i, i + 50)
+        await Promise.all(
+          batch.map(({ id, data }) =>
+            supabaseAdmin.from('properties').update(data).eq('id', id)
+          )
+        )
+      }
+
+      // Updates por fingerprint — lotes de 50 en paralelo
+      for (let i = 0; i < toUpdateByFp.length; i += 50) {
+        const batch = toUpdateByFp.slice(i, i + 50)
+        await Promise.all(
+          batch.map(({ id, data }) =>
+            supabaseAdmin.from('properties').update(data).eq('id', id)
+          )
+        )
+      }
+
+      // Inserts en un solo batch
+      if (toInsert.length > 0) {
+        const { error: insertErr } = await supabaseAdmin
+          .from('properties')
+          .insert(toInsert)
+        if (insertErr) {
+          console.error('Batch insert error:', insertErr.message)
+          stats.errors++
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Sync general error:', err)
+    stats.errors++
   }
 
+  await supabaseAdmin
+    .from('sync_logs')
+    .update({
+      finished_at: new Date().toISOString(),
+      ...stats,
+      details: {
+        conflict_details: conflictDetails.slice(0, 100),
+        inserted_sample: insertedSample,
+      },
+    })
+    .eq('id', logEntry?.id)
+
   return NextResponse.json({
-    success: feedErrors.length < FEEDS.length,
-    results: {
-      total: totalProcessed,
-      inserted: totalInserted,
-      updated: totalUpdated,
-      errors: totalErrors,
-    },
-    feedErrors: feedErrors.length > 0 ? feedErrors : undefined,
+    success: true,
+    dryRun,
+    stats,
+    logId: logEntry?.id,
   })
 }
