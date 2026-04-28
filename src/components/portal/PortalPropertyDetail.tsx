@@ -105,9 +105,14 @@ export function PortalPropertyDetail({ property }: Props) {
             )}
           </div>
 
-          <h1 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-4 leading-tight">
+          <h1 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-1 leading-tight">
             {toSentenceCase(translatePropertyTitle(property.title))}
           </h1>
+          {property.ref_code && (
+            <p className="text-sm text-muted-foreground mb-4">
+              Código: <span className="font-mono">{property.ref_code}</span>
+            </p>
+          )}
 
           <p className="font-display text-2xl font-medium text-gold mb-6">
             {formatPrice(property.price, property.currency)}
@@ -188,7 +193,9 @@ export function PortalPropertyDetail({ property }: Props) {
           <div className="bg-muted/40 rounded-xl p-4 text-sm space-y-2">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Referencia</span>
-              <span className="font-mono text-xs">{property.external_id ?? property.id.slice(0, 8)}</span>
+              <span className="font-mono text-xs">
+                {property.ref_code ?? property.external_id ?? property.id.slice(0, 8)}
+              </span>
             </div>
             {property.classification && (
               <div className="flex justify-between">

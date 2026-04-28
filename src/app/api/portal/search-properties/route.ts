@@ -7,6 +7,9 @@ const PAGE_SIZE = 24
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
+const REF_CODE_REGEX = /^AG-\d{4,6}$/i
+const NUMBER_ONLY_REGEX = /^\d{1,6}$/
+
 function sanitize(s: string): string {
   return s.replace(/[,()\[\]%_]/g, ' ').replace(/\s+/g, ' ').trim()
 }
@@ -29,6 +32,50 @@ export async function GET(request: NextRequest) {
   const page     = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))
 
   const supabase = await createClient()
+
+  // ── ref_code exacto: AG-XXXXX ────────────────────────────────────
+  if (REF_CODE_REGEX.test(q)) {
+    const code = q.toUpperCase()
+    const { data, error, count } = await supabase
+      .from('properties')
+      .select('*', { count: 'exact' })
+      .eq('ref_code', code)
+      .not('hidden', 'eq', true)
+      .not('sold', 'eq', true)
+      .limit(1)
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+    return NextResponse.json({
+      properties: data ?? [],
+      total:      count ?? 0,
+      page:       1,
+      totalPages: 1,
+    })
+  }
+
+  // ── Solo número → buscar como AG-XXXXX ───────────────────────────
+  if (NUMBER_ONLY_REGEX.test(q)) {
+    const code = `AG-${q.padStart(5, '0')}`
+    const { data, error, count } = await supabase
+      .from('properties')
+      .select('*', { count: 'exact' })
+      .eq('ref_code', code)
+      .not('hidden', 'eq', true)
+      .not('sold', 'eq', true)
+      .limit(1)
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+    return NextResponse.json({
+      properties: data ?? [],
+      total:      count ?? 0,
+      page:       1,
+      totalPages: 1,
+    })
+  }
 
   // ── UUID exacto → lookup directo por id ──────────────────────────
   // La columna `id` es tipo UUID en Postgres; no soporta ilike.
@@ -74,7 +121,7 @@ export async function GET(request: NextRequest) {
     const safe = sanitize(q)
     if (safe.length >= 2) {
       query = query.or(
-        `title.ilike.%${safe}%,location.ilike.%${safe}%,country.ilike.%${safe}%,external_id.ilike.%${safe}%`,
+        `title.ilike.%${safe}%,location.ilike.%${safe}%,country.ilike.%${safe}%,external_id.ilike.%${safe}%,ref_code.ilike.%${safe}%`,
       )
     }
   }

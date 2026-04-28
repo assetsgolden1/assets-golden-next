@@ -109,9 +109,12 @@ function PortalPropertyCard({ p }: { p: Property }) {
           <MapPin className="h-3 w-3 shrink-0 text-gold" />
           <span className="truncate">{[p.location, p.country].filter(Boolean).join(', ')}</span>
         </div>
-        <p className="font-display text-base font-semibold text-gold mb-2">
+        <p className="font-display text-base font-semibold text-gold mb-1">
           {formatPrice(p.price, p.currency)}
         </p>
+        {p.ref_code && (
+          <p className="text-xs text-muted-foreground font-mono mb-2">{p.ref_code}</p>
+        )}
         <div className="flex items-center gap-3 text-muted-foreground text-xs border-t border-border pt-2">
           {p.area_sqm    != null && <span className="flex items-center gap-1"><Maximize className="h-3 w-3" />{p.area_sqm} m²</span>}
           {p.bedrooms    != null && <span className="flex items-center gap-1"><BedDouble className="h-3 w-3" />{p.bedrooms}</span>}
@@ -179,7 +182,7 @@ function FiltersPanel({
             type="text"
             value={filters.q}
             onChange={e => onChange({ q: e.target.value })}
-            placeholder="Título, ubicación o código..."
+            placeholder="Título, ubicación o código (AG-12345)..."
             className="w-full pl-8 pr-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-gold"
           />
           {UUID_REGEX.test(filters.q) && (

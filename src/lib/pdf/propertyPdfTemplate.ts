@@ -30,7 +30,7 @@ export function generatePropertyPdfHtml(
   agent: Agent | null,
   siteOrigin: string,
 ): string {
-  const refCode = (property.external_id ?? property.id.slice(0, 8)).toUpperCase()
+  const refCode = property.ref_code ?? (property.external_id ?? property.id.slice(0, 8)).toUpperCase()
   const propType = translatePropertyType(property.property_type)
   const description = truncate(property.description, 420)
 

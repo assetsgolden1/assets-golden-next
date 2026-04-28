@@ -22,6 +22,7 @@ export interface PropertyRow {
   status: string
   image_url: string | null
   slug: string | null
+  ref_code: string | null
 }
 
 export function PropiedadesTable({
@@ -296,6 +297,7 @@ export function PropiedadesTable({
                 </th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium w-14">Img</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Título</th>
+                <th className="text-left px-4 py-3 text-gray-600 font-medium">Código</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">País / Ciudad</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Precio</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Tipo</th>
@@ -308,7 +310,7 @@ export function PropiedadesTable({
             <tbody>
               {properties.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-8 text-gray-400">
+                  <td colSpan={10} className="text-center py-8 text-gray-400">
                     No se encontraron propiedades
                   </td>
                 </tr>
@@ -347,6 +349,9 @@ export function PropiedadesTable({
                       }`}>
                         {prop.status}
                       </span>
+                    </td>
+                    <td className="px-4 py-2">
+                      <span className="font-mono text-xs text-gray-500">{prop.ref_code ?? '—'}</span>
                     </td>
                     <td className="px-4 py-2 text-gray-600">
                       <span>{prop.country ?? '—'}</span>

@@ -154,6 +154,11 @@ export default async function PropertyDetailPage({ params }: Props) {
               <h1 className="font-display text-3xl font-semibold text-foreground md:text-4xl leading-tight">
                 {toSentenceCase(translatePropertyTitle(property.title))}
               </h1>
+              {property.ref_code && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Ref: <span className="font-mono">{property.ref_code}</span>
+                </p>
+              )}
 
               {/* Precio */}
               <div className="mt-4 font-display text-2xl font-medium text-gold">
@@ -258,7 +263,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 
                 <div className="mt-6 pt-6 border-t border-border">
                   <p className="text-xs text-muted-foreground text-center">
-                    Referencia: {property.external_id ?? 'AG-' + property.id.slice(0, 8).toUpperCase()}
+                    Ref: {property.ref_code ?? property.external_id ?? 'AG-' + property.id.slice(0, 8).toUpperCase()}
                   </p>
                 </div>
               </div>

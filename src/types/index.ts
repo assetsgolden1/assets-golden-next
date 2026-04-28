@@ -28,6 +28,7 @@ export interface Property {
   created_by: string | null
   idealista_url: string | null
   nestseekers_url: string | null
+  ref_code: string | null
 }
 
 // ─── TeamMember ───────────────────────────────────────────────
