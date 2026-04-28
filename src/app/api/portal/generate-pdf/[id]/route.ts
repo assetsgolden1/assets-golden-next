@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import puppeteerCore from 'puppeteer-core'
-import chromium from '@sparticuz/chromium'
+import chromium from '@sparticuz/chromium-min'
 import { createClient } from '@/lib/supabase/server'
 import { getUserRole } from '@/lib/auth/getUserRole'
 import { generatePropertyPdfHtml } from '@/lib/pdf/propertyPdfTemplate'
@@ -11,18 +11,23 @@ export const maxDuration = 60
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
+// Binario remoto — versión debe coincidir con @sparticuz/chromium-min instalado (148.0.0)
+const CHROMIUM_REMOTE_URL =
+  'https://github.com/Sparticuz/chromium/releases/download/v148.0.0/chromium-v148.0.0-pack.tar'
+
 const isServerless = !!process.env.VERCEL_ENV || !!process.env.AWS_LAMBDA_FUNCTION_NAME
 
 async function getBrowser() {
   if (isServerless) {
+    const executablePath = await chromium.executablePath(CHROMIUM_REMOTE_URL)
     return puppeteerCore.launch({
       args: chromium.args,
       defaultViewport: { width: 1280, height: 800 },
-      executablePath: await chromium.executablePath(),
-      headless: true,
+      executablePath,
+      headless: 'shell',
     })
   }
-  // Local: usar puppeteer completo con su propio Chromium
+  // Local: usa el Chromium bundleado con puppeteer
   const puppeteer = await import('puppeteer')
   return puppeteer.default.launch({
     headless: true,
@@ -69,7 +74,6 @@ export async function GET(
   let browser
   try {
     browser = await getBrowser()
-
     const page = await browser.newPage()
 
     await page.setContent(html, {
@@ -84,23 +88,25 @@ export async function GET(
     })
 
     await browser.close()
+    browser = undefined
 
-    // Puppeteer v20+ returns Uint8Array<ArrayBufferLike>; convert to Buffer
-    // so NextResponse accepts it as BodyInit.
     const pdfBuffer = Buffer.from(pdfUint8)
-    const filename  = `${property.slug ?? id}.pdf`
+    const filename = `${property.slug ?? id}.pdf`
 
     return new NextResponse(pdfBuffer, {
       status: 200,
       headers: {
-        'Content-Type':        'application/pdf',
+        'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${filename}"`,
-        'Cache-Control':       'private, no-store',
+        'Cache-Control': 'private, no-store',
       },
     })
   } catch (err) {
     if (browser) await browser.close().catch(() => {})
     console.error('[generate-pdf]', err)
-    return NextResponse.json({ error: 'Error generando PDF' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Error generando PDF', details: err instanceof Error ? err.message : 'Unknown' },
+      { status: 500 },
+    )
   }
 }

@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
 
   // Puppeteer has native binaries — keep it server-side only, never bundle
-  serverExternalPackages: ['puppeteer', 'puppeteer-core', '@sparticuz/chromium'],
+  serverExternalPackages: ['puppeteer', 'puppeteer-core', '@sparticuz/chromium-min'],
 
   experimental: {
     optimizeCss: true,
