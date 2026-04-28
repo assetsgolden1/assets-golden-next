@@ -7,25 +7,35 @@ const FEEDS = [
   'https://medianewbuild.com/file/hh-media-bucket/agents/9e04488b-75ba-4831-b2c9-55e1ad47d4b9/feed_sol.xml',
 ]
 
+// Actual field names from HabiHub XML (Kyero format)
 interface HabiHubProperty {
   id?: string | number
-  name?: string
-  title?: string
-  description?: string
+  ref?: string
   price?: string | number
-  propertyType?: string
-  property_type?: string
-  bedrooms?: string | number
-  bathrooms?: string | number
-  area?: string | number
-  mainImage?: string
-  status?: string
+  currency?: string
+  type?: string
+  town?: string
+  province?: string
+  country?: string
   location?: {
-    city?: string
-    province?: string
-    country?: string
+    latitude?: string | number
+    longitude?: string | number
+    zipcode?: string
+    address?: string
   }
-  images?: { image?: string | string[] } | string[]
+  location_detail?: string
+  beds?: string | number
+  baths?: string | number
+  surface_area?: {
+    built?: string | number
+    plot?: string | number
+  }
+  desc?: Record<string, unknown>
+  images?: {
+    image?: Array<{ _text?: string; _id?: string } | string>
+  }
+  status?: string
+  new_build?: string | number
 }
 
 const HABIHUB_TYPE_MAPPING: Record<string, string> = {
@@ -60,15 +70,45 @@ const HABIHUB_TYPE_MAPPING: Record<string, string> = {
   'storage': 'other',
 }
 
+const TYPE_LABEL_ES: Record<string, string> = {
+  'apartment': 'Apartamento',
+  'penthouse': 'Ático',
+  'villa': 'Villa',
+  'house': 'Casa',
+  'townhouse': 'Adosado',
+  'rural': 'Finca',
+  'land': 'Terreno',
+  'commercial': 'Local comercial',
+  'building': 'Edificio',
+  'other': 'Propiedad',
+}
+
 function mapHabihubType(habihubType: string): string {
   if (!habihubType) return 'other'
   const normalized = habihubType.toLowerCase().trim()
   return HABIHUB_TYPE_MAPPING[normalized] ?? 'other'
 }
 
+function buildTitle(prop: HabiHubProperty): string {
+  const mappedType = mapHabihubType(String(prop.type ?? ''))
+  const typeLabel = TYPE_LABEL_ES[mappedType] ?? 'Propiedad'
+  const city = prop.town ?? prop.location_detail ?? ''
+  if (city) return `${typeLabel} en ${city}`
+  if (prop.ref) return `${typeLabel} ref. ${prop.ref}`
+  return typeLabel
+}
+
 function extractProperties(parsed: Record<string, unknown>): HabiHubProperty[] {
-  // Intentar distintas rutas comunes de HabiHub
   const tryPaths = [
+    // Actual HabiHub Kyero format: <root><property>
+    () => {
+      const root = parsed['root'] as Record<string, unknown>
+      if (root && root['property']) {
+        const p = root['property']
+        return Array.isArray(p) ? p : [p]
+      }
+      return null
+    },
     () => {
       const pl = parsed['propertyList'] as Record<string, unknown>
       if (pl && pl['property']) {
@@ -100,19 +140,30 @@ function extractProperties(parsed: Record<string, unknown>): HabiHubProperty[] {
 }
 
 function getFirstImage(prop: HabiHubProperty): string | null {
-  if (prop.mainImage) return prop.mainImage
+  const imageList = prop.images?.image
+  if (!imageList || !Array.isArray(imageList) || imageList.length === 0) return null
 
-  const images = prop.images
-  if (!images) return null
-
-  if (Array.isArray(images)) {
-    return typeof images[0] === 'string' ? images[0] : null
+  const first = imageList[0]
+  if (typeof first === 'string') return first
+  if (first && typeof first === 'object' && '_text' in first) {
+    return typeof first._text === 'string' ? first._text : null
   }
+  return null
+}
 
-  if (typeof images === 'object' && images.image) {
-    const img = images.image
-    return Array.isArray(img) ? img[0] : img
-  }
+function getDescriptionEs(prop: HabiHubProperty): string | null {
+  if (!prop.desc) return null
+  const desc = prop.desc as Record<string, unknown>
+  const es = desc['es']
+  if (typeof es === 'string') return es || null
+  return null
+}
+
+function getDescriptionEn(prop: HabiHubProperty): string | null {
+  if (!prop.desc) return null
+  const desc = prop.desc as Record<string, unknown>
+  const en = desc['en']
+  if (typeof en === 'string') return en || null
   return null
 }
 
@@ -171,7 +222,7 @@ export async function POST() {
       const properties = extractProperties(parsed)
 
       if (properties.length === 0) {
-        console.warn(`Feed ${feedUrl}: No properties found. Keys:`, Object.keys(parsed))
+        console.warn(`Feed ${feedUrl}: No properties found. Top-level keys:`, Object.keys(parsed))
         feedErrors.push(`Feed ${feedUrl}: No properties found in XML`)
         continue
       }
@@ -179,7 +230,7 @@ export async function POST() {
       for (const prop of properties) {
         totalProcessed++
         try {
-          const externalId = String(prop.id ?? '')
+          const externalId = String(prop.id ?? '').trim()
           if (!externalId) {
             totalErrors++
             continue
@@ -188,22 +239,22 @@ export async function POST() {
           const mapped = {
             external_id: externalId,
             external_source: 'habihub',
-            title: String(prop.name ?? prop.title ?? 'Sin título'),
-            description: prop.description ? String(prop.description) : null,
+            title: buildTitle(prop),
+            description: getDescriptionEs(prop),
+            description_en: getDescriptionEn(prop),
             price: prop.price ? parseFloat(String(prop.price).replace(/[^0-9.]/g, '')) : null,
-            property_type: mapHabihubType(String(prop.propertyType ?? prop.property_type ?? '')),
-            location: prop.location?.city ? String(prop.location.city) : null,
-            province: prop.location?.province ? String(prop.location.province) : null,
-            country: prop.location?.country ? String(prop.location.country) : null,
-            bedrooms: prop.bedrooms ? parseInt(String(prop.bedrooms)) : null,
-            bathrooms: prop.bathrooms ? parseInt(String(prop.bathrooms)) : null,
-            area_sqm: prop.area ? parseFloat(String(prop.area)) : null,
+            property_type: mapHabihubType(String(prop.type ?? '')),
+            location: prop.town ? String(prop.town) : null,
+            province: prop.province ? String(prop.province) : null,
+            country: prop.country ? String(prop.country) : null,
+            bedrooms: prop.beds ? parseInt(String(prop.beds)) : null,
+            bathrooms: prop.baths ? parseInt(String(prop.baths)) : null,
+            area_sqm: prop.surface_area?.built ? parseFloat(String(prop.surface_area.built)) : null,
             image_url: getFirstImage(prop),
             status: mapStatus(prop.status) as 'active' | 'inactive' | 'sold' | 'available' | 'reserved',
             last_synced_at: new Date().toISOString(),
           }
 
-          // Buscar por external_id
           const { data: existing } = await supabase
             .from('properties')
             .select('id, price, status')
@@ -222,7 +273,6 @@ export async function POST() {
               totalInserted++
             }
           } else {
-            // Solo actualizar si cambió precio o status
             const priceChanged = mapped.price !== existing.price
             const statusChanged = mapped.status !== existing.status
 
