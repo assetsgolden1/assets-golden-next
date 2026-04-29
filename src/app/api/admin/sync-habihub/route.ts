@@ -185,12 +185,18 @@ export async function POST(request: NextRequest) {
   let totalInScope = 0
 
   try {
-    // Cargar candidatos restringido al scope España
-    const { data: existing } = await supabaseAdmin
+    // Cargar candidatos restringido al scope España.
+    // .range explícito para bypassear el cap default de PostgREST (1.000 filas):
+    // hoy hay ~1.700 propiedades ES en DB, 50.000 da margen amplio para crecer.
+    const { data: existing, error: existingError } = await supabaseAdmin
       .from('properties')
       .select('id,ref_code,external_id,price,status,location,province,property_type,bedrooms,bathrooms,area_sqm,country,is_development,external_source,featured')
       .eq('country', 'España')
+      .range(0, 49999)
 
+    if (existingError) {
+      throw new Error(`Error cargando candidatos: ${existingError.message}`)
+    }
     const allExisting: ExistingProp[] = existing ?? []
     const byExternalId = new Map<string, ExistingProp>()
     for (const p of allExisting) {
