@@ -128,7 +128,7 @@ export default function SyncPage() {
       `  • ${updates} propiedades se ACTUALIZARÁN\n` +
       `  • ${insertedNew} propiedades nuevas se AGREGARÁN\n` +
       `  • ${deletedCount} propiedades obra nueva ES se BORRARÁN\n` +
-      `  • ${conflicts} quedan en conflicto sin resolver\n\n` +
+      `  • ${conflicts} con huella ambigua (se insertó la del feed, los viejos caen en BORRADO)\n\n` +
       `Backup en properties_backup_20260429 (1.757 filas).\n\n` +
       `¿Continuar?`
 

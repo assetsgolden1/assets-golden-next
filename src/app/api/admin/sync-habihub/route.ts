@@ -83,6 +83,7 @@ interface ConflictInfo {
   title: string
   location: string
   candidates: number
+  resolution?: 'insert_new_drop_old'
 }
 
 interface DeletedSample {
@@ -284,10 +285,59 @@ export async function POST(request: NextRequest) {
           continue
         }
 
-        // 2 — Match por huella digital
+        // 2 — Filtrar candidatos por huella digital
         const fpCandidates = allExisting.filter((e) => fingerprintMatch(e, fp))
 
-        if (fpCandidates.length === 1) {
+        // 2.b — Huella ambigua: el feed es la fuente de verdad. Logueamos
+        // el conflict pero NO lo agregamos a conflictIds y NO continue:
+        // caemos al flujo de INSERT que sigue. Los candidatos viejos
+        // caerán en el DELETE de Fase 4 si están dentro del scope.
+        if (fpCandidates.length > 1) {
+          stats.conflicts++
+          if (conflictDetails.length < 100) {
+            conflictDetails.push({
+              externalId: fp.externalId,
+              title: fp.title,
+              location: fp.location,
+              candidates: fpCandidates.length,
+              resolution: 'insert_new_drop_old',
+            })
+          }
+        }
+
+        // 3 — Si hay exactamente 1 match: UPDATE por huella.
+        //     Si no (0 candidatos o >1 ya logueado arriba): INSERT.
+        if (fpCandidates.length !== 1) {
+          // INSERT — cubre tanto length === 0 como length > 1 (conflict resuelto)
+          stats.inserted_new++
+          const newId = randomUUID()
+          processedIds.add(newId)
+          if (insertedSample.length < 50) insertedSample.push({ externalId: fp.externalId, title: fp.title })
+          toInsert.push({
+            id: newId,
+            external_id: fp.externalId,
+            external_source: 'habihub',
+            title: fp.title,
+            country: fp.country,
+            location: fp.location,
+            province: fp.province,
+            property_type: fp.property_type,
+            price: fp.price,
+            currency: 'EUR',
+            bedrooms: fp.bedrooms,
+            bathrooms: fp.bathrooms,
+            area_sqm: fp.area_sqm,
+            description: fp.description,
+            description_en: fp.description_en,
+            image_url: fp.image_url,
+            gallery_urls: fp.gallery_urls,
+            status: 'active',
+            featured: false,
+            is_development: true,
+            last_synced_at: new Date().toISOString(),
+          })
+        } else {
+          // UPDATE por huella (length === 1)
           stats.matched_by_fingerprint++
           processedIds.add(fpCandidates[0].id)
           toUpdateByFp.push({
@@ -306,49 +356,7 @@ export async function POST(request: NextRequest) {
             },
           })
           byExternalId.set(fp.externalId, { ...fpCandidates[0], external_id: fp.externalId })
-          continue
         }
-
-        if (fpCandidates.length > 1) {
-          stats.conflicts++
-          fpCandidates.forEach((c) => conflictIds.add(c.id))
-          conflictDetails.push({
-            externalId: fp.externalId,
-            title: fp.title,
-            location: fp.location,
-            candidates: fpCandidates.length,
-          })
-          continue
-        }
-
-        // 3 — Nueva propiedad
-        stats.inserted_new++
-        const newId = randomUUID()
-        processedIds.add(newId)
-        if (insertedSample.length < 50) insertedSample.push({ externalId: fp.externalId, title: fp.title })
-        toInsert.push({
-          id: newId,
-          external_id: fp.externalId,
-          external_source: 'habihub',
-          title: fp.title,
-          country: fp.country,
-          location: fp.location,
-          province: fp.province,
-          property_type: fp.property_type,
-          price: fp.price,
-          currency: 'EUR',
-          bedrooms: fp.bedrooms,
-          bathrooms: fp.bathrooms,
-          area_sqm: fp.area_sqm,
-          description: fp.description,
-          description_en: fp.description_en,
-          image_url: fp.image_url,
-          gallery_urls: fp.gallery_urls,
-          status: 'active',
-          featured: false,
-          is_development: true,
-          last_synced_at: new Date().toISOString(),
-        })
       } catch {
         stats.errors++
       }
