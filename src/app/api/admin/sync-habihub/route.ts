@@ -183,6 +183,8 @@ export async function POST(request: NextRequest) {
   const insertedSample: { externalId: string; title: string }[] = []
   let deletedSample: DeletedSample[] = []
   let totalInScope = 0
+  // [DIAG-3] Métricas internas para diagnóstico (se rellenan al final de Fase 4)
+  let diagnostics: Record<string, unknown> = {}
 
   try {
     // Cargar candidatos restringido al scope España.
@@ -418,6 +420,18 @@ export async function POST(request: NextRequest) {
 
     stats.updated_count = stats.matched_by_external_id + stats.matched_by_fingerprint
 
+    diagnostics = {
+      code_version: 'v3-row-limit-2026-04-29-23h',
+      all_existing_count: allExisting.length,
+      deduped_feed_count: dedupedFeed.length,
+      delete_scope_all_count: deleteScopeAll.length,
+      processed_ids_size: processedIds.size,
+      to_delete_count: toDelete.length,
+      to_update_by_id_size: toUpdateById.length,
+      to_update_by_fp_size: toUpdateByFp.length,
+      to_insert_size: toInsert.length,
+    }
+
     // Fase 5 — aplicar cambios si no es dry-run
     if (!dryRun) {
       // Updates por external_id — lotes de 50 en paralelo
@@ -465,6 +479,7 @@ export async function POST(request: NextRequest) {
         conflict_details: conflictDetails.slice(0, 100),
         inserted_sample: insertedSample,
         deleted_sample: deletedSample,
+        diagnostics,
       },
     })
     .eq('id', logEntry?.id)
