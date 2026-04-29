@@ -187,19 +187,32 @@ export async function POST(request: NextRequest) {
   let diagnostics: Record<string, unknown> = {}
 
   try {
-    // Cargar candidatos restringido al scope España.
-    // .range explícito para bypassear el cap default de PostgREST (1.000 filas):
-    // hoy hay ~1.700 propiedades ES en DB, 50.000 da margen amplio para crecer.
-    const { data: existing, error: existingError } = await supabaseAdmin
-      .from('properties')
-      .select('id,ref_code,external_id,price,status,location,province,property_type,bedrooms,bathrooms,area_sqm,country,is_development,external_source,featured')
-      .eq('country', 'España')
-      .range(0, 49999)
+    // Paginación manual: Supabase tiene cap server-side de 1000 filas que
+    // .range() no override. Iteramos hasta agotar el resultado.
+    const PAGE_SIZE = 1000
+    const MAX_PAGES = 100 // safety: 100k filas máximo
+    const allExisting: ExistingProp[] = []
 
-    if (existingError) {
-      throw new Error(`Error cargando candidatos: ${existingError.message}`)
+    for (let page = 0; page < MAX_PAGES; page++) {
+      const from = page * PAGE_SIZE
+      const to = from + PAGE_SIZE - 1
+
+      const { data, error } = await supabaseAdmin
+        .from('properties')
+        .select('id,ref_code,external_id,price,status,location,province,property_type,bedrooms,bathrooms,area_sqm,country,is_development,external_source,featured')
+        .eq('country', 'España')
+        .range(from, to)
+
+      if (error) {
+        throw new Error(`Error cargando candidatos (página ${page}): ${error.message}`)
+      }
+
+      if (!data || data.length === 0) break
+
+      allExisting.push(...(data as ExistingProp[]))
+
+      if (data.length < PAGE_SIZE) break // última página
     }
-    const allExisting: ExistingProp[] = existing ?? []
     const byExternalId = new Map<string, ExistingProp>()
     for (const p of allExisting) {
       if (p.external_id) byExternalId.set(p.external_id, p)
@@ -421,7 +434,7 @@ export async function POST(request: NextRequest) {
     stats.updated_count = stats.matched_by_external_id + stats.matched_by_fingerprint
 
     diagnostics = {
-      code_version: 'v3-row-limit-2026-04-29-23h',
+      code_version: 'v4-paginated-2026-04-29-23h',
       all_existing_count: allExisting.length,
       deduped_feed_count: dedupedFeed.length,
       delete_scope_all_count: deleteScopeAll.length,
