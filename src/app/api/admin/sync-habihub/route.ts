@@ -3,6 +3,10 @@ import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { requireAdmin } from '@/lib/auth/getUserRole'
 import { createClient } from '@/lib/supabase/server'
 import { XMLParser } from 'fast-xml-parser'
+import { randomUUID } from 'node:crypto'
+
+export const maxDuration = 300
+export const dynamic = 'force-dynamic'
 
 const supabaseAdmin = createAdminClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -58,6 +62,7 @@ interface FeedProp {
 
 interface ExistingProp {
   id: string
+  ref_code: string | null
   external_id: string | null
   price: number | null
   status: string | null
@@ -67,6 +72,10 @@ interface ExistingProp {
   bedrooms: number | null
   bathrooms: number | null
   area_sqm: number | null
+  country: string | null
+  is_development: boolean | null
+  external_source: string | null
+  featured: boolean | null
 }
 
 interface ConflictInfo {
@@ -74,6 +83,13 @@ interface ConflictInfo {
   title: string
   location: string
   candidates: number
+}
+
+interface DeletedSample {
+  id: string
+  ref_code: string | null
+  location: string
+  title: string
 }
 
 function parseFeedProp(raw: Record<string, unknown>): FeedProp {
@@ -159,15 +175,20 @@ export async function POST(request: NextRequest) {
     inserted_new: 0,
     conflicts: 0,
     errors: 0,
+    deleted_count: 0,
+    updated_count: 0,
   }
   const conflictDetails: ConflictInfo[] = []
   const insertedSample: { externalId: string; title: string }[] = []
+  let deletedSample: DeletedSample[] = []
+  let totalInScope = 0
 
   try {
-    // Cargar todas las propiedades existentes una sola vez
+    // Cargar candidatos restringido al scope España
     const { data: existing } = await supabaseAdmin
       .from('properties')
-      .select('id,external_id,price,status,location,province,property_type,bedrooms,bathrooms,area_sqm')
+      .select('id,ref_code,external_id,price,status,location,province,property_type,bedrooms,bathrooms,area_sqm,country,is_development,external_source,featured')
+      .eq('country', 'España')
 
     const allExisting: ExistingProp[] = existing ?? []
     const byExternalId = new Map<string, ExistingProp>()
@@ -182,9 +203,8 @@ export async function POST(request: NextRequest) {
       isArray: (name) => ['property', 'image'].includes(name),
     })
 
-    const toUpdateById: { id: string; data: Record<string, unknown> }[] = []
-    const toUpdateByFp: { id: string; data: Record<string, unknown> }[] = []
-    const toInsert: Record<string, unknown>[] = []
+    // Fase 1 — descargar y parsear todos los feeds
+    const combinedFeed: FeedProp[] = []
 
     for (const feedUrl of FEED_URLS) {
       let xmlText: string
@@ -214,98 +234,177 @@ export async function POST(request: NextRequest) {
         ? rawProps
         : rawProps ? [rawProps as Record<string, unknown>] : []
 
-      stats.total_in_feed += propsArray.length
-
       for (const raw of propsArray) {
         try {
           const fp = parseFeedProp(raw)
           if (!fp.externalId) { stats.errors++; continue }
-
-          // 1 — Match exacto por external_id
-          const exactMatch = byExternalId.get(fp.externalId)
-          if (exactMatch) {
-            stats.matched_by_external_id++
-            toUpdateById.push({
-              id: exactMatch.id,
-              data: {
-                price: fp.price,
-                description: fp.description,
-                description_en: fp.description_en,
-                image_url: fp.image_url,
-                gallery_urls: fp.gallery_urls,
-                last_synced_at: new Date().toISOString(),
-              },
-            })
-            continue
-          }
-
-          // 2 — Match por huella digital
-          const fpCandidates = allExisting.filter((e) => fingerprintMatch(e, fp))
-
-          if (fpCandidates.length === 1) {
-            stats.matched_by_fingerprint++
-            toUpdateByFp.push({
-              id: fpCandidates[0].id,
-              data: {
-                external_id: fp.externalId,
-                external_source: 'habihub',
-                title: fp.title,
-                price: fp.price,
-                province: fp.province,
-                description: fp.description,
-                description_en: fp.description_en,
-                image_url: fp.image_url,
-                gallery_urls: fp.gallery_urls,
-                last_synced_at: new Date().toISOString(),
-              },
-            })
-            // Actualizar mapa para evitar doble match en el mismo run
-            byExternalId.set(fp.externalId, { ...fpCandidates[0], external_id: fp.externalId })
-            continue
-          }
-
-          if (fpCandidates.length > 1) {
-            stats.conflicts++
-            conflictDetails.push({
-              externalId: fp.externalId,
-              title: fp.title,
-              location: fp.location,
-              candidates: fpCandidates.length,
-            })
-            continue
-          }
-
-          // 3 — Nueva propiedad
-          stats.inserted_new++
-          if (insertedSample.length < 50) insertedSample.push({ externalId: fp.externalId, title: fp.title })
-          toInsert.push({
-            external_id: fp.externalId,
-            external_source: 'habihub',
-            title: fp.title,
-            country: fp.country,
-            location: fp.location,
-            province: fp.province,
-            property_type: fp.property_type,
-            price: fp.price,
-            currency: 'EUR',
-            bedrooms: fp.bedrooms,
-            bathrooms: fp.bathrooms,
-            area_sqm: fp.area_sqm,
-            description: fp.description,
-            description_en: fp.description_en,
-            image_url: fp.image_url,
-            gallery_urls: fp.gallery_urls,
-            status: 'active',
-            featured: false,
-            last_synced_at: new Date().toISOString(),
-          })
+          combinedFeed.push(fp)
         } catch {
           stats.errors++
         }
       }
     }
 
-    // Aplicar cambios si no es dry-run
+    // Fase 2 — deduplicar entre los 2 feeds (mismo external_id)
+    const seenExternalIds = new Set<string>()
+    const dedupedFeed = combinedFeed.filter((fp) => {
+      if (!fp.externalId) return false
+      if (seenExternalIds.has(fp.externalId)) return false
+      seenExternalIds.add(fp.externalId)
+      return true
+    })
+    console.log(`Feed combinado: ${combinedFeed.length}, deduplicado: ${dedupedFeed.length}`)
+    stats.total_in_feed = dedupedFeed.length
+
+    // Fase 3 — matching contra la DB
+    const processedIds = new Set<string>()
+    const conflictIds = new Set<string>()
+    const toUpdateById: { id: string; data: Record<string, unknown> }[] = []
+    const toUpdateByFp: { id: string; data: Record<string, unknown> }[] = []
+    const toInsert: Record<string, unknown>[] = []
+
+    for (const fp of dedupedFeed) {
+      try {
+        // 1 — Match exacto por external_id
+        const exactMatch = byExternalId.get(fp.externalId)
+        if (exactMatch) {
+          stats.matched_by_external_id++
+          processedIds.add(exactMatch.id)
+          toUpdateById.push({
+            id: exactMatch.id,
+            data: {
+              price: fp.price,
+              description: fp.description,
+              description_en: fp.description_en,
+              image_url: fp.image_url,
+              gallery_urls: fp.gallery_urls,
+              last_synced_at: new Date().toISOString(),
+            },
+          })
+          continue
+        }
+
+        // 2 — Match por huella digital
+        const fpCandidates = allExisting.filter((e) => fingerprintMatch(e, fp))
+
+        if (fpCandidates.length === 1) {
+          stats.matched_by_fingerprint++
+          processedIds.add(fpCandidates[0].id)
+          toUpdateByFp.push({
+            id: fpCandidates[0].id,
+            data: {
+              external_id: fp.externalId,
+              external_source: 'habihub',
+              title: fp.title,
+              price: fp.price,
+              province: fp.province,
+              description: fp.description,
+              description_en: fp.description_en,
+              image_url: fp.image_url,
+              gallery_urls: fp.gallery_urls,
+              last_synced_at: new Date().toISOString(),
+            },
+          })
+          byExternalId.set(fp.externalId, { ...fpCandidates[0], external_id: fp.externalId })
+          continue
+        }
+
+        if (fpCandidates.length > 1) {
+          stats.conflicts++
+          fpCandidates.forEach((c) => conflictIds.add(c.id))
+          conflictDetails.push({
+            externalId: fp.externalId,
+            title: fp.title,
+            location: fp.location,
+            candidates: fpCandidates.length,
+          })
+          continue
+        }
+
+        // 3 — Nueva propiedad
+        stats.inserted_new++
+        const newId = randomUUID()
+        processedIds.add(newId)
+        if (insertedSample.length < 50) insertedSample.push({ externalId: fp.externalId, title: fp.title })
+        toInsert.push({
+          id: newId,
+          external_id: fp.externalId,
+          external_source: 'habihub',
+          title: fp.title,
+          country: fp.country,
+          location: fp.location,
+          province: fp.province,
+          property_type: fp.property_type,
+          price: fp.price,
+          currency: 'EUR',
+          bedrooms: fp.bedrooms,
+          bathrooms: fp.bathrooms,
+          area_sqm: fp.area_sqm,
+          description: fp.description,
+          description_en: fp.description_en,
+          image_url: fp.image_url,
+          gallery_urls: fp.gallery_urls,
+          status: 'active',
+          featured: false,
+          is_development: true,
+          last_synced_at: new Date().toISOString(),
+        })
+      } catch {
+        stats.errors++
+      }
+    }
+
+    // Fase 4 — calcular borrado selectivo
+    const deleteScopeAll = allExisting.filter((p) =>
+      p.country === 'España' &&
+      p.is_development === true &&
+      p.external_source === 'habihub' &&
+      p.featured !== true
+    )
+    totalInScope = deleteScopeAll.length
+
+    const toDelete = deleteScopeAll.filter((p) =>
+      !processedIds.has(p.id) && !conflictIds.has(p.id)
+    )
+    const deletedCount = toDelete.length
+    stats.deleted_count = deletedCount
+
+    if (deletedCount > 0) {
+      const deletePct = (deletedCount / Math.max(deleteScopeAll.length, 1)) * 100
+
+      deletedSample = toDelete.slice(0, 50).map((p) => ({
+        id: p.id,
+        ref_code: p.ref_code ?? null,
+        location: p.location ?? '',
+        title: `${p.property_type ?? '?'} en ${p.location ?? '?'}`,
+      }))
+
+      // El dry-run debe poder mostrar "borraría N propiedades" siempre,
+      // incluso si N es enorme — es la señal de alerta que el usuario
+      // necesita ver. La salvaguarda solo bloquea el DELETE real.
+      if (!dryRun) {
+        if (deletePct > 80 && deleteScopeAll.length > 100) {
+          throw new Error(
+            `Salvaguarda activada: borraría ${deletedCount} de ${deleteScopeAll.length} ` +
+            `(${deletePct.toFixed(1)}%). Posible feed corrupto. Sync abortado.`
+          )
+        }
+
+        // Borrado selectivo en lotes de 50
+        for (let i = 0; i < toDelete.length; i += 50) {
+          const batchIds = toDelete.slice(i, i + 50).map((p) => p.id)
+          const { error } = await supabaseAdmin
+            .from('properties')
+            .delete()
+            .in('id', batchIds)
+          if (error) throw error
+        }
+      }
+    }
+
+    stats.updated_count = stats.matched_by_external_id + stats.matched_by_fingerprint
+
+    // Fase 5 — aplicar cambios si no es dry-run
     if (!dryRun) {
       // Updates por external_id — lotes de 50 en paralelo
       for (let i = 0; i < toUpdateById.length; i += 50) {
@@ -351,6 +450,7 @@ export async function POST(request: NextRequest) {
       details: {
         conflict_details: conflictDetails.slice(0, 100),
         inserted_sample: insertedSample,
+        deleted_sample: deletedSample,
       },
     })
     .eq('id', logEntry?.id)
@@ -360,5 +460,7 @@ export async function POST(request: NextRequest) {
     dryRun,
     stats,
     logId: logEntry?.id,
+    deletedCount: stats.deleted_count,
+    totalInScope,
   })
 }

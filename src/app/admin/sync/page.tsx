@@ -10,6 +10,8 @@ interface SyncStats {
   inserted_new: number
   conflicts: number
   errors: number
+  deleted_count: number
+  updated_count: number
 }
 
 interface SyncResult {
@@ -18,6 +20,8 @@ interface SyncResult {
   stats?: SyncStats
   logId?: string
   error?: string
+  deletedCount?: number
+  totalInScope?: number
 }
 
 interface ConflictDetail {
@@ -32,6 +36,13 @@ interface InsertedSample {
   title: string
 }
 
+interface DeletedSample {
+  id: string
+  ref_code: string | null
+  location: string
+  title: string
+}
+
 interface SyncLog {
   id: string
   started_at: string
@@ -43,16 +54,20 @@ interface SyncLog {
   inserted_new: number
   conflicts: number
   errors: number
+  deleted_count: number
+  updated_count: number
   dry_run: boolean
   details: {
     conflict_details?: ConflictDetail[]
     inserted_sample?: InsertedSample[]
+    deleted_sample?: DeletedSample[]
   } | null
 }
 
 export default function SyncPage() {
   const [running, setRunning] = useState(false)
   const [lastResult, setLastResult] = useState<SyncResult | null>(null)
+  const [lastDryRun, setLastDryRun] = useState<SyncResult | null>(null)
   const [logs, setLogs] = useState<SyncLog[]>([])
   const [expandedLog, setExpandedLog] = useState<string | null>(null)
   const [hasDryRun, setHasDryRun] = useState(false)
@@ -78,7 +93,10 @@ export default function SyncPage() {
       const res = await fetch(`/api/admin/sync-habihub?dry=${dryRun}`, { method: 'POST' })
       const data: SyncResult = await res.json()
       setLastResult(data)
-      if (dryRun) setHasDryRun(true)
+      if (dryRun) {
+        setHasDryRun(true)
+        if (data.success) setLastDryRun(data)
+      }
       await loadLogs()
     } catch (err) {
       setLastResult({
@@ -92,7 +110,29 @@ export default function SyncPage() {
   }
 
   function handleRealSync() {
-    if (!confirm('¿Ejecutar sincronización real? Esto modificará la base de datos con los resultados del dry-run.')) return
+    if (!lastDryRun) {
+      alert('Primero ejecutá un dry-run en esta sesión.')
+      return
+    }
+
+    const matchedById = lastDryRun.stats?.matched_by_external_id ?? 0
+    const matchedByFp = lastDryRun.stats?.matched_by_fingerprint ?? 0
+    const insertedNew = lastDryRun.stats?.inserted_new ?? 0
+    const conflicts = lastDryRun.stats?.conflicts ?? 0
+    const deletedCount = lastDryRun.deletedCount ?? lastDryRun.stats?.deleted_count ?? 0
+    const updates = matchedById + matchedByFp
+
+    const message =
+      `🔴 SYNC REAL — confirmar acción\n\n` +
+      `Según el último dry-run:\n` +
+      `  • ${updates} propiedades se ACTUALIZARÁN\n` +
+      `  • ${insertedNew} propiedades nuevas se AGREGARÁN\n` +
+      `  • ${deletedCount} propiedades obra nueva ES se BORRARÁN\n` +
+      `  • ${conflicts} quedan en conflicto sin resolver\n\n` +
+      `Backup en properties_backup_20260429 (1.757 filas).\n\n` +
+      `¿Continuar?`
+
+    if (!confirm(message)) return
     runSync(false)
   }
 
@@ -192,13 +232,20 @@ export default function SyncPage() {
             </div>
 
             {lastResult.stats && (
-              <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-7 gap-3">
                 {[
                   { label: 'En feed', value: lastResult.stats.total_in_feed, color: 'text-gray-700' },
                   { label: 'Match ID', value: lastResult.stats.matched_by_external_id, color: 'text-blue-700' },
                   { label: 'Match huella', value: lastResult.stats.matched_by_fingerprint, color: 'text-purple-700' },
                   { label: 'Nuevas', value: lastResult.stats.inserted_new, color: 'text-green-700' },
                   { label: 'Conflictos', value: lastResult.stats.conflicts, color: 'text-orange-600' },
+                  {
+                    label: 'Borradas',
+                    value: lastResult.deletedCount ?? lastResult.stats.deleted_count ?? 0,
+                    color: (lastResult.deletedCount ?? lastResult.stats.deleted_count ?? 0) > 0
+                      ? 'text-red-600 font-bold'
+                      : 'text-gray-400',
+                  },
                   { label: 'Errores', value: lastResult.stats.errors, color: 'text-red-600' },
                 ].map(({ label, value, color }) => (
                   <div key={label} className="text-center bg-white rounded-lg p-2 shadow-sm">
@@ -243,6 +290,7 @@ export default function SyncPage() {
                   <th className="text-right px-2">Huella</th>
                   <th className="text-right px-2">Nuevas</th>
                   <th className="text-right px-2">Conflictos</th>
+                  <th className="text-right px-2">Borradas</th>
                   <th className="text-right px-2">Errores</th>
                   <th className="text-right pl-2">Duración</th>
                   <th className="w-6"></th>
@@ -267,6 +315,9 @@ export default function SyncPage() {
                       <td className="text-right px-2 text-purple-600">{log.matched_by_fingerprint}</td>
                       <td className="text-right px-2 text-green-600">{log.inserted_new}</td>
                       <td className="text-right px-2 text-orange-500">{log.conflicts}</td>
+                      <td className={`text-right px-2 ${(log.deleted_count ?? 0) > 0 ? 'text-red-600 font-bold' : 'text-gray-400'}`}>
+                        {log.deleted_count ?? 0}
+                      </td>
                       <td className="text-right px-2 text-red-500">{log.errors}</td>
                       <td className="text-right pl-2 text-gray-400 text-xs">{formatDuration(log.started_at, log.finished_at)}</td>
                       <td className="pl-2 text-gray-400">
@@ -276,7 +327,7 @@ export default function SyncPage() {
 
                     {expandedLog === log.id && log.details && (
                       <tr key={`${log.id}-detail`}>
-                        <td colSpan={10} className="pb-4 pt-1">
+                        <td colSpan={11} className="pb-4 pt-1">
                           <div className="bg-gray-50 rounded-lg p-4 ml-4 space-y-4">
                             {log.details.conflict_details && log.details.conflict_details.length > 0 && (
                               <div>
@@ -313,7 +364,27 @@ export default function SyncPage() {
                               </div>
                             )}
 
-                            {(!log.details.conflict_details?.length && !log.details.inserted_sample?.length) && (
+                            {log.details.deleted_sample && log.details.deleted_sample.length > 0 && (
+                              <div>
+                                <p className="text-xs font-semibold text-red-600 mb-2">
+                                  Borradas — muestra ({log.details.deleted_sample.length})
+                                </p>
+                                <div className="space-y-1 max-h-40 overflow-y-auto">
+                                  {log.details.deleted_sample.map((p) => (
+                                    <div key={p.id} className="text-xs text-gray-600 flex items-center gap-2">
+                                      <span className="text-red-400">●</span>
+                                      <span className="font-mono text-gray-400">{p.ref_code ?? p.id.slice(0, 8)}</span>
+                                      <span className="text-gray-400">{p.location}</span>
+                                      <span>{p.title}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {(!log.details.conflict_details?.length
+                              && !log.details.inserted_sample?.length
+                              && !log.details.deleted_sample?.length) && (
                               <p className="text-xs text-gray-400">Sin detalles adicionales</p>
                             )}
                           </div>
