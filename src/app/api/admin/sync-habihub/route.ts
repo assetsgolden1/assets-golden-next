@@ -43,6 +43,18 @@ function mapType(raw: string): string {
   return HABIHUB_TYPE_MAPPING[raw?.toLowerCase().trim()] ?? 'other'
 }
 
+function normalizeCountry(raw: string | undefined | null): string {
+  if (!raw) return 'España'
+  const lower = raw.toString().trim().toLowerCase()
+  const map: Record<string, string> = {
+    'spain': 'España',
+    'españa': 'España',
+    'espana': 'España',
+    'es': 'España',
+  }
+  return map[lower] ?? raw // si no matchea conocidos, deja el valor original
+}
+
 interface FeedProp {
   externalId: string
   title: string
@@ -115,7 +127,7 @@ function parseFeedProp(raw: Record<string, unknown>): FeedProp {
   return {
     externalId: String(raw.id ?? '').trim(),
     title: town ? `${typeLabel} en ${town}` : typeLabel,
-    country: String(raw.country ?? 'España'),
+    country: normalizeCountry(raw.country as string | undefined | null),
     location: town,
     province: String(raw.province ?? ''),
     property_type: mappedType,
@@ -183,7 +195,7 @@ export async function POST(request: NextRequest) {
   const insertedSample: { externalId: string; title: string }[] = []
   let deletedSample: DeletedSample[] = []
   let totalInScope = 0
-  // [DIAG-3] Métricas internas para diagnóstico (se rellenan al final de Fase 4)
+  // Métricas internas persistidas para auditoría (se rellenan al final de Fase 4)
   let diagnostics: Record<string, unknown> = {}
 
   try {
@@ -434,7 +446,7 @@ export async function POST(request: NextRequest) {
     stats.updated_count = stats.matched_by_external_id + stats.matched_by_fingerprint
 
     diagnostics = {
-      code_version: 'v4-paginated-2026-04-29-23h',
+      code_version: 'v5-stable',
       all_existing_count: allExisting.length,
       deduped_feed_count: dedupedFeed.length,
       delete_scope_all_count: deleteScopeAll.length,
