@@ -90,55 +90,98 @@ export interface GetSpainPropertiesFilters {
 }
 
 export async function getPropertiesForSpain(filters: GetSpainPropertiesFilters = {}) {
-  let query = supabaseAdmin
-    .from('properties')
-    .select('*', { count: 'exact' })
-    .or('country.ilike.%España%,country.ilike.%Spain%,country.ilike.%espana%')
-    .not('hidden', 'eq', true)
-    .not('sold', 'eq', true)
-
-  if (filters.zona) {
-    const cities = getCitiesInZone(filters.zona)
-    const provinces = getProvincesInZone(filters.zona)
-
-    // Construir condición OR: matchea por province (más fiable) o por
-    // ciudad (case-insensitive con ilike).
-    const orConditions: string[] = []
-
-    if (provinces.length > 0) {
-      // PostgREST: province.in.(Barcelona,Girona,...)
-      // Comillas dobles si tiene espacios (ej: "Islas Baleares")
-      const provinceList = provinces.map(p => `"${p}"`).join(',')
-      orConditions.push(`province.in.(${provinceList})`)
-    }
-
-    if (cities.length > 0) {
-      // PostgREST no tiene 'in' case-insensitive, usamos ilike por
-      // cada ciudad. Para zonas con muchas ciudades esto puede ser
-      // lento; las zonas reales tienen 4-15 entradas, está OK.
-      const cityConditions = cities.map(c => `location.ilike."${c}"`).join(',')
-      orConditions.push(cityConditions)
-    }
-
-    if (orConditions.length > 0) {
-      query = query.or(orConditions.join(','))
-    }
-  }
-  if (filters.ciudad) query = query.ilike('location', `%${filters.ciudad}%`)
-  if (filters.tipo)   query = query.eq('property_type', filters.tipo)
-  if (filters.precioMin) query = query.gte('price', filters.precioMin)
-  if (filters.precioMax) query = query.lte('price', filters.precioMax)
-  if (filters.habitaciones) query = query.gte('bedrooms', filters.habitaciones)
-
   const limit  = filters.limit  ?? 24
   const offset = filters.offset ?? 0
 
-  if (filters.orden === 'precio_asc')       query = query.order('price', { ascending: true })
-  else if (filters.orden === 'precio_desc') query = query.order('price', { ascending: false })
-  else                                      query = query.order('created_at', { ascending: false })
+  // Helper: aplica todos los filtros NO-zona y los modificadores comunes
+  const applyCommonFilters = (q: any) => {
+    let qq = q
+      .or('country.ilike.%España%,country.ilike.%Spain%,country.ilike.%espana%')
+      .not('hidden', 'eq', true)
+      .not('sold', 'eq', true)
+    if (filters.ciudad) qq = qq.ilike('location', `%${filters.ciudad}%`)
+    if (filters.tipo)   qq = qq.eq('property_type', filters.tipo)
+    if (filters.precioMin) qq = qq.gte('price', filters.precioMin)
+    if (filters.precioMax) qq = qq.lte('price', filters.precioMax)
+    if (filters.habitaciones) qq = qq.gte('bedrooms', filters.habitaciones)
+    return qq
+  }
 
-  const { data, error, count } = await query.range(offset, offset + limit - 1)
-  return { data: (data ?? []) as Property[], error, count: count ?? 0 }
+  // Caso 1: SIN filtro de zona — single query con paginación nativa
+  if (!filters.zona) {
+    let query = applyCommonFilters(
+      supabaseAdmin.from('properties').select('*', { count: 'exact' })
+    )
+    if (filters.orden === 'precio_asc')       query = query.order('price', { ascending: true })
+    else if (filters.orden === 'precio_desc') query = query.order('price', { ascending: false })
+    else                                      query = query.order('created_at', { ascending: false })
+
+    const { data, error, count } = await query.range(offset, offset + limit - 1)
+    return { data: (data ?? []) as Property[], error, count: count ?? 0 }
+  }
+
+  // Caso 2: CON filtro de zona — N queries paralelas + dedupe
+  const cities = getCitiesInZone(filters.zona)
+  const provinces = getProvincesInZone(filters.zona)
+
+  // Build N queries
+  const queries: Promise<any>[] = []
+
+  // 1 query por province (.in es seguro con array nativo)
+  if (provinces.length > 0) {
+    queries.push(
+      applyCommonFilters(
+        supabaseAdmin.from('properties').select('*')
+      ).in('province', provinces)
+    )
+  }
+
+  // 1 query por cada ciudad (.ilike por ciudad, paralelas)
+  for (const city of cities) {
+    queries.push(
+      applyCommonFilters(
+        supabaseAdmin.from('properties').select('*')
+      ).ilike('location', city)
+    )
+  }
+
+  if (queries.length === 0) {
+    return { data: [], error: null, count: 0 }
+  }
+
+  const results = await Promise.all(queries)
+
+  // Recolectar errores (no abortar — devolvemos lo que se pudo)
+  const firstError = results.find(r => r.error)?.error ?? null
+  if (firstError) {
+    console.error('[getPropertiesForSpain] Error en alguna query:', firstError)
+  }
+
+  // Dedupe por id
+  const map = new Map<string, Property>()
+  for (const r of results) {
+    for (const p of (r.data ?? []) as Property[]) {
+      map.set(p.id, p)
+    }
+  }
+
+  const properties = Array.from(map.values())
+
+  // Ordenar (mismo criterio que la query original)
+  if (filters.orden === 'precio_asc') {
+    properties.sort((a, b) => (a.price ?? 0) - (b.price ?? 0))
+  } else if (filters.orden === 'precio_desc') {
+    properties.sort((a, b) => (b.price ?? 0) - (a.price ?? 0))
+  } else {
+    properties.sort((a, b) =>
+      String(b.created_at ?? '').localeCompare(String(a.created_at ?? ''))
+    )
+  }
+
+  const total = properties.length
+  const paginated = properties.slice(offset, offset + limit)
+
+  return { data: paginated, error: firstError, count: total }
 }
 
 export async function getPropertyTypesForSpain(): Promise<string[]> {
