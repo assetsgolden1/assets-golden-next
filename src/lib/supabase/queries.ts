@@ -2,7 +2,7 @@ import { createClient } from './server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import type { Property, TeamMember, BlogPost, CountryDestination, LeadData } from '@/types'
 import { supabaseAdmin } from './admin'
-import { getCitiesInZone, ZONE_SLUGS } from '@/lib/constants/spainZones'
+import { getCitiesInZone, getProvincesInZone, ZONE_SLUGS } from '@/lib/constants/spainZones'
 import { normalizeLocation } from '@/lib/utils/normalizeLocation'
 
 // Client without cookies — only for generateStaticParams (build time)
@@ -99,7 +99,30 @@ export async function getPropertiesForSpain(filters: GetSpainPropertiesFilters =
 
   if (filters.zona) {
     const cities = getCitiesInZone(filters.zona)
-    if (cities.length > 0) query = query.in('location', cities)
+    const provinces = getProvincesInZone(filters.zona)
+
+    // Construir condición OR: matchea por province (más fiable) o por
+    // ciudad (case-insensitive con ilike).
+    const orConditions: string[] = []
+
+    if (provinces.length > 0) {
+      // PostgREST: province.in.(Barcelona,Girona,...)
+      // Comillas dobles si tiene espacios (ej: "Islas Baleares")
+      const provinceList = provinces.map(p => `"${p}"`).join(',')
+      orConditions.push(`province.in.(${provinceList})`)
+    }
+
+    if (cities.length > 0) {
+      // PostgREST no tiene 'in' case-insensitive, usamos ilike por
+      // cada ciudad. Para zonas con muchas ciudades esto puede ser
+      // lento; las zonas reales tienen 4-15 entradas, está OK.
+      const cityConditions = cities.map(c => `location.ilike."${c}"`).join(',')
+      orConditions.push(cityConditions)
+    }
+
+    if (orConditions.length > 0) {
+      query = query.or(orConditions.join(','))
+    }
   }
   if (filters.ciudad) query = query.ilike('location', `%${filters.ciudad}%`)
   if (filters.tipo)   query = query.eq('property_type', filters.tipo)

@@ -184,3 +184,13 @@ export function getCitiesInZone(zoneName: string): string[] {
     .filter(([, zone]) => zone === zoneName)
     .map(([city]) => city)
 }
+
+/**
+ * Devuelve las provincias que pertenecen a una zona dada.
+ * Inverso de PROVINCE_TO_ZONE.
+ */
+export function getProvincesInZone(zone: string): string[] {
+  return Object.entries(PROVINCE_TO_ZONE)
+    .filter(([, z]) => z === zone)
+    .map(([province]) => province)
+}
