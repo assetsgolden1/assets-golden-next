@@ -94,6 +94,7 @@ export default async function NoticiasPage() {
                         src={post.cover_image}
                         alt={post.title}
                         fill
+                        unoptimized
                         className="object-cover transition-transform group-hover:scale-105"
                       />
                     </div>

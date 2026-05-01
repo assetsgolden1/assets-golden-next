@@ -90,6 +90,7 @@ export function ProfileForm({ initialData, userId }: Props) {
                 alt="Logo agencia"
                 width={80}
                 height={80}
+                unoptimized
                 className="object-contain w-full h-full"
               />
             ) : (

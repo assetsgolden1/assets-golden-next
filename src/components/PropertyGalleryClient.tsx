@@ -80,6 +80,7 @@ export default function PropertyGalleryClient({ images, title }: Props) {
               src={images[selectedIndex]}
               alt={`${title} — imagen ${selectedIndex + 1}`}
               fill
+              unoptimized
               className="object-cover transition-opacity duration-300"
               sizes="100vw"
               priority={selectedIndex === 0}
@@ -125,6 +126,7 @@ export default function PropertyGalleryClient({ images, title }: Props) {
                   src={img}
                   alt={`${title} — imagen ${i + 1}`}
                   fill
+                  unoptimized
                   className="object-cover"
                   sizes="100vw"
                   priority={i === 0}
@@ -157,6 +159,7 @@ export default function PropertyGalleryClient({ images, title }: Props) {
                     src={img}
                     alt={`${title} — miniatura ${i + 1}`}
                     fill
+                    unoptimized
                     className="object-cover"
                     sizes="128px"
                   />
@@ -210,6 +213,7 @@ export default function PropertyGalleryClient({ images, title }: Props) {
               alt={`${title} — imagen ${lightboxIndex + 1}`}
               width={1200}
               height={800}
+              unoptimized
               className="object-contain w-full h-full max-h-[80vh]"
               sizes="90vw"
             />

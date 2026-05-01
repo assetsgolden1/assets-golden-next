@@ -52,6 +52,7 @@ function MemberCard({ member, onClick }: { member: TeamMember; onClick: () => vo
               src={getMemberPhoto(member)!}
               alt={member.name}
               fill
+              unoptimized
               className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
               sizes="260px"
             />
@@ -126,6 +127,7 @@ function BioModal({ member, onClose }: { member: TeamMember; onClose: () => void
                   src={getMemberPhoto(member)!}
                   alt={member.name}
                   fill
+                  unoptimized
                   className="object-cover object-top"
                   sizes="192px"
                 />

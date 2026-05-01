@@ -200,6 +200,7 @@ export default function HomeSidebar({ destinations, propertyCounts, partners }: 
                           alt={partner.name}
                           width={96}
                           height={96}
+                          unoptimized
                           className="w-24 h-24 rounded-xl object-cover object-top border-2 border-gold/30 group-hover:border-gold/60 transition-colors"
                         />
                       ) : (

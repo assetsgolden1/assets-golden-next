@@ -132,6 +132,7 @@ function LocationCard({ displayName, imageKey, count, index, onClick, cityImages
         src={imageSrc}
         alt={displayName}
         fill
+        unoptimized
         className="object-cover transition-transform duration-500 group-hover:scale-110"
         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
       />
@@ -173,6 +174,7 @@ function PropertyMiniCard({ property }: { property: Property }) {
             src={property.image_url}
             alt={property.title}
             fill
+            unoptimized
             className="object-cover transition-transform duration-700 group-hover:scale-110"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />

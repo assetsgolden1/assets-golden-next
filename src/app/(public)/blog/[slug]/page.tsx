@@ -178,6 +178,7 @@ export default async function BlogPostPage({ params }: Props) {
             src={post.banner_image_url}
             alt={post.title}
             fill
+            unoptimized
             className="object-cover"
             sizes="100vw"
             priority
@@ -241,6 +242,7 @@ export default async function BlogPostPage({ params }: Props) {
                 src={post.cover_image}
                 alt={post.title}
                 fill
+                unoptimized
                 className="object-cover"
                 sizes="100vw"
                 priority

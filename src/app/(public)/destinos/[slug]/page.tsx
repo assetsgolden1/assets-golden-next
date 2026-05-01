@@ -147,7 +147,7 @@ export default async function DestinoPage({ params, searchParams }: Props) {
           <Image
             src={(destination.hero_image_url ?? destination.card_image_url)!}
             alt={destination.country_name}
-            fill className="object-cover" priority sizes="100vw"
+            fill unoptimized className="object-cover" priority sizes="100vw"
           />
         ) : (
           <div className="absolute inset-0 gradient-navy" />

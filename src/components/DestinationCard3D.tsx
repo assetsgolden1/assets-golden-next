@@ -51,6 +51,7 @@ export default function DestinationCard3D({ dest, count }: Props) {
           src={dest.card_image_url ?? dest.hero_image_url!}
           alt={dest.country_name}
           fill
+          unoptimized
           className="object-cover transition-transform duration-700 group-hover:scale-110"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
         />

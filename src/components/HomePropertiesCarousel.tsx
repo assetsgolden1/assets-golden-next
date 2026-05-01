@@ -61,6 +61,7 @@ export default function HomePropertiesCarousel({ properties }: Props) {
                       src={property.image_url}
                       alt={property.title}
                       fill
+                      unoptimized
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                       sizes="(max-width: 768px) 100vw, 50vw"
                     />

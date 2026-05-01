@@ -98,6 +98,7 @@ export default async function DestinosPage() {
                         src={dest.card_image_url}
                         alt={dest.country_name}
                         fill
+                        unoptimized
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       />

@@ -131,6 +131,7 @@ export default async function EspanaPage({ searchParams }: Props) {
             src={destination.hero_image_url}
             alt="España"
             fill
+            unoptimized
             className="object-cover"
             priority
             sizes="100vw"
