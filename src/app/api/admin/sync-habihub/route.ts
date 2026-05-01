@@ -188,10 +188,24 @@ function fingerprintMatch(existing: ExistingProp, feed: FeedProp): boolean {
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    await requireAdmin()
-  } catch {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // Auth: Bearer token (cron) O sesión admin (UI manual)
+  const authHeader = request.headers.get('authorization')
+  const expectedToken = process.env.CRON_SECRET
+
+  const isCronAuth = !!expectedToken
+    && !!authHeader
+    && authHeader === `Bearer ${expectedToken}`
+
+  if (!isCronAuth) {
+    // Si no es cron, validar sesión admin (comportamiento histórico)
+    try {
+      await requireAdmin()
+    } catch {
+      return NextResponse.json(
+        { error: 'No autorizado' },
+        { status: 401 }
+      )
+    }
   }
 
   const url = new URL(request.url)

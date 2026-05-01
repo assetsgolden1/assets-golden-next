@@ -1,0 +1,36 @@
+name: Sync HabiHub Weekly
+
+on:
+  schedule:
+    # Lunes 03:00 UTC (05:00 Madrid)
+    - cron: '0 3 * * 1'
+  workflow_dispatch:  # permite disparar manualmente desde GitHub UI
+
+jobs:
+  sync:
+    name: Trigger sync endpoint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call sync endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SYNC_URL: https://assets-golden-next.vercel.app/api/admin/sync-habihub
+        run: |
+          echo "🔄 Disparando sync HabiHub..."
+
+          response=$(curl -sS -w "\nHTTP_STATUS:%{http_code}\n" \
+            -X POST "$SYNC_URL" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json")
+
+          echo "$response"
+
+          status=$(echo "$response" | grep "HTTP_STATUS:" | cut -d: -f2)
+
+          if [ "$status" != "200" ]; then
+            echo "❌ Sync falló con status $status"
+            exit 1
+          fi
+
+          echo "✅ Sync completado exitosamente"
