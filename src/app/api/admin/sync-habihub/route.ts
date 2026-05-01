@@ -5,6 +5,18 @@ import { createClient } from '@/lib/supabase/server'
 import { XMLParser } from 'fast-xml-parser'
 import { randomUUID } from 'node:crypto'
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')                    // descompone acentos
+    .replace(/[̀-ͯ]/g, '')      // remueve diacríticos
+    .replace(/[^a-z0-9\s-]/g, '')         // solo alfanuméricos, espacios, guiones
+    .trim()
+    .replace(/\s+/g, '-')                 // espacios → guion
+    .replace(/-+/g, '-')                  // colapsa guiones múltiples
+    .slice(0, 80)                         // máximo 80 chars (deja margen para sufijo)
+}
+
 export const maxDuration = 300
 export const dynamic = 'force-dynamic'
 
@@ -111,11 +123,24 @@ function parseFeedProp(raw: Record<string, unknown>): FeedProp {
   const typeLabel = TYPE_LABEL_ES[mappedType] ?? 'Propiedad'
   const town = String(raw.town ?? raw.location_detail ?? '')
 
+  // Estructura real del feed Kyero v3: <image id="N"><url>https://...</url></image>
+  // Con attributeNamePrefix='_' y textNodeName='_text', fast-xml-parser produce:
+  //   { _id: "N", url: "https://..." }
+  // Lectura defensiva: aceptamos múltiples formas por si el feed cambia de nuevo.
   const imageList = (raw.images as Record<string, unknown>)?.image
   const images: string[] = Array.isArray(imageList)
-    ? (imageList as unknown[]).map((i) =>
-        typeof i === 'string' ? i : typeof i === 'object' && i !== null ? String((i as Record<string, unknown>)._text ?? '') : ''
-      ).filter(Boolean)
+    ? (imageList as unknown[])
+        .map((i) => {
+          if (typeof i === 'string') return i
+          if (typeof i === 'object' && i !== null) {
+            const obj = i as Record<string, unknown>
+            // Orden de prioridad: url (Kyero v3) > _text (fallback histórico)
+            if (typeof obj.url === 'string') return obj.url
+            if (typeof obj._text === 'string') return obj._text
+          }
+          return ''
+        })
+        .filter((url) => url.length > 0 && url.startsWith('http'))
     : []
 
   const desc = raw.desc as Record<string, unknown> | undefined
@@ -310,8 +335,10 @@ export async function POST(request: NextRequest) {
               price: fp.price,
               description: fp.description,
               description_en: fp.description_en,
-              image_url: fp.image_url,
-              gallery_urls: fp.gallery_urls,
+              // Defensiva: solo actualizar imágenes si el feed parseó valores válidos.
+              // Evita destruir fotos existentes si un futuro cambio del feed rompe el extractor.
+              ...(fp.image_url ? { image_url: fp.image_url } : {}),
+              ...(fp.gallery_urls && fp.gallery_urls.length > 0 ? { gallery_urls: fp.gallery_urls } : {}),
               last_synced_at: new Date().toISOString(),
             },
           })
@@ -351,6 +378,7 @@ export async function POST(request: NextRequest) {
             external_id: fp.externalId,
             external_source: 'habihub',
             title: fp.title,
+            slug: `${slugify(fp.title)}-${fp.externalId}`,
             country: fp.country,
             location: fp.location,
             province: fp.province,
@@ -383,8 +411,10 @@ export async function POST(request: NextRequest) {
               province: fp.province,
               description: fp.description,
               description_en: fp.description_en,
-              image_url: fp.image_url,
-              gallery_urls: fp.gallery_urls,
+              // Defensiva: solo actualizar imágenes si el feed parseó valores válidos.
+              // Evita destruir fotos existentes si un futuro cambio del feed rompe el extractor.
+              ...(fp.image_url ? { image_url: fp.image_url } : {}),
+              ...(fp.gallery_urls && fp.gallery_urls.length > 0 ? { gallery_urls: fp.gallery_urls } : {}),
               last_synced_at: new Date().toISOString(),
             },
           })
