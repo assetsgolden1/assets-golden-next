@@ -1,12 +1,21 @@
+import { redirect } from 'next/navigation'
+import { getUserRole } from '@/lib/auth/getUserRole'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 
-// Auth protegida por middleware (src/middleware.ts)
-// El middleware redirige a /admin/login si no hay sesión activa
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const role = await getUserRole()
+
+  if (role !== 'admin') {
+    if (role === 'agent') {
+      redirect('/portal')
+    }
+    redirect('/admin/login')
+  }
+
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       <AdminSidebar />
