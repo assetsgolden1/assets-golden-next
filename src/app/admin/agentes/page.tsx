@@ -8,12 +8,30 @@ import type { Agent } from '@/types/agent'
 export default async function AdminAgentsPage() {
   await requireAdmin()
 
-  const { data } = await supabaseAdmin
+  const { data: allAgents } = await supabaseAdmin
     .from('agents')
     .select('*')
     .order('created_at', { ascending: false })
 
-  const agents = (data as Agent[]) ?? []
+  // Filtrar a solo usuarios con rol 'agent' en user_roles. Excluye admins que
+  // por error figuren en la tabla agents — borrarlos desde aqui destruiria su
+  // rol y su cuenta auth (ver delete-agent/route.ts).
+  const userIds = (allAgents ?? []).map((a) => a.id)
+  const { data: roles } = userIds.length
+    ? await supabaseAdmin
+        .from('user_roles')
+        .select('user_id, role')
+        .in('user_id', userIds)
+    : { data: [] as { user_id: string; role: string }[] }
+
+  const roleMap = new Map<string, string>()
+  for (const r of roles ?? []) {
+    if (r.user_id && r.role) roleMap.set(r.user_id, r.role)
+  }
+
+  const agents = ((allAgents as Agent[]) ?? []).filter(
+    (a) => roleMap.get(a.id) === 'agent',
+  )
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
