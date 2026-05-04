@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server'
 import { appendLeadToSheets } from '@/lib/googleSheets'
+import { requireAdmin } from '@/lib/auth/getUserRole'
 
 export async function GET() {
+  try {
+    await requireAdmin()
+  } catch {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  }
+
   console.log('[Test] GOOGLE_SHEETS_LEADS_ID:',
     process.env.GOOGLE_SHEETS_LEADS_ID)
   console.log('[Test] GOOGLE_SHEETS_CREDENTIALS_JSON exists:',

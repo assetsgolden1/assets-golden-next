@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/lib/auth/getUserRole'
 
 export async function POST(request: NextRequest) {
+  try {
+    await requireAdmin()
+  } catch {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  }
+
   try {
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
     console.log('[upload] service key exists:', !!serviceKey)

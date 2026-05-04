@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { normalizeLocation } from '@/lib/utils/normalizeLocation'
+import { requireAdmin } from '@/lib/auth/getUserRole'
 
 export async function GET(request: NextRequest) {
+  try {
+    await requireAdmin()
+  } catch {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  }
+
   const country = request.nextUrl.searchParams.get('country')
 
   if (!country) return NextResponse.json({ cities: [] })

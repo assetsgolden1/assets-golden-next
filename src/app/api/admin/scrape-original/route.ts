@@ -1,9 +1,16 @@
 import { NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/auth/getUserRole'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
 export async function GET() {
+  try {
+    await requireAdmin()
+  } catch {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  }
+
   try {
     // Dynamic import prevents puppeteer from being bundled at build time
     const { runScraper } = await import('@/scripts/scrapeOriginalWeb')

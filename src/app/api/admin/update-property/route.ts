@@ -2,8 +2,15 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { normalizeLocation } from '@/lib/utils/normalizeLocation'
+import { requireAdmin } from '@/lib/auth/getUserRole'
 
 export async function POST(request: NextRequest) {
+  try {
+    await requireAdmin()
+  } catch {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  }
+
   const data = await request.json()
   const { id, ...updates } = data
 
