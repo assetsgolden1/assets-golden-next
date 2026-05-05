@@ -73,8 +73,8 @@ commits, próximo paso sugerido.
 - CREATED: `DAILY_LOG.md`
 
 **Commits:**
-- (TBD) `chore(cleanup): borrar carpetas vacías + variable zombie + CSP unused`
-- (TBD) `feat(devx): sistema DAILY_LOG.md para bitácora entre sesiones`
+- `e73892a` — chore(cleanup): borrar carpetas vacías + variable zombie + CSP unused
+- `4cd32b4` — feat(devx): sistema DAILY_LOG.md para bitácora entre sesiones
 
 **Próximo paso sugerido:** Esperar acceso a Resend de Atilio para hacer
 el refactor del pipeline de leads. Mientras tanto, atacar item de
