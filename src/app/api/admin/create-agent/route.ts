@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/auth/getUserRole'
+import { checkRateLimit, mutationRateLimit, getIdentifier } from '@/lib/ratelimit'
 
 function generateTempPassword(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'
@@ -16,6 +17,17 @@ export async function POST(request: NextRequest) {
     await requireAdmin()
   } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const rateLimitCheck = await checkRateLimit(
+    mutationRateLimit,
+    getIdentifier(request)
+  )
+  if (!rateLimitCheck.ok) {
+    return NextResponse.json(
+      { error: 'Too many requests', retryAfter: rateLimitCheck.retryAfter },
+      { status: 429, headers: { 'Retry-After': String(rateLimitCheck.retryAfter) } }
+    )
   }
 
   const body = await request.json()

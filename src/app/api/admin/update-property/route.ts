@@ -3,12 +3,24 @@ import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { normalizeLocation } from '@/lib/utils/normalizeLocation'
 import { requireAdmin } from '@/lib/auth/getUserRole'
+import { checkRateLimit, mutationRateLimit, getIdentifier } from '@/lib/ratelimit'
 
 export async function POST(request: NextRequest) {
   try {
     await requireAdmin()
   } catch {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  }
+
+  const rateLimitCheck = await checkRateLimit(
+    mutationRateLimit,
+    getIdentifier(request)
+  )
+  if (!rateLimitCheck.ok) {
+    return NextResponse.json(
+      { error: 'Too many requests', retryAfter: rateLimitCheck.retryAfter },
+      { status: 429, headers: { 'Retry-After': String(rateLimitCheck.retryAfter) } }
+    )
   }
 
   const data = await request.json()

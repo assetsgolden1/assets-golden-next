@@ -1,12 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/auth/getUserRole'
+import { checkRateLimit, mutationRateLimit, getIdentifier } from '@/lib/ratelimit'
 
 export async function POST(request: NextRequest) {
   try {
     await requireAdmin()
   } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const rateLimitCheck = await checkRateLimit(
+    mutationRateLimit,
+    getIdentifier(request)
+  )
+  if (!rateLimitCheck.ok) {
+    return NextResponse.json(
+      { error: 'Too many requests', retryAfter: rateLimitCheck.retryAfter },
+      { status: 429, headers: { 'Retry-After': String(rateLimitCheck.retryAfter) } }
+    )
   }
 
   const { id, active } = await request.json()

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { requireAdmin } from '@/lib/auth/getUserRole'
 import { createClient } from '@/lib/supabase/server'
+import { checkRateLimit, syncRateLimit, getIdentifier } from '@/lib/ratelimit'
 import { XMLParser } from 'fast-xml-parser'
 import { randomUUID } from 'node:crypto'
 
@@ -206,6 +207,17 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       )
     }
+  }
+
+  const rateLimitCheck = await checkRateLimit(
+    syncRateLimit,
+    getIdentifier(request)
+  )
+  if (!rateLimitCheck.ok) {
+    return NextResponse.json(
+      { error: 'Too many requests', retryAfter: rateLimitCheck.retryAfter },
+      { status: 429, headers: { 'Retry-After': String(rateLimitCheck.retryAfter) } }
+    )
   }
 
   const url = new URL(request.url)
