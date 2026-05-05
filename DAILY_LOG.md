@@ -1,0 +1,85 @@
+# Daily Log — Assets Golden Next
+
+> Bitácora operativa del proyecto. Claude Code lee este archivo al
+> iniciar sesión y lo actualiza al cerrar. NO modificar manualmente
+> la sección "Historial de sesiones" — solo agregar entradas nuevas
+> arriba.
+
+---
+
+## 🔴 Pendientes activos (orden de prioridad)
+
+Lista viva. Claude Code la actualiza al final de cada sesión:
+marca con `[x]` lo terminado, agrega nuevos pendientes detectados,
+reordena si la prioridad cambió.
+
+### Bloqueantes para go-live
+- [ ] Captcha Cloudflare Turnstile en formularios públicos (3 endpoints + 1 server action)
+- [ ] Refactor pipeline de leads: eliminar n8n, consolidar en `processLead`, agregar Resend a todos los endpoints (depende de acceso Resend de Atilio)
+- [ ] Rotación de claves SUPABASE_SERVICE_ROLE_KEY y GOOGLE_SHEETS_CREDENTIALS_JSON
+- [ ] Páginas legales GDPR: política de privacidad, términos, banner cookies
+- [ ] Aviso GDPR en formularios `/contacto` y `/mi-demanda`
+- [ ] DNS de Atilio para conectar dominio assetsgolden.com
+
+### Importantes (post go-live)
+- [ ] Audit log de cambios admin
+- [ ] Migración de 166 imágenes legacy de Lovable a Supabase actual
+- [ ] Test PDF en producción end-to-end con agente real
+- [ ] Auditoría proyecto Supabase huérfano `yagrwbmsufpvjcgxkuoz`
+- [ ] Definir criterios `/inversiones` con Atilio
+- [ ] Monitoreo del cron y alertas
+
+### Limpieza técnica
+- [ ] Borrar backup `properties_backup_20260429` (después de 1-2 crons sin issues)
+- [ ] Limpiar variable zombie `conflictIds` del sync
+- [x] Borrar carpeta vacía `src/app/admin/destinos/`
+- [x] Borrar carpeta vacía `src/app/api/admin/update-destino/`
+- [x] CSP: remover `api.anthropic.com`
+- [x] Verificar bucket `team-photos` en Supabase (existe, público)
+
+### Pendientes operativos (Atilio)
+- [ ] Acceso a cuenta Resend (dominio assetsgolden.com ya está verificado en su cuenta)
+- [ ] Email del socio para crear cuenta admin
+- [ ] Acceso al panel DNS del dominio
+- [ ] Validar criterios `/inversiones`
+- [ ] Firma de contrato comercial formal
+- [ ] Decisión sobre infraestructura (cuentas IBott vs Assets Golden)
+- [ ] Acceso Meta Business Manager, Google Ads, GA4, Search Console (Fase 2)
+
+---
+
+## 📝 Historial de sesiones
+
+Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
+Formato: fecha, contexto, decisiones tomadas, archivos tocados,
+commits, próximo paso sugerido.
+
+---
+
+### Sesión 2026-05-06 (cleanup técnico + sistema DAILY_LOG)
+
+**Contexto:** sesión de limpieza menor + introducción del sistema DAILY_LOG.
+
+**Trabajo hecho:**
+- Borradas carpetas vacías `src/app/admin/destinos/` y `src/app/api/admin/update-destino/`
+- Eliminada variable zombie `conflictIds` del sync HabiHub (era Set sin .add())
+- Removido `api.anthropic.com` del CSP de next.config.ts (no se usaba)
+- Verificado bucket `team-photos` en Supabase (existe y está OK)
+- Creado este DAILY_LOG.md con el sistema de bitácora
+
+**Archivos tocados:**
+- DELETED: `src/app/admin/destinos/`, `src/app/api/admin/update-destino/`
+- MODIFIED: `src/app/api/admin/sync-habihub/route.ts`, `next.config.ts`, `CLAUDE.md`
+- CREATED: `DAILY_LOG.md`
+
+**Commits:**
+- (TBD) `chore(cleanup): borrar carpetas vacías + variable zombie + CSP unused`
+- (TBD) `feat(devx): sistema DAILY_LOG.md para bitácora entre sesiones`
+
+**Próximo paso sugerido:** Esperar acceso a Resend de Atilio para hacer
+el refactor del pipeline de leads. Mientras tanto, atacar item de
+pendientes activos (auditoría de claves o páginas legales GDPR).
+
+---
+
+*Última edición automática por Claude Code: 2026-05-06*
