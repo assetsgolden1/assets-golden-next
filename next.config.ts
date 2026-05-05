@@ -79,7 +79,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' blob: data: https://mromkwpqrxpxbbxhdofs.supabase.co https://wloneprkibfjioxwypaw.supabase.co https://*.supabase.co https://images.unsplash.com https://source.unsplash.com https://medianewbuild.com",
-              "connect-src 'self' https://*.supabase.co https://api.anthropic.com",
+              "connect-src 'self' https://*.supabase.co",
               "media-src 'self'",
               "frame-src 'none'",
             ].join("; "),

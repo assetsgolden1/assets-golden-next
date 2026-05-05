@@ -343,7 +343,6 @@ export async function POST(request: NextRequest) {
 
     // Fase 3 — matching contra la DB
     const processedIds = new Set<string>()
-    const conflictIds = new Set<string>()
     const toUpdateById: { id: string; data: Record<string, unknown> }[] = []
     const toUpdateByFp: { id: string; data: Record<string, unknown> }[] = []
     const toInsert: Record<string, unknown>[] = []
@@ -375,9 +374,8 @@ export async function POST(request: NextRequest) {
         const fpCandidates = allExisting.filter((e) => fingerprintMatch(e, fp))
 
         // 2.b — Huella ambigua: el feed es la fuente de verdad. Logueamos
-        // el conflict pero NO lo agregamos a conflictIds y NO continue:
-        // caemos al flujo de INSERT que sigue. Los candidatos viejos
-        // caerán en el DELETE de Fase 4 si están dentro del scope.
+        // el conflict y caemos al flujo de INSERT que sigue. Los candidatos
+        // viejos caerán en el DELETE de Fase 4 si están dentro del scope.
         if (fpCandidates.length > 1) {
           stats.conflicts++
           if (conflictDetails.length < 100) {
@@ -460,9 +458,7 @@ export async function POST(request: NextRequest) {
     )
     totalInScope = deleteScopeAll.length
 
-    const toDelete = deleteScopeAll.filter((p) =>
-      !processedIds.has(p.id) && !conflictIds.has(p.id)
-    )
+    const toDelete = deleteScopeAll.filter((p) => !processedIds.has(p.id))
     const deletedCount = toDelete.length
     stats.deleted_count = deletedCount
 
