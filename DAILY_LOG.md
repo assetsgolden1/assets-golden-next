@@ -56,6 +56,58 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-06 — sesión 2 (auditoría de claves + plan de rotación)
+
+**Contexto:** Iván pidió un diagnóstico completo del estado de
+secretos del proyecto antes de ejecutar la rotación pendiente. Solo
+lectura — sin modificaciones, sin rotación.
+
+**Trabajo hecho:**
+- Verificado historial git completo (`--all --full-history`) para
+  `.env`, `.env.local`, `.env.development`, `.env.production` y
+  variantes `.bak/.old/.backup`: ninguno commiteado nunca
+- Auditado `.gitignore`: cubre `.env*` y `*.pem`; falta `*.key`
+  (recomendación menor, no bloqueante)
+- Búsqueda exhaustiva de secretos hardcoded en src/scripts/supabase
+  (patrones JWT Supabase, Stripe, OAuth, AWS, PRIVATE KEY,
+  literales API_KEY/SECRET/TOKEN): **0 matches críticos**, todo
+  pasa por `process.env.X`
+- Mapeados los 16 archivos que consumen `SUPABASE_SERVICE_ROLE_KEY`
+  (6 runtime + 10 scripts CLI) y los 2 que consumen
+  `GOOGLE_SHEETS_CREDENTIALS_JSON`
+- Inventariadas 16 env vars del proyecto, clasificadas en
+  pública/sensible/config
+- Plan de rotación documentado para ambas claves con orden, smoke
+  tests, rollback y blockers identificados
+- Hallazgos menores anotados: `test-sheets/route.ts` logea
+  Sheet ID completo en Vercel logs; `debug-env/route.ts` existió
+  en historia (sin leak real, ya removido); SA Google compartida
+  con proyecto agencia (relevante para Opción A vs B)
+
+**Severidad global del audit:** 🟢 BAJA — no hay exposición real, la
+rotación es preventiva.
+
+**Archivos tocados:**
+- CREATED: `outputs/security-audit-2026-05-06.md`
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** ninguno todavía — pendiente de OK del usuario.
+
+**Próximo paso sugerido:**
+1. Iván revisa `outputs/security-audit-2026-05-06.md`.
+2. Confirmar antes de rotar:
+   - Titularidad/acceso al Supabase Dashboard `mromkwpqrxpxbbxhdofs`
+   - Titularidad/acceso a GCP Console `agencia-automatizacion-490823`
+   - Si la SA `assets-golden-sheets@…` se comparte con n8n/agencia
+     (decide Opción A vs B para rotar Sheets)
+3. Coordinar ventana de mantenimiento (~15 min) en horario bajo-tráfico
+4. Ejecutar rotación: primero `SUPABASE_SERVICE_ROLE_KEY`, después
+   `GOOGLE_SHEETS_CREDENTIALS_JSON`. Opcionalmente aprovechar para
+   rotar también `CRON_SECRET`, `RESEND_API_KEY`,
+   `UPSTASH_REDIS_REST_TOKEN`.
+
+---
+
 ### Sesión 2026-05-06 (cleanup técnico + sistema DAILY_LOG)
 
 **Contexto:** sesión de limpieza menor + introducción del sistema DAILY_LOG.
@@ -82,4 +134,4 @@ pendientes activos (auditoría de claves o páginas legales GDPR).
 
 ---
 
-*Última edición automática por Claude Code: 2026-05-06*
+*Última edición automática por Claude Code: 2026-05-06 (sesión 2)*
