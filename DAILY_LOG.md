@@ -17,7 +17,9 @@ reordena si la prioridad cambió.
 - [ ] Captcha Cloudflare Turnstile en formularios públicos (3 endpoints + 1 server action)
 - [ ] Refactor pipeline de leads: eliminar n8n, consolidar en `processLead`, agregar Resend a todos los endpoints (depende de acceso Resend de Atilio)
 - [ ] Rotación de claves SUPABASE_SERVICE_ROLE_KEY y GOOGLE_SHEETS_CREDENTIALS_JSON
-- [ ] Páginas legales GDPR: política de privacidad, términos, banner cookies
+- [ ] Páginas legales GDPR: política de privacidad, términos, banner cookies (BORRADORES creados con [PLACEHOLDER]; pendiente validación legal y banner)
+- [ ] Atilio o asesor legal: validar texto de las 3 páginas legales (`/politica-de-privacidad`, `/aviso-legal`, `/politica-de-cookies`) y reemplazar todos los `[PLACEHOLDER: …]` por valores reales (razón social, CIF, domicilio, registro mercantil, teléfono, emails, jurisdicción)
+- [ ] Atilio: aceptar/firmar los DPAs en los dashboards de Supabase, Vercel, Cloudflare, Google, Resend y Upstash. Algunos requieren accept-click, otros solicitar al soporte. Sin DPA aceptado, la frase de la política de privacidad §5 es inexacta.
 - [ ] Aviso GDPR en formularios `/contacto` y `/mi-demanda`
 - [ ] DNS de Atilio para conectar dominio assetsgolden.com
 
@@ -53,6 +55,78 @@ reordena si la prioridad cambió.
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 Formato: fecha, contexto, decisiones tomadas, archivos tocados,
 commits, próximo paso sugerido.
+
+---
+
+### Sesión 2026-05-06 — sesión 3 (páginas legales GDPR — borradores)
+
+**Contexto:** Iván pidió crear las páginas legales GDPR-compliant
+requeridas antes del go-live: política de privacidad, aviso legal y
+política de cookies. Banner de cookies + checkbox GDPR queda fuera
+de esta sesión (depende de captcha + refactor de leads).
+
+**Trabajo hecho:**
+- Detectado en PASO 1 que `/politica-de-privacidad` ya existía
+  (legacy de Lovable, 10 secciones razonables pero con datos
+  hardcoded y secciones faltantes); decidida con el usuario la
+  Opción B (ampliar manteniendo estructura)
+- Reescrita `/politica-de-privacidad` con secciones añadidas:
+  identidad completa (CIF, registro mercantil), transferencias
+  internacionales (EU-US DPF + SCCs), lista completa de proveedores
+  (Supabase, Vercel, Cloudflare, Resend, Google, Upstash), referencias
+  a artículos del RGPD (15-22), citas a LOPDGDD y LSSI-CE
+- Convertidos a `[PLACEHOLDER: …]` todos los datos hardcoded
+  (razón social, CIF, domicilio, registro mercantil, teléfono,
+  emails, jurisdicción) con sufijo del valor sospechado y nota
+  para confirmación con Atilio
+- Creada `/aviso-legal` desde cero con 10 secciones LSSI-CE Art. 10:
+  identificación del prestador, objeto y aceptación, condiciones
+  de uso, propiedad intelectual, información sobre los inmuebles
+  (no constituye oferta contractual), limitación de responsabilidad,
+  comunicaciones electrónicas, protección de datos, modificaciones,
+  legislación aplicable y jurisdicción
+- Creada `/politica-de-cookies` desde cero con 8 secciones según
+  guía AEPD: definición, tipos (técnicas estrictamente necesarias
+  con tabla detallada de cookies Supabase/Cloudflare/Vercel,
+  analíticas previstas con GA4, publicitarias previstas con Meta
+  Pixel/Google Ads), base jurídica, gestión y revocación con
+  enlaces a navegadores, transferencias internacionales,
+  retención (24 meses AEPD), modificaciones
+- Footer (`src/components/Footer.tsx`): agregados enlaces a
+  `/aviso-legal` y `/politica-de-cookies` junto al ya existente de
+  privacidad en el bottom-bar; ajustado layout para que envuelva en
+  móvil
+- Sitemap (`src/app/sitemap.ts`): añadidas las 3 rutas con
+  `priority: 0.3` y `changeFrequency: 'yearly'`
+- Build limpio: `Compiled successfully` + `Finished TypeScript`,
+  las 3 rutas legales aparecen como `○ (Static)`
+
+**Archivos tocados:**
+- MODIFIED: `src/app/(public)/politica-de-privacidad/page.tsx`
+  (reescrita, v1.0 → v2.0)
+- CREATED: `src/app/(public)/aviso-legal/page.tsx`
+- CREATED: `src/app/(public)/politica-de-cookies/page.tsx`
+- MODIFIED: `src/components/Footer.tsx`
+- MODIFIED: `src/app/sitemap.ts`
+- MODIFIED: `DAILY_LOG.md` (esta entrada + nuevo pendiente Atilio)
+
+**Commits:** ninguno todavía — pendiente de validación visual del
+usuario.
+
+**Próximo paso sugerido:**
+1. Iván abre las 3 páginas en el dev server y revisa visualmente
+   (espaciado, jerarquía, tabla de cookies en mobile).
+2. Una vez validado: commit + push.
+3. Después atacar uno de los siguientes pendientes activos:
+   - **Banner de cookies + GDPR checkbox** en formularios
+     (pareja natural: aprovechar para integrar Cloudflare Turnstile
+     en los 3 endpoints + 1 server action que ya están como
+     bloqueante go-live)
+   - O esperar acceso Resend de Atilio para refactor pipeline leads
+4. Cuando Atilio tenga lista la documentación legal real (CIF,
+   registro mercantil, dirección completa, emails de privacidad),
+   reemplazar los `[PLACEHOLDER: …]` en las 3 páginas + bottom-bar
+   del footer si la razón social difiere de "CFG Global Investment S.L.".
 
 ---
 
@@ -134,4 +208,4 @@ pendientes activos (auditoría de claves o páginas legales GDPR).
 
 ---
 
-*Última edición automática por Claude Code: 2026-05-06 (sesión 2)*
+*Última edición automática por Claude Code: 2026-05-06 (sesión 3)*
