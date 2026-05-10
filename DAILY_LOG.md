@@ -30,6 +30,7 @@ reordena si la prioridad cambió.
 - [ ] Auditoría proyecto Supabase huérfano `yagrwbmsufpvjcgxkuoz`
 - [ ] Definir criterios `/inversiones` con Atilio
 - [ ] Monitoreo del cron y alertas
+- [ ] Opt-out de AI training en Vercel Team Settings (revisar al migrar a Pro). Iván buscó en General, Security & Privacy, Billing, Members, Drains, Alerts del plan Hobby actual — toggle no visible. Posibilidades: (a) opción solo disponible en Pro, (b) Vercel movió/eliminó el setting, (c) está en sub-página no obvia. Re-evaluar después de upgrade.
 
 ### Limpieza técnica
 - [ ] Borrar backup `properties_backup_20260429` (después de 1-2 crons sin issues)
@@ -57,6 +58,54 @@ reordena si la prioridad cambió.
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 Formato: fecha, contexto, decisiones tomadas, archivos tocados,
 commits, próximo paso sugerido.
+
+---
+
+### Sesión 2026-05-10 — sesión 8 (fix extractor HabiHub — dedup URLs de fotos)
+
+**Contexto:** Después del último sync se encontraron 48 propiedades (2%
+del total) con URLs duplicadas en `gallery_urls`. Iván ejecutó SQL directo
+en producción para limpiarlas (176 duplicados eliminados — no hay commit,
+fue operación MCP directa). El bug estaba en el extractor del sync: el
+array de imágenes del XML de HabiHub se asignaba sin deduplicar.
+
+**Diagnóstico:** En `parseFeedProp()` (sync-habihub/route.ts), el array
+`images` se construía con `.filter(url => url.length > 0 && url.startsWith('http'))`
+pero sin eliminar repetidos. Luego se asignaba directo a `gallery_urls: images`.
+El feed de HabiHub incluye URLs duplicadas en algunas propiedades, y sin
+dedup en el extractor, cada sync lunes 03:00 UTC reintroducía los duplicados.
+
+**Trabajo hecho:**
+- Añadida función `dedupeImageUrls(urls: string[]): string[]` justo antes
+  de `parseFeedProp` (línea 122). Preserva orden original (primera ocurrencia
+  gana, usando Set + loop en lugar de `[...new Set()]` para control explícito
+  de orden y filtrado de vacíos)
+- En `parseFeedProp`: `const deduped = dedupeImageUrls(images)` antes del
+  return; ambos campos ahora usan el array limpio:
+  `image_url: deduped[0] ?? null` y `gallery_urls: deduped`
+- Build limpio: `Compiled successfully in 17.1s`, TypeScript OK, 1108 páginas
+
+**Nota operativa:** El SQL de dedup retroactivo (48 props, 176 fotos) fue
+ejecutado por Iván desde Supabase MCP en sesión anterior — sin commit en el
+repo, es una operación de datos, no de código.
+
+**No hay tests del sync** — el extractor no tiene test suite propia. Para
+validar habría que ejecutar el sync manual desde `/admin/sync` en staging/prod
+y verificar que las propiedades previamente afectadas no vuelvan a tener
+duplicados. Recomendable hacer la comprobación el próximo lunes tras el cron.
+
+**Archivos tocados:**
+- MODIFIED: `src/app/api/admin/sync-habihub/route.ts` (+12 líneas: helper + 2 cambios)
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** ninguno todavía — pendiente de validación.
+
+**Próximo paso sugerido:**
+1. Iván valida el diff y autoriza commit
+2. Verificar post-cron del lunes 13/05: que las 48 propiedades no vuelvan
+   a tener duplicados en `gallery_urls`
+3. Decidir si se ataca el límite de 6 fotos en la galería pública
+   (`/propiedades/[slug]/page.tsx:68` → `.slice(0, 6)`) — trivial
 
 ---
 
@@ -415,4 +464,4 @@ pendientes activos (auditoría de claves o páginas legales GDPR).
 
 ---
 
-*Última edición automática por Claude Code: 2026-05-10 (sesión 7)*
+*Última edición automática por Claude Code: 2026-05-10 (sesión 8)*

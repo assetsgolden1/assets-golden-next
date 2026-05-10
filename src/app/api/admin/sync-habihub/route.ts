@@ -119,6 +119,18 @@ interface DeletedSample {
   title: string
 }
 
+function dedupeImageUrls(urls: string[]): string[] {
+  const seen = new Set<string>()
+  const result: string[] = []
+  for (const url of urls) {
+    if (url && !seen.has(url)) {
+      seen.add(url)
+      result.push(url)
+    }
+  }
+  return result
+}
+
 function parseFeedProp(raw: Record<string, unknown>): FeedProp {
   const rawType = String(raw.type ?? '')
   const mappedType = mapType(rawType)
@@ -150,6 +162,7 @@ function parseFeedProp(raw: Record<string, unknown>): FeedProp {
   const descEn = desc?.en ? String(desc.en) : null
 
   const surfaceArea = raw.surface_area as Record<string, unknown> | undefined
+  const deduped = dedupeImageUrls(images)
 
   return {
     externalId: String(raw.id ?? '').trim(),
@@ -164,8 +177,8 @@ function parseFeedProp(raw: Record<string, unknown>): FeedProp {
     area_sqm: parseFloat(String(surfaceArea?.built ?? '0')) || 0,
     description: descEs,
     description_en: descEn,
-    image_url: images[0] ?? null,
-    gallery_urls: images,
+    image_url: deduped[0] ?? null,
+    gallery_urls: deduped,
   }
 }
 
