@@ -34,6 +34,8 @@ reordena si la prioridad cambió.
 ### Limpieza técnica
 - [ ] Borrar backup `properties_backup_20260429` (después de 1-2 crons sin issues)
 - [ ] Limpiar variable zombie `conflictIds` del sync
+- [ ] Actualizar `fast-xml-parser` de `^5.5.12` a `^5.7.0` (vuln MODERATE: XML comment/CDATA injection)
+- [ ] Corregir `react-hooks/set-state-in-effect` en `nueva-propiedad/page.tsx:34` y `PortalPropertiesGrid.tsx:341` (nueva regla React 19 en eslint-config-next@16.2.6)
 - [x] Borrar carpeta vacía `src/app/admin/destinos/`
 - [x] Borrar carpeta vacía `src/app/api/admin/update-destino/`
 - [x] CSP: remover `api.anthropic.com`
@@ -55,6 +57,95 @@ reordena si la prioridad cambió.
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 Formato: fecha, contexto, decisiones tomadas, archivos tocados,
 commits, próximo paso sugerido.
+
+---
+
+### Sesión 2026-05-10 — sesión 6 (security patch Next.js + React)
+
+**Contexto:** Vulnerabilidades de seguridad de mayo 2026 (auth bypass
+via segment-prefetch URL, dynamic route parameter injection). Diagnóstico
+previo confirmó patch update (no major/minor), riesgo mínimo.
+
+**Trabajo hecho:**
+- Aplicado `npm install next@16.2.6 react@19.2.6 react-dom@19.2.6 eslint-config-next@16.2.6`
+  (7 packages changed, 722 auditados)
+- Build limpio post-update: `Compiled successfully in 16.6s`, TypeScript OK,
+  1108 páginas estáticas generadas (mismo count que antes del patch)
+- Lint: 27 problemas (9 errores, 18 warnings) — todos pre-existentes EXCEPTO
+  posiblemente los 2 errores `react-hooks/set-state-in-effect` (nueva regla
+  habilitada en eslint-config-next@16.2.6, ver hallazgos)
+- Diff stat verificado: solo `package.json` y `package-lock.json` modificados
+  en esta sesión (src/ intacto)
+
+**Hallazgos del `npm audit` (9 vulnerabilidades, NINGUNA introducida por
+este patch — son transitorias pre-existentes):**
+- `fast-xml-parser@5.5.12` (dep directa) — MODERATE, vulnerable <5.7.0.
+  **ACCIONABLE:** actualizar a `^5.7.0`. Agregado a pendientes.
+- `postcss` via next@16.2.6 — el fix requeriría next@9.3.3 (downgrade
+  catastrófico). Es un falso positivo del npm audit. NO correr
+  `npm audit fix --force`. Bloqueado hasta que Vercel publique next@16.3.0+.
+- `hono@4.12.12`, `express-rate-limit@8.3.2`, `ip-address` — transitivas
+  vía `shadcn → @modelcontextprotocol/sdk`. No accionable sin actualizar shadcn.
+- `basic-ftp`, `fast-uri` — origen probable puppeteer/googleapis. No accionable.
+
+**Errores lint potencialmente nuevos** (habilitados por eslint-config-next@16.2.6):
+- `react-hooks/set-state-in-effect` en `src/app/admin/nueva-propiedad/page.tsx:34`
+  y `src/components/portal/PortalPropertiesGrid.tsx:341`. No son bugs críticos
+  pero sí anti-patrón en React 19. Agregado a pendientes limpieza técnica.
+
+**Archivos tocados:**
+- MODIFIED: `package.json` (4 versiones bumpeadas)
+- MODIFIED: `package-lock.json` (7 packages actualizados)
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** ninguno todavía — pendiente de validación visual.
+
+**Próximo paso sugerido:**
+1. Iván confirma que el build/lint es el esperado y autoriza commit
+2. Resolver `fast-xml-parser` (`npm install fast-xml-parser@^5.7.0`) en la
+   misma sesión o en una siguiente
+3. Atacar `react-hooks/set-state-in-effect` como limpieza técnica menor
+4. Próximo bloqueante go-live: Captcha Cloudflare Turnstile
+
+---
+
+### Sesión 2026-05-10 — sesión 5 (filtro destacadas admin — conteos en tabs)
+
+**Contexto:** Iván pidió que Atilio pueda ver rápido las propiedades
+con `featured=true` desde `/admin/propiedades`. Al explorar el código
+se detectó que el tab "Destacadas" ya existía; lo que faltaba eran los
+**conteos numéricos** en los tabs ("Todas (N)" / "Destacadas (N)").
+
+**Trabajo hecho:**
+- Eliminada la constante estática `TABS` del módulo; movida dentro
+  del server component para poder inyectar counts dinámicos
+- Agregadas 2 queries HEAD en paralelo al `Promise.all` existente:
+  count total del catálogo (sin filtros) y count solo `featured=true`
+- Los tabs "Todas" y "Destacadas" ahora muestran el conteo entre
+  paréntesis con `toLocaleString('es-ES')`; los demás tabs sin count
+- TypeScript: la guarda inicial `'count' in tab` no estrechaba el tipo
+  cuando la propiedad es opcional; corregida a `tab.count !== undefined`
+- Build limpio: `Compiled successfully` + todas las páginas estáticas
+  generadas sin errores
+
+**Patrón elegido:** Opción A (URL query param, `?filter=featured`).
+Era el patrón ya existente en la página; sin cambios al cliente ni
+al componente `PropiedadesTable`.
+
+**Archivos tocados:**
+- MODIFIED: `src/app/admin/propiedades/page.tsx`
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** ninguno todavía — pendiente de validación visual.
+
+**Próximo paso sugerido:**
+1. Iván valida visualmente que los tabs muestran los conteos correctos
+   y que el tab "Destacadas" filtra bien
+2. Una vez validado: commit + push (junto con sesión 4 si aún no se
+   hizo)
+3. Próximos pendientes bloqueantes go-live:
+   - Captcha Cloudflare Turnstile (mayor prioridad)
+   - Refactor pipeline leads cuando llegue acceso Resend de Atilio
 
 ---
 
@@ -269,4 +360,4 @@ pendientes activos (auditoría de claves o páginas legales GDPR).
 
 ---
 
-*Última edición automática por Claude Code: 2026-05-10 (sesión 4)*
+*Última edición automática por Claude Code: 2026-05-10 (sesión 6)*

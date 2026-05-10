@@ -3,14 +3,6 @@ import { PropiedadesTable, type PropertyRow } from '@/components/admin/Propiedad
 
 const PAGE_SIZE = 20
 
-const TABS = [
-  { key: '', label: 'Todas' },
-  { key: 'visible', label: 'Visibles' },
-  { key: 'hidden', label: 'Ocultas' },
-  { key: 'sold', label: 'Vendidas' },
-  { key: 'featured', label: 'Destacadas' },
-]
-
 export default async function PropiedadesPage({
   searchParams,
 }: {
@@ -36,8 +28,8 @@ export default async function PropiedadesPage({
   const filter = params.filter ?? ''
   const offset = page * PAGE_SIZE
 
-  // Queries en paralelo: filtros vía RPC (DISTINCT server-side) + principal
-  const [filtersResult, citiesResult, priceResult, mainResult] = await Promise.all([
+  // Queries en paralelo: filtros vía RPC (DISTINCT server-side) + principal + counts para tabs
+  const [filtersResult, citiesResult, priceResult, mainResult, allCountResult, featuredCountResult] = await Promise.all([
     // Países y tipos únicos — GROUP BY en la DB, sin límite de rows
     supabaseAdmin.rpc('get_property_filters'),
 
@@ -92,7 +84,24 @@ export default async function PropiedadesPage({
 
       return q
     })(),
+
+    // Count total del catálogo (sin filtros de tab) para badge "Todas"
+    supabaseAdmin.from('properties').select('*', { count: 'exact', head: true }),
+
+    // Count solo destacadas para badge "Destacadas"
+    supabaseAdmin.from('properties').select('*', { count: 'exact', head: true }).eq('featured', true),
   ])
+
+  const totalFeatured = featuredCountResult.count ?? 0
+  const totalAll = allCountResult.count ?? 0
+
+  const TABS = [
+    { key: '', label: 'Todas', count: totalAll },
+    { key: 'visible', label: 'Visibles' },
+    { key: 'hidden', label: 'Ocultas' },
+    { key: 'sold', label: 'Vendidas' },
+    { key: 'featured', label: 'Destacadas', count: totalFeatured },
+  ]
 
   // Si el RPC aún no existe, caer de vuelta a listas vacías (no rompe la UI)
   const rpcFilters = filtersResult.data as {
@@ -162,6 +171,13 @@ export default async function PropiedadesPage({
               }`}
             >
               {tab.label}
+              {tab.count !== undefined && (
+                <span className={`ml-1.5 text-xs font-normal ${
+                  filter === tab.key ? 'text-[#0a1628]/70' : 'text-gray-400'
+                }`}>
+                  ({tab.count.toLocaleString('es-ES')})
+                </span>
+              )}
             </a>
           )
         })}
