@@ -62,6 +62,45 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-10 — resumen del día (sesiones 1-9 + housekeeping)
+
+**Resumen ejecutivo de todo el 2026-05-10:**
+
+| Commit | Sesión | Qué |
+|---|---|---|
+| `43142d2` | s6 | Security patch Next.js 16.2.6 + React 19.2.6 |
+| `454f638` | s7 | BotID Basic en 3 endpoints + 1 server action |
+| `4c5134a` | s8 | Fix extractor HabiHub — dedup URLs fotos |
+| `03f1e70` | s9 | Fotos múltiples: público sin límite, create form, ⭐ Principal |
+
+**También hoy (sin commit de código, operaciones MCP/datos):**
+- Dedup retroactivo de fotos: 48 propiedades, 176 URLs duplicadas
+  eliminadas vía SQL en producción (backup en
+  `gallery_urls_backup_dedup_20260510` — borrar en 1-2 semanas)
+- `.gitignore` actualizado para excluir `outputs/inventario-servicios.md`
+
+**Commits anteriores referenciados en el day-log:**
+- `adbb6fc` — páginas legales GDPR (sesión 3, 2026-05-06)
+- `b324d1d` — audit log admin (sesión 4, 2026-05-10)
+- `e9e0ca7` — filtro destacadas con conteo en tabs (sesión 5, 2026-05-10)
+
+**Próximo paso sugerido:**
+Esperando respuesta de Atilio en 6 puntos pendientes:
+1. Acceso Resend → desbloquea refactor pipeline de leads (bloqueante go-live)
+2. Datos legales reales (CIF, domicilio, etc.) → reemplazar PLACEHOLDERs
+3. DNS → conectar assetsgolden.com
+4. Decisión titularidad infra (IBott vs Assets Golden)
+5. SA Google sheets — ¿compartida con n8n/agencia? → decide cómo rotar
+6. DPAs: aceptar en Supabase, Vercel, Cloudflare, Google, Resend, Upstash
+
+Mientras tanto, pendientes atacables independientes de Atilio:
+- Aviso GDPR en formularios `/contacto` y `/mi-demanda`
+- Refactor `<PropertyGalleryUpload />` (componente compartido create/edit)
+- Lint: `react-hooks/set-state-in-effect` en `PortalPropertiesGrid.tsx:341`
+- Actualizar `fast-xml-parser` a `^5.7.0` (vuln MODERATE)
+
+---
+
 ### Sesión 2026-05-10 — sesión 9 (fotos propiedades: mostrar todas, galería en create, imagen principal elegible)
 
 **Contexto:** Después del dedup retroactivo (sesión 8) y el fix del
@@ -534,4 +573,4 @@ pendientes activos (auditoría de claves o páginas legales GDPR).
 
 ---
 
-*Última edición automática por Claude Code: 2026-05-10 (sesión 9)*
+*Última edición automática por Claude Code: 2026-05-10 (cierre del día)*
