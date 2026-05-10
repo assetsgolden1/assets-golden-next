@@ -2,6 +2,7 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/auth/getUserRole'
+import { logAdminAction } from '@/lib/audit'
 
 // Propiedades
 export async function toggleFeatured(id: string, featured: boolean) {
@@ -10,7 +11,16 @@ export async function toggleFeatured(id: string, featured: boolean) {
   } catch {
     throw new Error('No autorizado: requiere rol admin')
   }
+  const { data: prop } = await supabaseAdmin
+    .from('properties').select('title').eq('id', id).maybeSingle()
   await supabaseAdmin.from('properties').update({ featured }).eq('id', id)
+  await logAdminAction({
+    action: 'toggle_featured',
+    entity_type: 'property',
+    entity_id: id,
+    entity_label: prop?.title ?? null,
+    metadata: { featured },
+  })
   revalidatePath('/admin/propiedades')
   revalidatePath('/admin/destacadas')
 }
@@ -21,7 +31,16 @@ export async function togglePropertyVisibility(id: string, hidden: boolean) {
   } catch {
     throw new Error('No autorizado: requiere rol admin')
   }
+  const { data: prop } = await supabaseAdmin
+    .from('properties').select('title').eq('id', id).maybeSingle()
   await supabaseAdmin.from('properties').update({ hidden }).eq('id', id)
+  await logAdminAction({
+    action: 'toggle_hidden',
+    entity_type: 'property',
+    entity_id: id,
+    entity_label: prop?.title ?? null,
+    metadata: { hidden },
+  })
   revalidatePath('/admin/propiedades')
   revalidatePath('/propiedades')
 }
@@ -32,7 +51,15 @@ export async function deleteProperty(id: string) {
   } catch {
     throw new Error('No autorizado: requiere rol admin')
   }
+  const { data: prop } = await supabaseAdmin
+    .from('properties').select('title').eq('id', id).maybeSingle()
   await supabaseAdmin.from('properties').delete().eq('id', id)
+  await logAdminAction({
+    action: 'delete_property',
+    entity_type: 'property',
+    entity_id: id,
+    entity_label: prop?.title ?? null,
+  })
   revalidatePath('/admin/propiedades')
   revalidatePath('/propiedades')
 }
@@ -54,7 +81,21 @@ export async function bulkDeleteProperties(ids: string[]) {
   } catch {
     throw new Error('No autorizado: requiere rol admin')
   }
+  const { data: targets } = await supabaseAdmin
+    .from('properties')
+    .select('id, title')
+    .in('id', ids)
   await supabaseAdmin.from('properties').delete().in('id', ids)
+  await logAdminAction({
+    action: 'bulk_delete_properties',
+    entity_type: 'property',
+    entity_id: null,
+    entity_label: `${ids.length} propiedades borradas en bulk`,
+    metadata: {
+      count: ids.length,
+      items: targets?.map(t => ({ id: t.id, title: t.title })) ?? [],
+    },
+  })
   revalidatePath('/admin/propiedades')
   revalidatePath('/propiedades')
 }
@@ -65,9 +106,18 @@ export async function togglePropertySold(id: string, sold: boolean) {
   } catch {
     throw new Error('No autorizado: requiere rol admin')
   }
+  const { data: prop } = await supabaseAdmin
+    .from('properties').select('title').eq('id', id).maybeSingle()
   const update: Record<string, unknown> = { sold }
   if (sold) update.hidden = true
   await supabaseAdmin.from('properties').update(update).eq('id', id)
+  await logAdminAction({
+    action: 'toggle_sold',
+    entity_type: 'property',
+    entity_id: id,
+    entity_label: prop?.title ?? null,
+    metadata: sold ? { sold, hidden: true } : { sold },
+  })
   revalidatePath('/admin/propiedades')
   revalidatePath('/propiedades')
 }
@@ -79,6 +129,11 @@ export async function bulkMarkAsSold(ids: string[]) {
     throw new Error('No autorizado: requiere rol admin')
   }
   await supabaseAdmin.from('properties').update({ sold: true, hidden: true }).in('id', ids)
+  await logAdminAction({
+    action: 'bulk_mark_as_sold',
+    entity_type: 'property',
+    metadata: { count: ids.length },
+  })
   revalidatePath('/admin/propiedades')
   revalidatePath('/propiedades')
 }
@@ -107,7 +162,7 @@ export async function createProperty(formData: FormData) {
   const baseSlug = title
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9\s-]/g, '')
     .trim()
     .replace(/\s+/g, '-')
@@ -135,7 +190,7 @@ export async function createProperty(formData: FormData) {
   const bathrooms = formData.get('bathrooms') ? Number(formData.get('bathrooms')) : null
   const area = formData.get('area_sqm') ? Number(formData.get('area_sqm')) : null
 
-  const { error } = await supabaseAdmin.from('properties').insert({
+  const { data: created, error } = await supabaseAdmin.from('properties').insert({
     title,
     slug,
     description: (formData.get('description') as string)?.trim() || null,
@@ -155,9 +210,17 @@ export async function createProperty(formData: FormData) {
     image_url: imageUrl,
     hidden: false,
     sold: false,
-  })
+  }).select('id').single()
 
   if (error) return { success: false, error: error.message }
+
+  await logAdminAction({
+    action: 'create_property',
+    entity_type: 'property',
+    entity_id: created?.id ?? null,
+    entity_label: title,
+    metadata: { slug },
+  })
   revalidatePath('/admin/propiedades')
   revalidatePath('/propiedades')
   return { success: true, slug }
@@ -180,7 +243,15 @@ export async function deleteLead(id: string) {
   } catch {
     throw new Error('No autorizado: requiere rol admin')
   }
+  const { data: lead } = await supabaseAdmin
+    .from('leads').select('name, email').eq('id', id).maybeSingle()
   await supabaseAdmin.from('leads').delete().eq('id', id)
+  await logAdminAction({
+    action: 'delete_lead',
+    entity_type: 'lead',
+    entity_id: id,
+    entity_label: lead ? `${lead.name} (${lead.email})` : null,
+  })
   revalidatePath('/admin/leads')
 }
 
@@ -195,7 +266,13 @@ export async function createBlogPost(data: {
   } catch {
     throw new Error('No autorizado: requiere rol admin')
   }
-  await supabaseAdmin.from('blog_posts').insert(data)
+  const { data: created } = await supabaseAdmin.from('blog_posts').insert(data).select('id').single()
+  await logAdminAction({
+    action: 'create_blog_post',
+    entity_type: 'blog_post',
+    entity_id: created?.id ?? null,
+    entity_label: data.title,
+  })
   revalidatePath('/admin/blog')
 }
 
@@ -210,6 +287,13 @@ export async function updateBlogPost(id: string, data: Partial<{
     throw new Error('No autorizado: requiere rol admin')
   }
   await supabaseAdmin.from('blog_posts').update(data).eq('id', id)
+  await logAdminAction({
+    action: 'update_blog_post',
+    entity_type: 'blog_post',
+    entity_id: id,
+    entity_label: data.title ?? null,
+    metadata: { fields_updated: Object.keys(data) },
+  })
   revalidatePath('/admin/blog')
 }
 
@@ -219,7 +303,15 @@ export async function deleteBlogPost(id: string) {
   } catch {
     throw new Error('No autorizado: requiere rol admin')
   }
+  const { data: post } = await supabaseAdmin
+    .from('blog_posts').select('title').eq('id', id).maybeSingle()
   await supabaseAdmin.from('blog_posts').delete().eq('id', id)
+  await logAdminAction({
+    action: 'delete_blog_post',
+    entity_type: 'blog_post',
+    entity_id: id,
+    entity_label: post?.title ?? null,
+  })
   revalidatePath('/admin/blog')
 }
 
@@ -243,7 +335,13 @@ export async function createTeamMember(data: {
   } catch {
     throw new Error('No autorizado: requiere rol admin')
   }
-  await supabaseAdmin.from('team_members').insert(data)
+  const { data: created } = await supabaseAdmin.from('team_members').insert(data).select('id').single()
+  await logAdminAction({
+    action: 'create_team_member',
+    entity_type: 'team_member',
+    entity_id: created?.id ?? null,
+    entity_label: data.name,
+  })
   revalidatePath('/admin/equipo')
 }
 
@@ -257,6 +355,13 @@ export async function updateTeamMember(id: string, data: Partial<{
     throw new Error('No autorizado: requiere rol admin')
   }
   await supabaseAdmin.from('team_members').update(data).eq('id', id)
+  await logAdminAction({
+    action: 'update_team_member',
+    entity_type: 'team_member',
+    entity_id: id,
+    entity_label: data.name ?? null,
+    metadata: { fields_updated: Object.keys(data) },
+  })
   revalidatePath('/admin/equipo')
 }
 
@@ -266,6 +371,14 @@ export async function deleteTeamMember(id: string) {
   } catch {
     throw new Error('No autorizado: requiere rol admin')
   }
+  const { data: member } = await supabaseAdmin
+    .from('team_members').select('name').eq('id', id).maybeSingle()
   await supabaseAdmin.from('team_members').delete().eq('id', id)
+  await logAdminAction({
+    action: 'delete_team_member',
+    entity_type: 'team_member',
+    entity_id: id,
+    entity_label: member?.name ?? null,
+  })
   revalidatePath('/admin/equipo')
 }

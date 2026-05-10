@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/auth/getUserRole'
 import { checkRateLimit, mutationRateLimit, getIdentifier } from '@/lib/ratelimit'
+import { logAdminAction } from '@/lib/audit'
 
 function generateTempPassword(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'
@@ -80,6 +81,14 @@ export async function POST(request: NextRequest) {
     await supabaseAdmin.auth.admin.deleteUser(userId)
     return NextResponse.json({ error: 'Error creando perfil de agente' }, { status: 500 })
   }
+
+  await logAdminAction({
+    action: 'create_agent',
+    entity_type: 'agent',
+    entity_id: userId,
+    entity_label: full_name.trim(),
+    metadata: { email: email.trim(), agency_name: agency_name?.trim() || null },
+  })
 
   return NextResponse.json({ success: true, tempPassword, userId })
 }

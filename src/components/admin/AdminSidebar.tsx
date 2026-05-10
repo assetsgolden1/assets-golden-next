@@ -14,6 +14,7 @@ import {
   Settings,
   PlusCircle,
   UserCheck,
+  ClipboardList,
 } from 'lucide-react'
 
 const navLinks = [
@@ -26,6 +27,7 @@ const navLinks = [
   { href: '/admin/agentes', label: 'Agentes', icon: UserCheck },
   { href: '/admin/sync', label: 'Sincronización', icon: RefreshCw },
   { href: '/admin/equipo', label: 'Equipo', icon: UserCircle },
+  { href: '/admin/audit', label: 'Auditoría', icon: ClipboardList },
   { href: '/admin/settings', label: 'Ajustes', icon: Settings },
 ]
 

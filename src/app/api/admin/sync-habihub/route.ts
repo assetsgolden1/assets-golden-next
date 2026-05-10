@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { checkRateLimit, syncRateLimit, getIdentifier } from '@/lib/ratelimit'
 import { XMLParser } from 'fast-xml-parser'
 import { randomUUID } from 'node:crypto'
+import { logAdminAction } from '@/lib/audit'
 
 function slugify(text: string): string {
   return text
@@ -560,6 +561,17 @@ export async function POST(request: NextRequest) {
       },
     })
     .eq('id', logEntry?.id)
+
+  if (!isCronAuth) {
+    await logAdminAction({
+      action: 'sync_habihub_manual',
+      entity_type: 'sync',
+      entity_id: logEntry?.id ?? null,
+      entity_label: `sync habihub — ${dryRun ? 'dry run' : 'real'}`,
+      metadata: { dry_run: dryRun, ...stats },
+      actor: user ? { id: user.id, email: user.email ?? null } : undefined,
+    })
+  }
 
   return NextResponse.json({
     success: true,

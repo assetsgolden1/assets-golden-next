@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/auth/getUserRole'
 import { checkRateLimit, mutationRateLimit, getIdentifier } from '@/lib/ratelimit'
+import { logAdminAction } from '@/lib/audit'
 
 export async function POST(request: NextRequest) {
   try {
@@ -49,6 +50,12 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  const { data: agentInfo } = await supabaseAdmin
+    .from('agents')
+    .select('full_name, email')
+    .eq('id', id)
+    .maybeSingle()
+
   const { error: agentsError } = await supabaseAdmin
     .from('agents')
     .delete()
@@ -67,6 +74,14 @@ export async function POST(request: NextRequest) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
+
+  await logAdminAction({
+    action: 'delete_agent',
+    entity_type: 'agent',
+    entity_id: id,
+    entity_label: agentInfo?.full_name ?? null,
+    metadata: { email: agentInfo?.email ?? null },
+  })
 
   return NextResponse.json({ success: true })
 }

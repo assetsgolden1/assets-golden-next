@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/auth/getUserRole'
 import { checkRateLimit, mutationRateLimit, getIdentifier } from '@/lib/ratelimit'
+import { logAdminAction } from '@/lib/audit'
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,6 +40,14 @@ export async function POST(request: NextRequest) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
+
+  await logAdminAction({
+    action: 'update_agent',
+    entity_type: 'agent',
+    entity_id: id,
+    entity_label: full_name.trim(),
+    metadata: { fields_updated: ['full_name', 'phone', 'agency_name'] },
+  })
 
   return NextResponse.json({ success: true })
 }

@@ -24,7 +24,7 @@ reordena si la prioridad cambió.
 - [ ] DNS de Atilio para conectar dominio assetsgolden.com
 
 ### Importantes (post go-live)
-- [ ] Audit log de cambios admin
+- [x] Audit log de cambios admin
 - [ ] Migración de 166 imágenes legacy de Lovable a Supabase actual
 - [ ] Test PDF en producción end-to-end con agente real
 - [ ] Auditoría proyecto Supabase huérfano `yagrwbmsufpvjcgxkuoz`
@@ -55,6 +55,67 @@ reordena si la prioridad cambió.
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 Formato: fecha, contexto, decisiones tomadas, archivos tocados,
 commits, próximo paso sugerido.
+
+---
+
+### Sesión 2026-05-10 — sesión 4 (audit log admin)
+
+**Contexto:** Iván pidió implementar un sistema de audit log para rastrear
+cambios críticos de admins: tabla Supabase, helper reutilizable, aplicación
+en server actions + endpoints críticos, y página `/admin/audit`.
+
+**Trabajo hecho:**
+- Migración `20260510000001_create_admin_audit_log.sql` creada en repo y
+  aplicada vía Supabase MCP (tabla + 3 índices + RLS). Confirmada por Iván
+  antes de proceder
+- Creado `src/lib/audit.ts` con `logAdminAction()` best-effort: actor
+  opcional (evita doble getUser), import estático de createClient,
+  nullish coalescing consistente
+- Modificado `src/app/admin/actions.ts`: 14 funciones ahora llaman
+  `logAdminAction` — toggleFeatured, togglePropertyVisibility, deleteProperty,
+  bulkDeleteProperties, createProperty, togglePropertySold, bulkMarkAsSold,
+  deleteLead, createBlogPost, updateBlogPost, deleteBlogPost, createTeamMember,
+  updateTeamMember, deleteTeamMember. Para deletes: fetch previo del label.
+  Para creates: `.select('id').single()` para capturar el ID generado
+- Modificados 6 endpoints API: create/update/delete/toggle-agent,
+  send-password-reset, sync-habihub (condición `!isCronAuth`; pasa `actor`
+  desde el user ya disponible en el route handler para evitar tercer getUser)
+- Creada página `src/app/admin/audit/page.tsx`: tabla paginada (50/página),
+  filtros GET por actor/action/entity_type, badges de color por tipo de acción,
+  metadata collapsable vía `<details>`, paginación por URL params, enlace
+  "Limpiar" cuando hay filtros activos
+- Modificado `AdminSidebar.tsx`: agregado enlace "Auditoría" con icono
+  ClipboardList antes de Ajustes
+
+**Nota técnica:** `updateProperty` del spec original no existe como server
+action en `actions.ts` — es el route handler `/api/admin/update-property/`.
+No fue incluido en este scope (no estaba en PASO 6). Puede auditarse en
+sesión futura si se prioriza.
+
+**Archivos tocados:**
+- CREATED: `supabase/migrations/20260510000001_create_admin_audit_log.sql`
+- CREATED: `src/lib/audit.ts`
+- CREATED: `src/app/admin/audit/page.tsx`
+- MODIFIED: `src/app/admin/actions.ts` (14 funciones + import audit)
+- MODIFIED: `src/app/api/admin/create-agent/route.ts`
+- MODIFIED: `src/app/api/admin/update-agent/route.ts`
+- MODIFIED: `src/app/api/admin/delete-agent/route.ts`
+- MODIFIED: `src/app/api/admin/toggle-agent/route.ts`
+- MODIFIED: `src/app/api/admin/send-password-reset/route.ts`
+- MODIFIED: `src/app/api/admin/sync-habihub/route.ts`
+- MODIFIED: `src/components/admin/AdminSidebar.tsx`
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** ninguno todavía — pendiente de validación visual del usuario.
+
+**Próximo paso sugerido:**
+1. Iván valida visualmente `/admin/audit` y confirma que las acciones se
+   loguean correctamente (hacer una operación de prueba y verificar la fila)
+2. Una vez validado: commit + push
+3. Próximos pendientes a atacar (en orden sugerido):
+   - Captcha Cloudflare Turnstile en formularios (bloqueante go-live)
+   - Refactor pipeline de leads cuando llegue acceso Resend de Atilio
+   - Migración de 166 imágenes legacy de Lovable (no depende de Resend)
 
 ---
 
@@ -208,4 +269,4 @@ pendientes activos (auditoría de claves o páginas legales GDPR).
 
 ---
 
-*Última edición automática por Claude Code: 2026-05-06 (sesión 3)*
+*Última edición automática por Claude Code: 2026-05-10 (sesión 4)*
