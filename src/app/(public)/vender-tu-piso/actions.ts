@@ -2,6 +2,7 @@
 
 import { createLead } from '@/lib/supabase/queries'
 import type { LeadData } from '@/types'
+import { checkBotId } from 'botid/server'
 
 export interface ActionState {
   success?: boolean
@@ -12,6 +13,13 @@ export async function submitLeadAction(
   _prev: ActionState | null,
   formData: FormData
 ): Promise<ActionState> {
+  const verification = await checkBotId()
+  if (verification.isBot) {
+    return {
+      success: false,
+      error: 'Detección de bot. Recargá la página e intentá de nuevo.'
+    } as ActionState
+  }
   const name = (formData.get('name') as string)?.trim()
   const email = (formData.get('email') as string)?.trim()
   const phone = (formData.get('phone') as string)?.trim()

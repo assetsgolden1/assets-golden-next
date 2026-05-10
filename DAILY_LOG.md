@@ -14,7 +14,7 @@ marca con `[x]` lo terminado, agrega nuevos pendientes detectados,
 reordena si la prioridad cambió.
 
 ### Bloqueantes para go-live
-- [ ] Captcha Cloudflare Turnstile en formularios públicos (3 endpoints + 1 server action)
+- [x] BotID Basic implementado en formularios (reemplaza Cloudflare Turnstile — 3 endpoints + 1 server action)
 - [ ] Refactor pipeline de leads: eliminar n8n, consolidar en `processLead`, agregar Resend a todos los endpoints (depende de acceso Resend de Atilio)
 - [ ] Rotación de claves SUPABASE_SERVICE_ROLE_KEY y GOOGLE_SHEETS_CREDENTIALS_JSON
 - [ ] Páginas legales GDPR: política de privacidad, términos, banner cookies (BORRADORES creados con [PLACEHOLDER]; pendiente validación legal y banner)
@@ -57,6 +57,61 @@ reordena si la prioridad cambió.
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 Formato: fecha, contexto, decisiones tomadas, archivos tocados,
 commits, próximo paso sugerido.
+
+---
+
+### Sesión 2026-05-10 — sesión 7 (BotID Basic en formularios públicos)
+
+**Contexto:** Implementar protección anti-bots en los 7 formularios
+públicos. Decisión arquitectural: BotID Basic (Vercel-native, gratis,
+sin env vars) en lugar de Cloudflare Turnstile (más integrado al stack).
+
+**Trabajo hecho:**
+- `npm install botid` → `botid@1.5.11` (1 package added, 723 auditados)
+- `next.config.ts`: wrapeado con `withBotId()` de `botid/next/config`
+- Creado `src/instrumentation-client.ts` con `initBotId()` protegiendo
+  3 paths: `/api/leads`, `/api/demands`, `/api/collaborations` (POST)
+- `src/app/api/leads/route.ts`: `checkBotId()` al inicio del try,
+  antes de parsear el body → 403 si isBot
+- `src/app/api/demands/route.ts`: mismo patrón
+- `src/app/api/collaborations/route.ts`: mismo patrón
+- `src/app/(public)/vender-tu-piso/actions.ts`: `checkBotId()` al
+  inicio del server action, antes de cualquier validación →
+  return ActionState con error si isBot
+- Build limpio: `Compiled successfully in 18.0s`, TypeScript OK,
+  1108 páginas estáticas (mismo count que sesión 6)
+
+**Verificaciones:**
+- `checkBotId` en 4 archivos (import + call en cada uno) ✓
+- `initBotId` en `src/instrumentation-client.ts` (import + call) ✓
+- `withBotId` en `next.config.ts` (import + export) ✓
+
+**Nota arquitectural:** Las server actions no se protegen con
+`protect[]` de `initBotId` (URL generada por Next.js); su protección
+es directamente en el código del action con `checkBotId()` server-side.
+El plan Basic no requiere upgrade — está incluido en cualquier plan Vercel.
+
+**Archivos tocados:**
+- MODIFIED: `package.json` (botid añadido)
+- MODIFIED: `package-lock.json`
+- MODIFIED: `next.config.ts` (import withBotId + wrap export)
+- CREATED: `src/instrumentation-client.ts`
+- MODIFIED: `src/app/api/leads/route.ts`
+- MODIFIED: `src/app/api/demands/route.ts`
+- MODIFIED: `src/app/api/collaborations/route.ts`
+- MODIFIED: `src/app/(public)/vender-tu-piso/actions.ts`
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** ninguno todavía — pendiente de validación visual.
+
+**Próximo paso sugerido:**
+1. Iván confirma que el build es el esperado y autoriza commit
+2. Próximo bloqueante go-live independiente de Atilio:
+   - Aviso GDPR en formularios `/contacto` y `/mi-demanda`
+   - DNS (depende Atilio)
+3. Pendiente que depende de Atilio: Resend access → refactor pipeline leads
+4. Opcional (si se quiere pasar a BotID Pro): upgrade plan Vercel para
+   analytics de detección de bots
 
 ---
 
@@ -360,4 +415,4 @@ pendientes activos (auditoría de claves o páginas legales GDPR).
 
 ---
 
-*Última edición automática por Claude Code: 2026-05-10 (sesión 6)*
+*Última edición automática por Claude Code: 2026-05-10 (sesión 7)*

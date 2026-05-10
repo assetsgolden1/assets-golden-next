@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { appendLeadToSheets } from '@/lib/googleSheets'
+import { checkBotId } from 'botid/server'
 
 export async function POST(req: NextRequest) {
   try {
+    const verification = await checkBotId()
+    if (verification.isBot) {
+      return NextResponse.json({ error: 'Detección de bot' }, { status: 403 })
+    }
     const body = await req.json()
     const { name, email, phone, company, specialty, collaborationType, message } = body
 

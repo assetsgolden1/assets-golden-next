@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withBotId } from 'botid/next/config'
 
 const nextConfig: NextConfig = {
   // Eliminar header X-Powered-By
@@ -133,4 +134,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBotId(nextConfig);

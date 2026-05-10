@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { appendLeadToSheets } from '@/lib/googleSheets'
+import { checkBotId } from 'botid/server'
 
 const SOURCE_LABELS: Record<string, string> = {
   website: 'Formulario Web General',
@@ -76,6 +77,10 @@ ${data.message ? `<div class="lbl">Mensaje</div><div class="msg">${data.message}
 
 export async function POST(req: NextRequest) {
   try {
+    const verification = await checkBotId()
+    if (verification.isBot) {
+      return NextResponse.json({ error: 'Detección de bot' }, { status: 403 })
+    }
     const body = await req.json()
     console.log('[leads] Body recibido:', body)
     const { name, email, phone, phone_country, phone_prefix, interest, type, message, location, source, property_id, property_title, property_url, budget } = body
