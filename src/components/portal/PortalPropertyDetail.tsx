@@ -28,7 +28,7 @@ export function PortalPropertyDetail({ property }: Props) {
   const allImages = [
     ...(property.image_url ? [property.image_url] : []),
     ...gallery,
-  ].slice(0, 10)
+  ]
 
   async function handleDownload() {
     setDownloading(true)

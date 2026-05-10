@@ -121,6 +121,14 @@ export default function EditPropertyPage({
     setForm((prev) => ({ ...prev, [field]: value }))
   }
 
+  function makeMainImage(i: number) {
+    setExistingImages((prev) => {
+      const next = [...prev]
+      const [item] = next.splice(i, 1)
+      return [item, ...next]
+    })
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
@@ -217,6 +225,22 @@ export default function EditPropertyPage({
                       }}>
                         Principal
                       </span>
+                    )}
+                    {i !== 0 && (
+                      <button
+                        type="button"
+                        onClick={() => makeMainImage(i)}
+                        title="Hacer principal"
+                        style={{
+                          position: 'absolute', bottom: 4, left: 4,
+                          backgroundColor: '#D4AF37', color: '#131D2E',
+                          border: 'none', borderRadius: 4,
+                          fontSize: 10, fontWeight: 700,
+                          padding: '2px 5px', cursor: 'pointer',
+                        }}
+                      >
+                        ⭐ Principal
+                      </button>
                     )}
                     <button
                       type="button"

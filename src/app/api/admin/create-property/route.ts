@@ -61,6 +61,9 @@ export async function POST(request: NextRequest) {
     featured: data.featured === true || data.featured === 'true',
     idealista_url: data.idealista_url?.trim() || null,
     image_url: data.image_url ?? null,
+    gallery_urls: Array.isArray(data.gallery_urls)
+      ? [...new Set((data.gallery_urls as string[]).filter((u) => typeof u === 'string' && u.startsWith('http')))]
+      : [],
     hidden: false,
     sold: false,
   })

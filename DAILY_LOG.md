@@ -36,7 +36,8 @@ reordena si la prioridad cambió.
 - [ ] Borrar backup `properties_backup_20260429` (después de 1-2 crons sin issues)
 - [ ] Limpiar variable zombie `conflictIds` del sync
 - [ ] Actualizar `fast-xml-parser` de `^5.5.12` a `^5.7.0` (vuln MODERATE: XML comment/CDATA injection)
-- [ ] Corregir `react-hooks/set-state-in-effect` en `nueva-propiedad/page.tsx:34` y `PortalPropertiesGrid.tsx:341` (nueva regla React 19 en eslint-config-next@16.2.6)
+- [ ] Corregir `react-hooks/set-state-in-effect` en `PortalPropertiesGrid.tsx:341` (nueva regla React 19 en eslint-config-next@16.2.6) — nota: `nueva-propiedad/page.tsx` fue reescrito en sesión 9, verificar si el lint error persiste
+- [ ] Refactor: extraer `<PropertyGalleryUpload />` como componente compartido entre create y edit forms (hoy es copy-paste idéntico)
 - [x] Borrar carpeta vacía `src/app/admin/destinos/`
 - [x] Borrar carpeta vacía `src/app/api/admin/update-destino/`
 - [x] CSP: remover `api.anthropic.com`
@@ -58,6 +59,75 @@ reordena si la prioridad cambió.
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 Formato: fecha, contexto, decisiones tomadas, archivos tocados,
 commits, próximo paso sugerido.
+
+---
+
+### Sesión 2026-05-10 — sesión 9 (fotos propiedades: mostrar todas, galería en create, imagen principal elegible)
+
+**Contexto:** Después del dedup retroactivo (sesión 8) y el fix del
+extractor HabiHub, quedan 3 problemas de fotos: (1) público truncaba a
+6, (2) create form solo permitía 1 foto, (3) no había UI para elegir
+imagen principal.
+
+**Trabajo hecho:**
+
+*Display público (trivial):*
+- `src/app/(public)/propiedades/[slug]/page.tsx:68` → eliminado
+  `.slice(0, 6)`. Ahora se muestran todas las fotos (promedio ~24 por
+  propiedad). El JSON-LD schema también incluye todas.
+- `src/components/portal/PortalPropertyDetail.tsx:31` → eliminado
+  `.slice(0, 10)`. Portal agente muestra galería completa.
+
+*Create form — galería completa (mediano):*
+- `src/app/admin/nueva-propiedad/page.tsx` reescrito. Reemplazado el
+  input simple de 1 foto por UI de galería completa:
+  - Estado `galleryFiles: File[]` + `galleryPreviews: string[]`
+  - Límite de `MAX_PHOTOS = 12` con alert si se excede
+  - Grid 4 columnas con thumbnails, badge "Principal" en i=0,
+    botón ⭐ "Principal" en i≠0, botón × para eliminar
+  - Upload secuencial a `/api/admin/upload-image`
+  - Envía `image_url: uploadedUrls[0]` y `gallery_urls: uploadedUrls`
+  - `URL.revokeObjectURL()` en `removePhoto` para evitar memory leaks
+- `src/app/api/admin/create-property/route.ts`: agregado `gallery_urls`
+  al INSERT con dedup server-side (`[...new Set(...)]` + filtro HTTP)
+
+*Botón "Hacer principal" — edit form (mediano):*
+- `src/app/admin/propiedades/[id]/edit/page.tsx`: agregada función
+  `makeMainImage(i)` que mueve el item al índice 0 del array en memoria.
+  Badge "Principal" (i=0) ya existía — se mueve automáticamente.
+  Botón ⭐ "Principal" visible en cada thumbnail con i≠0.
+
+**Decisión DRY:** La UI de galería NO se extrajo a un componente
+compartido `<PropertyGalleryUpload />` — copy-paste entre create y edit
+por simplicidad (extracción estimada en +30-45 min extra). Anotado como
+pendiente de refactor en limpieza técnica.
+
+**Build:** `Compiled successfully in 16.5s`, TypeScript OK, 1108 páginas
+
+**Verificaciones:**
+- `.slice(0, 6)` en src → 0 matches ✓
+- `.slice(0, 10)` en portal → 0 matches ✓
+- `makeMainImage` definida (l.124) y usada (l.232) en edit ✓
+- `gallery_urls` en create-property endpoint (l.64-65) ✓
+
+**Archivos tocados:**
+- MODIFIED: `src/app/(public)/propiedades/[slug]/page.tsx`
+- MODIFIED: `src/components/portal/PortalPropertyDetail.tsx`
+- MODIFIED: `src/app/admin/nueva-propiedad/page.tsx` (reescrito)
+- MODIFIED: `src/app/api/admin/create-property/route.ts`
+- MODIFIED: `src/app/admin/propiedades/[id]/edit/page.tsx`
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** ninguno todavía — pendiente validación visual.
+
+**Próximo paso sugerido:**
+1. Iván abre `/admin/nueva-propiedad` y prueba subir varias fotos,
+   cambiar la principal, eliminar alguna, y crear la propiedad
+2. Iván abre `/admin/propiedades/[id]/edit` en una propiedad con fotos
+   y prueba el botón ⭐ Principal
+3. Verificar que la galería pública de esa propiedad muestra todas las
+   fotos (antes 6, ahora sin límite)
+4. Si OK: commit + push
 
 ---
 
@@ -464,4 +534,4 @@ pendientes activos (auditoría de claves o páginas legales GDPR).
 
 ---
 
-*Última edición automática por Claude Code: 2026-05-10 (sesión 8)*
+*Última edición automática por Claude Code: 2026-05-10 (sesión 9)*

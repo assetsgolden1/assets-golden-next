@@ -65,7 +65,7 @@ export default async function PropertyDetailPage({ params }: Props) {
   const allImages = [
     ...(property.image_url ? [property.image_url] : []),
     ...gallery,
-  ].slice(0, 6)
+  ]
 
   // JSON-LD Schema
   const jsonLd = {

@@ -10,6 +10,7 @@ const STATUSES = [
   { value: 'available', label: 'Disponible' },
   { value: 'inactive', label: 'Inactiva' },
 ]
+const MAX_PHOTOS = 12
 
 const INPUT_CLS =
   'w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
@@ -19,7 +20,8 @@ export default function NuevaPropiedadPage() {
   const formRef = useRef<HTMLFormElement>(null)
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([])
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([])
   const [isDev, setIsDev] = useState(false)
   const [isFeatured, setIsFeatured] = useState(false)
 
@@ -45,9 +47,36 @@ export default function NuevaPropiedadPage() {
       })
   }, [country])
 
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (file) setImagePreview(URL.createObjectURL(file))
+  function handleFilesChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const selected = Array.from(e.target.files ?? [])
+    if (galleryFiles.length + selected.length > MAX_PHOTOS) {
+      alert(`Máximo ${MAX_PHOTOS} fotos. Ya tenés ${galleryFiles.length}, intentás agregar ${selected.length}.`)
+      e.target.value = ''
+      return
+    }
+    const previews = selected.map((f) => URL.createObjectURL(f))
+    setGalleryFiles((prev) => [...prev, ...selected])
+    setGalleryPreviews((prev) => [...prev, ...previews])
+    e.target.value = ''
+  }
+
+  function removePhoto(i: number) {
+    URL.revokeObjectURL(galleryPreviews[i])
+    setGalleryFiles((prev) => prev.filter((_, idx) => idx !== i))
+    setGalleryPreviews((prev) => prev.filter((_, idx) => idx !== i))
+  }
+
+  function makeMain(i: number) {
+    setGalleryFiles((prev) => {
+      const next = [...prev]
+      const [item] = next.splice(i, 1)
+      return [item, ...next]
+    })
+    setGalleryPreviews((prev) => {
+      const next = [...prev]
+      const [item] = next.splice(i, 1)
+      return [item, ...next]
+    })
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -59,9 +88,9 @@ export default function NuevaPropiedadPage() {
       const form = e.currentTarget
       const rawData = new FormData(form)
 
-      let imageUrl: string | null = null
-      const file = rawData.get('image') as File | null
-      if (file && file.size > 0) {
+      // Subir fotos secuencialmente
+      const uploadedUrls: string[] = []
+      for (const file of galleryFiles) {
         const fd = new FormData()
         fd.append('file', file)
         const uploadRes = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
@@ -71,29 +100,30 @@ export default function NuevaPropiedadPage() {
           setStatus('error')
           return
         }
-        imageUrl = uploadData.url
+        if (uploadData.url) uploadedUrls.push(uploadData.url)
       }
 
       const res = await fetch('/api/admin/create-property', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title:        rawData.get('title'),
-          description:  rawData.get('description'),
-          price:        rawData.get('price'),
-          currency:     rawData.get('currency'),
-          location,          // controlado
-          province:     rawData.get('province'),
-          country,           // controlado
-          bedrooms:     rawData.get('bedrooms'),
-          bathrooms:    rawData.get('bathrooms'),
-          area_sqm:     rawData.get('area_sqm'),
+          title:         rawData.get('title'),
+          description:   rawData.get('description'),
+          price:         rawData.get('price'),
+          currency:      rawData.get('currency'),
+          location,
+          province:      rawData.get('province'),
+          country,
+          bedrooms:      rawData.get('bedrooms'),
+          bathrooms:     rawData.get('bathrooms'),
+          area_sqm:      rawData.get('area_sqm'),
           property_type: rawData.get('property_type'),
-          status:       rawData.get('status'),
+          status:        rawData.get('status'),
           idealista_url: rawData.get('idealista_url'),
           is_development: isDev,
-          featured:     isFeatured,
-          image_url:    imageUrl,
+          featured:      isFeatured,
+          image_url:     uploadedUrls[0] ?? null,
+          gallery_urls:  uploadedUrls,
         }),
       })
 
@@ -125,25 +155,85 @@ export default function NuevaPropiedadPage() {
       )}
 
       <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
-        {/* Imagen */}
+        {/* Imágenes */}
         <div className="bg-white rounded-xl shadow-sm p-5">
-          <h2 className="font-semibold text-gray-800 mb-4">Imagen principal</h2>
-          <div className="flex gap-4 items-start">
-            {imagePreview ? (
-              <img src={imagePreview} alt="Preview" className="w-32 h-24 object-cover rounded-lg border border-gray-200" />
-            ) : (
-              <div className="w-32 h-24 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs">
-                Sin imagen
-              </div>
-            )}
-            <div className="flex-1">
+          <h2 className="font-semibold text-gray-800 mb-1">Imágenes</h2>
+          <p className="text-xs text-gray-400 mb-4">
+            La primera foto será la imagen principal. Máximo {MAX_PHOTOS} fotos.
+          </p>
+          {galleryPreviews.length > 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 12 }}>
+              {galleryPreviews.map((src, i) => (
+                <div key={i} style={{ position: 'relative' }}>
+                  <img
+                    src={src}
+                    alt={`Foto ${i + 1}`}
+                    style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: 6 }}
+                  />
+                  {i === 0 && (
+                    <span style={{
+                      position: 'absolute', top: 4, left: 4,
+                      backgroundColor: '#D4AF37', color: '#131D2E',
+                      fontSize: 10, fontWeight: 700,
+                      padding: '2px 6px', borderRadius: 4,
+                    }}>
+                      Principal
+                    </span>
+                  )}
+                  {i !== 0 && (
+                    <button
+                      type="button"
+                      onClick={() => makeMain(i)}
+                      title="Hacer principal"
+                      style={{
+                        position: 'absolute', bottom: 4, left: 4,
+                        backgroundColor: '#D4AF37', color: '#131D2E',
+                        border: 'none', borderRadius: 4,
+                        fontSize: 10, fontWeight: 700,
+                        padding: '2px 5px', cursor: 'pointer',
+                      }}
+                    >
+                      ⭐ Principal
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(i)}
+                    style={{
+                      position: 'absolute', top: 4, right: 4,
+                      backgroundColor: '#dc2626', color: 'white',
+                      border: 'none', borderRadius: '50%',
+                      width: 20, height: 20, fontSize: 14,
+                      cursor: 'pointer', display: 'flex',
+                      alignItems: 'center', justifyContent: 'center',
+                      padding: 0, lineHeight: 1,
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          {galleryFiles.length < MAX_PHOTOS ? (
+            <>
               <input
-                type="file" name="image" accept="image/*" onChange={handleImageChange}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFilesChange}
                 className="block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-[#0a1628] file:text-white hover:file:bg-[#1a2638] cursor-pointer"
               />
-              <p className="text-xs text-gray-400 mt-1.5">JPG, PNG, WebP. Máximo recomendado: 2 MB.</p>
-            </div>
-          </div>
+              <p className="text-xs text-gray-400 mt-1.5">
+                JPG, PNG, WebP.{' '}
+                {galleryFiles.length > 0
+                  ? `${galleryFiles.length}/${MAX_PHOTOS} fotos seleccionadas.`
+                  : `Podés seleccionar hasta ${MAX_PHOTOS} fotos.`}
+              </p>
+            </>
+          ) : (
+            <p className="text-xs text-amber-600">Límite de {MAX_PHOTOS} fotos alcanzado.</p>
+          )}
         </div>
 
         {/* Información básica */}
