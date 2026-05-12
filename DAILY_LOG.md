@@ -44,7 +44,7 @@ reordena si la prioridad cambió.
 - [x] Verificar bucket `team-photos` en Supabase (existe, público)
 
 ### Pendientes operativos (Atilio)
-- [ ] Confirmar Tomo del Registro Mercantil de Barcelona (para completar las 3 páginas legales — actualmente aparece `[TOMO_PENDIENTE: confirmar con Atilio]` en `/politica-de-privacidad` y `/aviso-legal`)
+- [ ] Confirmar Tomo y Folio del Registro Mercantil de Barcelona con Atilio — bloqueante atenuado: Tomo y Folio quitados del texto público para no publicar con placeholder. Cuando Atilio los confirme, agregar al final de la cadena registral: `...Hoja B-562057, Inscripción 2, Tomo X, Folio Y`
 - [ ] Acceso a cuenta Resend (dominio assetsgolden.com ya está verificado en su cuenta)
 - [ ] Email del socio para crear cuenta admin
 - [ ] Acceso al panel DNS del dominio

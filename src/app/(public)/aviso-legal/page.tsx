@@ -35,7 +35,7 @@ export default function AvisoLegalPage() {
                 <li>Titular: <strong className="text-foreground">COVA FUMADA GROUP S.L.</strong></li>
                 <li>CIF/NIF: <strong className="text-foreground">B05380886</strong></li>
                 <li>Domicilio social: <strong className="text-foreground">José Agustín Goytisolo 31, L5, 08970 Sant Joan Despí (Barcelona)</strong></li>
-                <li>Datos registrales: <strong className="text-foreground">Inscrita en el Registro Mercantil de Barcelona, Tomo [TOMO_PENDIENTE: confirmar con Atilio], Folio 1, Hoja B-562057, Inscripción 2</strong></li>
+                <li>Datos registrales: <strong className="text-foreground">Inscrita en el Registro Mercantil de Barcelona, Hoja B-562057, Inscripción 2</strong></li>
                 <li>Teléfono: <strong className="text-foreground">+34 611 85 30 01</strong></li>
                 <li>Email: <strong className="text-foreground">hola@assetsgolden.com</strong></li>
                 <li>Actividad: intermediación inmobiliaria y servicios relacionados con la inversión en bienes inmuebles.</li>
