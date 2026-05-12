@@ -32,16 +32,16 @@ export default function AvisoLegalPage() {
                 En cumplimiento del artículo 10 de la LSSI-CE, se informa al usuario de los siguientes datos identificativos del prestador del servicio de la sociedad de la información:
               </p>
               <ul className="list-disc pl-5 mt-3 space-y-1 text-sm">
-                <li>Titular: <strong className="text-foreground">[RAZÓN_SOCIAL: probablemente &ldquo;CFG Global Investment S.L.&rdquo; según footer, confirmar con Atilio]</strong></li>
-                <li>CIF/NIF: <strong className="text-foreground">[CIF_NIF: pendiente, solicitar a Atilio]</strong></li>
-                <li>Domicilio social: <strong className="text-foreground">[DOMICILIO_FISCAL: probablemente &ldquo;Passeig de Gràcia, Barcelona&rdquo; según política previa, confirmar dirección completa con código postal y provincia]</strong></li>
-                <li>Datos registrales: <strong className="text-foreground">[REGISTRO_MERCANTIL: pendiente, requerido por LSSI Art. 10 si la sociedad está inscrita — Registro Mercantil de [provincia], Tomo, Folio, Hoja, Inscripción]</strong></li>
-                <li>Teléfono: <strong className="text-foreground">[TELEFONO: probablemente &ldquo;+34 611 85 30 01&rdquo; según footer, confirmar con Atilio]</strong></li>
-                <li>Email: <strong className="text-foreground">[EMAIL_CONTACTO: probablemente &ldquo;hola@assetsgolden.com&rdquo; según footer, confirmar con Atilio]</strong></li>
+                <li>Titular: <strong className="text-foreground">COVA FUMADA GROUP S.L.</strong></li>
+                <li>CIF/NIF: <strong className="text-foreground">B05380886</strong></li>
+                <li>Domicilio social: <strong className="text-foreground">José Agustín Goytisolo 31, L5, 08970 Sant Joan Despí (Barcelona)</strong></li>
+                <li>Datos registrales: <strong className="text-foreground">Inscrita en el Registro Mercantil de Barcelona, Tomo [TOMO_PENDIENTE: confirmar con Atilio], Folio 1, Hoja B-562057, Inscripción 2</strong></li>
+                <li>Teléfono: <strong className="text-foreground">+34 611 85 30 01</strong></li>
+                <li>Email: <strong className="text-foreground">hola@assetsgolden.com</strong></li>
                 <li>Actividad: intermediación inmobiliaria y servicios relacionados con la inversión en bienes inmuebles.</li>
               </ul>
               <p className="text-sm mt-3">
-                Cuando la actividad esté sujeta a colegiación profesional o a requisitos administrativos específicos, el usuario podrá solicitar la información correspondiente en <strong className="text-foreground">[EMAIL_CONTACTO: probablemente &ldquo;hola@assetsgolden.com&rdquo; según footer, confirmar con Atilio]</strong>.
+                Cuando la actividad esté sujeta a colegiación profesional o a requisitos administrativos específicos, el usuario podrá solicitar la información correspondiente en <strong className="text-foreground">hola@assetsgolden.com</strong>.
               </p>
             </section>
 
@@ -70,7 +70,7 @@ export default function AvisoLegalPage() {
             <section>
               <h2 className="font-display text-xl text-foreground mb-3">4. Propiedad intelectual e industrial</h2>
               <p className="text-sm">
-                Todos los contenidos del sitio web, incluyendo a título enunciativo y no limitativo textos, fotografías, gráficos, logotipos, marcas, código fuente, diseño, estructura de navegación, bases de datos y cualquier otro elemento, son titularidad de <strong className="text-foreground">[RAZÓN_SOCIAL: probablemente &ldquo;CFG Global Investment S.L.&rdquo; según footer, confirmar con Atilio]</strong> o de terceros que han autorizado su utilización, y están protegidos por la normativa nacional e internacional de propiedad intelectual e industrial.
+                Todos los contenidos del sitio web, incluyendo a título enunciativo y no limitativo textos, fotografías, gráficos, logotipos, marcas, código fuente, diseño, estructura de navegación, bases de datos y cualquier otro elemento, son titularidad de <strong className="text-foreground">COVA FUMADA GROUP S.L.</strong> o de terceros que han autorizado su utilización, y están protegidos por la normativa nacional e internacional de propiedad intelectual e industrial.
               </p>
               <p className="text-sm mt-3">
                 Queda expresamente prohibida la reproducción, distribución, comunicación pública, transformación o cualquier otra forma de explotación, total o parcial, de los contenidos del sitio web sin la autorización previa y por escrito del titular. La mera consulta del sitio no otorga ningún derecho de uso sobre los contenidos.
@@ -116,7 +116,7 @@ export default function AvisoLegalPage() {
                 El usuario acepta que las comunicaciones que Assets Golden le dirija como consecuencia de las solicitudes y formularios cumplimentados a través del sitio web se realicen por medios electrónicos (correo electrónico, mensajería) en la dirección facilitada por el propio usuario, conforme al artículo 21 de la LSSI-CE.
               </p>
               <p className="text-sm mt-3">
-                El envío de comunicaciones comerciales por vía electrónica únicamente se realizará cuando el usuario lo haya consentido expresamente o cuando exista una relación contractual previa, en los términos del artículo 21.2 LSSI-CE. El usuario podrá oponerse a la recepción de tales comunicaciones en cualquier momento mediante notificación a <strong className="text-foreground">[EMAIL_DERECHOS_GDPR: sugerido &ldquo;privacidad@assetsgolden.com&rdquo;, confirmar o ajustar]</strong>.
+                El envío de comunicaciones comerciales por vía electrónica únicamente se realizará cuando el usuario lo haya consentido expresamente o cuando exista una relación contractual previa, en los términos del artículo 21.2 LSSI-CE. El usuario podrá oponerse a la recepción de tales comunicaciones en cualquier momento mediante notificación a <strong className="text-foreground">admin@assetsgolden.com</strong>.
               </p>
             </section>
 
@@ -137,13 +137,13 @@ export default function AvisoLegalPage() {
             <section>
               <h2 className="font-display text-xl text-foreground mb-3">10. Legislación aplicable y jurisdicción</h2>
               <p className="text-sm">
-                El presente Aviso Legal se rige por la legislación española. Para la resolución de cualquier controversia que pudiera derivarse del acceso o uso del sitio web, las partes se someten, con renuncia expresa a cualquier otro fuero que pudiera corresponderles, a los Juzgados y Tribunales de <strong className="text-foreground">[JURISDICCION: probablemente Barcelona conforme al domicilio social, confirmar con Atilio]</strong>, salvo en aquellos supuestos en que la normativa aplicable imponga un fuero específico (por ejemplo, en relaciones con consumidores).
+                El presente Aviso Legal se rige por la legislación española. Para la resolución de cualquier controversia que pudiera derivarse del acceso o uso del sitio web, las partes se someten, con renuncia expresa a cualquier otro fuero que pudiera corresponderles, a los Juzgados y Tribunales de <strong className="text-foreground">Barcelona</strong>, salvo en aquellos supuestos en que la normativa aplicable imponga un fuero específico (por ejemplo, en relaciones con consumidores).
               </p>
             </section>
 
             <section className="pt-6 border-t border-border">
               <p className="text-xs text-muted-foreground">
-                Versión 1.0 · Vigente desde mayo de 2026 · [RAZÓN_SOCIAL: probablemente &ldquo;CFG Global Investment S.L.&rdquo; según footer, confirmar con Atilio]
+                Versión 1.0 · Vigente desde mayo de 2026 · COVA FUMADA GROUP S.L.
               </p>
             </section>
 

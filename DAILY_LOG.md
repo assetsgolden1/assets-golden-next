@@ -18,7 +18,7 @@ reordena si la prioridad cambió.
 - [ ] Refactor pipeline de leads: eliminar n8n, consolidar en `processLead`, agregar Resend a todos los endpoints (depende de acceso Resend de Atilio)
 - [ ] Rotación de claves SUPABASE_SERVICE_ROLE_KEY y GOOGLE_SHEETS_CREDENTIALS_JSON
 - [ ] Páginas legales GDPR: política de privacidad, términos, banner cookies (BORRADORES creados con [PLACEHOLDER]; pendiente validación legal y banner)
-- [ ] Atilio o asesor legal: validar texto de las 3 páginas legales (`/politica-de-privacidad`, `/aviso-legal`, `/politica-de-cookies`) y reemplazar todos los `[PLACEHOLDER: …]` por valores reales (razón social, CIF, domicilio, registro mercantil, teléfono, emails, jurisdicción)
+- [ ] Atilio o asesor legal: validar texto de las 3 páginas legales (`/politica-de-privacidad`, `/aviso-legal`, `/politica-de-cookies`) y reemplazar todos los `[PLACEHOLDER: …]` por valores reales (razón social, CIF, domicilio, registro mercantil, teléfono, emails, jurisdicción) — **CASI COMPLETO**: todos los 7 datos reemplazados excepto Tomo del Registro Mercantil (ver pendiente abajo)
 - [ ] Atilio: aceptar/firmar los DPAs en los dashboards de Supabase, Vercel, Cloudflare, Google, Resend y Upstash. Algunos requieren accept-click, otros solicitar al soporte. Sin DPA aceptado, la frase de la política de privacidad §5 es inexacta.
 - [ ] Aviso GDPR en formularios `/contacto` y `/mi-demanda`
 - [ ] DNS de Atilio para conectar dominio assetsgolden.com
@@ -44,6 +44,7 @@ reordena si la prioridad cambió.
 - [x] Verificar bucket `team-photos` en Supabase (existe, público)
 
 ### Pendientes operativos (Atilio)
+- [ ] Confirmar Tomo del Registro Mercantil de Barcelona (para completar las 3 páginas legales — actualmente aparece `[TOMO_PENDIENTE: confirmar con Atilio]` en `/politica-de-privacidad` y `/aviso-legal`)
 - [ ] Acceso a cuenta Resend (dominio assetsgolden.com ya está verificado en su cuenta)
 - [ ] Email del socio para crear cuenta admin
 - [ ] Acceso al panel DNS del dominio
@@ -59,6 +60,39 @@ reordena si la prioridad cambió.
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 Formato: fecha, contexto, decisiones tomadas, archivos tocados,
 commits, próximo paso sugerido.
+
+---
+
+### Sesión 2026-05-12 — placeholders legales reemplazados (excepto Tomo Registro Mercantil)
+
+**Contexto:** Atilio confirmó los datos legales reales. Reemplazar todos los `[PLACEHOLDER: …]` en las 3 páginas legales por los valores definitivos.
+
+**Trabajo hecho:**
+- Reemplazados 7 tipos de placeholder en `politica-de-privacidad`, `aviso-legal` y `politica-de-cookies`:
+  - RAZÓN_SOCIAL → `COVA FUMADA GROUP S.L.` (3 ocurrencias en privacidad, 3 en aviso-legal, 1 en cookies)
+  - CIF_NIF → `B05380886`
+  - DOMICILIO_FISCAL → `José Agustín Goytisolo 31, L5, 08970 Sant Joan Despí (Barcelona)`
+  - REGISTRO_MERCANTIL → `Inscrita en el Registro Mercantil de Barcelona, Tomo [TOMO_PENDIENTE: confirmar con Atilio], Folio 1, Hoja B-562057, Inscripción 2`
+  - TELEFONO → `+34 611 85 30 01`
+  - EMAIL_CONTACTO → `hola@assetsgolden.com`
+  - EMAIL_DERECHOS_GDPR → `admin@assetsgolden.com` (3 ocurrencias en privacidad, 1 en aviso-legal, 1 en cookies)
+  - JURISDICCION → `Barcelona`
+- Grep de verificación: 0 matches de cualquier placeholder original ✓
+- Único `[TOMO_PENDIENTE: confirmar con Atilio]` queda en 2 archivos (privacidad:38, aviso-legal:38) hasta confirmación
+- Build: `Compiled successfully in 19.4s` ✓
+
+**Archivos tocados:**
+- MODIFIED: `src/app/(public)/politica-de-privacidad/page.tsx`
+- MODIFIED: `src/app/(public)/aviso-legal/page.tsx`
+- MODIFIED: `src/app/(public)/politica-de-cookies/page.tsx`
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** NO — validación visual antes de commit.
+
+**Próximo paso sugerido:**
+1. Iván abre las 3 páginas en dev server y verifica visualmente que los datos legales aparecen correctamente
+2. Confirmar con Atilio el Tomo del Registro Mercantil de Barcelona → reemplazar el único `[TOMO_PENDIENTE]` que queda
+3. Una vez verificado: commit + push
 
 ---
 

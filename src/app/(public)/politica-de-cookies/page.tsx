@@ -148,13 +148,13 @@ export default function PoliticaCookiesPage() {
             <section>
               <h2 className="font-display text-xl text-foreground mb-3">8. Más información</h2>
               <p className="text-sm">
-                Para cualquier consulta sobre el uso de cookies en este sitio web, el usuario puede dirigirse a <strong className="text-foreground">[EMAIL_DERECHOS_GDPR: sugerido &ldquo;privacidad@assetsgolden.com&rdquo;, confirmar o ajustar]</strong>.
+                Para cualquier consulta sobre el uso de cookies en este sitio web, el usuario puede dirigirse a <strong className="text-foreground">admin@assetsgolden.com</strong>.
               </p>
             </section>
 
             <section className="pt-6 border-t border-border">
               <p className="text-xs text-muted-foreground">
-                Versión 1.0 · Vigente desde mayo de 2026 · [RAZÓN_SOCIAL: probablemente &ldquo;CFG Global Investment S.L.&rdquo; según footer, confirmar con Atilio]
+                Versión 1.0 · Vigente desde mayo de 2026 · COVA FUMADA GROUP S.L.
               </p>
             </section>
 

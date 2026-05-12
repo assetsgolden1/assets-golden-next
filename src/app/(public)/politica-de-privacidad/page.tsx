@@ -29,16 +29,16 @@ export default function PoliticaPrivacidadPage() {
             <section>
               <h2 className="font-display text-xl text-foreground mb-3">1. Responsable del tratamiento</h2>
               <p className="text-sm">
-                <strong className="text-foreground">[RAZÓN_SOCIAL: probablemente &ldquo;CFG Global Investment S.L.&rdquo; según footer, confirmar con Atilio]</strong> (en adelante, &ldquo;la empresa&rdquo; o &ldquo;Assets Golden&rdquo;) es responsable del tratamiento de los datos personales que el usuario facilite a través de este sitio web.
+                <strong className="text-foreground">COVA FUMADA GROUP S.L.</strong> (en adelante, &ldquo;la empresa&rdquo; o &ldquo;Assets Golden&rdquo;) es responsable del tratamiento de los datos personales que el usuario facilite a través de este sitio web.
               </p>
               <ul className="list-disc pl-5 mt-3 space-y-1 text-sm">
-                <li>Razón social: <strong className="text-foreground">[RAZÓN_SOCIAL: probablemente &ldquo;CFG Global Investment S.L.&rdquo; según footer, confirmar con Atilio]</strong></li>
-                <li>CIF/NIF: <strong className="text-foreground">[CIF_NIF: pendiente, solicitar a Atilio]</strong></li>
-                <li>Domicilio fiscal: <strong className="text-foreground">[DOMICILIO_FISCAL: probablemente &ldquo;Passeig de Gràcia, Barcelona&rdquo; según política previa, confirmar dirección completa con código postal y provincia]</strong></li>
-                <li>Inscripción registral: <strong className="text-foreground">[REGISTRO_MERCANTIL: pendiente, requerido por LSSI Art. 10 si la sociedad está inscrita — datos de inscripción en el Registro Mercantil correspondiente]</strong></li>
-                <li>Teléfono: <strong className="text-foreground">[TELEFONO: probablemente &ldquo;+34 611 85 30 01&rdquo; según footer, confirmar con Atilio]</strong></li>
-                <li>Email de contacto general: <strong className="text-foreground">[EMAIL_CONTACTO: probablemente &ldquo;hola@assetsgolden.com&rdquo; según footer, confirmar con Atilio]</strong></li>
-                <li>Email para ejercicio de derechos GDPR: <strong className="text-foreground">[EMAIL_DERECHOS_GDPR: sugerido &ldquo;privacidad@assetsgolden.com&rdquo;, confirmar o ajustar]</strong></li>
+                <li>Razón social: <strong className="text-foreground">COVA FUMADA GROUP S.L.</strong></li>
+                <li>CIF/NIF: <strong className="text-foreground">B05380886</strong></li>
+                <li>Domicilio fiscal: <strong className="text-foreground">José Agustín Goytisolo 31, L5, 08970 Sant Joan Despí (Barcelona)</strong></li>
+                <li>Inscripción registral: <strong className="text-foreground">Inscrita en el Registro Mercantil de Barcelona, Tomo [TOMO_PENDIENTE: confirmar con Atilio], Folio 1, Hoja B-562057, Inscripción 2</strong></li>
+                <li>Teléfono: <strong className="text-foreground">+34 611 85 30 01</strong></li>
+                <li>Email de contacto general: <strong className="text-foreground">hola@assetsgolden.com</strong></li>
+                <li>Email para ejercicio de derechos GDPR: <strong className="text-foreground">admin@assetsgolden.com</strong></li>
               </ul>
             </section>
 
@@ -119,7 +119,7 @@ export default function PoliticaPrivacidadPage() {
                 <li><strong className="text-foreground">Localización de los datos:</strong> siempre que es técnicamente posible, los datos se procesan y almacenan en regiones de la Unión Europea.</li>
               </ul>
               <p className="text-sm mt-3">
-                El usuario puede solicitar copia de las garantías aplicables escribiendo a <strong className="text-foreground">[EMAIL_DERECHOS_GDPR: sugerido &ldquo;privacidad@assetsgolden.com&rdquo;, confirmar o ajustar]</strong>.
+                El usuario puede solicitar copia de las garantías aplicables escribiendo a <strong className="text-foreground">admin@assetsgolden.com</strong>.
               </p>
             </section>
 
@@ -157,7 +157,7 @@ export default function PoliticaPrivacidadPage() {
             <section>
               <h2 className="font-display text-xl text-foreground mb-3">9. Cómo ejercer los derechos y reclamaciones</h2>
               <p className="text-sm">
-                Para ejercer cualquiera de los derechos anteriores, el usuario puede dirigir una solicitud por escrito a <strong className="text-foreground">[EMAIL_DERECHOS_GDPR: sugerido &ldquo;privacidad@assetsgolden.com&rdquo;, confirmar o ajustar]</strong> indicando el derecho que desea ejercer y acompañando, en su caso, copia de su documento de identidad o documento equivalente que acredite la identidad.
+                Para ejercer cualquiera de los derechos anteriores, el usuario puede dirigir una solicitud por escrito a <strong className="text-foreground">admin@assetsgolden.com</strong> indicando el derecho que desea ejercer y acompañando, en su caso, copia de su documento de identidad o documento equivalente que acredite la identidad.
               </p>
               <p className="text-sm mt-3">
                 Si el usuario considera que el tratamiento de sus datos no se ajusta a la normativa, tiene derecho a presentar una reclamación ante la <a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">Agencia Española de Protección de Datos (AEPD)</a>, calle Jorge Juan, 6 — 28001 Madrid.
@@ -187,7 +187,7 @@ export default function PoliticaPrivacidadPage() {
 
             <section className="pt-6 border-t border-border">
               <p className="text-xs text-muted-foreground">
-                Versión 2.0 · Vigente desde mayo de 2026 · [RAZÓN_SOCIAL: probablemente &ldquo;CFG Global Investment S.L.&rdquo; según footer, confirmar con Atilio]
+                Versión 2.0 · Vigente desde mayo de 2026 · COVA FUMADA GROUP S.L.
               </p>
             </section>
 
