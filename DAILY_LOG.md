@@ -63,6 +63,31 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-13 — fix paginador /propiedades (reemplazo 'pagina' → 'page')
+
+**Contexto:** El paginador de /propiedades no funcionaba: los números y "Siguiente" no cambiaban la página. Diagnóstico: `PaginationBar` siempre genera `?page=N` (inglés), pero `propiedades/page.tsx` leía `params.pagina` (español) → la página recibía `undefined` y volvía siempre a página 1. `/destinos/[slug]` leía `sp.page` → funcionaba correctamente.
+
+**Trabajo hecho:**
+- 3 cambios en `src/app/(public)/propiedades/page.tsx`:
+  1. Interface `Props.searchParams`: `pagina?: string` → `page?: string` (línea 36)
+  2. Read del param: `params.pagina ?? '1'` → `params.page ?? '1'` (línea 45)
+  3. Llamada a `PaginationBar`: `currentParams={{ ...pageParams, pagina: undefined }}` → `currentParams={pageParams}` (línea 188)
+- Verificación post-cambio: 0 matches de `pagina` en el archivo ✓
+- Build: `Compiled successfully in 17.0s`, TypeScript OK, 1108 páginas ✓
+
+**Archivos tocados:**
+- MODIFIED: `src/app/(public)/propiedades/page.tsx`
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** NO — validación visual de Iván antes de commit.
+
+**Próximo paso sugerido:**
+1. Iván abre `/propiedades` en dev server y verifica que los botones del paginador navegan correctamente entre páginas
+2. Verificar también `/inversiones` (usa el mismo `PaginationBar` — confirmar que NO tiene el mismo bug de `pagina` vs `page`)
+3. Si OK: commit + push
+
+---
+
 ### Sesión 2026-05-12 — placeholders legales reemplazados (excepto Tomo Registro Mercantil)
 
 **Contexto:** Atilio confirmó los datos legales reales. Reemplazar todos los `[PLACEHOLDER: …]` en las 3 páginas legales por los valores definitivos.

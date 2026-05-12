@@ -33,7 +33,7 @@ interface Props {
     pais?: string
     zona?: string
     orden?: string
-    pagina?: string
+    page?: string
     destacadas?: string
   }>
 }
@@ -42,7 +42,7 @@ const PAGE_SIZE = 24
 
 export default async function PropiedadesPage({ searchParams }: Props) {
   const params = await searchParams
-  const page   = Math.max(1, parseInt(params.pagina ?? '1', 10))
+  const page   = Math.max(1, parseInt(params.page ?? '1', 10))
   const offset = (page - 1) * PAGE_SIZE
 
   const precioMin = params.precio_min ? parseInt(params.precio_min, 10) : undefined
@@ -185,7 +185,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
                       currentPage={page}
                       totalPages={totalPages}
                       basePath="/propiedades"
-                      currentParams={{ ...pageParams, pagina: undefined }}
+                      currentParams={pageParams}
                     />
                   )}
                 </>
