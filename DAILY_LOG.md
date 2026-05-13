@@ -63,6 +63,42 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-13 — assets de marca temporales: icon.png, opengraph-image.png, favicon.ico
+
+**Contexto:** Iván generó los assets de marca a partir del logo existente de Assets Golden con la marca de Gemini AI removida. Hay que colocarlos en las ubicaciones que Next.js convention espera para que el favicon y el OG preview funcionen.
+
+**Trabajo hecho:**
+- `src/app/icon.png` (112 KB, 512×512) colocado por Iván — Next.js lo sirve automáticamente como `/icon.png`
+- `src/app/opengraph-image.png` (111 KB, 1200×630) colocado por Iván — Next.js lo sirve como `/opengraph-image.png`
+- `public/favicon.ico` (3 KB) colocado por Iván — compatibilidad con crawlers y browsers legacy
+- Build: `Compiled successfully in 17.8s`, TypeScript OK, **1110 páginas** (2 más que antes: Next.js registró `/icon.png` y `/opengraph-image.png` como rutas estáticas propias ✓)
+- layout.tsx ya tenía las referencias correctas desde commit `06f02c4` — sin cambios en código
+
+**Verificaciones:**
+- `src/app/icon.png` → ✅ 112683 bytes
+- `src/app/opengraph-image.png` → ✅ 113520 bytes
+- `public/favicon.ico` → ✅ 3058 bytes
+- Build output muestra `○ /icon.png` y `○ /opengraph-image.png` como rutas estáticas ✓
+- 4 matches de referencias en layout.tsx (líneas 30, 32, 45, 58) ✓
+
+**Archivos tocados:**
+- CREATED: `src/app/icon.png`
+- CREATED: `src/app/opengraph-image.png`
+- CREATED: `public/favicon.ico`
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Nota:** Assets son temporales (logo limpiado de marca Gemini). Pendiente logo profesional cuando Atilio lo provea — reemplazar los mismos 3 archivos cuando llegue.
+
+**Commits:** NO — validación visual de Iván antes de commit (verificar favicon en browser y OG preview en WhatsApp/Slack).
+
+**Próximo paso sugerido:**
+1. Iván abre `http://localhost:3000` en dev server y verifica que el favicon del tab muestra el logo de Assets Golden (no el de Vercel)
+2. Iván comparte un link en WhatsApp o usa `https://opengraph.xyz` para verificar el preview 1200×630
+3. Si OK: commit los 3 archivos binarios + DAILY_LOG → push → deploy Vercel
+4. **Pendiente futuro**: cuando Atilio provea el logo profesional definitivo, reemplazar `src/app/icon.png`, `src/app/opengraph-image.png` y `public/favicon.ico`
+
+---
+
 ### Sesión 2026-05-13 — redirects 301 slugs Lovable + metadata OG/Twitter + sitemap completo
 
 **Contexto:** Google tenía indexados 3 slugs de Lovable que daban 404 en la nueva web. Además, layout.tsx no tenía openGraph/twitter configurados (causa del preview Vercel al compartir links). Sitemap tenía 8 rutas del proyecto sin incluir.
