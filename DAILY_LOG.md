@@ -63,6 +63,32 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-14 — fix favicon duplicado: borrado src/app/favicon.ico
+
+**Contexto:** El HTML de producción tenía 3 `link rel="icon"` tags en conflicto. El problema era `src/app/favicon.ico` (25 KB, versión vieja del logo completo con texto) que Next.js procesaba como metadata file y emitía con hash (`favicon.ico?favicon.0x3dzn~oxb6tn.ico` con `sizes="256x256"`), sobreescribiendo el `icon.png` correcto.
+
+**Trabajo hecho:**
+- `git rm src/app/favicon.ico` — eliminado el archivo residual de 25 KB
+- Build limpio: `Compiled successfully in 18.0s`, TypeScript OK, **1109 páginas** (−1 respecto al anterior, ya que Next.js ya no registra `/favicon.ico` como ruta metadata propia)
+- Build output confirma que **ya no aparece ninguna ruta `/favicon.ico` con hash** — solo `○ /icon.png` y `○ /opengraph-image.png` ✓
+
+**Estado final:**
+- `src/app/favicon.ico` → ❌ eliminado
+- `public/favicon.ico` (10 KB, versión correcta) → ✅ sigue activo para compatibilidad legacy
+- `src/app/icon.png` (113 KB) → ✅ favicon moderno, sirve como `○ /icon.png`
+
+**Archivos tocados:**
+- DELETED: `src/app/favicon.ico`
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** NO — validación visual de Iván antes de commit.
+
+**Próximo paso sugerido:**
+1. Iván verifica en el navegador que el favicon del tab muestra el logo correcto (después del deploy)
+2. Commit: `git rm src/app/favicon.ico` + `DAILY_LOG.md` → push
+
+---
+
 ### Sesión 2026-05-13 — assets de marca temporales: icon.png, opengraph-image.png, favicon.ico
 
 **Contexto:** Iván generó los assets de marca a partir del logo existente de Assets Golden con la marca de Gemini AI removida. Hay que colocarlos en las ubicaciones que Next.js convention espera para que el favicon y el OG preview funcionen.
