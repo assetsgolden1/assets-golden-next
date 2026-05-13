@@ -63,6 +63,33 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-14 — redirects 301 slugs en inglés de Lovable + handler /property/[uuid]
+
+**Contexto:** Google había indexado la web cuando estaba en Lovable en inglés. Los 3 redirects del commit `06f02c4` cubrían slugs en español; faltaban todos los slugs en inglés que también daban 404. Además, Lovable usaba UUIDs para identificar propiedades (`/property/UUID`) y Next.js usa slugs (`/propiedades/slug`).
+
+**Trabajo hecho:**
+- `next.config.ts`: agregados 12 redirects 301 para slugs en inglés en la sección `redirects()` existente:
+  `/contact→/contacto`, `/properties→/propiedades`, `/investments→/inversiones`, `/sell→/vender-tu-piso`, `/about→/sobre-nosotros`, `/services→/servicios`, `/promotions→/promociones`, `/team→/equipo`, `/destinations→/destinos`, `/news→/noticias`, `/tips→/consejos`, `/my-demand→/mi-demanda`
+  — `/partners` NO incluido: la ruta ya existe en Next.js (`src/app/(public)/partners/page.tsx`)
+- Creado `src/app/property/[id]/page.tsx`: handler dinámico que recibe UUID, valida formato con regex, busca `slug` en Supabase con `createStaticClient()`, y hace `permanentRedirect()` (308) a `/propiedades/[slug]`. Si UUID inválido o no encontrado → `notFound()` (404).
+  — Fix necesario respecto al spec: `RedirectType.permanent` no existe en esta versión de Next.js (16.2.6) — la API correcta es `permanentRedirect()` importada desde `next/navigation`
+- Build: `Compiled successfully in 18.0s`, TypeScript OK, **1109 páginas**, `ƒ /property/[id]` aparece como ruta dinámica ✓
+- Total `permanent: true` en next.config.ts: **15** (1 www + 2 español + 12 inglés)
+
+**Archivos tocados:**
+- MODIFIED: `next.config.ts` (12 redirects inglés agregados)
+- CREATED: `src/app/property/[id]/page.tsx`
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** NO — validación visual de Iván antes de commit.
+
+**Próximo paso sugerido:**
+1. Commit + push → deploy Vercel
+2. Smoke test en producción: `/contact`, `/sell`, `/properties` → deben redirigir a sus equivalentes en español
+3. Para testear `/property/[uuid]`: obtener un UUID real de la tabla `properties` en Supabase y verificar que redirige al slug correcto
+
+---
+
 ### Sesión 2026-05-14 — fix favicon duplicado: borrado src/app/favicon.ico
 
 **Contexto:** El HTML de producción tenía 3 `link rel="icon"` tags en conflicto. El problema era `src/app/favicon.ico` (25 KB, versión vieja del logo completo con texto) que Next.js procesaba como metadata file y emitía con hash (`favicon.ico?favicon.0x3dzn~oxb6tn.ico` con `sizes="256x256"`), sobreescribiendo el `icon.png` correcto.

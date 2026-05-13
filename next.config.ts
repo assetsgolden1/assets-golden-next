@@ -145,6 +145,19 @@ const nextConfig: NextConfig = {
         destination: '/',
         permanent: false,
       },
+      // Slugs en inglés de Lovable indexados por Google
+      { source: '/contact',      destination: '/contacto',       permanent: true },
+      { source: '/properties',   destination: '/propiedades',    permanent: true },
+      { source: '/investments',  destination: '/inversiones',    permanent: true },
+      { source: '/sell',         destination: '/vender-tu-piso', permanent: true },
+      { source: '/about',        destination: '/sobre-nosotros', permanent: true },
+      { source: '/services',     destination: '/servicios',      permanent: true },
+      { source: '/promotions',   destination: '/promociones',    permanent: true },
+      { source: '/team',         destination: '/equipo',         permanent: true },
+      { source: '/destinations', destination: '/destinos',       permanent: true },
+      { source: '/news',         destination: '/noticias',       permanent: true },
+      { source: '/tips',         destination: '/consejos',       permanent: true },
+      { source: '/my-demand',    destination: '/mi-demanda',     permanent: true },
     ];
   },
 };
