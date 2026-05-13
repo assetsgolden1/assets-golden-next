@@ -63,6 +63,36 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-13 — CIERRE FORMAL (resumen del día + commits reales)
+
+**Nota:** Las 4 entradas individuales de abajo dicen "Commits: NO" porque fueron escritas antes de que Iván validara y autorizara. Esta entrada documenta los commits reales y cierra la sesión formalmente.
+
+**Commits del día (en orden cronológico):**
+
+| Hash | Descripción |
+|------|-------------|
+| `1ff4bf8` | fix(propiedades): paginador pagina→page |
+| `06f02c4` | feat(seo): 3 redirects español + metadata openGraph/twitter + sitemap |
+| `e9c7720` | feat(brand): assets de marca v1 (icon.png + opengraph-image.png + favicon.ico) |
+| `e9a8b86` | fix(brand): favicon v2 — solo círculo AG+león, sin texto (legible a 16×16) |
+| `c39526d` | fix(brand): borrar favicon.ico duplicado en src/app/ |
+| `94796e6` | feat(seo): 12 redirects inglés Lovable + handler dinámico /property/UUID |
+
+**Operaciones DB (sin commit — vía MCP directo):**
+- RLS habilitado en tabla `user_roles`
+- 2 backups creados en Supabase
+
+**Estado final del día:**
+- Todos los commits pusheados a `origin/main` ✓
+- Árbol de trabajo limpio (`nothing to commit, working tree clean`) ✓
+- Build: 1109 páginas estáticas, 0 errores TypeScript ✓
+- Vercel deployando `94796e6` automáticamente
+
+**Pendientes abiertos que siguen igual (no atacados hoy):**
+- Refactor pipeline leads (Resend), rotación de claves, GDPR forms, DNS — todos bloqueados por Atilio
+
+---
+
 ### Sesión 2026-05-14 — redirects 301 slugs en inglés de Lovable + handler /property/[uuid]
 
 **Contexto:** Google había indexado la web cuando estaba en Lovable en inglés. Los 3 redirects del commit `06f02c4` cubrían slugs en español; faltaban todos los slugs en inglés que también daban 404. Además, Lovable usaba UUIDs para identificar propiedades (`/property/UUID`) y Next.js usa slugs (`/propiedades/slug`).
