@@ -116,7 +116,7 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Redirects: www → non-www (301 permanente)
+  // Redirects: www → non-www (301 permanente) + slugs legacy de Lovable
   async redirects() {
     return [
       {
@@ -129,6 +129,21 @@ const nextConfig: NextConfig = {
         ],
         destination: "https://assetsgolden.com/:path*",
         permanent: true,
+      },
+      {
+        source: '/oportunidades-de-inversion',
+        destination: '/inversiones',
+        permanent: true,
+      },
+      {
+        source: '/quiero-vender-mi-propiedad',
+        destination: '/vender-tu-piso',
+        permanent: true,
+      },
+      {
+        source: '/whatsapp',
+        destination: '/',
+        permanent: false,
       },
     ];
   },

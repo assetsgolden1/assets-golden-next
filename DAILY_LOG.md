@@ -63,6 +63,40 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-13 — redirects 301 slugs Lovable + metadata OG/Twitter + sitemap completo
+
+**Contexto:** Google tenía indexados 3 slugs de Lovable que daban 404 en la nueva web. Además, layout.tsx no tenía openGraph/twitter configurados (causa del preview Vercel al compartir links). Sitemap tenía 8 rutas del proyecto sin incluir.
+
+**Trabajo hecho:**
+- `next.config.ts`: agregados 3 redirects a la sección `redirects()` existente (junto al www→non-www):
+  - `/oportunidades-de-inversion` → `/inversiones` (301 permanente)
+  - `/quiero-vender-mi-propiedad` → `/vender-tu-piso` (301 permanente)
+  - `/whatsapp` → `/` (302 temporal, por si se crea la ruta en el futuro)
+- `src/app/layout.tsx`: agregados `icons`, `openGraph`, `twitter` y `robots` al objeto `metadata`. Los assets (`/icon.png`, `/favicon.ico`, `/apple-icon.png`, `/opengraph-image.png`) aún no existen — se crean en sesión separada cuando Iván tenga los assets de marca; Next.js los ignora silenciosamente hasta entonces.
+- `src/app/sitemap.ts`: agregadas 8 rutas faltantes a `STATIC_PAGES`: `/sobre-nosotros` (0.8), `/servicios` (0.8), `/colabora` (0.6), `/mi-demanda` (0.7), `/promociones` (0.5), `/partners` (0.5), `/consejos` (0.4), `/noticias` (0.4)
+- Build: `Compiled successfully in 17.7s`, TypeScript OK, 1108 páginas ✓
+
+**Verificaciones:**
+- 3 matches de slugs Lovable en next.config.ts (líneas 134, 139, 144) ✓
+- 3 matches de openGraph/twitter/icons en layout.tsx (líneas 29, 35, 53) ✓
+- 3+ matches de rutas nuevas en sitemap.ts ✓
+
+**Archivos tocados:**
+- MODIFIED: `next.config.ts` (3 redirects agregados)
+- MODIFIED: `src/app/layout.tsx` (icons + openGraph + twitter + robots)
+- MODIFIED: `src/app/sitemap.ts` (8 rutas nuevas)
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** NO — validación visual de Iván antes de commit.
+
+**Próximo paso sugerido:**
+1. Iván valida en dev server: `/oportunidades-de-inversion` → redirige a `/inversiones`, etc.
+2. Compartir link en WhatsApp/Slack para confirmar que ya no aparece favicon Vercel (requiere deploy + assets de imagen)
+3. **Pendiente separado**: crear `src/app/icon.png` (512×512) y `src/app/opengraph-image.png` (1200×630) con assets de marca de Iván → eso cierra el problema visual del favicon y OG preview
+4. Si OK: commit + push
+
+---
+
 ### Sesión 2026-05-13 — fix paginador /propiedades (reemplazo 'pagina' → 'page')
 
 **Contexto:** El paginador de /propiedades no funcionaba: los números y "Siguiente" no cambiaban la página. Diagnóstico: `PaginationBar` siempre genera `?page=N` (inglés), pero `propiedades/page.tsx` leía `params.pagina` (español) → la página recibía `undefined` y volvía siempre a página 1. `/destinos/[slug]` leía `sp.page` → funcionaba correctamente.
