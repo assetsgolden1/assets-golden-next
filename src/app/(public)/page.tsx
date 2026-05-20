@@ -23,6 +23,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://assetsgolden.com',
   },
+  openGraph: {
+    url: 'https://assetsgolden.com',
+  },
 }
 
 export const revalidate = 3600

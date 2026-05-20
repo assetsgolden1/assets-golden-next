@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/vender-tu-piso',
   },
+  openGraph: {
+    url: '/vender-tu-piso',
+  },
 }
 
 export default function VenderTuPisoPage() {

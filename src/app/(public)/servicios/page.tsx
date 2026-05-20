@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/servicios',
   },
+  openGraph: {
+    url: '/servicios',
+  },
 }
 
 const SERVICES = [

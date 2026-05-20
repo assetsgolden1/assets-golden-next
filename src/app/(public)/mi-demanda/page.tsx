@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/mi-demanda',
   },
+  openGraph: {
+    url: '/mi-demanda',
+  },
 }
 
 export default function MiDemandaPage() {

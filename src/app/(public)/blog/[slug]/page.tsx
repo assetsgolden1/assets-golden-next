@@ -47,6 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       type: 'article',
       images: post.cover_image ? [{ url: post.cover_image }] : [],
+      url: `/blog/${slug}`,
       ...(post.published_at && {
         publishedTime: post.published_at,
       }),

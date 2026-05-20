@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/aviso-legal',
   },
+  openGraph: {
+    url: '/aviso-legal',
+  },
 }
 
 export default function AvisoLegalPage() {

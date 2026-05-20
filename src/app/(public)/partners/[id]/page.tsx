@@ -28,6 +28,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: `/partners/${id}`,
     },
+    openGraph: {
+      url: `/partners/${id}`,
+    },
   }
 }
 

@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/equipo',
   },
+  openGraph: {
+    url: '/equipo',
+  },
 }
 
 export const revalidate = 86400

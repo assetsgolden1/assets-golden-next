@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/contacto',
   },
+  openGraph: {
+    url: '/contacto',
+  },
 }
 
 const jsonLd = {

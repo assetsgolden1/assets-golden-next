@@ -51,7 +51,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     alternates: {
       canonical: '/destinos/espana',
     },
-    openGraph: { title, description },
+    openGraph: { title, description, url: '/destinos/espana' },
   }
 }
 

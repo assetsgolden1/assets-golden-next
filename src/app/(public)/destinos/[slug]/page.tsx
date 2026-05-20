@@ -66,7 +66,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     alternates: {
       canonical: `/destinos/${slug}`,
     },
-    openGraph: { images: data.hero_image_url ? [{ url: data.hero_image_url }] : [] },
+    openGraph: {
+      images: data.hero_image_url ? [{ url: data.hero_image_url }] : [],
+      url: `/destinos/${slug}`,
+    },
   }
 }
 

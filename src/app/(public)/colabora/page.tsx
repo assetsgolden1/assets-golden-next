@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/colabora',
   },
+  openGraph: {
+    url: '/colabora',
+  },
 }
 
 export default function ColaboraPage() {
