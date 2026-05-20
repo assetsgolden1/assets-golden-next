@@ -52,6 +52,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         publishedTime: post.published_at,
       }),
     },
+    twitter: {
+      images: post.cover_image ? [post.cover_image] : undefined,
+    },
   }
 }
 

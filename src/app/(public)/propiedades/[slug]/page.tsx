@@ -41,6 +41,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       images: data.image_url ? [{ url: data.image_url }] : [],
       url: `/propiedades/${slug}`,
     },
+    twitter: {
+      images: data.image_url ? [data.image_url] : undefined,
+    },
   }
 }
 

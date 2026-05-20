@@ -52,9 +52,6 @@ export const metadata: Metadata = {
 
   twitter: {
     card: 'summary_large_image',
-    title: 'Assets Golden — Inmobiliaria de Lujo Internacional',
-    description:
-      'Propiedades exclusivas en los mejores destinos del mundo.',
     images: ['/opengraph-image.png'],
   },
 
