@@ -103,24 +103,15 @@ export default async function BlogPostPage({ params }: Props) {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
+    '@id': `https://assetsgolden.com/blog/${slug}`,
     headline: post.title,
     description: post.excerpt ?? undefined,
-    image: heroImage ? [heroImage] : [],
-    datePublished: post.published_at ?? post.created_at,
-    dateModified: post.updated_at ?? post.created_at,
-    author: {
-      '@type': 'Organization',
-      name: 'Assets Golden',
-      url: 'https://assetsgolden.com',
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'Assets Golden',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://assetsgolden.com/logo.png',
-      },
-    },
+    image: heroImage ? [heroImage] : undefined,
+    datePublished: post.published_at ?? post.created_at ?? undefined,
+    dateModified: post.updated_at ?? post.created_at ?? undefined,
+    inLanguage: post.language === 'en' ? 'en-GB' : 'es-ES',
+    author: { '@id': 'https://assetsgolden.com/#organization' },
+    publisher: { '@id': 'https://assetsgolden.com/#organization' },
     url: `https://assetsgolden.com/blog/${slug}`,
     mainEntityOfPage: {
       '@type': 'WebPage',
