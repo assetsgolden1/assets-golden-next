@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: 'Consejos Inmobiliarios | Assets Golden',
   description:
     'Guía práctica para compradores, vendedores e inversores inmobiliarios. Consejos de expertos para tomar las mejores decisiones.',
+  alternates: {
+    canonical: '/consejos',
+  },
 }
 
 export const revalidate = 3600

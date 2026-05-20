@@ -34,6 +34,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description:
       data.description?.slice(0, 160) ??
       `${data.property_type ?? 'Propiedad'} en ${data.location ?? 'España'}. ${data.price ? `Precio: ${data.price.toLocaleString('es-ES')} ${data.currency ?? 'EUR'}.` : ''}`,
+    alternates: {
+      canonical: `/propiedades/${slug}`,
+    },
     openGraph: {
       images: data.image_url ? [{ url: data.image_url }] : [],
     },

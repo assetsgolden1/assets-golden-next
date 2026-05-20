@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: 'Noticias del Mercado Inmobiliario | Assets Golden',
   description:
     'Últimas noticias y novedades del mercado inmobiliario internacional. Tendencias, análisis y actualizaciones de Assets Golden.',
+  alternates: {
+    canonical: '/noticias',
+  },
 }
 
 export const revalidate = 3600

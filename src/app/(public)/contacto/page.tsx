@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: 'Contacto — Assets Golden International',
   description:
     'Contacte con nuestro equipo de expertos en inmobiliaria de lujo internacional. Respuesta en menos de 24 horas.',
+  alternates: {
+    canonical: '/contacto',
+  },
 }
 
 const jsonLd = {

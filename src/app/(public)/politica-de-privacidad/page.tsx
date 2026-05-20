@@ -4,6 +4,9 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'Política de Privacidad — Assets Golden International',
   description: 'Información sobre el tratamiento de datos personales por Assets Golden International conforme al RGPD y la LOPDGDD.',
+  alternates: {
+    canonical: '/politica-de-privacidad',
+  },
 }
 
 export default function PoliticaPrivacidadPage() {

@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: 'Red Internacional de Partners | Assets Golden',
   description:
     'Nuestra red global de colaboradores y agencias inmobiliarias en más de 15 países. Partner oficial de Nest Seekers International.',
+  alternates: {
+    canonical: '/partners',
+  },
 }
 
 export const revalidate = 3600

@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: 'Equipo | Assets Golden',
   description:
     'Conoce a los especialistas en inmobiliaria de lujo de Assets Golden. Expertos en Barcelona y mercados internacionales.',
+  alternates: {
+    canonical: '/equipo',
+  },
 }
 
 export const revalidate = 86400

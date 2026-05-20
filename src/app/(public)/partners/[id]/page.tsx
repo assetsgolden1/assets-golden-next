@@ -25,6 +25,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${data.name} | Partners — Assets Golden`,
     description: data.bio_es?.slice(0, 160) ?? `Partner de Assets Golden International en ${data.country ?? 'el mercado inmobiliario internacional'}.`,
+    alternates: {
+      canonical: `/partners/${id}`,
+    },
   }
 }
 

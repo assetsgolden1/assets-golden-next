@@ -5,6 +5,9 @@ import BlogCategoryGrid from '@/components/blog/BlogCategoryGrid'
 export const metadata: Metadata = {
   title: 'Análisis de Mercado Inmobiliario | Blog Assets Golden',
   description: 'Análisis y tendencias del mercado inmobiliario en España y los principales mercados internacionales.',
+  alternates: {
+    canonical: '/blog/mercado',
+  },
 }
 
 export const revalidate = 3600

@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   title: 'Inversión Inmobiliaria Internacional | Assets Golden',
   description:
     'Oportunidades de inversión inmobiliaria en los mercados más rentables de Europa y América. Análisis de mercado, rentabilidades y asesoramiento personalizado.',
+  alternates: {
+    canonical: '/inversiones',
+  },
 }
 
 export const revalidate = 3600

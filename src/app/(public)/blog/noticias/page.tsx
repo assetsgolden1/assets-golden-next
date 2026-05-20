@@ -5,6 +5,9 @@ import BlogCategoryGrid from '@/components/blog/BlogCategoryGrid'
 export const metadata: Metadata = {
   title: 'Noticias Inmobiliarias | Blog Assets Golden',
   description: 'Últimas noticias y novedades del mercado inmobiliario internacional.',
+  alternates: {
+    canonical: '/blog/noticias',
+  },
 }
 
 export const revalidate = 3600

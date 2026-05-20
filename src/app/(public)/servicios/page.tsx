@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   title: 'Servicios Inmobiliarios | Assets Golden International',
   description:
     'Servicios especializados de compra, venta, inversión y gestión de propiedades de lujo en España y mercados internacionales.',
+  alternates: {
+    canonical: '/servicios',
+  },
 }
 
 const SERVICES = [

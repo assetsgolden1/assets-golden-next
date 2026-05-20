@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: 'Blog Inmobiliario | Assets Golden',
   description:
     'Artículos y análisis sobre el mercado inmobiliario de lujo en Barcelona y destinos internacionales. Tendencias, consejos e inversión.',
+  alternates: {
+    canonical: '/blog',
+  },
 }
 
 export const revalidate = 3600

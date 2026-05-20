@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: 'Sobre Nosotros — Assets Golden International',
   description:
     'Somos una consultora inmobiliaria internacional con más de 15 años de experiencia en los mercados de lujo de Europa y América. Conozca nuestra historia y valores.',
+  alternates: {
+    canonical: '/sobre-nosotros',
+  },
 }
 
 export const revalidate = 3600

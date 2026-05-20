@@ -5,6 +5,9 @@ import BlogCategoryGrid from '@/components/blog/BlogCategoryGrid'
 export const metadata: Metadata = {
   title: 'Consejos Inmobiliarios | Blog Assets Golden',
   description: 'Artículos con consejos prácticos para compradores, vendedores e inversores inmobiliarios.',
+  alternates: {
+    canonical: '/blog/consejos',
+  },
 }
 
 export const revalidate = 3600

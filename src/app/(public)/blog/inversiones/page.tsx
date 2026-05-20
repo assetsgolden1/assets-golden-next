@@ -5,6 +5,9 @@ import BlogCategoryGrid from '@/components/blog/BlogCategoryGrid'
 export const metadata: Metadata = {
   title: 'Blog Inversiones Inmobiliarias | Assets Golden',
   description: 'Artículos sobre inversión inmobiliaria, rentabilidades y mercados internacionales.',
+  alternates: {
+    canonical: '/blog/inversiones',
+  },
 }
 
 export const revalidate = 3600

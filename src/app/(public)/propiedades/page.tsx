@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   title: 'Propiedades de Lujo | Assets Golden',
   description:
     'Encuentre su propiedad ideal entre nuestra selección exclusiva de pisos, áticos, villas y casas de lujo en todo el mundo.',
+  alternates: {
+    canonical: '/propiedades',
+  },
 }
 
 export const revalidate = 3600

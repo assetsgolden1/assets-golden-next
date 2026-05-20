@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: 'Vender Tu Piso en Barcelona — Tasación Gratuita | Assets Golden',
   description:
     'Tasa tu propiedad gratis y de forma confidencial en 24 horas. Especialistas en venta de pisos de lujo en Barcelona. Sin compromiso.',
+  alternates: {
+    canonical: '/vender-tu-piso',
+  },
 }
 
 export default function VenderTuPisoPage() {

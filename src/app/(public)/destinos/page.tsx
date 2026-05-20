@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: 'Destinos de Inversión Inmobiliaria | Assets Golden',
   description:
     'Explore propiedades en España, México, Emiratos Árabes Unidos, Argentina, Estados Unidos y más. Inversión inmobiliaria internacional con Assets Golden.',
+  alternates: {
+    canonical: '/destinos',
+  },
 }
 
 export const revalidate = 3600

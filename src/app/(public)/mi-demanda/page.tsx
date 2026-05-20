@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: 'Mi Demanda — Personal Shopper Inmobiliario | Assets Golden',
   description:
     'Díganos qué propiedad busca y nuestro equipo encontrará activos que no están en el mercado para usted. Servicio de Personal Shopper Inmobiliario.',
+  alternates: {
+    canonical: '/mi-demanda',
+  },
 }
 
 export default function MiDemandaPage() {

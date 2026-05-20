@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: 'Obra Nueva y Promociones Inmobiliarias | Assets Golden',
   description:
     'Descubra nuestras promociones de obra nueva y desarrollos inmobiliarios exclusivos en España y los principales mercados internacionales.',
+  alternates: {
+    canonical: '/promociones',
+  },
 }
 
 export const revalidate = 3600

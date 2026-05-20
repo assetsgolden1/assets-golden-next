@@ -48,6 +48,9 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   return {
     title,
     description,
+    alternates: {
+      canonical: '/destinos/espana',
+    },
     openGraph: { title, description },
   }
 }

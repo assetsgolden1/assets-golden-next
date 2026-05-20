@@ -4,6 +4,9 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'Aviso Legal — Assets Golden International',
   description: 'Información legal del prestador de servicios y condiciones de uso del sitio web de Assets Golden International conforme a la LSSI-CE.',
+  alternates: {
+    canonical: '/aviso-legal',
+  },
 }
 
 export default function AvisoLegalPage() {
