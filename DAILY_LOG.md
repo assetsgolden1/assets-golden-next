@@ -63,6 +63,81 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-20 — feat(seo): Bloque 1 completo — correcciones técnicas SEO inmediatas
+
+**Contexto:** Ejecución del Bloque 1 del plan SEO aprobado (Plan-SEO-AssetsGolden_1.docx). Objetivo: corregir los errores técnicos de mayor impacto sin dependencias externas. Sesión repartida en dos contextos (compactado a mitad).
+
+**Trabajo hecho:**
+- **AC-2** (ya committeado en sesión anterior, `e22fc68`): canónicas autorreferenciales en las 28 rutas públicas ✓
+- **AC-3** (`d0ba2b2`): `openGraph.url` dinámico por página — sobreescribe el og:url fijo a la home en las 28 rutas estáticas y en los 5 `generateMetadata` dinámicos
+- **AH-5** (`4be6d93`): elimina doble branding en títulos — home usa `{ absolute }`, resto pierde el sufijo de marca para que el template del layout lo añada una sola vez
+- **TT-1** (`12f2524`): títulos y descripciones únicos — soluciona colisión `/consejos` vs `/blog/consejos`; quita `| Assets Golden` de títulos dinámicos en destinos; expande 8 descripciones cortas a ~150 chars; atribuye "15 años" al equipo (no a la marca); fallback de propiedades sin precio
+- **TW-1** (`521ffde`): Twitter Card dinámica — quita `twitter:title/description` fijos del root layout; añade `twitter.images` con la imagen propia en propiedades/[slug], blog/[slug] y destinos/[slug]
+- **AC-5** (`706419e`): activa caché HTTP — elimina `force-dynamic` de la home; cambia `Cache-Control` en `next.config.ts` de `no-store` a `s-maxage=3600, stale-while-revalidate=86400`
+- **AH-1**: ya estaba implementado (HeroImageCarousel y PropertyGalleryClient ya tenían `priority` en la primera imagen) — sin cambio de código
+- **AH-3** (`4f480c7`): preconexiones a CDN — `link rel=preconnect` en layout.tsx para los dos buckets Supabase activos y medianewbuild.com
+- **AH-2** (`c7151cd`): crea `public/llms.txt` con entidad, razón social correcta (COVA FUMADA GROUP, SOCIEDAD LIMITADA), páginas principales, especialidades y licencia de contenido
+
+**Archivos tocados:**
+- MODIFIED: `src/app/layout.tsx` (TW-1 + AH-3)
+- MODIFIED: `src/app/(public)/page.tsx` (AC-5)
+- MODIFIED: `next.config.ts` (AC-5)
+- MODIFIED: `public/llms.txt` (CREATED — AH-2)
+- MODIFIED: 28 archivos `page.tsx` en `src/app/(public)/` (AC-3, AH-5, TT-1)
+- MODIFIED: `src/app/(public)/propiedades/[slug]/page.tsx` (TW-1)
+- MODIFIED: `src/app/(public)/blog/[slug]/page.tsx` (TW-1)
+- MODIFIED: `src/app/(public)/destinos/[slug]/page.tsx` (TW-1 + TT-1)
+- MODIFIED: `src/app/(public)/destinos/espana/page.tsx` (TT-1)
+
+**Commits:**
+- `d0ba2b2` feat(seo): AC-3 — og:url dinámico en las 28 rutas públicas
+- `4be6d93` feat(seo): AH-5 — eliminar doble branding en títulos de página
+- `12f2524` feat(seo): TT-1 — títulos y descripciones únicos en todas las páginas
+- `521ffde` feat(seo): TW-1 — Twitter Card dinámica por página
+- `706419e` feat(seo): AC-5 — activar caché HTTP en la home
+- `4f480c7` feat(seo): AH-3 — preconexión a CDN externos de imágenes
+- `c7151cd` feat(seo): AH-2 — publicar llms.txt para motores de IA (GEO)
+
+**Próximo paso sugerido:**
+Bloque 2 — Schema markup. Depende de 3 datos a confirmar con Atilio:
+1. Razón social: COVA FUMADA GROUP, SOCIEDAD LIMITADA (a validar con Atilio)
+2. Número exacto de países en la red de partners
+3. URL del perfil LinkedIn de empresa de Assets Golden
+Sin estos datos, NO ejecutar AC-1 (schema Organization global).
+
+---
+
+### Sesión 2026-05-20 — fix(contacto): eliminar mapa y dirección física — solo 3 canales de contacto
+
+**Contexto:** Iván pidió quitar todo lo relacionado con el mapa embebido y la dirección física de `/contacto`, dejando únicamente 3 canales: teléfono, email y WhatsApp. Las páginas legales deben conservar la dirección completa (obligatorio legal).
+
+**Trabajo hecho:**
+- `contacto/page.tsx` reescrito:
+  - Eliminado `MapPin` de imports de lucide-react; añadido `MessageCircle` para WhatsApp
+  - `contactItems` ahora son 3: Phone (+34 611 85 30 01), Mail (hola@assetsgolden.com), WhatsApp (wa.me/34611853001)
+  - Eliminado el bloque `<iframe>` de Google Maps
+  - Eliminados `address` y `geo` del JSON-LD schema (evita publicar dirección en datos estructurados)
+  - Actualizado encabezado: "Nuestra oficina" → "Información de contacto"
+  - Actualizada metadata description: eliminada referencia "Oficina en Barcelona"
+  - Simplificado render de items: todos tienen href, eliminado condicional `href ? <a> : <p>`
+- **Verificación páginas legales:**
+  - `aviso-legal/page.tsx` l.37: "José Agustín Goytisolo 31, L5, 08970 Sant Joan Despí (Barcelona)" ✓
+  - `politica-de-privacidad/page.tsx` l.37: "José Agustín Goytisolo 31, L5, 08970 Sant Joan Despí (Barcelona)" ✓
+  - `politica-de-cookies/page.tsx`: no tiene dirección postal (correcto — la política de cookies no la requiere legalmente) ✓
+- Build: `Compiled successfully in 17.9s`, TypeScript OK, **1109 páginas**, `/contacto` como `○ (Static)` ✓
+
+**Archivos tocados:**
+- MODIFIED: `src/app/(public)/contacto/page.tsx`
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** NO — pendiente validación visual de Iván.
+
+**Próximo paso sugerido:**
+1. Iván abre `/contacto` en dev server y verifica que aparecen los 3 canales (Teléfono, Email, WhatsApp), que el mapa ya no está, y que los enlaces funcionan (tel:, mailto:, wa.me)
+2. Si OK: commit `fix(contacto): eliminar mapa + dirección — solo 3 canales` + push
+
+---
+
 ### Sesión 2026-05-13 — CIERRE FORMAL (resumen del día + commits reales)
 
 **Nota:** Las 4 entradas individuales de abajo dicen "Commits: NO" porque fueron escritas antes de que Iván validara y autorizara. Esta entrada documenta los commits reales y cierra la sesión formalmente.
