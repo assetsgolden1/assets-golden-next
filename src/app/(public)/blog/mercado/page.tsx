@@ -4,7 +4,7 @@ import BlogCategoryGrid from '@/components/blog/BlogCategoryGrid'
 
 export const metadata: Metadata = {
   title: 'Análisis del Mercado Inmobiliario',
-  description: 'Análisis y tendencias del mercado inmobiliario en España y los principales mercados internacionales.',
+  description: 'Análisis en profundidad de las tendencias del mercado inmobiliario en España y los principales destinos internacionales. Perspectivas y datos actualizados.',
   alternates: {
     canonical: '/blog/mercado',
   },

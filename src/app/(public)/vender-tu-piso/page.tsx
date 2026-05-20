@@ -4,7 +4,7 @@ import VenderForm from '@/components/forms/VenderForm'
 export const metadata: Metadata = {
   title: 'Vender Tu Piso en Barcelona — Tasación Gratuita',
   description:
-    'Tasa tu propiedad gratis y de forma confidencial en 24 horas. Especialistas en venta de pisos de lujo en Barcelona. Sin compromiso.',
+    'Vende tu piso o propiedad de lujo en Barcelona con la máxima discreción y al mejor precio. Tasación gratuita y sin compromiso en menos de 24 horas.',
   alternates: {
     canonical: '/vender-tu-piso',
   },

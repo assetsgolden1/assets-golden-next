@@ -5,7 +5,7 @@ import ContactForm from './ContactForm'
 export const metadata: Metadata = {
   title: 'Contacto',
   description:
-    'Contacte con nuestro equipo de expertos en inmobiliaria de lujo internacional. Respuesta en menos de 24 horas.',
+    'Contacte con nuestros expertos en inmobiliaria de lujo. Consultas confidenciales sobre compra, venta o inversión. Respondemos en menos de 24 horas.',
   alternates: {
     canonical: '/contacto',
   },

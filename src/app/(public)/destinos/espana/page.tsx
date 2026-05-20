@@ -34,15 +34,15 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const zoneName = params.zona ? ZONE_SLUGS[params.zona] : null
   const ciudad = params.ciudad ?? null
 
-  let title = 'Propiedades en España | Assets Golden'
-  let description = 'Descubre las mejores propiedades de lujo en España. Villas, apartamentos y áticos frente al mar.'
+  let title = 'Propiedades en España'
+  let description = 'Explore la selección de propiedades de lujo en España: villas en la costa, áticos en Barcelona y apartamentos en los destinos más exclusivos del país.'
 
   if (zoneName && ciudad) {
-    title = `Propiedades en ${ciudad}, ${zoneName} | Assets Golden`
-    description = `Apartamentos, villas y áticos de lujo en ${ciudad}. Expertos en ${zoneName}.`
+    title = `Propiedades en ${ciudad}, ${zoneName}`
+    description = `Apartamentos, villas y áticos de lujo en ${ciudad}, ${zoneName}. Selección exclusiva y asesoramiento experto para compradores nacionales e internacionales.`
   } else if (zoneName) {
-    title = `Propiedades en ${zoneName} | Assets Golden`
-    description = `Las mejores propiedades de lujo en ${zoneName}. Villas, apartamentos y áticos.`
+    title = `Propiedades en ${zoneName}`
+    description = `Las mejores propiedades de lujo en ${zoneName}: villas, apartamentos y áticos en ubicaciones privilegiadas. Asesoramiento personalizado en cada búsqueda.`
   }
 
   return {

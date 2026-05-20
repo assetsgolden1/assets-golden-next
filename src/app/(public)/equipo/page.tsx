@@ -7,7 +7,7 @@ import { getLocalPhoto } from '@/lib/constants/photoMap'
 export const metadata: Metadata = {
   title: 'Equipo',
   description:
-    'Conoce a los especialistas en inmobiliaria de lujo de Assets Golden. Expertos en Barcelona y mercados internacionales.',
+    'Profesionales especializados en inmobiliaria de lujo con trayectoria internacional. Conozca al equipo de expertos en Barcelona y en los principales destinos del mundo.',
   alternates: {
     canonical: '/equipo',
   },

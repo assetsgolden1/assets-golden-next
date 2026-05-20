@@ -4,7 +4,7 @@ import BlogCategoryGrid from '@/components/blog/BlogCategoryGrid'
 
 export const metadata: Metadata = {
   title: 'Inversiones Inmobiliarias',
-  description: 'Artículos sobre inversión inmobiliaria, rentabilidades y mercados internacionales.',
+  description: 'Artículos especializados en inversión inmobiliaria internacional. Rentabilidades, mercados emergentes y estrategias para diversificar su cartera de activos.',
   alternates: {
     canonical: '/blog/inversiones',
   },

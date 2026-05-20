@@ -7,7 +7,7 @@ import { buttonVariants } from '@/components/ui/button'
 export const metadata: Metadata = {
   title: 'Sobre Nosotros',
   description:
-    'Somos una consultora inmobiliaria internacional con más de 15 años de experiencia en los mercados de lujo de Europa y América. Conozca nuestra historia y valores.',
+    'Equipo con más de 15 años de experiencia en inmobiliaria de lujo internacional en Europa y América. Conozca la historia y los valores de Assets Golden.',
   alternates: {
     canonical: '/sobre-nosotros',
   },

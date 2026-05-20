@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: data.title,
     description:
       data.description?.slice(0, 160) ??
-      `${data.property_type ?? 'Propiedad'} en ${data.location ?? 'España'}. ${data.price ? `Precio: ${data.price.toLocaleString('es-ES')} ${data.currency ?? 'EUR'}.` : ''}`,
+      `${data.property_type ?? 'Propiedad exclusiva'} en ${data.location ?? data.province ?? 'España'}${data.bedrooms ? `, ${data.bedrooms} habitaciones` : ''}${data.area_sqm ? `, ${data.area_sqm} m²` : ''}. Asesoramiento personalizado para compradores e inversores. Consulte disponibilidad.`.slice(0, 160),
     alternates: {
       canonical: `/propiedades/${slug}`,
     },

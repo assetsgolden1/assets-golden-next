@@ -50,14 +50,14 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   if (!data) return { title: 'Destino — Assets Golden' }
 
   const ciudad = sp.ciudad ?? null
-  let title = `Propiedades en ${data.country_name} | Assets Golden`
+  let title = `Propiedades en ${data.country_name}`
   let description =
     data.description?.slice(0, 160) ??
-    `Descubra las mejores propiedades de lujo en ${data.country_name} con Assets Golden International.`
+    `Propiedades de lujo en ${data.country_name}: apartamentos, villas y áticos en los mejores barrios. Búsqueda personalizada y asesoramiento experto.`
 
   if (ciudad) {
-    title = `Propiedades en ${ciudad}, ${data.country_name} | Assets Golden`
-    description = `Apartamentos, villas y áticos de lujo en ${ciudad}, ${data.country_name}.`
+    title = `Propiedades en ${ciudad}, ${data.country_name}`
+    description = `Apartamentos, villas y áticos de lujo en ${ciudad}, ${data.country_name}. Selección exclusiva de propiedades premium con asesoramiento personalizado.`
   }
 
   return {

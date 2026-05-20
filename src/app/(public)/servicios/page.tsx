@@ -17,7 +17,7 @@ import { buttonVariants } from '@/components/ui/button'
 export const metadata: Metadata = {
   title: 'Servicios Inmobiliarios',
   description:
-    'Servicios especializados de compra, venta, inversión y gestión de propiedades de lujo en España y mercados internacionales.',
+    'Asesoramiento experto en compra, venta e inversión de propiedades de lujo en España y mercados internacionales. Due diligence completo en cada operación.',
   alternates: {
     canonical: '/servicios',
   },

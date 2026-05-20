@@ -13,7 +13,7 @@ import { PaginationBar } from '@/components/PaginationBar'
 export const metadata: Metadata = {
   title: 'Propiedades de Lujo',
   description:
-    'Encuentre su propiedad ideal entre nuestra selección exclusiva de pisos, áticos, villas y casas de lujo en todo el mundo.',
+    'Explore nuestra selección de propiedades de lujo: pisos, áticos, villas y casas en los mejores destinos del mundo. Filtre por país, precio y tipología.',
   alternates: {
     canonical: '/propiedades',
   },
