@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
+import GlobalSchemaOrg from "@/components/seo/GlobalSchemaOrg";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -76,6 +77,7 @@ export default function RootLayout({
       className={`${playfair.variable} ${dmSans.variable} h-full antialiased`}
     >
       <head>
+        <GlobalSchemaOrg />
         <link rel="preconnect" href="https://mromkwpqrxpxbbxhdofs.supabase.co" />
         <link rel="preconnect" href="https://wloneprkibfjioxwypaw.supabase.co" />
         <link rel="preconnect" href="https://medianewbuild.com" />
