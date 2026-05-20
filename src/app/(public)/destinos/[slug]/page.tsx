@@ -3,7 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { redirect, notFound } from 'next/navigation'
 import type { ElementType } from 'react'
-import { MapPin, ChevronRight, ArrowLeft, Sun, TrendingUp, Building2, Star, Globe, Shield, BarChart3 } from 'lucide-react'
+import { MapPin, ArrowLeft, Sun, TrendingUp, Building2, Star, Globe, Shield, BarChart3 } from 'lucide-react'
+import Breadcrumb from '@/components/seo/Breadcrumb'
 import { buttonVariants } from '@/components/ui/button'
 import {
   getAllDestinationSlugs,
@@ -133,22 +134,15 @@ export default async function DestinoPage({ params, searchParams }: Props) {
 
   return (
     <>
-      {/* Breadcrumb */}
-      <section className="bg-secondary border-b border-border">
-        <div className="container-luxury py-3 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/" className="hover:text-gold transition-colors">Inicio</Link>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <Link href="/destinos" className="hover:text-gold transition-colors">Destinos</Link>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <span className="text-foreground font-medium">{destination.country_name}</span>
-          {ciudad && (
-            <>
-              <ChevronRight className="h-3.5 w-3.5" />
-              <span className="text-foreground font-medium">{ciudad}</span>
-            </>
-          )}
-        </div>
-      </section>
+      <Breadcrumb
+        variant="secondary"
+        items={[
+          { name: 'Inicio', url: '/' },
+          { name: 'Destinos', url: '/destinos' },
+          { name: destination.country_name, url: `/destinos/${slug}` },
+          ...(ciudad ? [{ name: ciudad, url: `/destinos/${slug}?ciudad=${encodeURIComponent(ciudad)}` }] : []),
+        ]}
+      />
 
       {/* Hero */}
       <section className="relative h-80 md:h-[420px] overflow-hidden">

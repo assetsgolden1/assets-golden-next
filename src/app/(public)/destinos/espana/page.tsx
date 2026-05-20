@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { MapPin, ChevronRight, ArrowLeft } from 'lucide-react'
+import { MapPin, ArrowLeft } from 'lucide-react'
+import Breadcrumb from '@/components/seo/Breadcrumb'
 import {
   getDestinationBySlug,
   getPropertiesForSpain,
@@ -104,28 +105,16 @@ export default async function EspanaPage({ searchParams }: Props) {
 
   return (
     <>
-      {/* Breadcrumb */}
-      <section className="bg-secondary border-b border-border">
-        <div className="container-luxury py-3 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/" className="hover:text-gold transition-colors">Inicio</Link>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <Link href="/destinos" className="hover:text-gold transition-colors">Destinos</Link>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <span className="text-foreground font-medium">España</span>
-          {zona && zoneName && (
-            <>
-              <ChevronRight className="h-3.5 w-3.5" />
-              <span className="text-foreground font-medium">{zoneName}</span>
-            </>
-          )}
-          {ciudad && (
-            <>
-              <ChevronRight className="h-3.5 w-3.5" />
-              <span className="text-foreground font-medium">{ciudad}</span>
-            </>
-          )}
-        </div>
-      </section>
+      <Breadcrumb
+        variant="secondary"
+        items={[
+          { name: 'Inicio', url: '/' },
+          { name: 'Destinos', url: '/destinos' },
+          { name: 'España', url: '/destinos/espana' },
+          ...(zona && zoneName ? [{ name: zoneName, url: `/destinos/espana?zona=${zona}` }] : []),
+          ...(ciudad ? [{ name: ciudad, url: `/destinos/espana?${zona ? `zona=${zona}&` : ''}ciudad=${encodeURIComponent(ciudad)}` }] : []),
+        ]}
+      />
 
       {/* Hero */}
       <section className="relative h-80 md:h-[420px] overflow-hidden">

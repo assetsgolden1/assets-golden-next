@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import { Maximize, BedDouble, Bath, MapPin, ExternalLink, ChevronRight, ArrowLeft } from 'lucide-react'
+import { Maximize, BedDouble, Bath, MapPin, ExternalLink, ArrowLeft } from 'lucide-react'
+import Breadcrumb from '@/components/seo/Breadcrumb'
 import { buttonVariants } from '@/components/ui/button'
 import { getPropertyBySlug, getAllPropertySlugs } from '@/lib/supabase/queries'
 import PropertyGalleryClient from '@/components/PropertyGalleryClient'
@@ -102,16 +103,11 @@ export default async function PropertyDetailPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Breadcrumb */}
-      <nav className="container-luxury py-4">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-gold transition-colors">Inicio</Link>
-          <ChevronRight className="w-4 h-4" />
-          <Link href="/propiedades" className="hover:text-gold transition-colors">Propiedades</Link>
-          <ChevronRight className="w-4 h-4" />
-          <span className="text-foreground line-clamp-1">{property.title}</span>
-        </div>
-      </nav>
+      <Breadcrumb items={[
+        { name: 'Inicio', url: '/' },
+        { name: 'Propiedades', url: '/propiedades' },
+        { name: property.title, url: `/propiedades/${slug}` },
+      ]} />
 
       {/* Botón volver */}
       <div className="container-luxury pb-2">

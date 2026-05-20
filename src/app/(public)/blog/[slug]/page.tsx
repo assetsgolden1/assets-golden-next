@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getBlogPostBySlug, getAllBlogSlugs } from '@/lib/supabase/queries'
+import Breadcrumb from '@/components/seo/Breadcrumb'
 import { buttonVariants } from '@/components/ui/button'
 import { getRelatedProperties } from '@/lib/blogProperties'
 import { RelatedProperties } from '@/components/RelatedProperties'
@@ -153,6 +154,11 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <>
+      <Breadcrumb items={[
+        { name: 'Inicio', url: '/' },
+        { name: 'Blog', url: '/blog' },
+        { name: post.title, url: `/blog/${slug}` },
+      ]} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
