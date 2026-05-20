@@ -75,7 +75,11 @@ export default function RootLayout({
       lang="es"
       className={`${playfair.variable} ${dmSans.variable} h-full antialiased`}
     >
-      <head />
+      <head>
+        <link rel="preconnect" href="https://mromkwpqrxpxbbxhdofs.supabase.co" />
+        <link rel="preconnect" href="https://wloneprkibfjioxwypaw.supabase.co" />
+        <link rel="preconnect" href="https://medianewbuild.com" />
+      </head>
       <body className="flex min-h-full flex-col bg-background text-foreground">
         {children}
       </body>
