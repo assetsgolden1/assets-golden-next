@@ -16,12 +16,21 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'LocalBusiness',
-  name: 'Assets Golden International',
+  '@type': ['LocalBusiness', 'RealEstateAgent'],
+  '@id': 'https://assetsgolden.com/#organization',
+  name: 'Assets Golden',
   description: 'Consultoría inmobiliaria internacional especializada en propiedades de lujo',
   url: 'https://assetsgolden.com',
-  telephone: '+34-611-853-001',
+  telephone: '+34611853001',
   email: 'hola@assetsgolden.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'José Agustín Goytisolo, 31, L5',
+    postalCode: '08970',
+    addressLocality: 'Sant Joan Despí',
+    addressRegion: 'Cataluña',
+    addressCountry: 'ES',
+  },
   openingHoursSpecification: {
     '@type': 'OpeningHoursSpecification',
     dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
