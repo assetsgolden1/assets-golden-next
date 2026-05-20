@@ -59,12 +59,12 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // 2. Home page: no cache para evitar versión obsoleta en CDN
+        // 2. Home page: ISR 1h en CDN, stale-while-revalidate 24h
         source: "/",
         headers: [
           {
             key: "Cache-Control",
-            value: "no-store, must-revalidate",
+            value: "public, s-maxage=3600, stale-while-revalidate=86400",
           },
         ],
       },

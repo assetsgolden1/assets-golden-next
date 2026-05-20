@@ -29,7 +29,6 @@ export const metadata: Metadata = {
 }
 
 export const revalidate = 3600
-export const dynamic = 'force-dynamic'
 
 // 11 países reales de Assets Golden
 const VALID_COUNTRIES = [
