@@ -79,21 +79,36 @@ export default async function PropertyDetailPage({ params }: Props) {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'RealEstateListing',
+    '@id': `https://assetsgolden.com/propiedades/${slug}`,
     name: property.title,
     description: property.description ?? undefined,
     url: `https://assetsgolden.com/propiedades/${slug}`,
-    image: allImages,
-    ...(property.price && {
-      price: property.price,
-      priceCurrency: property.currency ?? 'EUR',
-    }),
+    image: allImages.length > 0 ? allImages : undefined,
     ...(property.location && {
       address: {
         '@type': 'PostalAddress',
         addressLocality: property.location,
+        ...(property.province && { addressRegion: property.province }),
         addressCountry: property.country ?? 'ES',
       },
     }),
+    ...(property.price && {
+      offers: {
+        '@type': 'Offer',
+        price: property.price,
+        priceCurrency: property.currency ?? 'EUR',
+        availability: 'https://schema.org/InStock',
+      },
+    }),
+    ...(property.bedrooms != null && { numberOfRooms: property.bedrooms }),
+    ...(property.area_sqm != null && {
+      floorSize: {
+        '@type': 'QuantitativeValue',
+        value: property.area_sqm,
+        unitCode: 'MTK',
+      },
+    }),
+    seller: { '@id': 'https://assetsgolden.com/#organization' },
   }
 
   return (
