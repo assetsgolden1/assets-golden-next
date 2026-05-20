@@ -3,7 +3,7 @@ import { getBlogPostsByCategory } from '@/lib/supabase/queries'
 import BlogCategoryGrid from '@/components/blog/BlogCategoryGrid'
 
 export const metadata: Metadata = {
-  title: 'Análisis de Mercado Inmobiliario | Blog Assets Golden',
+  title: 'Análisis del Mercado Inmobiliario',
   description: 'Análisis y tendencias del mercado inmobiliario en España y los principales mercados internacionales.',
   alternates: {
     canonical: '/blog/mercado',

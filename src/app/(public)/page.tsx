@@ -17,7 +17,7 @@ import {
 } from '@/lib/supabase/queries'
 
 export const metadata: Metadata = {
-  title: 'Assets Golden — Inmobiliaria de Lujo en Barcelona',
+  title: { absolute: 'Assets Golden — Inmobiliaria de Lujo en Barcelona' },
   description:
     'Tasación gratuita y confidencial en 24 horas. Especialistas en venta de propiedades de lujo en Barcelona con red offmarket exclusiva e internacional.',
   alternates: {

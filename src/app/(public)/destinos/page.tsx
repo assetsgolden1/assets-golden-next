@@ -6,7 +6,7 @@ import { getDestinations, getPropertyCountsByCountry } from '@/lib/supabase/quer
 import { buttonVariants } from '@/components/ui/button'
 
 export const metadata: Metadata = {
-  title: 'Destinos de Inversión Inmobiliaria | Assets Golden',
+  title: 'Destinos de Inversión Inmobiliaria',
   description:
     'Explore propiedades en España, México, Emiratos Árabes Unidos, Argentina, Estados Unidos y más. Inversión inmobiliaria internacional con Assets Golden.',
   alternates: {

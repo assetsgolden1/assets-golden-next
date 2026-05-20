@@ -6,7 +6,7 @@ import { getBlogPostsByCategory } from '@/lib/supabase/queries'
 import { buttonVariants } from '@/components/ui/button'
 
 export const metadata: Metadata = {
-  title: 'Consejos Inmobiliarios | Assets Golden',
+  title: 'Consejos Inmobiliarios',
   description:
     'Guía práctica para compradores, vendedores e inversores inmobiliarios. Consejos de expertos para tomar las mejores decisiones.',
   alternates: {

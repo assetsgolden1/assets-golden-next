@@ -5,7 +5,7 @@ import PropertyCard from '@/components/properties/PropertyCard'
 import { buttonVariants } from '@/components/ui/button'
 
 export const metadata: Metadata = {
-  title: 'Obra Nueva y Promociones Inmobiliarias | Assets Golden',
+  title: 'Obra Nueva y Promociones Inmobiliarias',
   description:
     'Descubra nuestras promociones de obra nueva y desarrollos inmobiliarios exclusivos en España y los principales mercados internacionales.',
   alternates: {

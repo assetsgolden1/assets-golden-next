@@ -6,7 +6,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { getLinkedin } from '@/lib/constants/linkedinMap'
 
 export const metadata: Metadata = {
-  title: 'Red Internacional de Partners | Assets Golden',
+  title: 'Red Internacional de Partners',
   description:
     'Nuestra red global de colaboradores y agencias inmobiliarias en más de 15 países. Partner oficial de Nest Seekers International.',
   alternates: {

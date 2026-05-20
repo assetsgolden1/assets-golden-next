@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import MiDemandaForm from './MiDemandaForm'
 
 export const metadata: Metadata = {
-  title: 'Mi Demanda — Personal Shopper Inmobiliario | Assets Golden',
+  title: 'Mi Demanda — Personal Shopper Inmobiliario',
   description:
     'Díganos qué propiedad busca y nuestro equipo encontrará activos que no están en el mercado para usted. Servicio de Personal Shopper Inmobiliario.',
   alternates: {

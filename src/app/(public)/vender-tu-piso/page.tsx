@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import VenderForm from '@/components/forms/VenderForm'
 
 export const metadata: Metadata = {
-  title: 'Vender Tu Piso en Barcelona — Tasación Gratuita | Assets Golden',
+  title: 'Vender Tu Piso en Barcelona — Tasación Gratuita',
   description:
     'Tasa tu propiedad gratis y de forma confidencial en 24 horas. Especialistas en venta de pisos de lujo en Barcelona. Sin compromiso.',
   alternates: {

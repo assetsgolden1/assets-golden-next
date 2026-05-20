@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Política de Cookies — Assets Golden International',
+  title: 'Política de Cookies',
   description: 'Información sobre el uso de cookies en el sitio web de Assets Golden International conforme al artículo 22.2 de la LSSI-CE y a la guía de cookies de la AEPD.',
   alternates: {
     canonical: '/politica-de-cookies',

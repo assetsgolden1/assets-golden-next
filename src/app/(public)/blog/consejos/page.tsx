@@ -3,7 +3,7 @@ import { getBlogPostsByCategory } from '@/lib/supabase/queries'
 import BlogCategoryGrid from '@/components/blog/BlogCategoryGrid'
 
 export const metadata: Metadata = {
-  title: 'Consejos Inmobiliarios | Blog Assets Golden',
+  title: 'Consejos Inmobiliarios',
   description: 'Artículos con consejos prácticos para compradores, vendedores e inversores inmobiliarios.',
   alternates: {
     canonical: '/blog/consejos',

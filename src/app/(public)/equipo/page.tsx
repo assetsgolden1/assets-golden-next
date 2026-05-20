@@ -5,7 +5,7 @@ import { getLinkedin } from '@/lib/constants/linkedinMap'
 import { getLocalPhoto } from '@/lib/constants/photoMap'
 
 export const metadata: Metadata = {
-  title: 'Equipo | Assets Golden',
+  title: 'Equipo',
   description:
     'Conoce a los especialistas en inmobiliaria de lujo de Assets Golden. Expertos en Barcelona y mercados internacionales.',
   alternates: {

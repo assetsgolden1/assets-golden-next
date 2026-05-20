@@ -3,7 +3,7 @@ import { getBlogPostsByCategory } from '@/lib/supabase/queries'
 import BlogCategoryGrid from '@/components/blog/BlogCategoryGrid'
 
 export const metadata: Metadata = {
-  title: 'Noticias Inmobiliarias | Blog Assets Golden',
+  title: 'Noticias Inmobiliarias',
   description: 'Últimas noticias y novedades del mercado inmobiliario internacional.',
   alternates: {
     canonical: '/blog/noticias',

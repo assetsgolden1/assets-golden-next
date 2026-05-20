@@ -5,7 +5,7 @@ import { Calendar, TrendingUp, Building2, MapPin } from 'lucide-react'
 import { getBlogPostsByCategory } from '@/lib/supabase/queries'
 
 export const metadata: Metadata = {
-  title: 'Noticias del Mercado Inmobiliario | Assets Golden',
+  title: 'Noticias del Mercado Inmobiliario',
   description:
     'Últimas noticias y novedades del mercado inmobiliario internacional. Tendencias, análisis y actualizaciones de Assets Golden.',
   alternates: {

@@ -12,7 +12,7 @@ import { PaginationBar } from '@/components/PaginationBar'
 import { TrendingUp, Globe, Shield, BarChart3 } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Inversión Inmobiliaria Internacional | Assets Golden',
+  title: 'Inversión Inmobiliaria Internacional',
   description:
     'Oportunidades de inversión inmobiliaria en los mercados más rentables de Europa y América. Análisis de mercado, rentabilidades y asesoramiento personalizado.',
   alternates: {

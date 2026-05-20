@@ -5,7 +5,7 @@ import { getTeamMembers } from '@/lib/supabase/queries'
 import { buttonVariants } from '@/components/ui/button'
 
 export const metadata: Metadata = {
-  title: 'Sobre Nosotros — Assets Golden International',
+  title: 'Sobre Nosotros',
   description:
     'Somos una consultora inmobiliaria internacional con más de 15 años de experiencia en los mercados de lujo de Europa y América. Conozca nuestra historia y valores.',
   alternates: {

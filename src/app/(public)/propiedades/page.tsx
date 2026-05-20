@@ -11,7 +11,7 @@ import { PropiedadesFilters } from '@/components/PropiedadesFilters'
 import { PaginationBar } from '@/components/PaginationBar'
 
 export const metadata: Metadata = {
-  title: 'Propiedades de Lujo | Assets Golden',
+  title: 'Propiedades de Lujo',
   description:
     'Encuentre su propiedad ideal entre nuestra selección exclusiva de pisos, áticos, villas y casas de lujo en todo el mundo.',
   alternates: {

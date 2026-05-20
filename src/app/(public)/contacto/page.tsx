@@ -3,7 +3,7 @@ import { Phone, Mail, MessageCircle } from 'lucide-react'
 import ContactForm from './ContactForm'
 
 export const metadata: Metadata = {
-  title: 'Contacto — Assets Golden International',
+  title: 'Contacto',
   description:
     'Contacte con nuestro equipo de expertos en inmobiliaria de lujo internacional. Respuesta en menos de 24 horas.',
   alternates: {
