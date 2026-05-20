@@ -63,6 +63,50 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-21 — feat(seo): Bloque 2 completo — Schema markup global y por página
+
+**Contexto:** Ejecución del Bloque 2 del plan SEO (Plan-SEO-AssetsGolden_1.docx). Objetivo: implementar schema markup correcto en todas las entidades clave del sitio. Sesión repartida en dos contextos (compactado a mitad); datos confirmados en sesión anterior.
+
+**Trabajo hecho:**
+- **AC-1** (`a788c49`): Schema global en layout — `src/components/seo/GlobalSchemaOrg.tsx` con `@graph` conteniendo `["LocalBusiness","RealEstateAgent"]` + `WebSite` + `SearchAction`. Validado con seo-schema: 0 FAIL, 2 WARN aceptados. Iteraciones: 3 rondas de refinamiento (target EntryPoint→string, @type array simplificado y revertido, @type string simple descartado por WARN de rich results).
+- **SC-6** (`5153de8`): Componente reutilizable `src/components/seo/Breadcrumb.tsx` con JSON-LD BreadcrumbList + nav visible. Variante `secondary` para destinos (fondo bg-secondary). Instalado en propiedades/[slug], destinos/[slug], destinos/espana, blog/[slug] (nuevo en blog).
+- **AH-6** (`b3cafac`): RealEstateListing schema mejorado en propiedades/[slug] — precio en `Offer` con `availability`, `numberOfRooms`, `floorSize QuantitativeValue`, `@id`, `seller` referencia a #organization, `addressRegion`.
+- **SC-3** (`84851c4`): LocalBusiness/RealEstateAgent schema en /contacto — corrige name (era "Assets Golden International"), telephone E.164, agrega address PostalAddress con dirección real (schema-only, no visible en UI).
+- **SC-5** (`ed8cc29`): BlogPosting schema mejorado en blog/[slug] — author/publisher via @id en lugar de objetos inline duplicados, @id propio, inLanguage desde post.language. FAQPage sin cambios (ya era correcto).
+- **SC-4**: EXPLÍCITAMENTE DIFERIDO — bloqueado hasta que Atilio provea certificaciones reales del equipo.
+
+**Decisiones de diseño:**
+- `@type: ["LocalBusiness", "RealEstateAgent"]` como array explícito (no string simple) para activar LocalBusiness rich results en Google
+- `SearchAction.target` como string directo (no objeto EntryPoint) — formato actual de Google
+- address en /contacto incluida en schema pero NO mostrada en UI (decisión de privacidad anterior)
+- numberOfItems: 2364 estático aceptado — coste de hacerlo dinámico supera el beneficio
+
+**Archivos tocados:**
+- CREATED: `src/components/seo/GlobalSchemaOrg.tsx`
+- CREATED: `src/components/seo/Breadcrumb.tsx`
+- MODIFIED: `src/app/layout.tsx` (import GlobalSchemaOrg)
+- MODIFIED: `src/app/(public)/propiedades/[slug]/page.tsx` (AH-6 + SC-6)
+- MODIFIED: `src/app/(public)/destinos/[slug]/page.tsx` (SC-6)
+- MODIFIED: `src/app/(public)/destinos/espana/page.tsx` (SC-6)
+- MODIFIED: `src/app/(public)/blog/[slug]/page.tsx` (SC-5 + SC-6)
+- MODIFIED: `src/app/(public)/contacto/page.tsx` (SC-3)
+- DELETED: `src/components/GlobalSchemaOrg.tsx` (movido a seo/ subdir)
+- DELETED: `validate-schema.js` (residuo del agente seo-schema)
+
+**Commits:**
+- `a788c49` feat(seo): AC-1 schema Organization global
+- `5153de8` feat(seo): SC-6 BreadcrumbList — componente reutilizable con JSON-LD
+- `b3cafac` feat(seo): AH-6 RealEstateListing schema enriquecido en propiedades/[slug]
+- `84851c4` feat(seo): SC-3 LocalBusiness/RealEstateAgent schema en /contacto
+- `ed8cc29` feat(seo): SC-5 BlogPosting schema enriquecido en blog/[slug]
+
+**Próximo paso sugerido:**
+- Push de los 5 commits del Bloque 2 a origin/main
+- Bloque 3 del plan SEO (si existe) o revisar si quedan acciones pendientes del documento
+- SC-4 (Person schema equipo) queda bloqueado hasta que Atilio provea datos reales de certificaciones
+
+---
+
 ### Sesión 2026-05-20 — feat(seo): Bloque 1 completo — correcciones técnicas SEO inmediatas
 
 **Contexto:** Ejecución del Bloque 1 del plan SEO aprobado (Plan-SEO-AssetsGolden_1.docx). Objetivo: corregir los errores técnicos de mayor impacto sin dependencias externas. Sesión repartida en dos contextos (compactado a mitad).
