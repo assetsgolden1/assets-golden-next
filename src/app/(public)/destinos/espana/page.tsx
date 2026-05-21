@@ -192,6 +192,253 @@ export default async function EspanaPage({ searchParams }: Props) {
         </section>
       )}
 
+      {/* Contenido editorial — visible solo en vista general, sin filtro de zona */}
+      {!zona && (
+        <section className="section-padding bg-muted/30">
+          <div className="container-luxury">
+            <article className="max-w-3xl mx-auto">
+
+              {/* Panorama */}
+              <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-6">
+                España: panorama del mercado inmobiliario de lujo
+              </h2>
+              <div className="space-y-4 text-muted-foreground leading-relaxed">
+                <p>
+                  España ocupa una posición consolidada entre los destinos preferidos del
+                  comprador internacional de alto patrimonio. La combinación de un marco
+                  jurídico europeo estable, una infraestructura de servicios de primer nivel
+                  y una diversidad geográfica sin equivalente en el Mediterráneo occidental
+                  explica la demanda sostenida que registra el segmento residencial de lujo
+                  a lo largo de sus costas y principales ciudades.
+                </p>
+                <p>
+                  El mercado español atrae perfiles de comprador diferenciados. Por un lado,
+                  la adquisición de segunda residencia por compradores europeos —principalmente
+                  del norte de Europa y el Reino Unido— que priorizan calidad de vida con
+                  conexión directa a sus países de origen. Por otro, el inversor latinoamericano
+                  y de Oriente Medio que ve en España una plataforma de entrada a Europa con
+                  exposición a un mercado inmobiliario maduro y con liquidez contrastada.
+                </p>
+                <p>
+                  En todos los mercados de lujo españoles, la oferta de producto verdaderamente
+                  exclusivo —villas frente al mar, áticos en primera línea de playa, obra nueva
+                  con especificaciones premium— presenta una escasez estructural que sostiene
+                  la demanda a largo plazo.
+                </p>
+              </div>
+
+              <div className="h-px w-12 bg-gold my-10" />
+
+              {/* Zonas costeras */}
+              <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-8">
+                Las principales zonas costeras de lujo
+              </h2>
+              <div className="space-y-8">
+
+                <div>
+                  <h3 className="font-display text-xl font-semibold mb-3">
+                    <Link
+                      href="/destinos/espana?zona=costa-del-sol"
+                      className="hover:text-gold transition-colors"
+                    >
+                      Costa del Sol
+                    </Link>
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    La Costa del Sol concentra el mayor volumen de transacciones premium del
+                    litoral español.{' '}
+                    <Link
+                      href="/destinos/espana?zona=costa-del-sol&ciudad=Marbella"
+                      className="text-gold hover:underline"
+                    >
+                      Marbella
+                    </Link>
+                    , Benahavís y Estepona configuran el epicentro, con una combinación de
+                    proyectos de obra nueva de alto standing, complejos de golf consolidados
+                    y una infraestructura de servicios —náutica, gastronomía, educación
+                    internacional— que acompaña el nivel de la oferta residencial. La demanda
+                    procede principalmente de compradores del norte de Europa, el Reino Unido
+                    y el Oriente Medio.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-display text-xl font-semibold mb-3">
+                    <Link
+                      href="/destinos/espana?zona=costa-blanca"
+                      className="hover:text-gold transition-colors"
+                    >
+                      Costa Blanca
+                    </Link>
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    La Costa Blanca ofrece un espectro amplio dentro del lujo. El norte
+                    —Jávea, Moraira, Altea— atrae a un comprador europeo que valora la
+                    privacidad y el entorno natural sobre la concentración de servicios. El
+                    sur presenta mayor diversidad de producto y acceso, con propiedades en
+                    primera línea cuyo precio de entrada es comparativamente inferior al de
+                    la Costa del Sol, lo que genera oportunidades para perfiles inversores
+                    con visión de medio plazo.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-display text-xl font-semibold mb-3">
+                    <Link
+                      href="/destinos/espana?zona=cataluna"
+                      className="hover:text-gold transition-colors"
+                    >
+                      Cataluña
+                    </Link>
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Barcelona mantiene una demanda activa en los rangos más altos del mercado
+                    urbano, impulsada por compradores internacionales atraídos por su dimensión
+                    económica y cultural. En el litoral, la Costa Brava —con Begur, Cadaqués y
+                    Palafrugell como referentes— ofrece un segmento con oferta restringida:
+                    propiedades singulares con escasez de producto nuevo, factores que el
+                    comprador de largo plazo valora expresamente.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-display text-xl font-semibold mb-3">
+                    <Link
+                      href="/destinos/espana?zona=islas-baleares"
+                      className="hover:text-gold transition-colors"
+                    >
+                      Islas Baleares
+                    </Link>
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    El archipiélago opera en una categoría propia. La normativa de protección
+                    medioambiental limita el suelo disponible para desarrollo, generando una
+                    presión sostenida sobre el stock existente. Ibiza concentra el perfil más
+                    internacional y de mayor capacidad adquisitiva del Mediterráneo; Mallorca
+                    presenta un mercado más diversificado, desde el comprador familiar hasta
+                    el inversor institucional; Menorca se distingue por su discreción y la
+                    preservación de un entorno natural excepcional.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-display text-xl font-semibold mb-3">
+                    <Link
+                      href="/destinos/espana?zona=costa-de-la-luz"
+                      className="hover:text-gold transition-colors"
+                    >
+                      Costa de la Luz
+                    </Link>
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    La Costa de la Luz —con Sotogrande como referente histórico de lujo en la
+                    provincia de Cádiz— ofrece un segmento caracterizado por menor presión
+                    urbanística respecto al litoral mediterráneo. Las fincas con amplias
+                    parcelas, las propiedades singulares y los desarrollos de polo, golf y
+                    náutica mantienen su atractivo para un comprador que prioriza la
+                    exclusividad y la privacidad sobre la concentración de servicios.
+                  </p>
+                </div>
+
+              </div>
+
+              <div className="h-px w-12 bg-gold my-10" />
+
+              {/* Marco legal */}
+              <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-6">
+                Marco legal para compradores internacionales
+              </h2>
+              <div className="space-y-4 text-muted-foreground leading-relaxed">
+                <p>
+                  La adquisición de inmuebles en España por ciudadanos extranjeros no está
+                  sujeta a restricciones de nacionalidad en el mercado libre. El proceso
+                  requiere la obtención previa del Número de Identificación de Extranjero
+                  (NIE), gestionable desde el consulado español en el país de residencia o
+                  directamente en territorio español.
+                </p>
+                <p>
+                  La fiscalidad de la compra varía según el tipo de inmueble: la obra nueva
+                  tributa por IVA (al 10% en uso residencial) más el Impuesto sobre Actos
+                  Jurídicos Documentados; la segunda mano, por el Impuesto de Transmisiones
+                  Patrimoniales, cuyo tipo varía según la comunidad autónoma donde se ubique
+                  el inmueble.
+                </p>
+                <p>
+                  <strong className="font-semibold text-foreground">Importante:</strong> el
+                  programa de Visa de Oro por inversión inmobiliaria fue derogado por la Ley
+                  Orgánica 1/2025, en vigor desde abril de 2025. Para compradores no
+                  comunitarios que buscaban residencia mediante esta vía, existen alternativas
+                  (Visa de Inversor en proyectos empresariales, Visa de Nómada Digital,
+                  residencia no lucrativa) que un asesor legal especializado puede valorar
+                  caso por caso.{' '}
+                  <Link
+                    href="/blog/golden-visa-espana-2026-residencia-comprando-propiedad"
+                    className="text-gold hover:underline"
+                  >
+                    Puede consultarse un análisis detallado en nuestro artículo sobre la
+                    Golden Visa España 2026.
+                  </Link>
+                </p>
+                <p className="text-xs text-muted-foreground/70 italic border-l-2 border-gold/30 pl-3">
+                  La información contenida en este apartado es de carácter general e
+                  informativo. No constituye asesoramiento fiscal ni legal. Para operaciones
+                  concretas, consulte con un abogado especializado en derecho inmobiliario
+                  español.
+                </p>
+              </div>
+
+              <div className="h-px w-12 bg-gold my-10" />
+
+              {/* Por qué España */}
+              <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-6">
+                ¿Por qué España?
+              </h2>
+              <p className="text-muted-foreground leading-relaxed mb-6">
+                Más allá de las condiciones del mercado, España ofrece factores estructurales
+                que explican la fidelidad del comprador internacional al destino:
+              </p>
+              <dl className="space-y-5">
+                <div>
+                  <dt className="font-semibold text-foreground">Conectividad.</dt>
+                  <dd className="text-muted-foreground leading-relaxed mt-1">
+                    Los aeropuertos de Madrid, Barcelona, Málaga, Palma de Mallorca y Alicante
+                    operan con rutas directas a los principales destinos europeos y
+                    transatlánticos, con frecuencias que permiten gestionar una agenda
+                    internacional sin fricciones de movilidad.
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-semibold text-foreground">Seguridad jurídica.</dt>
+                  <dd className="text-muted-foreground leading-relaxed mt-1">
+                    Como Estado miembro de la Unión Europea, España ofrece un marco de
+                    protección de derechos de propiedad alineado con los estándares del
+                    mercado continental y una trazabilidad registral consolidada.
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-semibold text-foreground">Infraestructura de servicios.</dt>
+                  <dd className="text-muted-foreground leading-relaxed mt-1">
+                    Las principales zonas de lujo cuentan con una red de colegios
+                    internacionales, clínicas privadas, marinas, campos de golf de referencia y
+                    restauración de nivel que permite un estándar de vida sin concesiones.
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-semibold text-foreground">Comunidad internacional establecida.</dt>
+                  <dd className="text-muted-foreground leading-relaxed mt-1">
+                    Los principales destinos de lujo en España cuentan con comunidades de
+                    residentes extranjeros consolidadas desde hace décadas, lo que reduce
+                    significativamente la curva de adaptación para nuevos compradores
+                    internacionales.
+                  </dd>
+                </div>
+              </dl>
+
+            </article>
+          </div>
+        </section>
+      )}
+
       {/* Layout filtros + grid */}
       <section className="container-luxury py-12">
         <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-start">
