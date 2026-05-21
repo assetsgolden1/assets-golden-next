@@ -63,6 +63,27 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-21 (cierre) — chore(brand+seo): correcciones menores post-Bloque-2
+
+**Contexto:** Dos correcciones detectadas tras el cierre del Bloque 2: razón social incorrecta en el footer y horarios del schema /contacto desalineados con Google Business Profile.
+
+**Trabajo hecho:**
+- Footer: reemplazada razón social "CFG Global Investment S.L." → "COVA FUMADA GROUP S.L." (solo texto de copyright, sin tocar estructura)
+- Schema /contacto: horarios actualizados a L-S 08:00-20:00 (añadido Saturday, opens 09:00→08:00, closes 19:00→20:00) para coincidir con GBP
+
+**Archivos tocados:**
+- MODIFIED: `src/components/Footer.tsx`
+- MODIFIED: `src/app/(public)/contacto/page.tsx`
+
+**Commits:**
+- `9bce336` chore(brand+seo): footer razón social correcta + horarios schema alineados con GBP
+
+**Próximo paso sugerido:**
+- Verificar en producción (Vercel) que el deploy del commit `9bce336` sea exitoso
+- Continuar con Bloque 3 del plan SEO o revisar pendientes de Atilio
+
+---
+
 ### Sesión 2026-05-21 — feat(seo): Bloque 2 completo — Schema markup global y por página
 
 **Contexto:** Ejecución del Bloque 2 del plan SEO (Plan-SEO-AssetsGolden_1.docx). Objetivo: implementar schema markup correcto en todas las entidades clave del sitio. Sesión repartida en dos contextos (compactado a mitad); datos confirmados en sesión anterior.
