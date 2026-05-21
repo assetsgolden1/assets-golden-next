@@ -64,6 +64,33 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-22 — chore(content): CLEANUP inconsistencias pre-CT1-rest
+
+**Contexto:** Antes de replicar CT-1 a los otros 10 países, limpiar inconsistencias de contenido acumuladas: número de países incorrecto ("más de 15" cuando son 11 reales), horario visible desactualizado en /contacto.
+
+**Trabajo hecho:**
+
+- Auditoría completa del repo: encontradas 8 ocurrencias de "15 países"/"más de 15 países", 1 de "15 años" (correctamente atribuida al equipo → no tocada), 1 de horario incorrecto.
+- REGLA 1 — "más de 15 países" / "15 países" → "11 países" en 8 lugares: `Footer.tsx`, `page.tsx` (home), `equipo/page.tsx`, `partners/page.tsx`, `sobre-nosotros/page.tsx` (×3: VALUES desc + misión + red internacional), `servicios/page.tsx`.
+- REGLA 2 — "Equipo con más de 15 años de experiencia" en `sobre-nosotros/page.tsx:10` (meta description): INTACTO — atribuido correctamente al equipo, no a la empresa.
+- REGLA 3 — `contacto/page.tsx:109`: "Lunes a viernes, 9:00–19:00 h" → "Lunes a sábado, 8:00–20:00 h".
+- Security-auditor post-edición: cero residuos de "15 países", cero residuos de horario incorrecto. Build limpio (1111 páginas, 0 errores).
+
+**Archivos tocados:**
+- MODIFIED: `src/components/Footer.tsx`
+- MODIFIED: `src/app/(public)/page.tsx`
+- MODIFIED: `src/app/(public)/equipo/page.tsx`
+- MODIFIED: `src/app/(public)/partners/page.tsx`
+- MODIFIED: `src/app/(public)/sobre-nosotros/page.tsx`
+- MODIFIED: `src/app/(public)/servicios/page.tsx`
+- MODIFIED: `src/app/(public)/contacto/page.tsx`
+
+**Commits:** `12ad72f` — chore(content): coherencia 11 países + horarios L-S 8-20h
+
+**Próximo paso sugerido:** Replicar CT-1 (texto editorial) a los otros 10 países destino. Primero decidir si el formato es idéntico al de España o adaptado por país.
+
+---
+
 ### Sesión 2026-05-22 — feat(meta): Meta Pixel + Conversions API (CAPI)
 
 **Contexto:** Campaña Meta Ads arranca el lunes. Necesidad de instalar tracking completo para optimización por conversiones reales. Pixel ID: 1009529298161262.
