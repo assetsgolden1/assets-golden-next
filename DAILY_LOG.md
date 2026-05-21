@@ -64,6 +64,36 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-21/22 — feat(seo): CT-1 piloto — texto editorial /destinos/espana
+
+**Contexto:** Fase 3.B piloto del plan SEO. Insertar contenido editorial (~800-1200 palabras) en `/destinos/espana` entre el bloque de stats y el grid de propiedades, visible solo cuando no hay filtro de zona activo (`{!zona && (...)}` ).
+
+**Restricciones aplicadas (verbatim del usuario):**
+- NO inventar cifras concretas (precios, rentabilidades, porcentajes)
+- NO prometer retornos
+- NO usar "más de 15 países"
+- NO aseveraciones no verificadas sobre la empresa
+- NO inventar URLs
+
+**Trabajo hecho:**
+- Texto editorial aprobado por usuario con un único ajuste: párrafo Golden Visa reemplazado por redacción correcta (programa derogado por Ley Orgánica 1/2025, en vigor desde abril 2025). El borrador original describía el programa como activo — error factual corregido.
+- Sección insertada con estructura: panorama de mercado (3 párrafos) → 5 zonas principales (H3 enlazados a filtros internos) → marco legal (NIE, fiscalidad, Golden Visa derogada + disclaimer) → ¿Por qué España? (`<dl>` factores estructurales).
+- Links internos a: `/destinos/espana?zona=costa-del-sol`, `?zona=costa-blanca`, `?zona=cataluna`, `?zona=islas-baleares`, `?zona=costa-de-la-luz`, inline Marbella con `&ciudad=Marbella`, y `/blog/golden-visa-espana-2026-residencia-comprando-propiedad`.
+
+**NOTA PENDIENTE:** El post `golden-visa-espana-2026-residencia-comprando-propiedad` probablemente no refleja la derogación del programa (LO 1/2025). **Reescribir cuando lleguemos a Fase 3.C (AM-1/AM-2).**
+
+**Archivos tocados:**
+- MODIFIED: `src/app/(public)/destinos/espana/page.tsx` (CT-1)
+
+**Commits:**
+- `2a220ac` feat(seo): CT-1 piloto — texto editorial /destinos/espana
+
+**Próximo paso sugerido:**
+- Continuar Fase 3.B con resto de páginas de destino (CT-2, CT-3...)
+- Reescribir post golden-visa cuando llegue Fase 3.C (AM-1/AM-2)
+
+---
+
 ### Sesión 2026-05-21 — feat(seo): Bloque 3.A — Hreflang + Enlazado interno
 
 **Contexto:** Fase 3.A del plan SEO (Plan-SEO-AssetsGolden_1.docx). Dos acciones técnicas sin dependencias editoriales: AM-3 (hreflang) y EL-1 (enlazado interno — 21 páginas con 1 solo enlace entrante según SEMrush).
