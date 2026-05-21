@@ -44,6 +44,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: post.excerpt?.slice(0, 160) ?? undefined,
     alternates: {
       canonical: `/blog/${slug}`,
+      languages: post.language === 'en'
+        ? {
+            en: `https://assetsgolden.com/blog/${slug}`,
+            'x-default': 'https://assetsgolden.com',
+          }
+        : {
+            'es-ES': `https://assetsgolden.com/blog/${slug}`,
+            'x-default': `https://assetsgolden.com/blog/${slug}`,
+          },
     },
     openGraph: {
       type: 'article',
