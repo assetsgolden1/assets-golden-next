@@ -25,6 +25,7 @@ reordena si la prioridad cambió.
 
 ### Importantes (post go-live)
 - [x] Audit log de cambios admin
+- [ ] EL-1/F — Sección "Propiedades similares" en /propiedades/[slug] (diferido de Fase 3.A — Bloque 4)
 - [ ] Migración de 166 imágenes legacy de Lovable a Supabase actual
 - [ ] Test PDF en producción end-to-end con agente real
 - [ ] Auditoría proyecto Supabase huérfano `yagrwbmsufpvjcgxkuoz`
@@ -60,6 +61,53 @@ reordena si la prioridad cambió.
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 Formato: fecha, contexto, decisiones tomadas, archivos tocados,
 commits, próximo paso sugerido.
+
+---
+
+### Sesión 2026-05-21 — feat(seo): Bloque 3.A — Hreflang + Enlazado interno
+
+**Contexto:** Fase 3.A del plan SEO (Plan-SEO-AssetsGolden_1.docx). Dos acciones técnicas sin dependencias editoriales: AM-3 (hreflang) y EL-1 (enlazado interno — 21 páginas con 1 solo enlace entrante según SEMrush).
+
+**Auditorías realizadas antes de implementar:**
+- AM-3: BD confirmó 10 posts EN + 13 posts ES. Los posts EN NO son traducciones de los ES (contenido independiente, sin campo de pairing). El `blog_posts` tiene `title_en/content_en` legacy pero no `translation_of`. Hreflang bilateral de pares N/A; se implementa self-referencial por idioma.
+- EL-1: `/partners` solo enlazado desde HomeSidebar y back-button de fichas. Footer existente tenía `footerLinks.empresa` definido pero nunca renderizado. `/sobre-nosotros` y `/servicios` mencionaban partners en texto plano sin enlazar. `/partners/[id]` sin sección de otros partners. `/vender-tu-piso` sin links contextuales.
+
+**Trabajo hecho:**
+
+**AM-3** (`7da76be`): `alternates.languages` en `generateMetadata()` de `blog/[slug]/page.tsx`:
+- Posts EN → `hreflang="en"` self + `x-default` → homepage
+- Posts ES → `hreflang="es-ES"` self + `x-default` → self
+- Limitación conocida: `<html lang>` permanece `"es"` en root layout (App Router sin reestructura de rutas). Los `<link rel="alternate" hreflang>` en `<head>` son suficientes para Google.
+
+**EL-1** (`51ad3f6`):
+- Footer: columna "Empresa" añadida (5 links: Sobre Nosotros, Equipo, Red de Partners, Blog, Contacto). Grid cambia `lg:grid-cols-4 → lg:grid-cols-5`. `footerLinks.empresa` existía pero nunca se renderizaba.
+- `/sobre-nosotros`: Link "Ver red de partners →" en sección "Red internacional" (bloque navy derecho).
+- `/servicios`: Botón "Conocer a nuestros partners" → /partners en sección "Presencia internacional".
+- `/vender-tu-piso`: Sección contextual al pie con links → /propiedades y → /sobre-nosotros.
+- `/partners/[id]`: Sección "Otros partners" (3 cards). Nueva función `getRelatedPartners()` en `queries.ts` — prioriza mismo país, completa con otros si no hay suficientes.
+- Diferido: `F` — "Propiedades similares" en `/propiedades/[slug]` → anotar en pendientes Bloque 4.
+
+**Decisiones de diseño:**
+- `footerLinks.empresa` tenía key duplicable en `servicios` (`href="/servicios"` aparece 2 veces). Para empresa se usa `key={link.href + link.label}` — defensivo.
+- `getRelatedPartners` no valida UUID del `currentId` explícitamente; el gate es `getPartnerById` que llama `notFound()` si el ID no existe antes de que se llame a `getRelatedPartners`.
+
+**Archivos tocados:**
+- MODIFIED: `src/app/(public)/blog/[slug]/page.tsx` (AM-3)
+- MODIFIED: `src/components/Footer.tsx` (EL-1 A)
+- MODIFIED: `src/app/(public)/sobre-nosotros/page.tsx` (EL-1 B)
+- MODIFIED: `src/app/(public)/servicios/page.tsx` (EL-1 C)
+- MODIFIED: `src/app/(public)/partners/[id]/page.tsx` (EL-1 D)
+- MODIFIED: `src/app/(public)/vender-tu-piso/page.tsx` (EL-1 E)
+- MODIFIED: `src/lib/supabase/queries.ts` (nueva fn `getRelatedPartners`)
+
+**Commits:**
+- `7da76be` feat(seo): AM-3 hreflang declarativo en blog/[slug]
+- `51ad3f6` feat(seo): EL-1 enlazado interno — footer, sobre-nosotros, servicios, vender-tu-piso, otros partners
+
+**Próximo paso sugerido:**
+- Push de `7da76be` y `51ad3f6` a origin/main cuando Iván dé OK
+- Bloque 3.B (pendiente definir con Iván qué acciones incluye)
+- EL-1/F (propiedades similares) → Bloque 4
 
 ---
 
