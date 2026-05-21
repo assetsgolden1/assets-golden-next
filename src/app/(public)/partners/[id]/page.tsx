@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { MapPin, ArrowLeft } from 'lucide-react'
-import { getPartnerById, getPartners } from '@/lib/supabase/queries'
+import { getPartnerById, getPartners, getRelatedPartners } from '@/lib/supabase/queries'
 import { buttonVariants } from '@/components/ui/button'
 import { getLinkedin } from '@/lib/constants/linkedinMap'
 
@@ -39,6 +39,8 @@ export default async function PartnerDetailPage({ params }: Props) {
   const { data: partner } = await getPartnerById(id)
 
   if (!partner) notFound()
+
+  const { data: related } = await getRelatedPartners(id, partner.country, 3)
 
   const specialties = (partner.specialties ?? []) as string[]
 
@@ -117,6 +119,26 @@ export default async function PartnerDetailPage({ params }: Props) {
                   >
                     {s}
                   </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {related.length > 0 && (
+            <div className="mb-10">
+              <h2 className="font-display text-xl font-semibold mb-4">Otros partners</h2>
+              <div className="space-y-3">
+                {related.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/partners/${p.id}`}
+                    className="flex items-center justify-between rounded-lg border border-border px-4 py-3 text-sm hover:border-gold/40 hover:text-gold transition-colors"
+                  >
+                    <span className="font-medium">{p.name}</span>
+                    {p.country && (
+                      <span className="text-xs text-muted-foreground">{p.country}</span>
+                    )}
+                  </Link>
                 ))}
               </div>
             </div>

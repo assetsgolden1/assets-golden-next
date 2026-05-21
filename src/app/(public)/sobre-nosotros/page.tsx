@@ -145,6 +145,12 @@ export default async function SobreNosotrosPage() {
               <p className="text-white/70 text-sm leading-relaxed">
                 Contamos con una red consolidada de agentes y partners en más de 15 países, lo que nos permite ofrecer oportunidades exclusivas y acceso a compradores e inversores de alto perfil en cualquier parte del mundo.
               </p>
+              <Link
+                href="/partners"
+                className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-gold hover:underline"
+              >
+                Ver red de partners →
+              </Link>
             </div>
           </div>
         </div>

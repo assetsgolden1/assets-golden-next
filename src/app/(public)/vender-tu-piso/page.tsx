@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import VenderForm from '@/components/forms/VenderForm'
+import { buttonVariants } from '@/components/ui/button'
 
 export const metadata: Metadata = {
   title: 'Vender Tu Piso en Barcelona — Tasación Gratuita',
@@ -128,6 +130,21 @@ export default function VenderTuPisoPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── NAVEGACIÓN CONTEXTUAL ───────────────────────────── */}
+      <section className="section-padding bg-muted/30">
+        <div className="container-luxury text-center">
+          <p className="text-sm text-muted-foreground mb-6">¿No está seguro todavía?</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/propiedades" className={buttonVariants({ variant: 'goldOutline' })}>
+              Ver propiedades disponibles
+            </Link>
+            <Link href="/sobre-nosotros" className={buttonVariants({ variant: 'outline' })}>
+              Conozca nuestro equipo
+            </Link>
           </div>
         </div>
       </section>

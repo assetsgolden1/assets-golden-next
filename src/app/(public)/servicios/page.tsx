@@ -187,6 +187,11 @@ export default function ServiciosPage() {
           <p className="text-sm text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Partners inmobiliarios en <strong className="text-foreground">España, Italia, Reino Unido, Francia, Grecia, Dubai, Argentina, Brasil, Colombia, Venezuela, Costa Rica, Puerto Rico, México, Estados Unidos y Canadá</strong>.
           </p>
+          <div className="mt-6">
+            <Link href="/partners" className={buttonVariants({ variant: 'goldOutline', size: 'sm' })}>
+              Conocer a nuestros partners
+            </Link>
+          </div>
         </div>
       </section>
 

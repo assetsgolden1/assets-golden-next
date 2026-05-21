@@ -6,6 +6,7 @@ const footerLinks = {
   empresa: [
     { label: "Sobre Nosotros", href: "/sobre-nosotros" },
     { label: "Equipo", href: "/equipo" },
+    { label: "Red de Partners", href: "/partners" },
     { label: "Blog", href: "/blog" },
     { label: "Contacto", href: "/contacto" },
   ],
@@ -27,7 +28,7 @@ export default function Footer() {
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container-luxury py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand column (spans 2 on large) */}
           <div className="lg:col-span-2">
             <Link href="/" className="inline-block mb-4">
@@ -55,6 +56,25 @@ export default function Footer() {
                   hola@assetsgolden.com
                 </a>
               </li>
+            </ul>
+          </div>
+
+          {/* Empresa */}
+          <div>
+            <h4 className="text-xs tracking-[0.15em] uppercase text-gold mb-4 font-medium">
+              Empresa
+            </h4>
+            <ul className="space-y-2">
+              {footerLinks.empresa.map((link) => (
+                <li key={link.href + link.label}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-primary-foreground/60 hover:text-gold transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 

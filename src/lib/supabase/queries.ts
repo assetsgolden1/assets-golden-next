@@ -331,6 +331,37 @@ export async function getPartnerById(id: string) {
   return { data: data as TeamMember | null, error }
 }
 
+export async function getRelatedPartners(currentId: string, country: string | null, limit = 3) {
+  const supabase = createStaticClient()
+  const results: TeamMember[] = []
+
+  if (country) {
+    const { data: sameCountry } = await supabase
+      .from('team_members')
+      .select('id, name, country, role_es, photo_url')
+      .eq('member_type', 'partner')
+      .eq('active', true)
+      .eq('country', country)
+      .neq('id', currentId)
+      .limit(limit)
+    results.push(...((sameCountry ?? []) as TeamMember[]))
+  }
+
+  if (results.length < limit) {
+    const excludeIds = [currentId, ...results.map((p) => p.id)]
+    const { data: others } = await supabase
+      .from('team_members')
+      .select('id, name, country, role_es, photo_url')
+      .eq('member_type', 'partner')
+      .eq('active', true)
+      .not('id', 'in', `(${excludeIds.join(',')})`)
+      .limit(limit - results.length)
+    results.push(...((others ?? []) as TeamMember[]))
+  }
+
+  return { data: results }
+}
+
 export async function getTeamMembers() {
   const supabase = await createClient()
   const { data, error } = await supabase
