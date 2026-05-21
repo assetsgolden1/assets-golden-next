@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { PhoneInput } from '@/components/PhoneInput'
+import { fbqTrack, sendServerEvent } from '@/lib/meta/track'
 
 const PROPERTY_TYPES = [
   { value: 'piso', label: 'Piso / Apartamento' },
@@ -72,6 +73,19 @@ export default function MiDemandaForm() {
         body: JSON.stringify({ ...form, phone_country: phoneCountry, phone_prefix: phonePrefix }),
       })
       if (!res.ok) throw new Error('Error')
+      // Evento Lead — client + server en paralelo para deduplicación
+      const eventId = crypto.randomUUID()
+      fbqTrack('Lead', {}, eventId)
+      sendServerEvent({
+        eventName: 'Lead',
+        eventId,
+        userData: {
+          email: form.email.trim(),
+          phone: form.phone.trim() || undefined,
+          firstName: form.name.trim().split(' ')[0],
+          lastName: form.name.trim().split(' ').slice(1).join(' ') || undefined,
+        },
+      })
       setDone(true)
     } catch {
       setError('No se pudo enviar el formulario. Por favor, inténtelo de nuevo.')

@@ -64,6 +64,52 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-22 — feat(meta): Meta Pixel + Conversions API (CAPI)
+
+**Contexto:** Campaña Meta Ads arranca el lunes. Necesidad de instalar tracking completo para optimización por conversiones reales. Pixel ID: 1009529298161262.
+
+**Trabajo hecho:**
+
+- `MetaPixel.tsx`: componente `'use client'` con `next/script afterInteractive`. Usa `usePathname()` + `useRef` para disparar PageView en cada navegación SPA sin duplicar el PageView de la inicialización del script.
+- `track.ts`: helpers client-side `fbqTrack()` y `sendServerEvent()`. Declara `window.fbq` globalmente para TypeScript.
+- `cookies.ts`: parsea `_fbp` y `_fbc` del header `cookie` del request para el CAPI matching.
+- `capi.ts`: `sendCapiEvent()` con SHA-256 (Node.js `crypto`) para todos los campos PII. Incluye test mode via `META_CAPI_TEST_EVENT_CODE` solo en `NODE_ENV !== 'production'`.
+- `api/meta/conversion/route.ts`: endpoint POST que extrae IP (`x-forwarded-for`), User-Agent, cookies _fbp/_fbc del request y llama `sendCapiEvent`.
+- `ViewContentTracker.tsx`: client component que se monta en `/propiedades/[slug]/page.tsx` y dispara ViewContent al primer render con `content_ids`, precio y ref_code.
+- `MetaPixel` integrado en `src/app/layout.tsx` (root, todas las páginas).
+- Evento Lead + deduplicación agregado a: `ContactForm.tsx`, `MiDemandaForm.tsx`, `PropertyContactModal.tsx`.
+- Evento Contact agregado a `WhatsAppButton.tsx` (click handler).
+- `.env.local` actualizado con `NEXT_PUBLIC_META_PIXEL_ID`, `META_CAPI_ACCESS_TOKEN`, `META_CAPI_TEST_EVENT_CODE` (placeholders para el token).
+- `docs/meta-pixel-capi.md` creado: documentación completa de eventos, archivos, verificación y cómo agregar nuevos eventos.
+
+**Build:** `npm run build` → `✓ Compiled successfully` sin errores TypeScript ni lint.
+
+**Archivos tocados:**
+- CREATED: `src/components/analytics/MetaPixel.tsx`
+- CREATED: `src/components/analytics/ViewContentTracker.tsx`
+- CREATED: `src/lib/meta/track.ts`
+- CREATED: `src/lib/meta/cookies.ts`
+- CREATED: `src/lib/meta/capi.ts`
+- CREATED: `src/app/api/meta/conversion/route.ts`
+- CREATED: `docs/meta-pixel-capi.md`
+- MODIFIED: `src/app/layout.tsx` (agrega MetaPixel)
+- MODIFIED: `src/app/(public)/contacto/ContactForm.tsx` (evento Lead)
+- MODIFIED: `src/app/(public)/mi-demanda/MiDemandaForm.tsx` (evento Lead)
+- MODIFIED: `src/components/PropertyContactModal.tsx` (evento Lead)
+- MODIFIED: `src/app/(public)/propiedades/[slug]/page.tsx` (ViewContentTracker)
+- MODIFIED: `src/components/WhatsAppButton.tsx` (evento Contact)
+- MODIFIED: `.env.local` (variables Meta — access token pendiente de Iván)
+
+**Commits:** (pendiente de OK del usuario)
+
+**Próximo paso sugerido:**
+1. Iván carga `META_CAPI_ACCESS_TOKEN` en `.env.local` y en Vercel → Settings → Environment Variables
+2. Agregar `META_CAPI_TEST_EVENT_CODE` con el código de Events Manager para verificar test events
+3. `npm run dev` → verificar `window.fbq` en consola y eventos en Events Manager → Test Events
+4. Deploy a Vercel y verificar en producción que aparece "Received via Server" en Events Manager
+
+---
+
 ### Sesión 2026-05-21/22 — feat(seo): CT-1 piloto — texto editorial /destinos/espana
 
 **Contexto:** Fase 3.B piloto del plan SEO. Insertar contenido editorial (~800-1200 palabras) en `/destinos/espana` entre el bloque de stats y el grid de propiedades, visible solo cuando no hay filtro de zona activo (`{!zona && (...)}` ).

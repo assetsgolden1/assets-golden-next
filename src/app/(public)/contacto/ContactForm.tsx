@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { PhoneInput } from '@/components/PhoneInput'
+import { fbqTrack, sendServerEvent } from '@/lib/meta/track'
 
 const inputClass =
   'w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-colors'
@@ -62,6 +63,19 @@ export default function ContactForm() {
         }),
       })
       if (!res.ok) throw new Error('Error')
+      // Evento Lead — client + server en paralelo para deduplicación
+      const eventId = crypto.randomUUID()
+      fbqTrack('Lead', {}, eventId)
+      sendServerEvent({
+        eventName: 'Lead',
+        eventId,
+        userData: {
+          email: form.email.trim(),
+          phone: form.phone.trim() || undefined,
+          firstName: form.name.trim().split(' ')[0],
+          lastName: form.name.trim().split(' ').slice(1).join(' ') || undefined,
+        },
+      })
       setDone(true)
     } catch {
       setError('No se pudo enviar el mensaje. Por favor inténtelo de nuevo.')

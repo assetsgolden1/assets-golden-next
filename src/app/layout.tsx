@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
 import GlobalSchemaOrg from "@/components/seo/GlobalSchemaOrg";
+import MetaPixel from "@/components/analytics/MetaPixel";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -84,6 +85,7 @@ export default function RootLayout({
       </head>
       <body className="flex min-h-full flex-col bg-background text-foreground">
         {children}
+        <MetaPixel />
       </body>
     </html>
   );

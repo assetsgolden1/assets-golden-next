@@ -11,6 +11,7 @@ import { translatePropertyType, translatePropertyTitle } from '@/lib/propertyTyp
 import { toSentenceCase } from '@/lib/utils/normalizeText'
 import PropertyContactModal from '@/components/PropertyContactModal'
 import { ZONE_SLUGS } from '@/lib/constants/spainZones'
+import ViewContentTracker from '@/components/analytics/ViewContentTracker'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -113,6 +114,13 @@ export default async function PropertyDetailPage({ params }: Props) {
 
   return (
     <>
+      <ViewContentTracker
+        propertyId={property.id}
+        propertyTitle={property.title}
+        price={property.price}
+        currency={property.currency}
+        refCode={property.ref_code}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

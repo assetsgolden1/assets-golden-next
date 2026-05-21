@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { PhoneInput } from '@/components/PhoneInput'
+import { fbqTrack, sendServerEvent } from '@/lib/meta/track'
 
 interface Props {
   propertyId: string
@@ -45,6 +46,20 @@ export default function PropertyContactModal({ propertyId, propertyTitle, proper
         body: JSON.stringify(data),
       })
       if (!res.ok) throw new Error('Error al enviar')
+      // Evento Lead — client + server en paralelo para deduplicación
+      const eventId = crypto.randomUUID()
+      fbqTrack('Lead', { content_name: propertyTitle }, eventId)
+      sendServerEvent({
+        eventName: 'Lead',
+        eventId,
+        userData: {
+          email: data.email,
+          phone: data.phone,
+          firstName: data.name.split(' ')[0],
+          lastName: data.name.split(' ').slice(1).join(' ') || undefined,
+        },
+        customData: { contentName: propertyTitle },
+      })
       setStatus('success')
     } catch {
       setErrorMsg('Ha ocurrido un error. Por favor inténtelo de nuevo.')
