@@ -64,6 +64,39 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-22 — fix(meta): debug Pixel no visible en producción
+
+**Contexto:** ADS-P6. Meta Pixel Helper decía "No se han encontrado píxeles" en assetsgolden.com tras el deploy de ADS-P5.
+
+**Causa raíz identificada:**
+- `NEXT_PUBLIC_META_PIXEL_ID` no estaba configurada en Vercel cuando el primer build de c2398f2 se ejecutó → valor baked como `undefined` → `return null`
+- El redeploy posterior usó el build cacheado → el pixel ID nunca se embebió
+
+**Investigación:**
+- Build local: `let o="1009529298161262"` sí aparece en el chunk `.next/static/chunks/0ebjul4896wi-.js`
+- HTML server: `<noscript>` con pixel ID SÍ aparece localmente, el `<script>` fbq init NO (expected: `afterInteractive` es 100% client-side)
+- Confirmado que `strategy="afterInteractive"` nunca inyecta nada en el HTML inicial — siempre es post-hidratación
+
+**Fix aplicado:**
+1. `MetaPixel.tsx` simplificado a puro SPA PageView tracker (sin `<Script>` adentro)
+2. `<Script strategy="afterInteractive" dangerouslySetInnerHTML={...}>` movido directamente a `RootLayout` (server component) — patrón oficial de Next.js 16 docs para "Application Scripts"
+3. Este commit fuerza un rebuild fresco en Vercel con la env var ya configurada
+
+**Archivos tocados:**
+- MODIFIED: `src/components/analytics/MetaPixel.tsx`
+- MODIFIED: `src/app/layout.tsx`
+- CREATED: `outputs/2026-05-22-meta-pixel-debug.md`
+
+**Commits:** (este commit)
+
+**Próximo paso sugerido:**
+1. Verificar en producción con Meta Pixel Helper tras el deploy
+2. Confirmar que el token `META_CAPI_ACCESS_TOKEN` en Vercel NO tiene ángulos `<>` alrededor — si los tiene, las llamadas CAPI fallarán con 401
+3. Agregar `META_CAPI_TEST_EVENT_CODE` en Vercel para test events
+4. Una vez confirmado pixel, testear eventos Lead/Contact/ViewContent en Events Manager
+
+---
+
 ### Sesión 2026-05-22 — chore(content): CLEANUP inconsistencias pre-CT1-rest
 
 **Contexto:** Antes de replicar CT-1 a los otros 10 países, limpiar inconsistencias de contenido acumuladas: número de países incorrecto ("más de 15" cuando son 11 reales), horario visible desactualizado en /contacto.
