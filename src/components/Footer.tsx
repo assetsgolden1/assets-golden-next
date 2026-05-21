@@ -36,7 +36,7 @@ export default function Footer() {
             </Link>
             <p className="text-primary-foreground/60 text-sm leading-relaxed max-w-xs mb-6">
               Expertos en inmobiliaria de lujo internacional. Conectamos
-              inversores con las mejores oportunidades en más de 15 países.
+              inversores con las mejores oportunidades en 11 países.
             </p>
             {/* Contact */}
             <ul className="space-y-2 text-sm">

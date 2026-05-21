@@ -8,7 +8,7 @@ import { getLinkedin } from '@/lib/constants/linkedinMap'
 export const metadata: Metadata = {
   title: 'Red Internacional de Partners',
   description:
-    'Nuestra red global de colaboradores y agencias inmobiliarias en más de 15 países. Partner oficial de Nest Seekers International.',
+    'Nuestra red global de colaboradores y agencias inmobiliarias en 11 países. Partner oficial de Nest Seekers International.',
   alternates: {
     canonical: '/partners',
   },

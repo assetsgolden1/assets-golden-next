@@ -169,7 +169,7 @@ export default async function HomePage() {
                 icon: '🌍',
                 title: 'Red internacional',
                 description:
-                  'Compradores cualificados de más de 15 países. Conectamos su propiedad con el inversor correcto, sin importar su origen.',
+                  'Compradores cualificados de 11 países. Conectamos su propiedad con el inversor correcto, sin importar su origen.',
               },
               {
                 icon: '⭐',

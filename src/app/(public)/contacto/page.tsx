@@ -106,7 +106,7 @@ export default function ContactoPage() {
 
               <div className="pt-4">
                 <p className="text-xs tracking-[0.15em] uppercase text-muted-foreground mb-2">Horario</p>
-                <p className="text-foreground font-medium">Lunes a viernes, 9:00–19:00 h</p>
+                <p className="text-foreground font-medium">Lunes a sábado, 8:00–20:00 h</p>
               </div>
             </div>
 

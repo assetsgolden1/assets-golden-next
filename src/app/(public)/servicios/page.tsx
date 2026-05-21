@@ -124,7 +124,7 @@ export default function ServiciosPage() {
             Soluciones Inmobiliarias
           </h1>
           <p className="mt-4 text-white/60 max-w-2xl mx-auto text-sm leading-relaxed">
-            Somos un equipo de profesionales con amplia experiencia en el sector inmobiliario e inversiones en todo el mundo. Disponemos de partners en más de 15 países.
+            Somos un equipo de profesionales con amplia experiencia en el sector inmobiliario e inversiones en todo el mundo. Disponemos de partners en 11 países.
           </p>
         </div>
       </section>

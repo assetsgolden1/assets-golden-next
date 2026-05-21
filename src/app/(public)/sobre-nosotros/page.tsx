@@ -29,7 +29,7 @@ const VALUES = [
   {
     icon: Globe,
     title: 'Alcance global',
-    desc: 'Presencia activa en los principales mercados inmobiliarios internacionales, con red de partners en 15 países.',
+    desc: 'Presencia activa en los principales mercados inmobiliarios internacionales, con red de partners en 11 países.',
   },
   {
     icon: Users,
@@ -86,7 +86,7 @@ export default async function SobreNosotrosPage() {
         <div className="container-luxury max-w-3xl">
           <h2 className="font-display text-3xl font-semibold mb-6">Nuestra misión</h2>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            En Assets Golden International conectamos a inversores, compradores y vendedores con las mejores oportunidades inmobiliarias del mercado global. Nuestra red de partners en más de 15 países nos permite ofrecer un servicio integral y adaptado a cada perfil de cliente.
+            En Assets Golden International conectamos a inversores, compradores y vendedores con las mejores oportunidades inmobiliarias del mercado global. Nuestra red de partners en 11 países nos permite ofrecer un servicio integral y adaptado a cada perfil de cliente.
           </p>
           <p className="text-muted-foreground leading-relaxed">
             Operamos en España, Portugal, Italia, Francia, Grecia, Montenegro, Turquía, Argentina, México, Estados Unidos (Miami, Nueva York) y otros mercados emergentes de alto potencial.
@@ -143,7 +143,7 @@ export default async function SobreNosotrosPage() {
               <p className="text-xs tracking-widest text-gold uppercase mb-2">Presencia global</p>
               <h3 className="font-display text-2xl font-semibold mb-4">Red de partners independientes</h3>
               <p className="text-white/70 text-sm leading-relaxed">
-                Contamos con una red consolidada de agentes y partners en más de 15 países, lo que nos permite ofrecer oportunidades exclusivas y acceso a compradores e inversores de alto perfil en cualquier parte del mundo.
+                Contamos con una red consolidada de agentes y partners en 11 países, lo que nos permite ofrecer oportunidades exclusivas y acceso a compradores e inversores de alto perfil en cualquier parte del mundo.
               </p>
               <Link
                 href="/partners"
