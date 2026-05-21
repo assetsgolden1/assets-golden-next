@@ -103,7 +103,7 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="container-luxury py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-primary-foreground/40">
-        <p>© {new Date().getFullYear()} CFG Global Investment S.L. Todos los derechos reservados.</p>
+        <p>© {new Date().getFullYear()} COVA FUMADA GROUP S.L. Todos los derechos reservados.</p>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 justify-center sm:justify-end">
           <Link href="/aviso-legal" className="hover:text-gold transition-colors">
             Aviso legal
