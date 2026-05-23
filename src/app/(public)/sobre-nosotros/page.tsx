@@ -123,14 +123,14 @@ export default async function SobreNosotrosPage() {
               </p>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 {[
-                  'España — Barcelona, Madrid, Marbella, Ibiza',
-                  'Portugal — Lisboa, Algarve, Oporto',
-                  'Italia — Roma, Milán, Costa Amalfitana',
-                  'Francia — París, Côte d\'Azur',
-                  'Grecia — Atenas, Mykonos, Santorini',
-                  'Estados Unidos — Miami, Nueva York',
-                  'Argentina — Buenos Aires',
-                  'México — Ciudad de México, Riviera Maya',
+                  'España: Barcelona, Madrid, Marbella, Ibiza',
+                  'Portugal: Lisboa, Algarve, Oporto',
+                  'Italia: Roma, Milán, Costa Amalfitana',
+                  'Francia: París, Côte d\'Azur',
+                  'Grecia: Atenas, Mykonos, Santorini',
+                  'Estados Unidos: Miami, Nueva York',
+                  'Argentina: Buenos Aires',
+                  'México: Ciudad de México, Riviera Maya',
                 ].map((country) => (
                   <li key={country} className="flex items-start gap-2">
                     <span className="text-gold mt-0.5">›</span>

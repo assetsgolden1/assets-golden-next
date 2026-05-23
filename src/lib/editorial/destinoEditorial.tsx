@@ -12,8 +12,8 @@ function MexicoContent() {
       <div className="space-y-4 text-muted-foreground leading-relaxed">
         <p>
           México ocupa un lugar singular en la cartografía del lujo latinoamericano.
-          La diversidad geográfica del país —costas en dos océanos, ciudades coloniales
-          y destinos de playa con proyección internacional— genera un espectro de
+          La diversidad geográfica del país (costas en dos océanos, ciudades coloniales
+          y destinos de playa con proyección internacional) genera un espectro de
           oportunidades que atrae tanto al comprador latinoamericano como al
           norteamericano y europeo en busca de activos en un mercado con régimen
           fiscal propio y dinamismo contrastado.
@@ -29,7 +29,7 @@ function MexicoContent() {
         </p>
         <p>
           La escasez de producto de primera línea en los destinos consolidados
-          —especialmente frente al mar en los corredores más demandados— mantiene
+          (especialmente frente al mar en los corredores más demandados) mantiene
           una presión sostenida sobre la oferta, particularmente en el segmento
           de villas y residencias con acceso privado a la playa.
         </p>
@@ -68,7 +68,7 @@ function MexicoContent() {
             Los Cabos (Baja California Sur)
           </h3>
           <p className="text-muted-foreground leading-relaxed">
-            Los Cabos —la conurbación de San José del Cabo y Cabo San Lucas— es el
+            Los Cabos (la conurbación de San José del Cabo y Cabo San Lucas) es el
             destino de lujo de mayor penetración entre el comprador norteamericano.
             Los complejos residenciales vinculados a campos de golf, la oferta de
             marinas y una infraestructura hotelera de primer nivel explican la
@@ -130,7 +130,7 @@ function MexicoContent() {
           la práctica totalidad del catálogo costero.
         </p>
         <p>
-          Fuera de la Zona Restringida —en Ciudad de México, por ejemplo— los
+          Fuera de la Zona Restringida (en Ciudad de México, por ejemplo), los
           extranjeros pueden adquirir directamente con escritura pública ante notario,
           sin necesidad de fideicomiso.
         </p>
@@ -155,7 +155,7 @@ function IndonesiaContent() {
       </h2>
       <div className="space-y-4 text-muted-foreground leading-relaxed">
         <p>
-          Indonesia —y Bali en particular— ocupa un lugar único en el mercado
+          Indonesia, y Bali en particular, ocupa un lugar único en el mercado
           inmobiliario de lujo del sudeste asiático. La isla ha evolucionado desde
           un destino turístico convencional hacia un ecosistema residencial con
           atractivo estructural para un perfil de comprador internacional que
@@ -168,7 +168,7 @@ function IndonesiaContent() {
           excepcional riqueza, una tradición arquitectónica propia que se ha
           integrado con el diseño contemporáneo de alta gama, una infraestructura
           turística en expansión y la llegada de una comunidad de residentes
-          internacionales —nómadas digitales, creativos, emprendedores— que ha
+          internacionales (nómadas digitales, creativos, emprendedores) que ha
           transformado zonas como Canggu en mercados con demanda constante de
           producto premium.
         </p>
@@ -221,7 +221,7 @@ function IndonesiaContent() {
             Uluwatu y la Península de Bukit
           </h3>
           <p className="text-muted-foreground leading-relaxed">
-            La Península de Bukit —con Uluwatu, Ungasan y Bingin como referentes—
+            La Península de Bukit, con Uluwatu, Ungasan y Bingin como referentes,
             se ha consolidado como el sector de mayor crecimiento en el segmento
             de lujo. Las villas en acantilado con vistas al océano Índico
             representan algunos de los productos más exclusivos del mercado balinés.
@@ -310,7 +310,7 @@ function EmiratosContent() {
       </h2>
       <div className="space-y-4 text-muted-foreground leading-relaxed">
         <p>
-          Los Emiratos Árabes Unidos —y Dubai en particular— representan uno de
+          Los Emiratos Árabes Unidos, y Dubai en particular, representan uno de
           los mercados de lujo de mayor dinamismo a escala global. La capacidad del
           emirato para atraer capital internacional, su posición como hub de
           conectividad entre Europa, Asia y África, y una política activa de
@@ -322,9 +322,9 @@ function EmiratosContent() {
           sobre la renta y las plusvalías en el comprador persona física, una
           infraestructura de clase mundial, un marco regulatorio predecible y una
           oferta residencial que se ha sofisticado notablemente en la última década.
-          El segmento de prime y super-prime —penthouses en torres icónicas, villas
-          en primera línea de mar, residencias en comunidades cerradas de diseño—
-          mantiene una demanda activa alimentada por compradores de Europa, Asia,
+          El segmento de prime y super-prime, que incluye penthouses en torres
+          icónicas, villas en primera línea de mar y residencias en comunidades
+          cerradas de diseño, mantiene una demanda activa alimentada por compradores de Europa, Asia,
           el subcontinente indio y Latinoamérica.{' '}
           <Link
             href="/blog/comprar-propiedad-dubai-siendo-latino-guia-2026"
@@ -362,8 +362,8 @@ function EmiratosContent() {
             Downtown Dubai y Burj Khalifa District
           </h3>
           <p className="text-muted-foreground leading-relaxed">
-            El centro urbano de Dubai —con el Burj Khalifa, Dubai Mall y el canal
-            como ejes— concentra la mayor densidad de torres residenciales de lujo.
+            El centro urbano de Dubai, con el Burj Khalifa, Dubai Mall y el canal
+            como ejes, concentra la mayor densidad de torres residenciales de lujo.
             Los penthouses y apartamentos de grandes superficies en este distrito
             son demandados tanto por el comprador que prioriza el uso urbano como
             por el orientado al mercado de alquiler a corto plazo de alto standing.
@@ -388,8 +388,8 @@ function EmiratosContent() {
             Dubai Hills y nuevos desarrollos maestros
           </h3>
           <p className="text-muted-foreground leading-relaxed">
-            Los grandes desarrollos planificados —Dubai Hills Estate, Emirates
-            Living, Mohammed Bin Rashid City— ofrecen un modelo de vida diferente
+            Los grandes desarrollos planificados (Dubai Hills Estate, Emirates
+            Living, Mohammed Bin Rashid City) ofrecen un modelo de vida diferente
             al urbano: comunidades cerradas con golf, parques y colegios
             internacionales, orientadas al perfil familiar y al comprador que
             prioriza espacio y privacidad.
@@ -413,9 +413,9 @@ function EmiratosContent() {
           plazo, generalmente 99 años) o <em>musataha</em>.
         </p>
         <p>
-          Las principales zonas freehold en Dubai —incluyendo Palm Jumeirah,
+          Las principales zonas freehold en Dubai, que incluyen Palm Jumeirah,
           Downtown Dubai, Dubai Marina, Dubai Hills Estate, Business Bay, Jumeirah
-          Village Circle y otras áreas designadas— permiten la adquisición en pleno
+          Village Circle y otras áreas designadas, permiten la adquisición en pleno
           dominio por ciudadanos de cualquier nacionalidad sin restricciones de
           procedencia.
         </p>
@@ -451,8 +451,8 @@ function ArgentinaContent() {
       <div className="space-y-4 text-muted-foreground leading-relaxed">
         <p>
           Argentina ofrece un escenario inmobiliario con características singulares
-          dentro del contexto latinoamericano. Buenos Aires —y en particular sus
-          barrios de mayor demanda histórica— mantiene un mercado residencial con
+          dentro del contexto latinoamericano. Buenos Aires, y en particular sus
+          barrios de mayor demanda histórica, mantiene un mercado residencial con
           producto de calidad arquitectónica contrastada y precios que representan
           una entrada comparativamente asequible para el comprador con capital
           internacional.
@@ -460,7 +460,7 @@ function ArgentinaContent() {
         <p>
           El mercado porteño de lujo se concentra en barrios como Palermo Chico,
           Recoleta y Puerto Madero en la ciudad, y en el corredor de countries y
-          clubes de campo del Gran Buenos Aires —Nordelta, San Isidro, Pilar— donde
+          clubes de campo del Gran Buenos Aires (Nordelta, San Isidro, Pilar), donde
           las casas con parcela, acceso a golf y seguridad privada configuran el
           producto de mayor demanda en el segmento premium familiar.
         </p>
@@ -544,18 +544,18 @@ function EstadosUnidosContent() {
       <div className="space-y-4 text-muted-foreground leading-relaxed">
         <p>
           El mercado inmobiliario de lujo en Estados Unidos es el de mayor
-          profundidad y liquidez a escala mundial. La diversidad de sus destinos
-          —desde los centros financieros y culturales de la costa este hasta los
+          profundidad y liquidez a escala mundial. Su diversidad de destinos abarca
+          desde los centros financieros y culturales de la costa este hasta los
           enclaves de sol y bienestar de Florida y California, pasando por los
-          destinos de montaña del oeste— permite una segmentación de producto que
-          se adapta a prácticamente cualquier perfil de comprador internacional.
+          destinos de montaña del oeste. Esto permite una segmentación de producto
+          que se adapta a prácticamente cualquier perfil de comprador internacional.
         </p>
         <p>
           Para el comprador latinoamericano o europeo, Estados Unidos combina un
           marco jurídico maduro con plena protección de la propiedad privada,
           liquidez contrastada en los principales mercados y acceso a financiación
-          hipotecaria para no residentes —con condiciones más exigentes que para
-          ciudadanos, pero disponibles a través de entidades especializadas.
+          hipotecaria para no residentes (con condiciones más exigentes que para
+          ciudadanos, pero disponibles a través de entidades especializadas).
         </p>
       </div>
 
@@ -572,9 +572,9 @@ function EstadosUnidosContent() {
           </h3>
           <p className="text-muted-foreground leading-relaxed">
             Florida concentra la mayor proporción de compradores internacionales
-            del mercado inmobiliario norteamericano. Miami —con su dinámica
+            del mercado inmobiliario norteamericano. Miami, con su dinámica
             latinoamericana, su perfil de hub financiero regional y su oferta de
-            penthouses y propiedades frente al mar— representa el punto de entrada
+            penthouses y propiedades frente al mar, representa el punto de entrada
             más habitual para el comprador de alto patrimonio procedente de
             Latinoamérica y Europa.
           </p>
@@ -605,8 +605,8 @@ function EstadosUnidosContent() {
           Los ciudadanos extranjeros pueden adquirir bienes inmuebles en Estados
           Unidos de forma general sin restricciones de nacionalidad. La adquisición
           puede realizarse a título personal o a través de estructuras societarias
-          (LLC, trust u otras). Las implicaciones fiscales —en particular el FIRPTA,
-          retención sobre plusvalías para no residentes en la transmisión— son
+          (LLC, trust u otras). Las implicaciones fiscales (en particular el FIRPTA,
+          retención sobre plusvalías para no residentes en la transmisión) son
           relevantes y justifican la consulta previa con un asesor especializado en
           operaciones inmobiliarias internacionales.
         </p>
@@ -632,15 +632,15 @@ function CostaRicaContent() {
       <div className="space-y-4 text-muted-foreground leading-relaxed">
         <p>
           Costa Rica ocupa un lugar propio en el mapa del lujo centroamericano.
-          El país combina estabilidad política e institucional —notable en el
-          contexto regional—, una naturaleza de excepcional biodiversidad y un
+          El país combina estabilidad política e institucional (notable en el
+          contexto regional), una naturaleza de excepcional biodiversidad y un
           modelo de turismo que ha atraído a lo largo de décadas un perfil de
           comprador internacional interesado en la segunda residencia y en un
           estándar de vida vinculado al entorno natural.
         </p>
         <p>
           El mercado de lujo costarricense se concentra principalmente en el
-          corredor del Pacífico norte —Guanacaste, Tamarindo, Papagayo— donde
+          corredor del Pacífico norte (Guanacaste, Tamarindo, Papagayo), donde
           los desarrollos residenciales frente al mar conviven con resorts de
           cinco estrellas, y en el Valle Central, con San José y sus áreas
           residenciales como centro de servicios y demanda urbana.
@@ -689,8 +689,8 @@ function ReinoUnidoContent() {
         <p>
           El mercado inmobiliario de lujo del Reino Unido está dominado por
           Londres, que mantiene su condición de uno de los mercados prime más
-          profundos del mundo. Prime Central London —los distritos de Mayfair,
-          Belgravia, Knightsbridge, Chelsea y Kensington— concentra una demanda
+          profundos del mundo. Prime Central London (los distritos de Mayfair,
+          Belgravia, Knightsbridge, Chelsea y Kensington) concentra una demanda
           internacional que, a pesar de los ciclos, sostiene valores unitarios
           entre los más altos del planeta. Fuera de la capital, los Cotswolds,
           Surrey y determinados condados del sur de Inglaterra albergan un mercado
@@ -744,10 +744,10 @@ function EcuadorContent() {
           Ecuador concentra su mercado de propiedades de calidad en dos ciudades
           con perfiles diferenciados. Quito, la capital, combina un centro histórico
           declarado Patrimonio de la Humanidad por la UNESCO con barrios residenciales
-          de alto standing —Cumbayá, Los Chillos, González Suárez— que concentran
+          de alto standing como Cumbayá, Los Chillos y González Suárez, que concentran
           la oferta premium urbana. Cuenca, en los Andes, ha atraído a lo largo de
-          los últimos años a un perfil de comprador internacional —principalmente
-          norteamericano— en busca de calidad de vida, clima templado y coste
+          los últimos años a un perfil de comprador internacional, principalmente
+          norteamericano, en busca de calidad de vida, clima templado y coste
           contenido. La costa ecuatoriana, con Salinas y Montañita como referentes,
           alberga un mercado de segunda residencia orientado al comprador nacional
           y regional.
@@ -764,8 +764,8 @@ function EcuadorContent() {
           La legislación ecuatoriana reconoce a los ciudadanos extranjeros los
           mismos derechos que a los nacionales para la adquisición de bienes
           inmuebles, sin restricciones de nacionalidad ni zonas reservadas en el
-          mercado residencial general. La estructura de la operación —compraventa
-          directa ante notario— es relativamente sencilla en comparación con otros
+          mercado residencial general. La estructura de la operación (compraventa
+          directa ante notario) es relativamente sencilla en comparación con otros
           mercados de la región.
         </p>
         <p className="text-xs text-muted-foreground/70 italic border-l-2 border-gold/30 pl-3">
@@ -792,10 +792,10 @@ function GreciaContent() {
           mercado inmobiliario de lujo concentrado en sus islas más reconocidas
           internacionalmente: Mykonos, Santorini, Creta y las islas del
           Dodecaneso. El segmento de villas privadas con piscina y vistas al Egeo
-          representa el producto icónico del lujo griego. Atenas, por su parte
-          —especialmente en el barrio de Kolonaki, la riviera sur y el área de
-          Glyfada— ha experimentado una recuperación notable del mercado residencial
-          de alta gama en la última década.
+          representa el producto icónico del lujo griego. Atenas, por su parte,
+          ha experimentado una recuperación notable del mercado residencial de alta
+          gama en la última década, especialmente en el barrio de Kolonaki, la
+          riviera sur y el área de Glyfada.
         </p>
         <p>
           Grecia mantiene activo un programa de{' '}

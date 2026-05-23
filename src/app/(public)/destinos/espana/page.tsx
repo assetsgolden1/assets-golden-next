@@ -213,16 +213,16 @@ export default async function EspanaPage({ searchParams }: Props) {
                 </p>
                 <p>
                   El mercado español atrae perfiles de comprador diferenciados. Por un lado,
-                  la adquisición de segunda residencia por compradores europeos —principalmente
-                  del norte de Europa y el Reino Unido— que priorizan calidad de vida con
+                  la adquisición de segunda residencia por compradores europeos, principalmente
+                  del norte de Europa y el Reino Unido, que priorizan calidad de vida con
                   conexión directa a sus países de origen. Por otro, el inversor latinoamericano
                   y de Oriente Medio que ve en España una plataforma de entrada a Europa con
                   exposición a un mercado inmobiliario maduro y con liquidez contrastada.
                 </p>
                 <p>
                   En todos los mercados de lujo españoles, la oferta de producto verdaderamente
-                  exclusivo —villas frente al mar, áticos en primera línea de playa, obra nueva
-                  con especificaciones premium— presenta una escasez estructural que sostiene
+                  exclusivo (villas frente al mar, áticos en primera línea de playa, obra nueva
+                  con especificaciones premium) presenta una escasez estructural que sostiene
                   la demanda a largo plazo.
                 </p>
               </div>
@@ -255,8 +255,8 @@ export default async function EspanaPage({ searchParams }: Props) {
                     </Link>
                     , Benahavís y Estepona configuran el epicentro, con una combinación de
                     proyectos de obra nueva de alto standing, complejos de golf consolidados
-                    y una infraestructura de servicios —náutica, gastronomía, educación
-                    internacional— que acompaña el nivel de la oferta residencial. La demanda
+                    y una infraestructura de servicios (náutica, gastronomía, educación
+                    internacional) que acompaña el nivel de la oferta residencial. La demanda
                     procede principalmente de compradores del norte de Europa, el Reino Unido
                     y el Oriente Medio.
                   </p>
@@ -273,7 +273,7 @@ export default async function EspanaPage({ searchParams }: Props) {
                   </h3>
                   <p className="text-muted-foreground leading-relaxed">
                     La Costa Blanca ofrece un espectro amplio dentro del lujo. El norte
-                    —Jávea, Moraira, Altea— atrae a un comprador europeo que valora la
+                    (Jávea, Moraira, Altea) atrae a un comprador europeo que valora la
                     privacidad y el entorno natural sobre la concentración de servicios. El
                     sur presenta mayor diversidad de producto y acceso, con propiedades en
                     primera línea cuyo precio de entrada es comparativamente inferior al de
@@ -294,8 +294,8 @@ export default async function EspanaPage({ searchParams }: Props) {
                   <p className="text-muted-foreground leading-relaxed">
                     Barcelona mantiene una demanda activa en los rangos más altos del mercado
                     urbano, impulsada por compradores internacionales atraídos por su dimensión
-                    económica y cultural. En el litoral, la Costa Brava —con Begur, Cadaqués y
-                    Palafrugell como referentes— ofrece un segmento con oferta restringida:
+                    económica y cultural. En el litoral, la Costa Brava, con Begur, Cadaqués y
+                    Palafrugell como referentes, ofrece un segmento con oferta restringida:
                     propiedades singulares con escasez de producto nuevo, factores que el
                     comprador de largo plazo valora expresamente.
                   </p>
@@ -331,8 +331,8 @@ export default async function EspanaPage({ searchParams }: Props) {
                     </Link>
                   </h3>
                   <p className="text-muted-foreground leading-relaxed">
-                    La Costa de la Luz —con Sotogrande como referente histórico de lujo en la
-                    provincia de Cádiz— ofrece un segmento caracterizado por menor presión
+                    La Costa de la Luz, con Sotogrande como referente histórico de lujo en la
+                    provincia de Cádiz, ofrece un segmento caracterizado por menor presión
                     urbanística respecto al litoral mediterráneo. Las fincas con amplias
                     parcelas, las propiedades singulares y los desarrollos de polo, golf y
                     náutica mantienen su atractivo para un comprador que prioriza la
