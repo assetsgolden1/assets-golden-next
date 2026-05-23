@@ -658,11 +658,14 @@ function CostaRicaContent() {
           ciudadanos extranjeros adquieran propiedades en las mismas condiciones
           que los nacionales. La excepción relevante es la{' '}
           <strong className="font-semibold text-foreground">Zona
-          Marítimo-Terrestre</strong>: los primeros 50 metros desde la línea de
-          marea alta son dominio público; los siguientes 150 metros constituyen la
-          Zona Restringida, que solo puede explotarse mediante concesión otorgada
+          Marítimo-Terrestre</strong>, que comprende los primeros 200 metros desde
+          la pleamar ordinaria: los primeros 50 metros son Zona Pública (dominio
+          público, no susceptible de propiedad privada), y los siguientes 150
+          metros son Zona Restringida, que se opera mediante concesión otorgada
           por la municipalidad correspondiente. Las propiedades de primera línea
-          en la costa pueden estar sujetas a esta regulación.
+          en la costa pueden estar sujetas a este régimen, por lo que conviene
+          verificar la situación jurídica concreta de cada inmueble antes de
+          operar.
         </p>
         <p className="text-xs text-muted-foreground/70 italic border-l-2 border-gold/30 pl-3">
           La información contenida en este apartado es de carácter general e
@@ -795,11 +798,17 @@ function GreciaContent() {
           de alta gama en la última década.
         </p>
         <p>
-          Grecia mantiene activo un programa de visa de residencia por inversión
-          inmobiliaria para compradores no comunitarios que superen el umbral
-          establecido por la normativa vigente. Este programa ha atraído a
-          compradores procedentes de Asia, Oriente Medio y Latinoamérica interesados
-          en combinar la inversión con el acceso al espacio Schengen.
+          Grecia mantiene activo un programa de{' '}
+          <strong className="font-semibold text-foreground">Golden Visa</strong>{' '}
+          por inversión inmobiliaria para compradores no comunitarios, reformado
+          en 2024 con umbrales diferenciados por zona: 800.000 € en áreas de mayor
+          demanda (Ática, Salónica, Mykonos, Santorini y otras islas designadas)
+          y 400.000 € en el resto del territorio. El programa ha atraído a
+          compradores procedentes de Asia, Oriente Medio y Latinoamérica
+          interesados en combinar la inversión con el acceso al espacio Schengen.
+          Los umbrales y condiciones específicas pueden actualizarse; conviene
+          verificar el régimen vigente con un asesor local antes de estructurar
+          una operación.
         </p>
       </div>
 
