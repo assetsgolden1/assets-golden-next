@@ -16,6 +16,7 @@ import {
 import { DestinationFilters } from '@/components/DestinationFilters'
 import { PaginationBar } from '@/components/PaginationBar'
 import PropertyCard from '@/components/properties/PropertyCard'
+import { getDestinoEditorial } from '@/lib/editorial/destinoEditorial'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -123,6 +124,7 @@ export default async function DestinoPage({ params, searchParams }: Props) {
   const hasMarketInfo = Object.values(marketInfo).some(Boolean)
 
   const currentFilters = { ciudad, tipo, precioMin, precioMax, habitaciones, orden }
+  const editorialContent = getDestinoEditorial(slug)
   const pageParams: Record<string, string | undefined> = {
     ciudad:        ciudad       || undefined,
     tipo:          tipo         || undefined,
@@ -288,6 +290,17 @@ export default async function DestinoPage({ params, searchParams }: Props) {
                 </div>
               )}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Contenido editorial — visible solo sin filtro de ciudad activo */}
+      {!ciudad && editorialContent && (
+        <section className="section-padding bg-muted/30">
+          <div className="container-luxury">
+            <article className="max-w-3xl mx-auto">
+              {editorialContent}
+            </article>
           </div>
         </section>
       )}
