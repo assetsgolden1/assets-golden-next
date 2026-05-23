@@ -64,6 +64,40 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-23 — feat(seo): CT-1 textos editoriales — 10 países (Fase 3.B)
+
+**Contexto:** Replicar el patrón editorial de CT-1 (piloto España, commit 2a220ac) a los 10 países restantes del catálogo. Estructura en 3 tiers por volumen de catálogo. Protocolo de 3 pausas de validación antes de commit.
+
+**Decisión técnica:** Contenido estático en `src/lib/editorial/destinoEditorial.tsx` (lookup map slug → componente React). El `[slug]/page.tsx` importa `getDestinoEditorial(slug)` y lo renderiza condicionado a `!ciudad`, entre el bloque de mercado y el grid de propiedades. Sin páginas individuales nuevas: el template dinámico es suficiente para todos los países no-España.
+
+**Correcciones pre-commit aplicadas (6 ajustes del usuario):**
+- Indonesia: Leasehold (Hak Sewa) añadido como primera vía; texto del párrafo de cierre sobre elección de estructura
+- EAU: Golden Visa 10 años con umbral concreto 2M AED (~545.000 €)
+- Argentina: añadida mención Ley 26.737 para tierras rurales y zonas de frontera
+- Costa Rica: Zona Marítimo-Terrestre reescrita con medidas correctas (200m totales: 50m pública + 150m restringida desde pleamar ordinaria)
+- Grecia: Golden Visa reformado 2024 con umbrales diferenciados (800k€ áreas alta demanda / 400k€ resto)
+
+**Links internos enlazados (verificados en DB antes de insertar):**
+- `/blog/invertir-en-tulum-analisis-2026` → México/Tulum
+- `/blog/comprar-propiedad-dubai-siendo-latino-guia-2026` → EAU
+
+**Archivos tocados:**
+- CREATED: `src/lib/editorial/destinoEditorial.tsx` (904 líneas; 10 funciones + lookup map)
+- MODIFIED: `src/app/(public)/destinos/[slug]/page.tsx` (import + sección editorial condicional)
+
+**Commits (pusheados):**
+- `a03e137` feat(seo): CT-1 textos editoriales — México, Indonesia, EAU
+- `0d4f578` feat(seo): CT-1 textos editoriales — Argentina, EEUU
+- `fd447b7` feat(seo): CT-1 textos editoriales — Costa Rica, UK, Ecuador, Grecia, Paraguay
+
+**Build:** `✓ Compiled successfully`, TypeScript OK, 1111 páginas, 0 errores en los 3 builds.
+
+**Próximo paso sugerido:**
+- Fase 3.C (AM-1/AM-2): reescribir post `golden-visa-espana-2026-residencia-comprando-propiedad` — el artículo actual describe el programa como activo (derogado por LO 1/2025 desde abril 2025). Anotado como pendiente desde sesión 2026-05-21.
+- EL-1/F diferido: "Propiedades similares" en `/propiedades/[slug]` (Bloque 4)
+
+---
+
 ### Sesión 2026-05-22 — fix(meta): debug Pixel no visible en producción
 
 **Contexto:** ADS-P6. Meta Pixel Helper decía "No se han encontrado píxeles" en assetsgolden.com tras el deploy de ADS-P5.
