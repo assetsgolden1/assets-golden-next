@@ -509,9 +509,13 @@ function ArgentinaContent() {
       </h2>
       <div className="space-y-4 text-muted-foreground leading-relaxed">
         <p>
-          Los ciudadanos extranjeros pueden adquirir bienes inmuebles en Argentina
-          en condiciones similares a las de los nacionales, sin restricciones de
-          nacionalidad en el mercado libre residencial. La particularidad más
+          Los ciudadanos extranjeros pueden adquirir bienes inmuebles residenciales
+          en Argentina en condiciones similares a las de los nacionales, sin
+          restricciones de nacionalidad en el mercado urbano y residencial libre.
+          La adquisición de tierras rurales y zonas de frontera está sujeta a una
+          normativa específica (Ley 26.737), por lo que conviene verificar el
+          régimen aplicable según el tipo y la ubicación del inmueble. La
+          particularidad más
           relevante para el comprador internacional es el entorno cambiario del
           país: las operaciones inmobiliarias se realizan habitualmente en dólares
           estadounidenses, y la repatriación de capital puede estar sujeta a
