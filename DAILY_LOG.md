@@ -64,6 +64,43 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-25d — [FASE-3.C-P2] Post Dubái: mercado inmobiliario 2026
+
+**Contexto:** Post 2 de la serie de 5 reescrituras editoriales. Slug target `dubai-inversion-inmobiliaria-2026-mercado-lujo` no existía en DB → INSERT nuevo post.
+
+**Posts Dubái ya existentes (preservados sin tocar):**
+- `comprar-propiedad-dubai-siendo-latino-guia-2026` (ES, 5717 chars, banner asignado)
+- `buying-property-dubai-international-investors` (EN, 5917 chars, banner asignado)
+
+**Trabajo hecho:**
+- INSERT en `blog_posts` con todo el contenido vía Supabase MCP
+- Link interno `/destinos/emiratos-arabes-unidos` hardcodeado en prosa (el H2 "La Golden Visa de Emiratos..." viene antes → auto-linker skipearía por H2 protegida → solución: hardcode en párrafo + entrada en link map para otros posts)
+- `blogInternalLinks.ts`: agrega "Emiratos Árabes Unidos" → `/destinos/emiratos-arabes-unidos` (ES) y "United Arab Emirates" → `/destinos/emiratos-arabes-unidos` (EN)
+- `blogPostZones.ts`: agrega nuevo slug al POST_ZONE_MAPPING
+- Banner: MERIDEN BEACH RESIDENCES (`1772280847001.png`) — único sin usar entre los posts de Dubái
+- Build limpio, TypeScript OK
+
+**Métricas finales:**
+- `content_length`: 14.693 chars
+- `meta_description` length: 223 chars (sin truncar)
+- `num_citations`: 5
+- FAQs detectadas: 5
+- Em-dash en prosa: 0 (5 solo en anchor text bibliográfico — aceptables)
+- Tablas: 2 (precios zona Q1 2026 + comparativa Dubái vs España)
+
+**Smoke test prod:** 8/10 ✅ (los 2 ❌ del tool son falsos positivos — headings limpios confirmados; em-dash en prosa = 0 confirmado por SQL)
+
+**Archivos tocados:**
+- MODIFIED: `src/lib/utils/blogInternalLinks.ts`
+- MODIFIED: `src/lib/constants/blogPostZones.ts`
+- Solo DB para el contenido (INSERT directo)
+
+**Commits:** `e3049e6` chore(content): Fase 3.C-P2 — post Dubái mercado inmobiliario 2026
+
+**Próximo paso sugerido:** Fase 3.C-P3 (siguiente post de la serie de 5). Confirmar cuál es el slug target.
+
+---
+
 ### Sesión 2026-05-25c — [FASE-3.C-P1-FIX] Correcciones post-deploy: anchor anidado, H3 links, meta truncation
 
 **Contexto:** Smoke test post-deploy reveló 3 issues en el auto-linker y generateMetadata.
