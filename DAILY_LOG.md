@@ -64,6 +64,64 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-25g — [FASE-3.C-P4] Reescritura Post 4 — Marbella 2026
+
+**Contexto:** Post 4 de la serie de 5 reescrituras editoriales. Slug `comprar-villa-marbella-zonas-exclusivas-precios` — reposicionamiento a "análisis prime micro-zona con datos E&V Q1 2026". Slug preservado para SEO.
+
+**Trabajo hecho:**
+
+**Paso 1 — PROTECTED_PHRASES (commit aparte `59c803d`):**
+- Añadido `Las Lomas Marbella Club` (único que contiene término linkeable "Marbella")
+- Añadidos defensivos: Sierra Blanca, Altos Reales, Puerto Banús, Golden Mile, Nueva Andalucía, Valle del Golf
+- TypeScript: 0 errores
+
+**Paso 2 — Backup + UPDATE:**
+- Backup id=3 en `blog_posts_backup` (2026-05-25 21:38:56 UTC)
+- UPDATE `blog_posts` con nuevo title, content (typo `</tl>` corregido a `</tr>`), excerpt, meta_description, citations JSONB
+- Banner: reemplazado `logo.jpg` (medianewbuild) por foto "Lujo Mediterráneo frente al mar" (Sitges, Supabase storage) — temporal por ausencia de propiedades Marbella con imagen en DB
+
+**Métricas:**
+
+| Campo | Antes | Después |
+|---|---|---|
+| content_length | 5.694 | **15.591** |
+| meta_desc_len | — | 227 |
+| excerpt_len | — | 225 |
+| num_citations | — | **5** |
+| faq_h3_count | — | **5** |
+| table_count | — | **2** (micro-zonas + Marbella vs Ibiza vs Mallorca) |
+| external_links | — | **5** |
+| em-dashes en prosa | — | **0** (5 solo en anchor text bibliográfico) |
+| tl_typo_count | — | **0** (corregido) |
+| autolinker_anchors_in_db | 0 | 0 |
+
+**Secciones del nuevo contenido:**
+1. Apertura: anomalía estructural (apartamento > casa en €/m²) con datos E&V abril 2026
+2. El dato que define el mercado (tabla 6 micro-zonas con precios casa + apartamento)
+3. Las seis micro-zonas con encaje de perfil (H3 por cada zona: Golden Mile, Sierra Blanca, Las Lomas Marbella Club, Altos Reales, Puerto Banús, Nueva Andalucía)
+4. Alquiler prime: yields reales + cálculo ejemplo sobre 250 m² Sierra Blanca
+5. Costes operativos reales (IBI, comunidad, mantenimiento — 25k-45k €/año)
+6. Marbella vs Ibiza vs Mallorca SW (tabla 7 variables)
+7. Cuándo Marbella no es la respuesta correcta
+8. 5 FAQs + footer fuentes + disclaimer + timestamp
+
+**Links internos hardcodeados:** solo 2 × `/destinos/espana` (ruta confirmada existente). Sin links a rutas no verificadas.
+
+**⚠️ Banner temporal:** no hay propiedades Marbella activas con imagen en DB. Banner asignado es "Lujo Mediterráneo Frente al Mar Sitges" (temáticamente próximo pero no Marbella). Reemplazar cuando haya propiedad Marbella con imagen en DB.
+
+**Archivos tocados:**
+- MODIFIED: `src/lib/utils/blogInternalLinks.ts` (+9 líneas — PROTECTED_PHRASES Marbella)
+- MODIFIED: `DAILY_LOG.md`
+- Solo DB para el contenido (UPDATE + banner)
+
+**Commits:**
+- `59c803d` fix(blog): PROTECTED_PHRASES para micro-zonas Marbella
+- `(ver abajo)` chore(content): Fase 3.C-P4 — reescritura Post 4 Marbella 2026
+
+**Próximo paso sugerido:** FASE-3.C-P5 — Post 5 de la serie de 5 reescrituras. Confirmar slug target.
+
+---
+
 ### Sesión 2026-05-25f — [FASE-3.C-P3] Reescritura Post 3 — Costa del Sol 2026
 
 **Contexto:** Post 3 de la serie de 5 reescrituras editoriales. Slug `costa-del-sol-vs-costa-blanca-invertir-2026` — reposicionamiento de "comparativa vs Costa Blanca" a "post estructural Costa del Sol" (slug preservado para SEO).
