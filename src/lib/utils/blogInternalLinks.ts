@@ -55,8 +55,12 @@ export function addInternalLinks(html: string, language: 'es' | 'en' = 'es'): st
 
     const idx = result.indexOf(match[0])
 
-    // Skip if the match falls inside an existing <a> or <h1>–<h6> tag
-    if (isInsideProtectedTag(result, idx)) continue
+    // idx points to the first char of match[0], which is the $1 group
+    // (either `>` or whitespace). We use idx+1 so the "before" slice
+    // includes that character — critical when $1 is `>` from an opening
+    // tag like <h3> or <a href="...">, otherwise the closing `>` is
+    // excluded and the tag-counting regex won't detect it as open.
+    if (isInsideProtectedTag(result, idx + 1)) continue
 
     result = result.replace(
       regex,
