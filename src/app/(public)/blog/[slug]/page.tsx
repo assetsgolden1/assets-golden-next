@@ -41,7 +41,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: post.title,
-    description: (post.meta_description ?? post.excerpt)?.slice(0, 160) ?? undefined,
+    // meta_description viene curada desde la DB — no truncar.
+    // excerpt puede ser más largo; truncar en último espacio antes de 160.
+    description: post.meta_description
+      ? post.meta_description
+      : post.excerpt
+        ? (post.excerpt.length > 160
+          ? post.excerpt.slice(0, post.excerpt.lastIndexOf(' ', 160) || 160)
+          : post.excerpt)
+        : undefined,
     alternates: {
       canonical: `/blog/${slug}`,
       languages: post.language === 'en'
