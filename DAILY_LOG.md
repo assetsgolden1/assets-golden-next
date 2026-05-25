@@ -64,6 +64,95 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-25b — [FASE-3.C-P1] UPDATE final post Golden Visa España — derogada LO 1/2025
+
+**Contexto:** Continuación de sesión 2026-05-25. Toda la infraestructura ya estaba lista (commit 9f1d77f). En esta sesión se ejecutó el UPDATE directo en Supabase con el contenido completo reescrito.
+
+**Trabajo hecho:**
+- UPDATE `blog_posts` vía Supabase MCP: nuevo título, meta_description, content HTML completo (18.946 chars), citations JSONB (7 elementos), published=true, updated_at=2026-05-25T17:32:19Z
+- Verificación post-UPDATE: content_length=18.946, meta_len=217, num_citations=7 — todos correctos
+- Verificación FAQPage: 5 h3 con `?` extraídas correctamente por regexp — schema FAQPage funcionará en prod
+- Contenido incluye: 2 tablas HTML (`<table>`), 5 FAQ, links internos a /destinos/espana y /destinos/grecia, 5 enlaces externos con target=_blank + rel=noopener noreferrer, bloque de fuentes, disclaimer legal en italics
+- Em-dash count: 0 en el cuerpo del post
+
+**Datos del UPDATE:**
+- slug: `golden-visa-espana-2026-residencia-comprando-propiedad`
+- Título: "Golden Visa de España en 2026: derogación, alternativas y vías de residencia para inversores internacionales"
+- meta_description: "La Golden Visa española fue derogada en abril de 2025 por la Ley Orgánica 1/2025. Analizamos el estado vigente, los derechos de los titulares actuales y las alternativas reales para inversores internacionales en 2026."
+- Backup disponible en `blog_posts_backup` id=1 (pre-update)
+
+**Archivos tocados:** Solo DB (Supabase directo) — sin cambios de código en este commit
+
+**Commits:** `(ver abajo — solo DAILY_LOG)`
+
+**Próximo paso sugerido:** Smoke test en prod una vez Vercel complete el redeploy (ISR TTL=3600s — si no se quiere esperar, forzar revalidación o nuevo commit vacío)
+
+---
+
+### Sesión 2026-05-25 — [FASE-3.C-P1] Infraestructura Golden Visa reescritura (PARCIAL — bloqueado en contenido)
+
+**Contexto:** Reescribir post Golden Visa España con contenido post-derogación LO 1/2025. El archivo `golden-visa-espana-post.md` no fue adjuntado → UPDATE del contenido bloqueado.
+
+**Trabajo hecho:**
+- Verificado slug en Supabase: existe, published=true, 6032 chars HTML, banner ya asignado
+- Creada tabla `blog_posts_backup` (migration: `create_blog_posts_backup_table`)
+- Backup del contenido actual guardado: `blog_posts_backup` id=1, `2026-05-25 16:50:37 UTC`
+- Agregada columna `citations jsonb` a `blog_posts` (migration: `add_citations_column_to_blog_posts`)
+- `types/index.ts`: campo `citations` añadido a `BlogPost` interface
+- `blog/[slug]/page.tsx`: JSON-LD BlogPosting incluye `citation[]` cuando el campo DB está poblado; `generateMetadata` usa `meta_description` con fallback a `excerpt` (fix: antes ignoraba `meta_description`)
+- `blogInternalLinks.ts`: Grecia → `/destinos/grecia` (ES) + Greece → `/destinos/grecia` (EN)
+- Build limpio, TypeScript sin errores
+- Commit: `9f1d77f` — pushed a main
+
+**Hallazgos:**
+- `meta_description` existía en DB pero el componente lo ignoraba → corregido en este commit
+- `/destinos/grecia` activo en Supabase → agregado al link map
+- Marbella sigue linkeando a `/propiedades?pais=España&ciudad=Marbella` globalmente; el link a `/destinos/espana` para el Golden Visa post deberá ir hardcodeado en el HTML del contenido
+
+**Archivos tocados:**
+- MODIFIED: `src/types/index.ts`
+- MODIFIED: `src/app/(public)/blog/[slug]/page.tsx`
+- MODIFIED: `src/lib/utils/blogInternalLinks.ts`
+
+**Commits:** `9f1d77f` feat(blog): infraestructura para reescritura Golden Visa — citations schema + meta_description fix
+
+**Próximo paso sugerido:** Proporcionar `golden-visa-espana-post.md` (o confirmar que lo escriba Claude basándose en LO 1/2025) → ejecutar UPDATE en Supabase con nuevo title, content HTML, excerpt, meta_description y citations JSONB → smoke test en prod
+
+---
+
+### Sesión 2026-05-23b — chore(content): eliminar em-dash de prosa editorial (11 países + España + sobre-nosotros)
+
+**Contexto:** [FIX-prosa] Auditoría y reemplazo de em-dashes (—) en textos editoriales. Regla aprobada: aposiciones cortas → paréntesis; "con X como referente" → comas; incisos restrictivos → comas; 5 casos con reformulación; H3 títulos de lista (Buenos Aires —, Florida —, California —) protegidos.
+
+**Bloques aplicados:**
+- Bloque A: `destinoEditorial.tsx` — 25 reemplazos (México 4, Indonesia 3, EAU 5, Argentina 2, EEUU 4, Costa Rica 2, Reino Unido 1, Ecuador 3, Grecia 1)
+- Bloque B: `espana/page.tsx` — 6 reemplazos en prosa de Costa del Sol, Costa Blanca, Cataluña, Costa de la Luz y sección de compradores
+- Bloque C: `sobre-nosotros/page.tsx` — 8 strings de país (em-dash → dos puntos)
+- Bloque D: `politica-de-privacidad/page.tsx` — no tocado (texto legal)
+
+**Em-dashes remanentes (intencionales):**
+- `destinoEditorial.tsx` L478/571/585: H3 títulos de lista protegidos
+- `espana/page.tsx` L152: template literal metadata title
+- `espana/page.tsx` L195: comentario JSX
+
+**Auditoría de seguridad:** sin `dangerouslySetInnerHTML` nuevo, sin hrefs dinámicos en editorial.
+
+**Archivos tocados:**
+- MODIFIED: `src/lib/editorial/destinoEditorial.tsx`
+- MODIFIED: `src/app/(public)/destinos/espana/page.tsx`
+- MODIFIED: `src/app/(public)/sobre-nosotros/page.tsx`
+
+**Commits (pusheados):**
+- `0c5abb9` chore(content): reemplazar em-dash por puntuación natural en prosa editorial (11 países + España + sobre-nosotros)
+
+**Build:** `✓ Compiled successfully`, TypeScript OK, 1111 páginas, 0 errores.
+
+**Próximo paso sugerido:**
+- Fase 3.C (AM-1/AM-2): reescribir post `golden-visa-espana-2026-residencia-comprando-propiedad` — artículo actual describe el programa como activo (derogado por LO 1/2025 desde abril 2025)
+- EL-1/F diferido: "Propiedades similares" en `/propiedades/[slug]`
+
+---
+
 ### Sesión 2026-05-23 — feat(seo): CT-1 textos editoriales — 10 países (Fase 3.B)
 
 **Contexto:** Replicar el patrón editorial de CT-1 (piloto España, commit 2a220ac) a los 10 países restantes del catálogo. Estructura en 3 tiers por volumen de catálogo. Protocolo de 3 pausas de validación antes de commit.
