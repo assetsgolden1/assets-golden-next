@@ -49,11 +49,19 @@ const PROTECTED_PHRASES: string[] = [
   'Costa del Sol Hospital',
   'Costa del Sol Airport',
   'Costa Blanca Tourism Board',
-  // Marbella compounds
+  // Marbella compounds (incluye las que contienen "Marbella" como término linkeable)
+  'Las Lomas Marbella Club',
   'Marbella Club',
   'Marbella Club Hotel',
   'Marbella Town Hall',
   'Marbella Country Club',
+  // Marbella micro-zonas (defensivo: no contienen término linkeable pero documentan nomenclatura)
+  'Sierra Blanca',
+  'Altos Reales',
+  'Puerto Banús',
+  'Golden Mile',
+  'Nueva Andalucía',
+  'Valle del Golf',
   // Other destination compounds
   'Tulum Country Club',
   'Tulum National Park',
