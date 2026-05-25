@@ -64,6 +64,30 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-25c — [FASE-3.C-P1-FIX] Correcciones post-deploy: anchor anidado, H3 links, meta truncation
+
+**Contexto:** Smoke test post-deploy reveló 3 issues en el auto-linker y generateMetadata.
+
+**Issues resueltos:**
+1. **Anchor anidado `<a><a>`** (Issue 1): blogInternalLinks.ts usaba un guard "mira 20 chars atrás" que no detectaba términos dentro de `<a>` abierto más arriba. Reemplazado por `isInsideProtectedTag()` que cuenta pares open/close de `<a>` y `<h1-h6>` antes del match.
+2. **Links dentro de headings** (Issue 2): misma función `isInsideProtectedTag()` bloquea el auto-link si el match cae dentro de `<h1>–<h6>` abierto. Resuelve "Grecia" en H3.
+3. **meta_description truncada mid-word** (Issue 3): `generateMetadata` aplicaba `.slice(0, 160)` también a `meta_description` (no solo a `excerpt`). Fix: si `meta_description` existe → usar tal cual; si solo `excerpt` → truncar en último espacio antes de 160.
+4. **Hotfix off-by-one en isInsideProtectedTag**: el slice(0, idx) excluía el `>` del tag de apertura, haciendo que `<h3>` no se detectara. Fix: `idx+1`.
+
+**Commits:**
+- `07b9070` — fix(blog): anchor anidado + skip headings + fix meta truncation
+- `b74e336` — fix(blog): corregir off-by-one en isInsideProtectedTag
+
+**Archivos tocados:**
+- MODIFIED: `src/lib/utils/blogInternalLinks.ts`
+- MODIFIED: `src/app/(public)/blog/[slug]/page.tsx`
+
+**Nota:** smoke test post-fix muestra ISR cache todavía activo (TTL=3600s). Los fixes son correctos en código; verán efecto tras el próximo ciclo de revalidación o redeploy Vercel.
+
+**Próximo paso sugerido:** Re-verificar en prod pasada 1h o forzar revalidación. Confirmar H3 sin anchor y meta_description completa.
+
+---
+
 ### Sesión 2026-05-25b — [FASE-3.C-P1] UPDATE final post Golden Visa España — derogada LO 1/2025
 
 **Contexto:** Continuación de sesión 2026-05-25. Toda la infraestructura ya estaba lista (commit 9f1d77f). En esta sesión se ejecutó el UPDATE directo en Supabase con el contenido completo reescrito.
