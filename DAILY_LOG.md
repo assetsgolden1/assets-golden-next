@@ -64,6 +64,97 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-25f — [FASE-3.C-P3] Reescritura Post 3 — Costa del Sol 2026
+
+**Contexto:** Post 3 de la serie de 5 reescrituras editoriales. Slug `costa-del-sol-vs-costa-blanca-invertir-2026` — reposicionamiento de "comparativa vs Costa Blanca" a "post estructural Costa del Sol" (slug preservado para SEO).
+
+**Diagnóstico previo:**
+- [FASE-3.C-P2-REPROCESS] descartada: el auto-linker corre en render time, no en save time. DB siempre almacena HTML crudo (0 autolinker anchors confirmado por SQL). Fix commit a1c610b ya aplicó en Vercel al invalidar ISR caches.
+- Smoke test de producción confirmó "Dubai Land Department" sin `<a>` y hero con subtítulo ✅
+
+**Trabajo hecho:**
+- Backup id=2 insertado en `blog_posts_backup` (backup_date: 2026-05-25 21:13:02 UTC)
+- UPDATE `blog_posts` con: nuevo title, content HTML completo, excerpt, meta_description, citations JSONB (5 items), updated_at
+- Banner corregido: de `medianewbuild.com/logo.jpg` (logo incorrecto) a `medianewbuild.com/.../commonareas/1.jpg` (foto de áreas comunes — Fuengirola, Costa del Sol)
+- TypeScript: 0 errores
+
+**Métricas:**
+
+| Campo | Antes | Después |
+|---|---|---|
+| content_length | 5.853 | **19.637** |
+| meta_desc_len | 160 | 216 |
+| excerpt_len | 153 | 226 |
+| num_citations | — | **5** |
+| faq_h3_count | — | **5** |
+| table_count | — | **2** |
+| external_links | — | **5** |
+| em-dashes en prosa | — | **0** (5 solo en anchor text bibliográfico) |
+| autolinker_anchors_in_db | 0 | 0 |
+
+**Secciones del nuevo contenido:**
+1. Apertura con cifras clave 2024 (11.404 compras extranjeras, 32,4% provincial)
+2. El mercado en cifras 2024-2025 (lista detallada)
+3. Las cinco micro-zonas (tabla: Marbella, Benahavís, Estepona, Mijas Costa, Málaga capital)
+4. Quién compra en Costa del Sol en 2026 (nacionalidades, perfil)
+5. Nueva regulación VFT Andalucía 2024-2025 (Decreto 31/2024, Decreto-ley 1/2025)
+6. Costa del Sol vs Costa Blanca (tabla comparativa 10 variables)
+7. El efecto Cataluña (ITP Decreto Ley 5/2025)
+8. Riesgos reales del mercado 2026
+9. Cuándo Costa del Sol no es la respuesta correcta
+10. 5 FAQs + footer fuentes + disclaimer + timestamp
+
+**Links hardcodeados en HTML:**
+- `/destinos/reino-unido` (Reino Unido)
+- `/destinos/espana` (Costa Blanca)
+- `/destinos/mexico` (Tulum)
+- `/destinos/indonesia` (Bali)
+- `/destinos/emiratos-arabes-unidos` (Dubái)
+- ⚠️ Nota: `/destinos/reino-unido` y `/destinos/indonesia` pueden no existir como rutas — verificar o crear antes del go-live
+
+**Archivos tocados:**
+- Solo DB para el contenido (UPDATE + banner)
+- MODIFIED: `DAILY_LOG.md`
+
+**Commits:** (ver abajo)
+
+**Próximo paso sugerido:** FASE-3.C-P4 — Post 4 de la serie de 5 reescrituras. Confirmar slug target.
+
+---
+
+### Sesión 2026-05-25e — [FASE-3.C-P2-FIX] Auto-linker nombres propios compuestos + excerpt Post 2 Dubái
+
+**Contexto:** Smoke test del Post 2 (Dubái) detectó: (1) auto-linker envolvía "Dubai" dentro de "Dubai Land Department" generando `<a>Dubai</a> Land Department`; (2) hero del post sin subtítulo porque `excerpt` estaba vacío.
+
+**Trabajo hecho:**
+
+**Issue 1 — Auto-linker compound proper nouns:**
+- Añadida constante `PROTECTED_PHRASES` (30 frases): Dubai Land Department, Dubai Marina, Dubai Hills Estate, Dubai Internet City, Marbella Club, Banco de España, Costa del Sol Airport, Tulum National Park, etc.
+- Añadida constante `INSTITUTIONAL_SUFFIXES` (34 sufijos): Land, Authority, Department, Marina, Hills, Holdings, Commission, Ministry, etc.
+- Nueva función `isPartOfCompoundProper(html, matchIndex, matchLength, term, followChar)`:
+  - Check 1: ventana de contexto ±50 chars alrededor del match → busca si alguna PROTECTED_PHRASE que contenga el trigger aparece en esa ventana
+  - Check 2: si el char seguidor ($3) es whitespace → obtiene el siguiente token y lo compara contra INSTITUTIONAL_SUFFIXES (sólo capitalizado)
+  - Cualquier check positivo → skip link
+- TypeScript: 0 errores (`npx tsc --noEmit` limpio)
+
+**Issue 2 — Excerpt Post 2:**
+- UPDATE `blog_posts` vía Supabase MCP: `excerpt = 'Análisis del mercado más dinámico del mundo en 2026: cifras, yields por zona, Golden Visa y comparativa con España para el inversor internacional.'`
+- Confirmado: `updated_at = 2026-05-25 20:51:06+00`, slug correcto
+
+**Archivos tocados:**
+- MODIFIED: `src/lib/utils/blogInternalLinks.ts` (+108 líneas netas — PROTECTED_PHRASES, INSTITUTIONAL_SUFFIXES, isPartOfCompoundProper)
+- Solo DB para excerpt (UPDATE directo)
+
+**Commits:** `a1c610b` fix(blog): auto-linker respeta nombres propios compuestos + excerpt Post 2 Dubai
+
+**Smoke test:** ✅ CONFIRMADO en prod (WebFetch). "Dubai Land Department" texto plano sin `<a>`. Hero muestra subtítulo. Sin anchors `text-gold underline` incorrectos.
+
+**Nota FASE-3.C-P2-REPROCESS:** Protocolo de reprocessing descartado. El auto-linker corre en RENDER TIME (page.tsx:118), no en save time. DB content tiene 0 auto-linker anchors (confirmado por SQL). El nuevo deployment de Vercel invalida ISR caches → fix a1c610b aplicó inmediatamente.
+
+**Próximo paso sugerido:** Fase 3.C-P3 — Post 3 de la serie de 5 reescrituras editoriales. Confirmar con el usuario cuál es el slug target.
+
+---
+
 ### Sesión 2026-05-25d — [FASE-3.C-P2] Post Dubái: mercado inmobiliario 2026
 
 **Contexto:** Post 2 de la serie de 5 reescrituras editoriales. Slug target `dubai-inversion-inmobiliaria-2026-mercado-lujo` no existía en DB → INSERT nuevo post.
