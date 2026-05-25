@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: post.title,
-    description: post.excerpt?.slice(0, 160) ?? undefined,
+    description: (post.meta_description ?? post.excerpt)?.slice(0, 160) ?? undefined,
     alternates: {
       canonical: `/blog/${slug}`,
       languages: post.language === 'en'
@@ -109,12 +109,17 @@ export default async function BlogPostPage({ params }: Props) {
   const relatedProperties = await getRelatedProperties(slug, 3)
   const processedContent = post.content ? addInternalLinks(post.content, lang) : null
 
+  // citations: campo JSONB en blog_posts, array de objetos schema.org
+  const citationsArr = Array.isArray(post.citations) && post.citations.length > 0
+    ? post.citations
+    : undefined
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     '@id': `https://assetsgolden.com/blog/${slug}`,
     headline: post.title,
-    description: post.excerpt ?? undefined,
+    description: post.meta_description ?? post.excerpt ?? undefined,
     image: heroImage ? [heroImage] : undefined,
     datePublished: post.published_at ?? post.created_at ?? undefined,
     dateModified: post.updated_at ?? post.created_at ?? undefined,
@@ -126,6 +131,7 @@ export default async function BlogPostPage({ params }: Props) {
       '@type': 'WebPage',
       '@id': `https://assetsgolden.com/blog/${slug}`,
     },
+    ...(citationsArr && { citation: citationsArr }),
   }
 
   const backBtn = (

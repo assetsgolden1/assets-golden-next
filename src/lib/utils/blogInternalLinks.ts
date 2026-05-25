@@ -6,6 +6,7 @@ const LINK_MAP_ES: Record<string, string> = {
   'Estepona': '/propiedades?pais=Espa%C3%B1a&ciudad=Estepona',
   'Tulum': '/propiedades?pais=M%C3%A9xico&ciudad=Tulum',
   'Dubai': '/propiedades?pais=Emiratos+%C3%81rabes+Unidos',
+  'Grecia': '/destinos/grecia',
 }
 
 const LINK_MAP_EN: Record<string, string> = {
@@ -15,6 +16,7 @@ const LINK_MAP_EN: Record<string, string> = {
   'Estepona': '/propiedades?pais=Espa%C3%B1a&ciudad=Estepona',
   'Tulum': '/propiedades?pais=M%C3%A9xico&ciudad=Tulum',
   'Dubai': '/propiedades?pais=Emiratos+%C3%81rabes+Unidos',
+  'Greece': '/destinos/grecia',
 }
 
 export function addInternalLinks(html: string, language: 'es' | 'en' = 'es'): string {

@@ -90,6 +90,8 @@ export interface BlogPost {
   published: boolean
   published_at: string | null
   read_time: number | null
+  /** Array de referencias schema.org (CreativeWork / GovernmentService) para el bloque citation del JSON-LD */
+  citations: Record<string, unknown>[] | null
 }
 
 // ─── Lead ─────────────────────────────────────────────────────
