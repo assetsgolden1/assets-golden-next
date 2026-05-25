@@ -7,6 +7,7 @@ const LINK_MAP_ES: Record<string, string> = {
   'Tulum': '/propiedades?pais=M%C3%A9xico&ciudad=Tulum',
   'Dubai': '/propiedades?pais=Emiratos+%C3%81rabes+Unidos',
   'Grecia': '/destinos/grecia',
+  'Emiratos Árabes Unidos': '/destinos/emiratos-arabes-unidos',
 }
 
 const LINK_MAP_EN: Record<string, string> = {
@@ -17,6 +18,7 @@ const LINK_MAP_EN: Record<string, string> = {
   'Tulum': '/propiedades?pais=M%C3%A9xico&ciudad=Tulum',
   'Dubai': '/propiedades?pais=Emiratos+%C3%81rabes+Unidos',
   'Greece': '/destinos/grecia',
+  'United Arab Emirates': '/destinos/emiratos-arabes-unidos',
 }
 
 /**

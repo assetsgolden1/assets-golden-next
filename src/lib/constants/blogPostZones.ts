@@ -16,6 +16,7 @@ export const POST_ZONE_MAPPING: BlogPostZone[] = [
   { slug: 'invertir-en-tulum-analisis-2026', country: 'México', city: 'Tulum' },
   { slug: 'rentabilidad-alquiler-vacacional-costa-del-sol', country: 'España', zone: 'costa-del-sol' },
   { slug: 'comprar-propiedad-dubai-siendo-latino-guia-2026', country: 'Emiratos Árabes Unidos' },
+  { slug: 'dubai-inversion-inmobiliaria-2026-mercado-lujo', country: 'Emiratos Árabes Unidos' },
   { slug: 'mejores-zonas-comprar-estepona-2026', country: 'España', zone: 'costa-del-sol', city: 'Estepona' },
   // ── English ────────────────────────────────────────────────────
   { slug: 'buying-property-spain-foreigner-2026', country: 'España' },
