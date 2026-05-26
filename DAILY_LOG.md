@@ -64,6 +64,84 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-27b — [FASE-3.C-POLISH] Fix og:image global + GDPR cookie consent
+
+**Contexto:** Dos issues técnicos pre-campaña Meta Ads:
+A) og:image/twitter:image mostraban logo en lugar del banner del post
+B) Meta Pixel cargaba sin consentimiento (violación RGPD)
+
+---
+
+**FIX A — og:image (commit `67807b0`)**
+
+Root cause: `generateMetadata` en `blog/[slug]/page.tsx` usaba `post.cover_image` en lugar de `post.banner_image_url`. Para P5, `cover_image` era el antiguo logo URL porque no fue actualizado en la sesión anterior de reescritura.
+
+Solución:
+- `isLogoPlaceholder(url)`: filtra URLs que terminan en `logo.{ext}`
+- `resolveOgImage(post)`: prioridad `banner_image_url` → `cover_image` → omite (cascada del layout)
+- Omitir la clave `images` (no `[]`) cuando no hay imagen válida, para que el og fallback del layout sea visible
+- DB: sincronizado `cover_image` de P5 con `banner_image_url` (eran divergentes)
+- Layout og-default mejorado: usa España hero de Supabase storage (reemplaza `/opengraph-image.png` que no existía en `/public`)
+
+**FIX B — Cookie consent GDPR (commit `4e3e158`)**
+
+Instala `vanilla-cookieconsent v3.1.0`. Arquitectura:
+- `CookieConsentInit.tsx` (`'use client'`): inicializa el banner, define 3 categorías (necessary/analytics/marketing), carga Meta Pixel dinámicamente en `onConsent`/`onChange` solo cuando marketing es aceptado
+- `OpenPreferencesButton.tsx` (`'use client'`): botón footer → `CookieConsent.showPreferences()`
+- `src/lib/cookies/consent.ts`: helper `hasConsent()` (lee `cc_cookie`)
+- `layout.tsx`: ELIMINADO `<Script id="meta-pixel">` always-on + `<noscript>` pixel img. AÑADIDO `<CookieConsentInit />`
+- `Footer.tsx`: añadido "Configurar cookies" en bottom bar
+- `globals.css`: theming vanilla-cookieconsent con paleta navy/gold
+
+Bug extra resuelto: `fbq.d.ts` eliminado (conflicto con declaración existente en `src/lib/meta/track.ts`).
+
+**Checklist RGPD:**
+- [x] Banner en primera visita
+- [x] Botón Rechazar igual de visible que Aceptar (`equalWeightButtons: true`)
+- [x] Consentimiento granular por categoría
+- [x] Meta Pixel NO carga sin consentimiento marketing
+- [x] `<noscript>` pixel img ELIMINADO
+- [x] Persistencia en `cc_cookie`
+- [x] Revocación desde footer ("Configurar cookies")
+- [x] Link a `/politica-de-cookies` en banner
+- [x] TypeScript: 0 errores | Build: ✓ 16.3s, 1112/1112 páginas
+
+**Archivos tocados:**
+- MODIFIED: `src/app/(public)/blog/[slug]/page.tsx` (FIX A)
+- MODIFIED: `src/app/layout.tsx` (remove Pixel always-on, add CookieConsentInit, fix og-default)
+- MODIFIED: `src/components/Footer.tsx` (OpenPreferencesButton)
+- MODIFIED: `src/app/globals.css` (CC theme overrides)
+- CREATED: `src/components/cookies/CookieConsentInit.tsx`
+- CREATED: `src/components/cookies/OpenPreferencesButton.tsx`
+- CREATED: `src/lib/cookies/consent.ts`
+- DELETED: `src/types/fbq.d.ts` (conflicto con track.ts)
+- MODIFIED: `DAILY_LOG.md`
+- DB: `cover_image` P5 sincronizado con `banner_image_url`
+
+**Commits:**
+- `67807b0` fix(seo): og:image y twitter:image apuntan al banner del post
+- `4e3e158` feat(legal): banner cookies GDPR + consentimiento granular Meta Pixel
+
+**Smoke test pendiente (post-deploy Vercel):**
+
+FIX A — og:image:
+- `opengraph.xyz` con URL del Post 5 → debe mostrar banner Costa Blanca (no logo)
+- Repetir Posts 1–4 (ya tenían cover_image = banner_image_url, deberían estar OK)
+- WhatsApp Web: pegar link del Post 5 y verificar preview visual
+- Posts con `cover_image = logo.jpg` y `banner_image_url = logo.jpg` → deben usar fallback del layout (España hero Supabase)
+
+FIX B — Cookie consent:
+- Modo incógnito → banner debe aparecer en primera visita
+- Click "Rechazar" → DevTools Network: NO debe aparecer `connect.facebook.net`
+- Refrescar → banner NO debe volver a aparecer
+- Limpiar cookies + "Aceptar todas" → Network: SÍ debe aparecer Meta Pixel request
+- Footer → "Configurar cookies" → debe abrir modal de preferencias
+- Categorías necesarias: siempre ON, no toggleable
+
+**Próximo paso sugerido:** Smoke test producción una vez Vercel despliega (≈2-3 min). Retomar pendientes bloqueantes go-live: Resend + DNS Atilio.
+
+---
+
 ### Sesión 2026-05-27 — [FASE-3.C-P5] Reescritura Post 5 — Guía extranjero con foco Brexit UK 2026 ✅ SERIE 3.C COMPLETA
 
 **Contexto:** Post 5 (último) de la serie de 5 reescrituras editoriales Fase 3.C. Slug `comprar-piso-espana-siendo-extranjero-2026` — reposicionamiento de guía genérica a "guía estructural del comprador extranjero en España 2026 con foco específico Brexit UK + alemán + francés + latinoamericano + estadounidense". Slug preservado para SEO.
