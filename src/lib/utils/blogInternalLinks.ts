@@ -8,6 +8,7 @@ const LINK_MAP_ES: Record<string, string> = {
   'Dubai': '/propiedades?pais=Emiratos+%C3%81rabes+Unidos',
   'Grecia': '/destinos/grecia',
   'Emiratos Árabes Unidos': '/destinos/emiratos-arabes-unidos',
+  'Reino Unido': '/destinos/reino-unido',
 }
 
 const LINK_MAP_EN: Record<string, string> = {
