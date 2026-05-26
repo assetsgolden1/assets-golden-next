@@ -409,3 +409,43 @@
     font-size: 1.2rem;
   }
 }
+
+/* ─── vanilla-cookieconsent v3 — Assets Golden brand theme ─── */
+/* Override default CC variables to match navy/gold palette.     */
+#cc-main {
+  --cc-font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* Modal background */
+  --cc-bg:                     oklch(0.185 0.042 264);   /* --navy */
+  --cc-secondary-color:        oklch(0.75 0.01 260);     /* text/60 */
+  --cc-primary-color:          oklch(0.97 0.003 264);    /* near-white text */
+
+  /* Accept all / primary action button → gold */
+  --cc-btn-primary-bg:         oklch(0.74 0.17 78);      /* --gold */
+  --cc-btn-primary-text:       oklch(0.185 0.042 264);   /* navy text on gold */
+  --cc-btn-primary-border-color: transparent;
+  --cc-btn-primary-hover-bg:   oklch(0.83 0.14 82);      /* --gold-light */
+
+  /* Reject / secondary button → outlined gold */
+  --cc-btn-secondary-bg:       transparent;
+  --cc-btn-secondary-text:     oklch(0.74 0.17 78);      /* gold text */
+  --cc-btn-secondary-border-color: oklch(0.74 0.17 78);
+  --cc-btn-secondary-hover-bg: oklch(0.74 0.17 78 / 0.12);
+
+  /* Toggle ON → gold */
+  --cc-toggle-on-bg:           oklch(0.74 0.17 78);
+  --cc-toggle-off-bg:          oklch(0.35 0.025 264);
+  --cc-toggle-readonly-bg:     oklch(0.28 0.025 264);
+  --cc-toggle-knob-bg:         oklch(0.97 0.003 264);
+
+  /* Links */
+  --cc-link-color:             oklch(0.74 0.17 78);
+
+  /* Separator */
+  --cc-separator-border-color: oklch(0.74 0.17 78 / 0.18);
+
+  /* Overlay */
+  --cc-overlay-bg:             oklch(0 0 0 / 0.55);
+  --cc-overlay-z-index:        9998;
+  --cc-modal-z-index:          9999;
+}

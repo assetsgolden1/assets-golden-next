@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import GlobalSchemaOrg from "@/components/seo/GlobalSchemaOrg";
 import MetaPixelPageViewTracker from "@/components/analytics/MetaPixel";
+import CookieConsentInit from "@/components/cookies/CookieConsentInit";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -45,7 +45,9 @@ export const metadata: Metadata = {
       'Propiedades exclusivas en los mejores destinos del mundo. Compra, vende e invierte con expertos en inmobiliaria de lujo internacional.',
     images: [
       {
-        url: '/opengraph-image.png',
+        // España hero image — used as global og:image fallback for pages
+        // without a specific image (home, destinos, servicios, etc.)
+        url: 'https://wloneprkibfjioxwypaw.supabase.co/storage/v1/object/public/property-images/1766763271521.png',
         width: 1200,
         height: 630,
         alt: 'Assets Golden — Inmobiliaria de Lujo Internacional',
@@ -55,7 +57,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: 'summary_large_image',
-    images: ['/opengraph-image.png'],
+    images: ['https://wloneprkibfjioxwypaw.supabase.co/storage/v1/object/public/property-images/1766763271521.png'],
   },
 
   robots: {
@@ -86,40 +88,21 @@ export default function RootLayout({
       </head>
       <body className="flex min-h-full flex-col bg-background text-foreground">
         {children}
+        {/*
+          MetaPixelPageViewTracker: fires fbq('track','PageView') on SPA
+          navigation — only executes if window.fbq exists, which only happens
+          after the user grants marketing consent via CookieConsentInit.
+        */}
         <MetaPixelPageViewTracker />
+        {/*
+          CookieConsentInit: shows GDPR cookie banner on first visit and
+          manages consent state. Loads Meta Pixel dynamically ONLY when
+          the user accepts the "marketing" category.
+          The always-on <Script id="meta-pixel"> block has been removed —
+          the Pixel is now consent-gated.
+        */}
+        <CookieConsentInit />
       </body>
-      {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
-        <>
-          <Script
-            id="meta-pixel"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                !function(f,b,e,v,n,t,s)
-                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-                n.queue=[];t=b.createElement(e);t.async=!0;
-                t.src=v;s=b.getElementsByTagName(e)[0];
-                s.parentNode.insertBefore(t,s)}(window, document,'script',
-                'https://connect.facebook.net/en_US/fbevents.js');
-                fbq('init', '${process.env.NEXT_PUBLIC_META_PIXEL_ID}');
-                fbq('track', 'PageView');
-              `,
-            }}
-          />
-          <noscript>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              height="1"
-              width="1"
-              style={{ display: 'none' }}
-              src={`https://www.facebook.com/tr?id=${process.env.NEXT_PUBLIC_META_PIXEL_ID}&ev=PageView&noscript=1`}
-              alt=""
-            />
-          </noscript>
-        </>
-      )}
     </html>
   );
 }

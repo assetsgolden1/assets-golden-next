@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Phone, Mail } from "lucide-react";
+import OpenPreferencesButton from "@/components/cookies/OpenPreferencesButton";
 
 const footerLinks = {
   empresa: [
@@ -134,6 +135,7 @@ export default function Footer() {
           <Link href="/politica-de-cookies" className="hover:text-gold transition-colors">
             Política de cookies
           </Link>
+          <OpenPreferencesButton />
         </div>
       </div>
     </footer>
