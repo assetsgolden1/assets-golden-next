@@ -64,6 +64,79 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-27 — [FASE-3.C-P5] Reescritura Post 5 — Guía extranjero con foco Brexit UK 2026 ✅ SERIE 3.C COMPLETA
+
+**Contexto:** Post 5 (último) de la serie de 5 reescrituras editoriales Fase 3.C. Slug `comprar-piso-espana-siendo-extranjero-2026` — reposicionamiento de guía genérica a "guía estructural del comprador extranjero en España 2026 con foco específico Brexit UK + alemán + francés + latinoamericano + estadounidense". Slug preservado para SEO.
+
+**Trabajo hecho:**
+
+**Paso 1 — PROTECTED_PHRASES + LINK_MAP (commit aparte `bfd8cca`):**
+- Añadido `'Reino Unido': '/destinos/reino-unido'` a LINK_MAP_ES
+  - Slug verificado en `country_destinations` (active: true)
+- Sin nuevas PROTECTED_PHRASES necesarias para este post:
+  - `Agencia Tributaria`, `CaixaBank Research`, `Modelo 720`, `Modelo 721` → no están en LINK_MAP → no requieren protección
+  - `Costa del Sol`, `Costa Blanca`, `Marbella` → ya en LINK_MAP, deben linkearse (correcto)
+- TypeScript: 0 errores
+
+**Paso 2 — Backup + UPDATE:**
+- Backup id=4 en `blog_posts_backup` (2026-05-26 22:27:12 UTC)
+  - `backup_reason`: 'Fase 3.C-P5 pre-rewrite backup'
+- UPDATE `blog_posts` con nuevo title, content (19.681 chars), excerpt, meta_description, citations JSONB (5 items), updated_at
+- Banner: reemplazado `logo.jpg` (medianewbuild) por foto Torrevieja Costa Blanca `developments_v2/65152743/media/images/commonareas/1.jpg` — temáticamente apropiado (Costa Blanca es zona #1 de compradores británicos)
+
+**Métricas:**
+
+| Campo | Antes | Después |
+|---|---|---|
+| content_length | 6.267 | **19.681** |
+| meta_len | — | 262 |
+| excerpt_len | — | 259 |
+| num_citations | — | **5** |
+| h3_count | — | **12** (7 secciones + 5 FAQs) |
+| table_count | — | **1** (mapa comprador) |
+| internal_links | — | **1** (`/destinos/espana`) |
+| external_links | — | **5** |
+| em-dashes en prosa | — | **0** |
+| autolinker_anchors_in_db | 0 | 0 |
+
+**⚠️ Discrepancia smoke test:** El brief listaba "2 tablas HTML (mapa comprador + algún otro)" pero el HTML especificado solo contiene 1 tabla (mapa de nacionalidades). Contenido insertado tal como fue redactado. Sin acción correctiva necesaria — es consistencia interna del brief.
+
+**Secciones del nuevo contenido:**
+1. Apertura: transformación estructural 2008-2024 (92.958 compras, caída UK 38%→14%)
+2. El nuevo mapa del comprador extranjero (tabla 7 nacionalidades)
+3. El comprador británico: lo que cambia / no cambia con Brexit
+4. El comprador alemán: el grupo que más crece (Baleares, Canarias, Costa del Sol)
+5. El comprador francés y belga
+6. El comprador estadounidense: crecimiento explosivo (×16 en Málaga)
+7. El comprador latinoamericano (argentino, mexicano, venezolano)
+8. Trámites operativos comunes (NIE, cuenta bancaria, ITP/IVA)
+9. Modelo 720 + Modelo 721 (criptomonedas en el extranjero)
+10. Financiación hipotecaria para no residente (LTV diferenciado UE vs no-UE)
+11. 5 FAQs + footer fuentes + disclaimer + timestamp
+
+**Links internos hardcodeados:** 1 × `/destinos/espana` (latinoamericanos — ruta confirmada existente).
+**Auto-linker en render:** `Reino Unido` → `/destinos/reino-unido` (primera ocurrencia en tabla), `Costa del Sol` → `/destinos/espana?zona=costa-del-sol`, `Costa Blanca` → `/destinos/espana?zona=costa-blanca` (primera ocurrencia c/u).
+
+**Archivos tocados:**
+- MODIFIED: `src/lib/utils/blogInternalLinks.ts` (+1 línea — Reino Unido en LINK_MAP_ES)
+- MODIFIED: `DAILY_LOG.md`
+- Solo DB para el contenido (backup id=4 + UPDATE)
+
+**Commits:**
+- `bfd8cca` fix(blog): add Reino Unido to LINK_MAP_ES
+- `(este commit)` chore(content): Fase 3.C-P5 — reescritura Post 5 guía extranjero con foco Brexit UK 2026
+
+**🏁 CIERRE SERIE FASE 3.C — 5/5 posts completados:**
+- P1: `golden-visa-espana-2026-residencia-comprando-propiedad` (sesión 2026-05-25c)
+- P2: `dubai-2026-mercado-inmobiliario-inversores-internacionales` (sesión 2026-05-25e)
+- P3: `costa-del-sol-vs-costa-blanca-invertir-2026` (sesión 2026-05-25f)
+- P4: `comprar-villa-marbella-zonas-exclusivas-precios` (sesión 2026-05-25g)
+- P5: `comprar-piso-espana-siendo-extranjero-2026` (sesión 2026-05-27) ✅
+
+**Próximo paso sugerido:** Smoke test producción `?nocache=1` en los 5 slugs reescritos. Retomar pendientes bloqueantes: pipeline leads (Resend), páginas legales GDPR, DNS.
+
+---
+
 ### Sesión 2026-05-25g — [FASE-3.C-P4] Reescritura Post 4 — Marbella 2026
 
 **Contexto:** Post 4 de la serie de 5 reescrituras editoriales. Slug `comprar-villa-marbella-zonas-exclusivas-precios` — reposicionamiento a "análisis prime micro-zona con datos E&V Q1 2026". Slug preservado para SEO.
