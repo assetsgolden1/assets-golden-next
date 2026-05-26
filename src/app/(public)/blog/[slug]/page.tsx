@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getBlogPostBySlug, getAllBlogSlugs } from '@/lib/supabase/queries'
+import type { BlogPost } from '@/types'
 import Breadcrumb from '@/components/seo/Breadcrumb'
 import { buttonVariants } from '@/components/ui/button'
 import { getRelatedProperties } from '@/lib/blogProperties'
@@ -33,11 +34,34 @@ const categoryLabels: Record<string, string> = {
   noticias: 'Noticias',
 }
 
+/** Returns true for placeholder logo images that should NOT be used as og:image */
+function isLogoPlaceholder(url: string): boolean {
+  return /logo\.(jpg|jpeg|png|svg|webp)(\?.*)?$/i.test(url)
+}
+
+/**
+ * Resolves the best og:image for a blog post.
+ * Priority: banner_image_url (non-logo) → cover_image (non-logo) → undefined.
+ * Returning undefined lets the layout-level og:image cascade instead of
+ * overriding with an empty array (which would suppress the fallback).
+ */
+function resolveOgImage(post: BlogPost): string | undefined {
+  if (post.banner_image_url && !isLogoPlaceholder(post.banner_image_url)) {
+    return post.banner_image_url
+  }
+  if (post.cover_image && !isLogoPlaceholder(post.cover_image)) {
+    return post.cover_image
+  }
+  return undefined
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const { data: post } = await getBlogPostBySlug(slug)
 
   if (!post) return { title: 'Artículo no encontrado — Assets Golden' }
+
+  const ogImage = resolveOgImage(post)
 
   return {
     title: post.title,
@@ -64,14 +88,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     openGraph: {
       type: 'article',
-      images: post.cover_image ? [{ url: post.cover_image }] : [],
+      // If ogImage is undefined, omit the key entirely so the layout-level
+      // og:image cascades instead of being suppressed by an empty array.
+      ...(ogImage && {
+        images: [{ url: ogImage, width: 1200, height: 630, alt: post.title }],
+      }),
       url: `/blog/${slug}`,
       ...(post.published_at && {
         publishedTime: post.published_at,
       }),
     },
     twitter: {
-      images: post.cover_image ? [post.cover_image] : undefined,
+      ...(ogImage && { images: [ogImage] }),
     },
   }
 }
