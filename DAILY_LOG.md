@@ -64,6 +64,27 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-27c — [FASE-3.C-POLISH-CSP] Hotfix CSP Meta Pixel + GA4
+
+**Contexto:** Smoke test post-deploy detectó que el CSP bloqueaba connect.facebook.net incluso después de aceptar cookies de marketing. El banner de consent estaba correcto pero el Pixel era bloqueado por header CSP.
+
+**Trabajo hecho:** Único archivo: `next.config.ts` — añadidos dominios Meta Pixel y GA4 a las directivas `script-src`, `img-src` y `connect-src`.
+
+**CSP antes → después (diferencias):**
+- `script-src`: + `connect.facebook.net` + `googletagmanager.com`
+- `img-src`: + `www.facebook.com` + `google-analytics.com` + `*.google-analytics.com`
+- `connect-src`: + `www.facebook.com` + `connect.facebook.net` + `google-analytics.com` + `*.google-analytics.com` + `*.analytics.google.com` + `googletagmanager.com`
+
+**Sin cambios:** `unsafe-eval`, `unsafe-inline`, `default-src`, `frame-src 'none'` — sin relajar.
+
+**Archivos tocados:** MODIFIED `next.config.ts` | MODIFIED `DAILY_LOG.md`
+
+**Commit:** `d922b8f` fix(security): CSP permite Meta Pixel y GA4 con consentimiento
+
+**Smoke test definitivo:** Aceptar cookies en producción → DevTools Network → `connect.facebook.net` debe responder **200 OK** (ya no bloqueado).
+
+---
+
 ### Sesión 2026-05-27b — [FASE-3.C-POLISH] Fix og:image global + GDPR cookie consent
 
 **Contexto:** Dos issues técnicos pre-campaña Meta Ads:
