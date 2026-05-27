@@ -7,7 +7,7 @@ import { buttonVariants } from '@/components/ui/button'
 export const metadata: Metadata = {
   title: 'Sobre Nosotros',
   description:
-    'Equipo con más de 15 años de experiencia en inmobiliaria de lujo internacional en Europa y América. Conozca la historia y los valores de Assets Golden.',
+    'Socios fundadores con más de 40 años de trayectoria conjunta en inmobiliaria de lujo internacional. Más de 1.500 operaciones acompañadas en 11 países. Conozca Assets Golden.',
   alternates: {
     canonical: '/sobre-nosotros',
   },
@@ -19,9 +19,9 @@ export const metadata: Metadata = {
 export const revalidate = 3600
 
 const STATS = [
-  { value: '15+', label: 'Años de experiencia' },
-  { value: '500+', label: 'Propiedades gestionadas' },
-  { value: '9', label: 'Países de operación' },
+  { value: '40+', label: 'Años de trayectoria conjunta' },
+  { value: '1.500+', label: 'Operaciones acompañadas' },
+  { value: '11', label: 'Países de operación' },
   { value: '98%', label: 'Clientes satisfechos' },
 ]
 
@@ -85,6 +85,9 @@ export default async function SobreNosotrosPage() {
       <section className="section-padding bg-background">
         <div className="container-luxury max-w-3xl">
           <h2 className="font-display text-3xl font-semibold mb-6">Nuestra misión</h2>
+          <p className="text-muted-foreground leading-relaxed mb-4">
+            Detrás de Assets Golden hay un equipo con más de 40 años de trayectoria conjunta en el sector inmobiliario, acumulada por sus socios fundadores entre operaciones en España y mercados internacionales. A lo largo de esa trayectoria hemos acompañado más de 1.500 operaciones inmobiliarias, desde viviendas residenciales hasta activos comerciales y de inversión.
+          </p>
           <p className="text-muted-foreground leading-relaxed mb-4">
             En Assets Golden International conectamos a inversores, compradores y vendedores con las mejores oportunidades inmobiliarias del mercado global. Nuestra red de partners en 11 países nos permite ofrecer un servicio integral y adaptado a cada perfil de cliente.
           </p>
