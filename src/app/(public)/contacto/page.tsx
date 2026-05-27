@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Phone, Mail, MessageCircle } from 'lucide-react'
+import { Phone, Mail, MessageCircle, MapPin } from 'lucide-react'
 import ContactForm from './ContactForm'
 
 export const metadata: Metadata = {
@@ -40,6 +40,12 @@ const jsonLd = {
 }
 
 const contactItems = [
+  {
+    Icon: MapPin,
+    label: 'Dirección',
+    value: 'Sant Joan Despí, Barcelona, España',
+    href: null,
+  },
   {
     Icon: Phone,
     label: 'Teléfono',
@@ -97,9 +103,13 @@ export default function ContactoPage() {
                   </div>
                   <div>
                     <p className="text-xs tracking-[0.15em] uppercase text-muted-foreground mb-1">{label}</p>
-                    <a href={href} className="text-foreground hover:text-gold transition-colors font-medium">
-                      {value}
-                    </a>
+                    {href ? (
+                      <a href={href} className="text-foreground hover:text-gold transition-colors font-medium">
+                        {value}
+                      </a>
+                    ) : (
+                      <span className="text-foreground font-medium">{value}</span>
+                    )}
                   </div>
                 </div>
               ))}
