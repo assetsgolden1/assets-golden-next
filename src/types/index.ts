@@ -29,6 +29,11 @@ export interface Property {
   idealista_url: string | null
   nestseekers_url: string | null
   ref_code: string | null
+  sold: boolean | null
+  hidden: boolean | null
+  external_source: string | null
+  last_synced_at: string | null
+  featured_order: number | null
 }
 
 // ─── TeamMember ───────────────────────────────────────────────
