@@ -64,6 +64,35 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-28b — [FASE-4.B-P2] Claims trayectoria conjunta socios fundadores
+
+**Contexto:** Atilio confirmó que los claims "+40 años" y "+1.500 propiedades" son trayectoria conjunta de los dos socios fundadores, no de la empresa (COVA FUMADA GROUP S.L.). Se reformula para atribuirlos correctamente como plural de socios.
+
+**Trabajo hecho:**
+
+- **`src/app/(public)/sobre-nosotros/page.tsx`** — único archivo con claims numéricos específicos:
+
+  - **Metadata description**: `"Equipo con más de 15 años de experiencia…"` → `"Socios fundadores con más de 40 años de trayectoria conjunta en inmobiliaria de lujo internacional. Más de 1.500 operaciones acompañadas en 11 países."`
+
+  - **STATS (tarjetas de cifras)**:
+    - `15+` / `"Años de experiencia"` → `40+` / `"Años de trayectoria conjunta"`
+    - `500+` / `"Propiedades gestionadas"` → `1.500+` / `"Operaciones acompañadas"`
+    - `9` / `"Países de operación"` → `11` / `"Países de operación"` (corregido al catálogo real)
+    - `98%` / `"Clientes satisfechos"` — sin cambio
+
+  - **Sección Misión**: añadido párrafo introductorio:
+    > "Detrás de Assets Golden hay un equipo con más de 40 años de trayectoria conjunta en el sector inmobiliario, acumulada por sus socios fundadores entre operaciones en España y mercados internacionales. A lo largo de esa trayectoria hemos acompañado más de 1.500 operaciones inmobiliarias, desde viviendas residenciales hasta activos comerciales y de inversión."
+
+- **Búsqueda global en repo**: ningún otro archivo contiene claims con año/propiedades específicos que requieran cambio. `/servicios` dice "amplia experiencia" (genérico, OK). `/equipo` dice "trayectoria internacional" (genérico, OK).
+
+**Archivos tocados:** MODIFIED `src/app/(public)/sobre-nosotros/page.tsx`
+
+**Commits:** `ab7ac6c` — fix(sobre-nosotros): reformular claims trayectoria conjunta socios fundadores
+
+**Próximo paso sugerido:** Smoke test en /sobre-nosotros: (1) tarjetas de cifras muestran 40+ / 1.500+ / 11; (2) sección Misión muestra el párrafo de trayectoria como primer párrafo; (3) sin mención de años atribuidos a persona individual o empresa.
+
+---
+
 ### Sesión 2026-05-28 — [FASE-4.B-P1] Contenido editorial — servicios, países, sobre-nosotros, contacto
 
 **Contexto:** Feedback de Atilio (Word "NUEBA_WEB_AJUSTES_1") — ajustes de contenido editorial. Cambios seguros (sin validación previa requerida).
