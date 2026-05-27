@@ -142,10 +142,10 @@ export default function ServiciosPage() {
                   <Icon className="h-7 w-7 text-gold" />
                 </div>
                 <h3 className="font-display text-xl font-semibold text-white mb-3">{title}</h3>
-                <p className="text-white/50 text-sm leading-relaxed mb-4">{desc}</p>
+                <p className="text-white/70 text-sm leading-relaxed mb-4">{desc}</p>
                 <ul className="space-y-1.5">
                   {benefits.map((b) => (
-                    <li key={b} className="flex items-center gap-2 text-xs text-white/40">
+                    <li key={b} className="flex items-center gap-2 text-xs text-white/70">
                       <span className="text-gold">›</span>
                       {b}
                     </li>
@@ -185,7 +185,7 @@ export default function ServiciosPage() {
         <div className="container-luxury text-center">
           <p className="text-xs text-muted-foreground tracking-widest uppercase mb-3">Presencia internacional</p>
           <p className="text-sm text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Partners inmobiliarios en <strong className="text-foreground">España, Italia, Reino Unido, Francia, Grecia, Dubai, Argentina, Brasil, Colombia, Venezuela, Costa Rica, Puerto Rico, México, Estados Unidos y Canadá</strong>.
+            Partners inmobiliarios en <strong className="text-foreground">España, México, Indonesia (Bali), Emiratos Árabes Unidos (Dubái), Argentina, Estados Unidos, Costa Rica, Reino Unido, Ecuador, Grecia y Paraguay</strong>. Permanentemente abrimos nuevos mercados en busca de mejores oportunidades para nuestros clientes.
           </p>
           <div className="mt-6">
             <Link href="/partners" className={buttonVariants({ variant: 'goldOutline', size: 'sm' })}>
