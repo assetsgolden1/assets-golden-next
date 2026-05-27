@@ -41,6 +41,7 @@ interface Props {
     orden?: string
     page?: string
     destacadas?: string
+    q?: string
   }>
 }
 
@@ -57,6 +58,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
   const orden = params.orden as 'reciente' | 'precio_asc' | 'precio_desc' | undefined
 
   const soloDestacadas = params.destacadas === 'true'
+  const q = params.q?.trim() || undefined
 
   const [{ data: properties, count }, propertyCounts, cities] = await Promise.all([
     getProperties({
@@ -69,6 +71,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
       zona:     params.zona    || undefined,
       featured: soloDestacadas || undefined,
       orden,
+      q,
       limit:  PAGE_SIZE,
       offset,
     }),
@@ -92,6 +95,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
     zona:         params.zona         || undefined,
     orden:        params.orden        || undefined,
     destacadas:   params.destacadas   || undefined,
+    q:            params.q            || undefined,
   }
 
   const currentFilters = {
@@ -104,6 +108,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
     habitaciones:  habitaciones ?? null,
     orden:         params.orden       || undefined,
     destacadas:    params.destacadas  || undefined,
+    q:             params.q           || undefined,
   }
 
   return (
@@ -158,9 +163,10 @@ export default async function PropiedadesPage({ searchParams }: Props) {
                   <span className="font-semibold text-foreground">
                     {(count ?? 0).toLocaleString('es-ES')}
                   </span>{' '}
-                  {(count ?? 0) === 1 ? 'propiedad encontrada' : 'propiedades encontradas'}
-                  {params.pais && ` en ${params.pais}`}
-                  {params.ciudad && `, ${params.ciudad}`}
+                  {q
+                    ? `${(count ?? 0) === 1 ? 'propiedad coincide' : 'propiedades coinciden'} con "${q}"`
+                    : `${(count ?? 0) === 1 ? 'propiedad encontrada' : 'propiedades encontradas'}${params.pais ? ` en ${params.pais}` : ''}${params.ciudad ? `, ${params.ciudad}` : ''}`
+                  }
                 </p>
               </div>
 
@@ -182,6 +188,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
                         property_type={property.property_type}
                         image_url={property.image_url}
                         featured={property.featured}
+                        sold={property.sold}
                       />
                     ))}
                   </div>
@@ -198,7 +205,9 @@ export default async function PropiedadesPage({ searchParams }: Props) {
               ) : (
                 <div className="py-24 text-center">
                   <p className="text-muted-foreground text-lg mb-4">
-                    No se encontraron propiedades con estos filtros.
+                    {q
+                      ? `No encontramos propiedades para "${q}". Prueba con otra búsqueda o explora por destinos.`
+                      : 'No se encontraron propiedades con estos filtros.'}
                   </p>
                   <Link href="/propiedades" className={buttonVariants({ variant: 'goldOutline' })}>
                     Ver todas las propiedades

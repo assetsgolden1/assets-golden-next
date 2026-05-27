@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 import { translatePropertyType } from '@/lib/propertyTypes'
@@ -20,6 +20,7 @@ interface PropiedadesFiltersProps {
     habitaciones?: number | null
     orden?: string
     destacadas?: string
+    q?: string
   }
   totalCount: number
   basePath: string
@@ -36,6 +37,11 @@ export function PropiedadesFilters({
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [searchText, setSearchText] = useState(currentFilters.q ?? '')
+
+  useEffect(() => {
+    setSearchText(currentFilters.q ?? '')
+  }, [currentFilters.q])
 
   function applyFilter(key: string, value: string, resetKeys: string[] = []) {
     const params = new URLSearchParams(window.location.search)
@@ -106,6 +112,56 @@ export function PropiedadesFilters({
           )}
         </div>
       </div>
+
+      {/* BÚSQUEDA LIBRE */}
+      <FilterBlock title="Buscar">
+        <div style={{ display: 'flex', gap: 6 }}>
+          <input
+            type="text"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                applyFilter('q', searchText.trim())
+              }
+            }}
+            placeholder="Ciudad, zona, código o palabra clave..."
+            style={{
+              flex: 1, padding: '8px 10px', borderRadius: 6,
+              border: '1px solid #e5e7eb', fontSize: 13,
+              backgroundColor: 'white', color: '#374151',
+              outline: 'none',
+            }}
+          />
+          <button
+            onClick={() => applyFilter('q', searchText.trim())}
+            disabled={isPending}
+            style={{
+              padding: '8px 12px', borderRadius: 6,
+              backgroundColor: '#131D2E', color: 'white',
+              border: 'none', fontSize: 12, fontWeight: 600,
+              cursor: isPending ? 'wait' : 'pointer',
+              opacity: isPending ? 0.7 : 1,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Buscar
+          </button>
+        </div>
+        {currentFilters.q && (
+          <button
+            onClick={() => { setSearchText(''); applyFilter('q', '') }}
+            style={{
+              marginTop: 6, fontSize: 11, color: '#D4AF37',
+              background: 'none', border: 'none', cursor: 'pointer',
+              fontWeight: 600, padding: 0,
+            }}
+          >
+            ✕ Quitar búsqueda
+          </button>
+        )}
+      </FilterBlock>
 
       {/* DESTACADAS — toggle */}
       <FilterBlock title="Solo destacadas">

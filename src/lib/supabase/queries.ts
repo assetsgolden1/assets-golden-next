@@ -29,6 +29,7 @@ export interface GetPropertiesFilters {
   zona?: string
   orden?: 'reciente' | 'precio_asc' | 'precio_desc'
   excludeTypes?: string[]
+  q?: string
 }
 
 export async function getProperties(filters?: GetPropertiesFilters) {
@@ -39,7 +40,6 @@ export async function getProperties(filters?: GetPropertiesFilters) {
     .select('*', { count: 'exact' })
     .in('status', ['active', 'available'])
     .not('hidden', 'eq', true)
-    .not('sold', 'eq', true)
 
   if (filters?.excludeTypes && filters.excludeTypes.length > 0)
     query = query.not('property_type', 'in', `(${filters.excludeTypes.join(',')})`)
@@ -59,9 +59,26 @@ export async function getProperties(filters?: GetPropertiesFilters) {
     }
   }
 
+  if (filters?.q) {
+    const raw = filters.q.trim()
+    const safe = raw.replace(/[%,()]/g, '')
+    if (safe) {
+      if (/^\d+$/.test(safe)) {
+        const padded = safe.padStart(5, '0')
+        query = query.or(`ref_code.ilike.%AG-${padded}%`)
+      } else if (/^ag-/i.test(safe)) {
+        query = query.ilike('ref_code', `%${safe.toUpperCase()}%`)
+      } else {
+        query = query.or(`title.ilike.%${safe}%,location.ilike.%${safe}%,province.ilike.%${safe}%,country.ilike.%${safe}%`)
+      }
+    }
+  }
+
   const limit = filters?.limit ?? 12
   const offset = filters?.offset ?? 0
 
+  // Propiedades vendidas siempre al final
+  query = query.order('sold', { ascending: true, nullsFirst: true })
   if (filters?.orden === 'precio_asc') query = query.order('price', { ascending: true })
   else if (filters?.orden === 'precio_desc') query = query.order('price', { ascending: false })
   else query = query.order('created_at', { ascending: false })
@@ -98,7 +115,6 @@ export async function getPropertiesForSpain(filters: GetSpainPropertiesFilters =
     let qq = q
       .or('country.ilike.%España%,country.ilike.%Spain%,country.ilike.%espana%')
       .not('hidden', 'eq', true)
-      .not('sold', 'eq', true)
     if (filters.ciudad) qq = qq.ilike('location', `%${filters.ciudad}%`)
     if (filters.tipo)   qq = qq.eq('property_type', filters.tipo)
     if (filters.precioMin) qq = qq.gte('price', filters.precioMin)
@@ -112,6 +128,7 @@ export async function getPropertiesForSpain(filters: GetSpainPropertiesFilters =
     let query = applyCommonFilters(
       supabaseAdmin.from('properties').select('*', { count: 'exact' })
     )
+    query = query.order('sold', { ascending: true, nullsFirst: true })
     if (filters.orden === 'precio_asc')       query = query.order('price', { ascending: true })
     else if (filters.orden === 'precio_desc') query = query.order('price', { ascending: false })
     else                                      query = query.order('created_at', { ascending: false })
@@ -167,16 +184,15 @@ export async function getPropertiesForSpain(filters: GetSpainPropertiesFilters =
 
   const properties = Array.from(map.values())
 
-  // Ordenar (mismo criterio que la query original)
-  if (filters.orden === 'precio_asc') {
-    properties.sort((a, b) => (a.price ?? 0) - (b.price ?? 0))
-  } else if (filters.orden === 'precio_desc') {
-    properties.sort((a, b) => (b.price ?? 0) - (a.price ?? 0))
-  } else {
-    properties.sort((a, b) =>
-      String(b.created_at ?? '').localeCompare(String(a.created_at ?? ''))
-    )
-  }
+  // Ordenar: vendidas siempre al final, luego criterio secundario
+  properties.sort((a, b) => {
+    const soldA = (a.sold ? 1 : 0)
+    const soldB = (b.sold ? 1 : 0)
+    if (soldA !== soldB) return soldA - soldB
+    if (filters.orden === 'precio_asc') return (a.price ?? 0) - (b.price ?? 0)
+    if (filters.orden === 'precio_desc') return (b.price ?? 0) - (a.price ?? 0)
+    return String(b.created_at ?? '').localeCompare(String(a.created_at ?? ''))
+  })
 
   const total = properties.length
   const paginated = properties.slice(offset, offset + limit)
@@ -190,7 +206,6 @@ export async function getPropertyTypesForSpain(): Promise<string[]> {
     .select('property_type')
     .or('country.ilike.%España%,country.ilike.%Spain%')
     .not('hidden', 'eq', true)
-    .not('sold', 'eq', true)
   const types = [
     ...new Set((data ?? []).map((d: { property_type: string | null }) => d.property_type).filter(Boolean)),
   ] as string[]
@@ -219,7 +234,6 @@ export async function getPropertiesForDestination(
     .select('*', { count: 'exact' })
     .ilike('country', `%${countryName}%`)
     .not('hidden', 'eq', true)
-    .not('sold', 'eq', true)
 
   if (filters.ciudad)      query = query.ilike('location', `%${filters.ciudad}%`)
   if (filters.tipo)        query = query.eq('property_type', filters.tipo)
@@ -230,6 +244,7 @@ export async function getPropertiesForDestination(
   const limit  = filters.limit  ?? 24
   const offset = filters.offset ?? 0
 
+  query = query.order('sold', { ascending: true, nullsFirst: true })
   if (filters.orden === 'precio_asc')       query = query.order('price', { ascending: true })
   else if (filters.orden === 'precio_desc') query = query.order('price', { ascending: false })
   else                                      query = query.order('created_at', { ascending: false })
@@ -244,7 +259,6 @@ export async function getCitiesForDestination(countryName: string): Promise<stri
     .select('location')
     .ilike('country', `%${countryName}%`)
     .not('hidden', 'eq', true)
-    .not('sold', 'eq', true)
     .not('location', 'is', null)
   const cities = [
     ...new Set(
@@ -263,7 +277,6 @@ export async function getPropertyTypesForDestination(countryName: string): Promi
     .select('property_type')
     .ilike('country', `%${countryName}%`)
     .not('hidden', 'eq', true)
-    .not('sold', 'eq', true)
     .not('property_type', 'is', null)
   const types = [
     ...new Set((data ?? []).map((d: { property_type: string | null }) => d.property_type).filter(Boolean)),
@@ -302,7 +315,6 @@ export async function getAllPropertySlugs() {
     .select('slug')
     .in('status', ['active', 'available'])
     .not('hidden', 'eq', true)
-    .not('sold', 'eq', true)
     .not('slug', 'is', null)
   return (data ?? []).map((p) => p.slug as string)
 }
@@ -478,7 +490,6 @@ export async function getPropertiesByCountry(slug: string) {
       .select('*')
       .in('status', ['active', 'available'])
       .not('hidden', 'eq', true)
-      .not('sold', 'eq', true)
       .ilike('country', countryName)
       .order('province', { ascending: true, nullsFirst: false })
       .order('location', { ascending: true })
@@ -502,7 +513,6 @@ export async function getPropertyCountsByCountry(): Promise<Record<string, numbe
     .select('country')
     .in('status', ['active', 'available'])
     .not('hidden', 'eq', true)
-    .not('sold', 'eq', true)
     .not('country', 'is', null)
 
   const counts: Record<string, number> = {}
