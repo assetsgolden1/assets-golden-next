@@ -89,7 +89,7 @@ export default async function SobreNosotrosPage() {
             En Assets Golden International conectamos a inversores, compradores y vendedores con las mejores oportunidades inmobiliarias del mercado global. Nuestra red de partners en 11 países nos permite ofrecer un servicio integral y adaptado a cada perfil de cliente.
           </p>
           <p className="text-muted-foreground leading-relaxed">
-            Operamos en España, Portugal, Italia, Francia, Grecia, Montenegro, Turquía, Argentina, México, Estados Unidos (Miami, Nueva York) y otros mercados emergentes de alto potencial.
+            Operamos en España, México, Indonesia, Emiratos Árabes Unidos, Argentina, Estados Unidos, Costa Rica, Reino Unido, Ecuador, Grecia y Paraguay. Permanentemente abrimos nuevos mercados en busca de mejores y más rentables oportunidades para nuestros clientes.
           </p>
         </div>
       </section>
@@ -124,13 +124,16 @@ export default async function SobreNosotrosPage() {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 {[
                   'España: Barcelona, Madrid, Marbella, Ibiza',
-                  'Portugal: Lisboa, Algarve, Oporto',
-                  'Italia: Roma, Milán, Costa Amalfitana',
-                  'Francia: París, Côte d\'Azur',
-                  'Grecia: Atenas, Mykonos, Santorini',
+                  'México: Tulum, Riviera Maya',
+                  'Indonesia: Bali (Uluwatu, Canggu, Ubud)',
+                  'Emiratos Árabes Unidos: Dubái',
+                  'Argentina: Buenos Aires, Córdoba',
                   'Estados Unidos: Miami, Nueva York',
-                  'Argentina: Buenos Aires',
-                  'México: Ciudad de México, Riviera Maya',
+                  'Costa Rica',
+                  'Reino Unido',
+                  'Ecuador',
+                  'Grecia',
+                  'Paraguay: Asunción, Luque, Ciudad del Este',
                 ].map((country) => (
                   <li key={country} className="flex items-start gap-2">
                     <span className="text-gold mt-0.5">›</span>
