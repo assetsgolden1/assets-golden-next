@@ -23,6 +23,7 @@ export interface PropertyRow {
   image_url: string | null
   slug: string | null
   ref_code: string | null
+  external_id: string | null
 }
 
 export function PropiedadesTable({
@@ -120,7 +121,7 @@ export function PropiedadesTable({
 
   function handleBulkSold() {
     if (selected.size === 0) return
-    if (!window.confirm(`¿Marcar ${selected.size} propiedades como vendidas? Se ocultarán de la web.`)) return
+    if (!window.confirm(`¿Marcar ${selected.size} propiedades como vendidas? Seguirán visibles con banda "VENDIDA".`)) return
     startTransition(async () => {
       await bulkMarkAsSold(Array.from(selected))
       setSelected(new Set())
@@ -140,15 +141,15 @@ export function PropiedadesTable({
         <input type="hidden" name="filter" value={filter} />
         <input type="hidden" name="page" value="0" />
 
-        {/* Búsqueda */}
+        {/* Búsqueda flexible */}
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-500 font-medium">Título</label>
+          <label className="text-xs text-gray-500 font-medium">Búsqueda libre</label>
           <input
             type="text"
             name="search"
             defaultValue={search}
-            placeholder="Buscar..."
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
+            placeholder="AG-1234, código HabiHub, ciudad..."
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
           />
         </div>
 
@@ -297,7 +298,8 @@ export function PropiedadesTable({
                 </th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium w-14">Img</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Título</th>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium">Código</th>
+                <th className="text-left px-4 py-3 text-gray-600 font-medium">Ref.</th>
+                <th className="text-left px-4 py-3 text-gray-600 font-medium">Cód. HabiHub</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">País / Ciudad</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Precio</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Tipo</th>
@@ -310,7 +312,7 @@ export function PropiedadesTable({
             <tbody>
               {properties.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="text-center py-8 text-gray-400">
+                  <td colSpan={11} className="text-center py-8 text-gray-400">
                     No se encontraron propiedades
                   </td>
                 </tr>
@@ -352,6 +354,11 @@ export function PropiedadesTable({
                     </td>
                     <td className="px-4 py-2">
                       <span className="font-mono text-xs text-gray-500">{prop.ref_code ?? '—'}</span>
+                    </td>
+                    <td className="px-4 py-2">
+                      {prop.external_id
+                        ? <span className="font-mono text-xs bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">{prop.external_id}</span>
+                        : <span className="text-xs text-gray-300">—</span>}
                     </td>
                     <td className="px-4 py-2 text-gray-600">
                       <span>{prop.country ?? '—'}</span>

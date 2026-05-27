@@ -64,13 +64,29 @@ export default async function PropiedadesPage({
       let q = supabaseAdmin
         .from('properties')
         .select(
-          'id,title,location,country,price,currency,property_type,featured,hidden,sold,status,image_url,slug,ref_code',
+          'id,title,location,country,price,currency,property_type,featured,hidden,sold,status,image_url,slug,ref_code,external_id',
           { count: 'exact' }
         )
         .order('created_at', { ascending: false })
         .range(offset, offset + PAGE_SIZE - 1)
 
-      if (search) q = q.ilike('title', `%${search}%`)
+      if (search) {
+        const trimmed = search.trim()
+        const safe = trimmed.replace(/[%,()]/g, '')
+        if (safe) {
+          if (/^\d+$/.test(safe)) {
+            // Numérico: buscar como ref_code AG-XXXXX (pad 5 dígitos) Y como external_id exacto
+            const padded = safe.padStart(5, '0')
+            q = q.or(`ref_code.ilike.%AG-${padded}%,external_id.eq.${safe}`)
+          } else if (/^ag-/i.test(safe)) {
+            // Formato AG-XXXX: normalizar y buscar en ref_code
+            q = q.ilike('ref_code', `%${safe.toUpperCase()}%`)
+          } else {
+            // Texto libre: buscar en título, ciudad, provincia
+            q = q.or(`title.ilike.%${safe}%,location.ilike.%${safe}%,province.ilike.%${safe}%`)
+          }
+        }
+      }
       if (pais) q = q.eq('country', pais)
       if (ciudad) q = q.eq('location', ciudad)
       if (tipo) q = q.eq('property_type', tipo)

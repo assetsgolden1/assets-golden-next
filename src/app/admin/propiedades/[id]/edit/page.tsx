@@ -58,6 +58,12 @@ export default function EditPropertyPage({
   const [availableCities, setAvailableCities] = useState<string[]>([])
   const [useCustomCity, setUseCustomCity] = useState(false)
   const initialLoadDone = useRef(false)
+  const [meta, setMeta] = useState<{
+    ref_code: string | null
+    external_id: string | null
+    external_source: string | null
+    last_synced_at: string | null
+  } | null>(null)
 
   // Cargar ciudades cuando cambia el país (no en la carga inicial para no resetear)
   useEffect(() => {
@@ -101,6 +107,12 @@ export default function EditPropertyPage({
         } else {
           setExistingImages([])
         }
+        setMeta({
+          ref_code: p.ref_code ?? null,
+          external_id: p.external_id ?? null,
+          external_source: p.external_source ?? null,
+          last_synced_at: p.last_synced_at ?? null,
+        })
         // Cargar ciudades del país actual al iniciar
         if (p.country) {
           fetch(`/api/admin/get-cities?country=${encodeURIComponent(p.country)}`)
@@ -192,6 +204,34 @@ export default function EditPropertyPage({
         <h1 className="text-2xl font-bold text-gray-900">Editar propiedad</h1>
         <p className="text-sm text-gray-500 mt-1">Modifique los campos y guarde los cambios.</p>
       </div>
+
+      {/* Bloque de identificadores — solo lectura */}
+      {meta && (
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6 grid grid-cols-2 gap-3 text-sm">
+          <div>
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Ref. interna</span>
+            <span className="font-mono text-gray-700">{meta.ref_code ?? '—'}</span>
+          </div>
+          <div>
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Cód. HabiHub</span>
+            {meta.external_id
+              ? <span className="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">{meta.external_id}</span>
+              : <span className="text-gray-400">—</span>}
+          </div>
+          <div>
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Fuente</span>
+            <span className="text-gray-600">{meta.external_source ?? 'manual'}</span>
+          </div>
+          <div>
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Última sync</span>
+            <span className="text-gray-600">
+              {meta.last_synced_at
+                ? new Date(meta.last_synced_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                : '—'}
+            </span>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Imágenes */}
