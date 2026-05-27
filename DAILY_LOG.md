@@ -64,6 +64,64 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-28 — [FASE-4.A-P1] Operatividad admin + buscadores + banda VENDIDA
+
+**Contexto:** Feedback de Atilio (WhatsApp + Word): (1) buscador admin no encuentra por AG-XXXXX/numérico; (2) falta código HabiHub (external_id) en tabla admin; (3) catálogo público sin buscador de texto; (4) marcar vendida oculta la propiedad — debería mostrar con banda.
+
+**Trabajo hecho:**
+
+- **DB**: Migración `fase4_a_p1_search_indexes` aplicada en Supabase — `pg_trgm` habilitada, índices GIN trigram en `title/location/province`, índices B-tree en `ref_code/external_id`, índice parcial de catálogo público.
+
+- **A1 — Buscador admin flexible** (`admin/propiedades/page.tsx`, `PropiedadesTable.tsx`):
+  - Label cambiado a "Búsqueda libre", placeholder actualizado
+  - Numérico → pad 5 dígitos → `ref_code ILIKE AG-XXXXX` **Y** `external_id = valor`
+  - Formato AG- → normaliza y busca en `ref_code`
+  - Texto libre → `title / location / province ILIKE`
+
+- **A2 — external_id en admin** (`PropiedadesTable.tsx`, `edit/page.tsx`):
+  - Columna "Cód. HabiHub" visible en tabla (badge azul o `—`)
+  - Bloque de solo-lectura en ficha edit: Ref. interna, Cód. HabiHub, Fuente, Última sync
+
+- **A3 — Buscador público** (`PropiedadesFilters.tsx`, `queries.ts`, `(public)/propiedades/page.tsx`):
+  - Input "Buscar" al inicio del panel de filtros (mobile + desktop)
+  - URL shareable: `/propiedades?q=malaga` preserva query string
+  - Contador: "X propiedades coinciden con 'malaga'" / mensaje no-resultados específico
+  - `getProperties` acepta `q` con misma lógica AG-/numérico/texto libre
+
+- **A4 — Banda VENDIDA** (`actions.ts`, `SoldToggleButton.tsx`, `PropertyCard.tsx`, `[slug]/page.tsx`, `queries.ts`):
+  - `togglePropertySold` y `bulkMarkAsSold` ya NO fuerzan `hidden=true`
+  - `PropertyCard`: banda diagonal roja "VENDIDA" + imagen al 60% de opacidad cuando sold=true
+  - Ficha de detalle: badge "PROPIEDAD VENDIDA" rojo, banda sobre el hero, CTA cambia a "Ver propiedades similares" (→ `/propiedades?ciudad=X`)
+  - Todas las queries públicas: eliminado `.not('sold','eq',true)`, añadido `ORDER BY sold ASC` (vendidas al final); excepción: `getFeaturedProperties` mantiene el filtro
+  - `getAllPropertySlugs` incluye vendidas → sus páginas se generan estáticamente
+
+**Decisiones tomadas:**
+- `getFeaturedProperties` (sección Destacadas del home) mantiene `sold=false` para no mostrar vendidas en la portada
+- Propiedades ya vendidas con `hidden=true` por el comportamiento anterior seguirán ocultas hasta que Atilio las visibilice manualmente desde admin
+
+**Archivos tocados:**
+- MODIFIED `src/types/index.ts`
+- MODIFIED `src/app/admin/actions.ts`
+- MODIFIED `src/app/admin/propiedades/page.tsx`
+- MODIFIED `src/components/admin/PropiedadesTable.tsx`
+- MODIFIED `src/app/admin/propiedades/[id]/edit/page.tsx`
+- MODIFIED `src/components/admin/SoldToggleButton.tsx`
+- MODIFIED `src/lib/supabase/queries.ts`
+- MODIFIED `src/components/properties/PropertyCard.tsx`
+- MODIFIED `src/app/(public)/propiedades/page.tsx`
+- MODIFIED `src/components/PropiedadesFilters.tsx`
+- MODIFIED `src/app/(public)/propiedades/[slug]/page.tsx`
+
+**Commits:**
+- `be19fc8` — feat(db): pg_trgm + índices búsqueda flexible
+- `e149357` — feat(admin): buscador propiedades acepta AG-, numérico, texto + columna HabiHub external_id
+- `422a4eb` — feat(public): buscador de texto en /propiedades
+- `454d4d4` — feat(public): propiedades vendidas visibles con banda VENDIDA en lugar de ocultarse
+
+**Próximo paso sugerido:** Smoke test en producción (Vercel deploy ~3 min). Atilio debe: (1) visibilizar manualmente propiedades vendidas antiguas con `hidden=true` desde admin → quitar hidden para que aparezcan con banda VENDIDA. (2) Fase 4.B-P2: limpiar campo `status` (duplicado con `sold`/`hidden`), activar lógica `/inversiones` con `classification`.
+
+---
+
 ### Sesión 2026-05-27c — [FASE-3.C-POLISH-CSP] Hotfix CSP Meta Pixel + GA4
 
 **Contexto:** Smoke test post-deploy detectó que el CSP bloqueaba connect.facebook.net incluso después de aceptar cookies de marketing. El banner de consent estaba correcto pero el Pixel era bloqueado por header CSP.
