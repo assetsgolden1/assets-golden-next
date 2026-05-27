@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation'
 import { propertyTypeMap } from '@/lib/propertyTypes'
 
 const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF']
-const STATUSES = [
-  { value: 'active', label: 'Activa' },
-  { value: 'available', label: 'Disponible' },
-  { value: 'inactive', label: 'Inactiva' },
+const CLASSIFICATIONS = [
+  { value: '', label: 'Normal' },
+  { value: 'promotion', label: 'Promoción' },
+  { value: 'investment', label: 'Inversión' },
 ]
-const MAX_PHOTOS = 12
+const MAX_PHOTOS = 30
 
 const INPUT_CLS =
   'w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
@@ -24,6 +24,7 @@ export default function NuevaPropiedadPage() {
   const [galleryPreviews, setGalleryPreviews] = useState<string[]>([])
   const [isDev, setIsDev] = useState(false)
   const [isFeatured, setIsFeatured] = useState(false)
+  const [classification, setClassification] = useState('')
 
   // Campos controlados para ubicación
   const [country, setCountry] = useState('')
@@ -118,10 +119,10 @@ export default function NuevaPropiedadPage() {
           bathrooms:     rawData.get('bathrooms'),
           area_sqm:      rawData.get('area_sqm'),
           property_type: rawData.get('property_type'),
-          status:        rawData.get('status'),
           idealista_url: rawData.get('idealista_url'),
           is_development: isDev,
           featured:      isFeatured,
+          classification: classification || null,
           image_url:     uploadedUrls[0] ?? null,
           gallery_urls:  uploadedUrls,
         }),
@@ -245,23 +246,33 @@ export default function NuevaPropiedadPage() {
               <input name="title" required className={INPUT_CLS} placeholder="Ej: Villa con vistas al mar en Marbella" />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Tipo de propiedad</label>
-                <select name="property_type" className={`${INPUT_CLS} bg-white`}>
-                  <option value="">Sin especificar</option>
-                  {Object.entries(propertyTypeMap)
-                    .filter(([key]) => !key.includes('-') && !key.includes(' ') || key === 'ground_floor')
-                    .map(([key, label]) => (
-                      <option key={key} value={key}>{label}</option>
-                    ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Estado</label>
-                <select name="status" className={`${INPUT_CLS} bg-white`}>
-                  {STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
-                </select>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Tipo de propiedad</label>
+              <select name="property_type" className={`${INPUT_CLS} bg-white`}>
+                <option value="">Sin especificar</option>
+                {Object.entries(propertyTypeMap)
+                  .filter(([key]) => !key.includes('-') && !key.includes(' ') || key === 'ground_floor')
+                  .map(([key, label]) => (
+                    <option key={key} value={key}>{label}</option>
+                  ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Clasificación</label>
+              <div className="flex gap-4 pt-1">
+                {CLASSIFICATIONS.map((c) => (
+                  <label key={c.value} className="flex items-center gap-1.5 cursor-pointer text-sm text-gray-700">
+                    <input
+                      type="radio"
+                      name="classification_radio"
+                      value={c.value}
+                      checked={classification === c.value}
+                      onChange={() => setClassification(c.value)}
+                      className="w-4 h-4"
+                    />
+                    {c.label}
+                  </label>
+                ))}
               </div>
             </div>
 

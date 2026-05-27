@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     bathrooms: data.bathrooms ? Number(data.bathrooms) : null,
     area_sqm: data.area_sqm ? Number(data.area_sqm) : null,
     property_type: data.property_type || null,
-    status: data.status || 'active',
+    status: 'active',
     is_development: data.is_development === true || data.is_development === 'true',
     featured: data.featured === true || data.featured === 'true',
     idealista_url: data.idealista_url?.trim() || null,
@@ -66,6 +66,7 @@ export async function POST(request: NextRequest) {
       : [],
     hidden: false,
     sold: false,
+    classification: data.classification ?? null,
   })
 
   if (error) {

@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
     const ext = file.name.split('.').pop() ?? 'jpg'
     const folder = bucket === 'destination-images' ? ''
       : bucket === 'blog-images' ? 'blog/'
+      : bucket === 'team-photos' ? ''
       : 'properties/'
     const fileName = `${folder}${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 

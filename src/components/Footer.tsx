@@ -10,6 +10,7 @@ const footerLinks = {
     { label: "Red de Partners", href: "/partners" },
     { label: "Blog", href: "/blog" },
     { label: "Contacto", href: "/contacto" },
+    { label: "Acceso agentes", href: "/portal/login" },
   ],
   servicios: [
     { label: "Compra de propiedades", href: "/propiedades" },

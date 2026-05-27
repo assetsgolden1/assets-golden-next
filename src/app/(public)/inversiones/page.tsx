@@ -92,7 +92,7 @@ export default async function InversionesPage({ searchParams }: Props) {
       orden,
       limit:        PAGE_SIZE,
       offset,
-      excludeTypes: EXCLUDED_FROM_INVESTMENT,
+      classification: 'investment',
     }),
     getPropertyCountsByCountry(),
     params.pais ? getCitiesForDestination(params.pais) : Promise.resolve([] as string[]),

@@ -3,12 +3,30 @@
 import { use, useEffect, useState, useRef } from 'react'
 import { propertyTypeMap } from '@/lib/propertyTypes'
 import { toSentenceCase } from '@/lib/utils/normalizeText'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF']
-const STATUSES = [
-  { value: 'active', label: 'Activa' },
-  { value: 'available', label: 'Disponible' },
-  { value: 'inactive', label: 'Inactiva' },
+
+const CLASSIFICATIONS = [
+  { value: '', label: 'Normal' },
+  { value: 'promotion', label: 'Promoción' },
+  { value: 'investment', label: 'Inversión' },
 ]
 
 interface FormState {
@@ -25,7 +43,78 @@ interface FormState {
   description: string
   featured: boolean
   hidden: boolean
-  status: string
+  sold: boolean
+  classification: string
+}
+
+function SortableImage({
+  url,
+  index,
+  onRemove,
+  onMakeMain,
+}: {
+  url: string
+  index: number
+  onRemove: () => void
+  onMakeMain: () => void
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: url })
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+  return (
+    <div ref={setNodeRef} style={{ ...style, position: 'relative' }}>
+      <img
+        src={url}
+        alt={`Imagen ${index + 1}`}
+        style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: 6, cursor: 'grab' }}
+        onError={(e) => { e.currentTarget.src = '/placeholder-property.svg' }}
+        {...attributes}
+        {...listeners}
+      />
+      {index === 0 && (
+        <span style={{
+          position: 'absolute', top: 4, left: 4,
+          backgroundColor: '#D4AF37', color: '#131D2E',
+          fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
+          pointerEvents: 'none',
+        }}>
+          Principal
+        </span>
+      )}
+      {index !== 0 && (
+        <button
+          type="button"
+          onClick={onMakeMain}
+          style={{
+            position: 'absolute', bottom: 4, left: 4,
+            backgroundColor: '#D4AF37', color: '#131D2E',
+            border: 'none', borderRadius: 4, fontSize: 10, fontWeight: 700,
+            padding: '2px 5px', cursor: 'pointer',
+          }}
+        >
+          ⭐ Principal
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={onRemove}
+        style={{
+          position: 'absolute', top: 4, right: 4,
+          backgroundColor: '#dc2626', color: 'white',
+          border: 'none', borderRadius: '50%',
+          width: 20, height: 20, fontSize: 14,
+          cursor: 'pointer', display: 'flex',
+          alignItems: 'center', justifyContent: 'center',
+          padding: 0, lineHeight: 1,
+        }}
+      >
+        ×
+      </button>
+    </div>
+  )
 }
 
 export default function EditPropertyPage({
@@ -48,7 +137,8 @@ export default function EditPropertyPage({
     description: '',
     featured: false,
     hidden: false,
-    status: 'active',
+    sold: false,
+    classification: '',
   })
   const [existingImages, setExistingImages] = useState<string[]>([])
   const [newImages, setNewImages] = useState<File[]>([])
@@ -64,6 +154,21 @@ export default function EditPropertyPage({
     external_source: string | null
     last_synced_at: string | null
   } | null>(null)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    setExistingImages((imgs) => {
+      const oldIndex = imgs.indexOf(active.id as string)
+      const newIndex = imgs.indexOf(over.id as string)
+      return arrayMove(imgs, oldIndex, newIndex)
+    })
+  }
 
   // Cargar ciudades cuando cambia el país (no en la carga inicial para no resetear)
   useEffect(() => {
@@ -97,7 +202,8 @@ export default function EditPropertyPage({
           description: p.description ?? '',
           featured: p.featured ?? false,
           hidden: p.hidden ?? false,
-          status: p.status ?? 'active',
+          sold: p.sold ?? false,
+          classification: p.classification ?? '',
         })
         const imgs = p.gallery_urls ?? []
         if (imgs.length > 0) {
@@ -239,77 +345,53 @@ export default function EditPropertyPage({
           <h2 className="font-semibold text-gray-800 mb-4">Imágenes</h2>
           {existingImages.length > 0 && (
             <div>
-              <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 8 }}>
-                Imágenes actuales:
+              <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 4 }}>
+                Imágenes actuales ({existingImages.length} / 30) — arrastrá para reordenar
               </p>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(4, 1fr)',
-                gap: 8,
-                marginBottom: 12,
-              }}>
-                {existingImages.map((url, i) => (
-                  <div key={i} style={{ position: 'relative' }}>
-                    <img
-                      src={url}
-                      alt={`Imagen ${i + 1}`}
-                      style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: 6 }}
-                      onError={(e) => { e.currentTarget.src = '/placeholder-property.svg' }}
-                    />
-                    {i === 0 && (
-                      <span style={{
-                        position: 'absolute', top: 4, left: 4,
-                        backgroundColor: '#D4AF37', color: '#131D2E',
-                        fontSize: 10, fontWeight: 700,
-                        padding: '2px 6px', borderRadius: 4,
-                      }}>
-                        Principal
-                      </span>
-                    )}
-                    {i !== 0 && (
-                      <button
-                        type="button"
-                        onClick={() => makeMainImage(i)}
-                        title="Hacer principal"
-                        style={{
-                          position: 'absolute', bottom: 4, left: 4,
-                          backgroundColor: '#D4AF37', color: '#131D2E',
-                          border: 'none', borderRadius: 4,
-                          fontSize: 10, fontWeight: 700,
-                          padding: '2px 5px', cursor: 'pointer',
-                        }}
-                      >
-                        ⭐ Principal
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => setExistingImages(prev => prev.filter((_, idx) => idx !== i))}
-                      style={{
-                        position: 'absolute', top: 4, right: 4,
-                        backgroundColor: '#dc2626', color: 'white',
-                        border: 'none', borderRadius: '50%',
-                        width: 20, height: 20, fontSize: 14,
-                        cursor: 'pointer', display: 'flex',
-                        alignItems: 'center', justifyContent: 'center',
-                        padding: 0, lineHeight: 1,
-                      }}
-                    >
-                      ×
-                    </button>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={existingImages} strategy={rectSortingStrategy}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 12 }}>
+                    {existingImages.map((url, i) => (
+                      <SortableImage
+                        key={url}
+                        url={url}
+                        index={i}
+                        onRemove={() => setExistingImages(prev => prev.filter((_, idx) => idx !== i))}
+                        onMakeMain={() => makeMainImage(i)}
+                      />
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
             </div>
           )}
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => setNewImages(Array.from(e.target.files ?? []))}
-            className="block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-[#0a1628] file:text-white hover:file:bg-[#1a2638] cursor-pointer"
-          />
-          <p className="text-xs text-gray-400 mt-1.5">Añadir nuevas imágenes (se suman a las existentes).</p>
+          {existingImages.length < 30 ? (
+            <>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(e) => {
+                  const files = Array.from(e.target.files ?? [])
+                  const remaining = 30 - existingImages.length
+                  if (files.length > remaining) {
+                    alert(`Solo quedan ${remaining} fotos disponibles (límite 30).`)
+                    setNewImages(files.slice(0, remaining))
+                  } else {
+                    setNewImages(files)
+                  }
+                  e.target.value = ''
+                }}
+                className="block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-[#0a1628] file:text-white hover:file:bg-[#1a2638] cursor-pointer"
+              />
+              <p className="text-xs text-gray-400 mt-1.5">
+                Añadir nuevas imágenes (se suman a las existentes).{' '}
+                {newImages.length > 0 && <span className="text-blue-600">{newImages.length} seleccionada{newImages.length > 1 ? 's' : ''}.</span>}
+              </p>
+            </>
+          ) : (
+            <p className="text-xs text-amber-600">Límite de 30 fotos alcanzado.</p>
+          )}
         </div>
 
         {/* Información básica */}
@@ -330,33 +412,37 @@ export default function EditPropertyPage({
                 </p>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Tipo de propiedad</label>
-                <select
-                  value={form.property_type}
-                  onChange={(e) => set('property_type', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                >
-                  <option value="">Sin especificar</option>
-                  {Object.entries(propertyTypeMap)
-                    .filter(([key]) => !key.includes('-') && !key.includes(' ') || key === 'ground_floor')
-                    .map(([key, label]) => (
-                      <option key={key} value={key}>{label}</option>
-                    ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Estado</label>
-                <select
-                  value={form.status}
-                  onChange={(e) => set('status', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                >
-                  {STATUSES.map((s) => (
-                    <option key={s.value} value={s.value}>{s.label}</option>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Tipo de propiedad</label>
+              <select
+                value={form.property_type}
+                onChange={(e) => set('property_type', e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              >
+                <option value="">Sin especificar</option>
+                {Object.entries(propertyTypeMap)
+                  .filter(([key]) => !key.includes('-') && !key.includes(' ') || key === 'ground_floor')
+                  .map(([key, label]) => (
+                    <option key={key} value={key}>{label}</option>
                   ))}
-                </select>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Clasificación</label>
+              <div className="flex gap-4">
+                {CLASSIFICATIONS.map((c) => (
+                  <label key={c.value} className="flex items-center gap-1.5 cursor-pointer text-sm text-gray-700">
+                    <input
+                      type="radio"
+                      name="classification"
+                      value={c.value}
+                      checked={form.classification === c.value}
+                      onChange={() => set('classification', c.value)}
+                      className="w-4 h-4"
+                    />
+                    {c.label}
+                  </label>
+                ))}
               </div>
             </div>
             <div>
@@ -534,6 +620,15 @@ export default function EditPropertyPage({
                 className="w-4 h-4 rounded"
               />
               <span className="text-sm text-gray-700">Ocultar de la web</span>
+            </label>
+            <label className="flex items-center gap-2.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.sold}
+                onChange={(e) => set('sold', e.target.checked)}
+                className="w-4 h-4 rounded"
+              />
+              <span className="text-sm text-gray-700">Marcar como vendida</span>
             </label>
           </div>
         </div>

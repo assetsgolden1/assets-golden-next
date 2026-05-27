@@ -29,6 +29,7 @@ export interface GetPropertiesFilters {
   zona?: string
   orden?: 'reciente' | 'precio_asc' | 'precio_desc'
   excludeTypes?: string[]
+  classification?: string
   q?: string
 }
 
@@ -58,6 +59,8 @@ export async function getProperties(filters?: GetPropertiesFilters) {
       if (citiesInZone.length > 0) query = query.in('location', citiesInZone)
     }
   }
+
+  if (filters?.classification) query = query.eq('classification', filters.classification)
 
   if (filters?.q) {
     const raw = filters.q.trim()

@@ -6,7 +6,7 @@ import { Copy, CheckCheck } from 'lucide-react'
 export function NewAgentForm() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<{ email: string; tempPassword: string } | null>(null)
+  const [result, setResult] = useState<{ email: string; tempPassword: string; name: string } | null>(null)
   const [copied, setCopied] = useState(false)
   const [form, setForm] = useState({
     email: '',
@@ -34,14 +34,13 @@ export function NewAgentForm() {
       alert(data.error ?? 'Error creando agente')
       return
     }
-    setResult({ email: form.email, tempPassword: data.tempPassword })
+    setResult({ email: form.email, tempPassword: data.tempPassword, name: form.full_name })
   }
 
   async function copyCredentials() {
     if (!result) return
-    await navigator.clipboard.writeText(
-      `Email: ${result.email}\nContraseña: ${result.tempPassword}`,
-    )
+    const msg = `Hola ${result.name}, ya tienes acceso al portal de Assets Golden.\n\nEntra aquí: https://assetsgolden.com/portal/login\nEmail: ${result.email}\nContraseña temporal: ${result.tempPassword}\n\nTe recomendamos cambiar la contraseña al primer acceso.`
+    await navigator.clipboard.writeText(msg)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -76,7 +75,7 @@ export function NewAgentForm() {
             className="flex items-center gap-2 text-sm px-4 py-2 border border-green-300 text-green-800 rounded-lg hover:bg-green-100 transition-colors"
           >
             {copied ? <CheckCheck size={14} /> : <Copy size={14} />}
-            {copied ? 'Copiado' : 'Copiar credenciales'}
+            {copied ? 'Copiado' : 'Copiar mensaje WhatsApp'}
           </button>
           <button
             onClick={() => router.push('/admin/agentes')}

@@ -48,7 +48,8 @@ export async function POST(request: NextRequest) {
       gallery_urls: updates.gallery_urls ?? [],
       featured: updates.featured,
       hidden: updates.hidden,
-      status: updates.status,
+      sold: updates.sold ?? false,
+      classification: updates.classification ?? null,
     })
     .eq('id', id)
 

@@ -3,8 +3,6 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Edit2, Trash2, X, Upload } from 'lucide-react'
 import { createTeamMember, updateTeamMember, deleteTeamMember } from '@/app/admin/actions'
-import { createClient } from '@/lib/supabase/client'
-
 function TeamPhotoUploader({
   value,
   onChange,
@@ -22,21 +20,18 @@ function TeamPhotoUploader({
       return
     }
     setUploading(true)
-    const supabase = createClient()
-    const ext = file.name.split('.').pop() ?? 'jpg'
-    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-    const { error } = await supabase.storage
-      .from('team-photos')
-      .upload(fileName, file, { cacheControl: '3600', upsert: false })
-    if (error) {
-      alert('Error subiendo foto: ' + error.message)
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('bucket', 'team-photos')
+    const res = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
+    const data = await res.json()
+    if (!res.ok || data.error) {
+      alert('Error subiendo foto: ' + (data.error ?? 'desconocido'))
       setUploading(false)
       return
     }
-    const { data: { publicUrl } } = supabase.storage.from('team-photos').getPublicUrl(fileName)
-    onChange(publicUrl)
+    onChange(data.url)
     setUploading(false)
-    // reset input so same file can be re-uploaded
     e.target.value = ''
   }
 
