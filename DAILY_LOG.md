@@ -29,7 +29,7 @@ reordena si la prioridad cambió.
 - [ ] Migración de 166 imágenes legacy de Lovable a Supabase actual
 - [ ] Test PDF en producción end-to-end con agente real
 - [ ] Auditoría proyecto Supabase huérfano `yagrwbmsufpvjcgxkuoz`
-- [ ] Definir criterios `/inversiones` con Atilio
+- [x] Definir criterios `/inversiones` con Atilio — implementado vía `classification='investment'`
 - [ ] Monitoreo del cron y alertas
 - [ ] Opt-out de AI training en Vercel Team Settings (revisar al migrar a Pro). Iván buscó en General, Security & Privacy, Billing, Members, Drains, Alerts del plan Hobby actual — toggle no visible. Posibilidades: (a) opción solo disponible en Pro, (b) Vercel movió/eliminó el setting, (c) está en sub-página no obvia. Re-evaluar después de upgrade.
 
@@ -42,7 +42,7 @@ reordena si la prioridad cambió.
 - [x] Borrar carpeta vacía `src/app/admin/destinos/`
 - [x] Borrar carpeta vacía `src/app/api/admin/update-destino/`
 - [x] CSP: remover `api.anthropic.com`
-- [x] Verificar bucket `team-photos` en Supabase (existe, público)
+- [x] Verificar bucket `team-photos` en Supabase (existe, público — INSERT policy aplicada en FASE-4.A-P2)
 
 ### Pendientes operativos (Atilio)
 - [ ] Confirmar Tomo y Folio del Registro Mercantil de Barcelona con Atilio — bloqueante atenuado: Tomo y Folio quitados del texto público para no publicar con placeholder. Cuando Atilio los confirme, agregar al final de la cadena registral: `...Hoja B-562057, Inscripción 2, Tomo X, Folio Y`
@@ -61,6 +61,120 @@ reordena si la prioridad cambió.
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 Formato: fecha, contexto, decisiones tomadas, archivos tocados,
 commits, próximo paso sugerido.
+
+---
+
+### Sesión 2026-05-28 — [FASE-4.B-P1] Contenido editorial — servicios, países, sobre-nosotros, contacto
+
+**Contexto:** Feedback de Atilio (Word "NUEBA_WEB_AJUSTES_1") — ajustes de contenido editorial. Cambios seguros (sin validación previa requerida).
+
+**Trabajo hecho:**
+
+- **B1 — Contraste WCAG AA en /servicios** (`servicios/page.tsx`):
+  - Bullets de servicios: `text-white/40` → `text-white/70`
+  - Descripciones de tarjetas: `text-white/50` → `text-white/70`
+  - Hero description `text-white/60` — mantenida (nivel aceptable)
+
+- **B2 — Presencia Internacional /servicios** (`servicios/page.tsx`):
+  - Eliminados países inexistentes: Italia, Brasil, Colombia, Venezuela, Puerto Rico, Canadá, Francia
+  - Lista actualizada a los 11 países reales: España, México, Indonesia (Bali), Emiratos Árabes Unidos (Dubái), Argentina, Estados Unidos, Costa Rica, Reino Unido, Ecuador, Grecia y Paraguay
+  - Añadida frase: "Permanentemente abrimos nuevos mercados en busca de mejores oportunidades para nuestros clientes."
+
+- **B3 — Home países (verificado, sin cambio)**: Sección destinos ya es dinámica — lee de `getDestinations()` + filtra con `isValidCountry()`. `VALID_COUNTRIES` ya incluye los 11. No requería cambio de código.
+
+- **B4a — Misión /sobre-nosotros** (`sobre-nosotros/page.tsx`):
+  - Reemplazado "Portugal, Italia, Francia, Montenegro, Turquía…" por: "España, México, Indonesia, Emiratos Árabes Unidos, Argentina, Estados Unidos, Costa Rica, Reino Unido, Ecuador, Grecia y Paraguay."
+  - Añadida frase de apertura de mercados.
+
+- **B4b — Red Internacional /sobre-nosotros** (`sobre-nosotros/page.tsx`):
+  - Lista de ciudades corregida. Eliminados: Portugal, Italia, Francia.
+  - Añadidos: Indonesia (Bali: Uluwatu, Canggu, Ubud), Emiratos Árabes Unidos (Dubái), Costa Rica, Reino Unido, Ecuador, Grecia
+  - Argentina: añadida Córdoba
+  - México: actualizado a Tulum, Riviera Maya
+  - Paraguay: añadidas Asunción, Luque, Ciudad del Este
+
+- **B5a — Dirección /contacto** (`contacto/page.tsx`):
+  - Añadido ítem MapPin "Sant Joan Despí, Barcelona, España" al inicio de contactItems
+  - Render condicional para `href=null` (no genera `<a>` vacío)
+
+- **B5b — Logo /contacto**: No existe ningún logo en la página de contacto actual. No hay imagen/logo para corregir. Pendiente clarificación de Atilio sobre qué exactamente quería cambiar.
+
+- **B4c — Claims "+40 años" y "+1500 propiedades"**: NO tocados. Pendiente validación de Atilio.
+
+**Decisiones tomadas:**
+- Home país-section: ya dinámica, sin cambio de código
+- B5b logo: no se encontró problema concreto — pendiente Atilio
+
+**Archivos tocados:**
+- MODIFIED `src/app/(public)/servicios/page.tsx`
+- MODIFIED `src/app/(public)/sobre-nosotros/page.tsx`
+- MODIFIED `src/app/(public)/contacto/page.tsx`
+
+**Commits:**
+- `a051577` — fix(servicios): contraste WCAG AA en bullets y descripciones
+- `fc570e2` — fix(sobre-nosotros): misión y Red Internacional con los 11 países reales
+- `0ed0d00` — fix(contacto): añadir dirección Sant Joan Despí, Barcelona
+
+**Próximo paso sugerido:**
+- Smoke test: /servicios (bullets visibles, Presencia Internacional correcta), /sobre-nosotros (misión + Red Internacional), /contacto (dirección nueva visible)
+- Pendiente de Atilio: (1) confirmar claims "+40 años" y "+1500 propiedades" para implementar B4c; (2) aclarar qué quería cambiar del logo en /contacto (B5b — no hay logo en esa página)
+
+---
+
+### Sesión 2026-05-27 — [FASE-4.A-P2] Consolidación estados + clasificación + drag gallery + fixes
+
+**Contexto:** Continuación de FASE-4.A con 6 tareas nuevas de mejora admin y correcciones.
+
+**Trabajo hecho:**
+
+- **A5 — Consolidar estados:**
+  - DB: `UPDATE properties SET status='active' WHERE status='available'` (migración aplicada)
+  - `PropiedadesTable.tsx`: badge de `status` reemplazado por badges combinados VISIBLE/OCULTA/VENDIDA/★DEST.
+  - Edit page: eliminado dropdown `status`, añadido checkbox "Marcar como vendida" en sección Opciones
+  - Nueva propiedad: eliminado dropdown `status` (siempre crea con `status='active'`)
+  - API routes `update-property` y `create-property`: actualizados para guardar `sold` y `classification`
+
+- **A6 — Flag Inversión:**
+  - `queries.ts`: añadido `classification?: string` a `GetPropertiesFilters`, filtro `eq('classification', ...)`
+  - Edit + nueva-propiedad: radio group Normal/Promoción/Inversión reemplaza el dropdown Estado
+  - `/inversiones/page.tsx`: cambia de `excludeTypes: EXCLUDED_FROM_INVESTMENT` a `classification: 'investment'`
+  - DB: índice `idx_properties_classification` aplicado
+
+- **A7 — Drag-to-reorder fotos:**
+  - Instalado `@dnd-kit/core` + `@dnd-kit/sortable`
+  - Edit page: sección de imágenes usa `DndContext` + `SortableContext` + `SortableImage` (arrastrando reordena; primera posición = principal)
+  - Indicador "arrastrá para reordenar" + contador "X / 30"
+
+- **A8 — Límite 30 fotos:**
+  - `MAX_PHOTOS 12 → 30` en nueva-propiedad
+  - Edit page: cap de 30 con mensaje de límite y contador de seleccionadas
+
+- **A9 — Fix upload foto de partner:**
+  - DB: policy `"Authenticated upload team-photos"` en `storage.objects` aplicada
+  - `TeamPhotoUploader`: ruta a través de `/api/admin/upload-image?bucket=team-photos` (servicio admin con service key)
+  - `upload-image/route.ts`: añadido caso `team-photos` (sin subfolder)
+  - Eliminada dependencia del anon client para storage
+
+- **A10 — Onboarding agente:**
+  - `NewAgentForm.tsx`: `copyCredentials` produce mensaje WhatsApp completo (URL portal, nombre, email, contraseña temporal); botón renombrado "Copiar mensaje WhatsApp"
+  - `Footer.tsx`: añadido "Acceso agentes" → `/portal/login` en sección Empresa
+
+**Archivos tocados:**
+- MODIFIED `src/lib/supabase/queries.ts`
+- MODIFIED `src/app/api/admin/update-property/route.ts`
+- MODIFIED `src/app/api/admin/create-property/route.ts`
+- MODIFIED `src/app/api/admin/upload-image/route.ts`
+- MODIFIED `src/app/(public)/inversiones/page.tsx`
+- MODIFIED `src/app/admin/propiedades/[id]/edit/page.tsx`
+- MODIFIED `src/app/admin/nueva-propiedad/page.tsx`
+- MODIFIED `src/components/admin/PropiedadesTable.tsx`
+- MODIFIED `src/components/admin/TeamManager.tsx`
+- MODIFIED `src/components/admin/NewAgentForm.tsx`
+- MODIFIED `src/components/Footer.tsx`
+
+**Commits:** `c099bb8` — feat(admin): FASE-4.A-P2 — A5-A10 admin improvements
+
+**Próximo paso sugerido:** Smoke test en producción (Vercel deploy). Atilio debe: (1) probar clasificar propiedades como "Inversión" desde edit para poblar `/inversiones`; (2) verificar drag-to-reorder en edit de una propiedad con fotos; (3) testar upload foto de partner en TeamManager; (4) agregar agente de prueba y copiar mensaje WhatsApp.
 
 ---
 
