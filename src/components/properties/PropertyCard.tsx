@@ -18,6 +18,7 @@ interface PropertyCardProps {
   property_type: string | null;
   image_url: string | null;
   featured?: boolean;
+  sold?: boolean | null;
   className?: string;
 }
 
@@ -43,6 +44,7 @@ export default function PropertyCard({
   property_type,
   image_url,
   featured,
+  sold,
   className,
 }: PropertyCardProps) {
   void id;
@@ -62,7 +64,7 @@ export default function PropertyCard({
             alt={title}
             fill
             unoptimized
-            className="object-cover transition-transform duration-700 group-hover:scale-110"
+            className={`object-cover transition-transform duration-700 group-hover:scale-110 ${sold ? 'opacity-60' : ''}`}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
@@ -75,10 +77,33 @@ export default function PropertyCard({
         <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent opacity-40" />
 
         {/* Featured badge */}
-        {featured && (
+        {featured && !sold && (
           <span className="absolute top-4 right-4 rounded-full bg-primary/80 px-2.5 py-1 text-xs font-medium text-gold border border-gold/30">
             Destacada
           </span>
+        )}
+
+        {/* VENDIDA band */}
+        {sold && (
+          <div className="absolute top-0 right-0 z-10 overflow-hidden" style={{ width: 90, height: 90 }}>
+            <div style={{
+              position: 'absolute',
+              top: 20,
+              right: -22,
+              width: 96,
+              backgroundColor: '#dc2626',
+              color: 'white',
+              fontSize: 9,
+              fontWeight: 800,
+              letterSpacing: '0.12em',
+              textAlign: 'center',
+              transform: 'rotate(45deg)',
+              padding: '4px 0',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.35)',
+            }}>
+              VENDIDA
+            </div>
+          </div>
         )}
       </div>
 

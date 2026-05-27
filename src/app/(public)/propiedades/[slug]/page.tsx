@@ -144,15 +144,38 @@ export default async function PropertyDetailPage({ params }: Props) {
       </div>
 
       {/* Galería con hero + thumbnails + lightbox */}
-      {allImages.length > 0 ? (
-        <PropertyGalleryClient images={allImages} title={property.title} />
-      ) : (
-        <section className="bg-muted">
-          <div className="h-64 gradient-navy flex items-center justify-center">
-            <span className="font-display text-2xl text-gold/40">Assets Golden</span>
+      <div className="relative">
+        {allImages.length > 0 ? (
+          <PropertyGalleryClient images={allImages} title={property.title} />
+        ) : (
+          <section className="bg-muted">
+            <div className="h-64 gradient-navy flex items-center justify-center">
+              <span className="font-display text-2xl text-gold/40">Assets Golden</span>
+            </div>
+          </section>
+        )}
+        {property.sold && (
+          <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
+            <div style={{
+              position: 'absolute',
+              top: 32,
+              right: -36,
+              width: 200,
+              backgroundColor: '#dc2626',
+              color: 'white',
+              fontSize: 13,
+              fontWeight: 800,
+              letterSpacing: '0.15em',
+              textAlign: 'center',
+              transform: 'rotate(45deg)',
+              padding: '8px 0',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+            }}>
+              VENDIDA
+            </div>
           </div>
-        </section>
-      )}
+        )}
+      </div>
 
       {/* Contenido */}
       <section className="section-padding bg-background">
@@ -160,6 +183,15 @@ export default async function PropertyDetailPage({ params }: Props) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Columna principal */}
             <div className="lg:col-span-2">
+              {/* Badge VENDIDA */}
+              {property.sold && (
+                <div className="mb-4">
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-600 text-white text-sm font-bold tracking-wider uppercase">
+                    Propiedad vendida
+                  </span>
+                </div>
+              )}
+
               {/* Tipo + ubicación */}
               <div className="flex flex-wrap items-center gap-3 mb-4">
                 {property.property_type && (
@@ -273,19 +305,39 @@ export default async function PropertyDetailPage({ params }: Props) {
                   Contacte con un especialista para obtener más información.
                 </p>
 
-                <div className="space-y-3">
-                  <PropertyContactModal
-                    propertyId={property.id}
-                    propertyTitle={property.title}
-                    propertySlug={property.slug ?? ''}
-                  />
-                  <a
-                    href="tel:+34611853001"
-                    className={buttonVariants({ variant: 'navyOutline', size: 'lg', className: 'w-full' })}
-                  >
-                    Llamar ahora
-                  </a>
-                </div>
+                {property.sold ? (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Esta propiedad ya ha sido vendida. Explore otras opciones similares.
+                    </p>
+                    <Link
+                      href={`/propiedades?${property.location ? `ciudad=${encodeURIComponent(property.location)}` : property.country ? `pais=${encodeURIComponent(property.country)}` : ''}`}
+                      className={buttonVariants({ variant: 'gold', size: 'lg', className: 'w-full' })}
+                    >
+                      Ver propiedades similares
+                    </Link>
+                    <a
+                      href="tel:+34611853001"
+                      className={buttonVariants({ variant: 'navyOutline', size: 'lg', className: 'w-full' })}
+                    >
+                      Consultar disponibilidad
+                    </a>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <PropertyContactModal
+                      propertyId={property.id}
+                      propertyTitle={property.title}
+                      propertySlug={property.slug ?? ''}
+                    />
+                    <a
+                      href="tel:+34611853001"
+                      className={buttonVariants({ variant: 'navyOutline', size: 'lg', className: 'w-full' })}
+                    >
+                      Llamar ahora
+                    </a>
+                  </div>
+                )}
 
                 <div className="mt-6 pt-6 border-t border-border">
                   <p className="text-xs text-muted-foreground text-center">

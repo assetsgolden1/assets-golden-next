@@ -6,7 +6,7 @@ export function SoldToggleButton({ id, sold }: { id: string; sold: boolean }) {
   const [pending, startTransition] = useTransition()
 
   function handleClick() {
-    if (!sold && !window.confirm('¿Marcar como vendida? Se ocultará de la web.')) return
+    if (!sold && !window.confirm('¿Marcar como vendida? Seguirá visible en la web con banda "VENDIDA".')) return
     startTransition(() => togglePropertySold(id, !sold))
   }
 

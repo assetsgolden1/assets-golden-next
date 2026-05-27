@@ -108,15 +108,13 @@ export async function togglePropertySold(id: string, sold: boolean) {
   }
   const { data: prop } = await supabaseAdmin
     .from('properties').select('title').eq('id', id).maybeSingle()
-  const update: Record<string, unknown> = { sold }
-  if (sold) update.hidden = true
-  await supabaseAdmin.from('properties').update(update).eq('id', id)
+  await supabaseAdmin.from('properties').update({ sold }).eq('id', id)
   await logAdminAction({
     action: 'toggle_sold',
     entity_type: 'property',
     entity_id: id,
     entity_label: prop?.title ?? null,
-    metadata: sold ? { sold, hidden: true } : { sold },
+    metadata: { sold },
   })
   revalidatePath('/admin/propiedades')
   revalidatePath('/propiedades')
@@ -128,7 +126,7 @@ export async function bulkMarkAsSold(ids: string[]) {
   } catch {
     throw new Error('No autorizado: requiere rol admin')
   }
-  await supabaseAdmin.from('properties').update({ sold: true, hidden: true }).in('id', ids)
+  await supabaseAdmin.from('properties').update({ sold: true }).in('id', ids)
   await logAdminAction({
     action: 'bulk_mark_as_sold',
     entity_type: 'property',
