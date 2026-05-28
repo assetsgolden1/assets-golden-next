@@ -37,7 +37,7 @@ export function LeadFilters() {
     } else {
       params.delete(key)
     }
-    startTransition(() => router.push(`${pathname}?${params.toString()}`))
+    startTransition(() => router.replace(`${pathname}?${params.toString()}`))
   }
 
   function toggleUrgent() {
@@ -47,7 +47,7 @@ export function LeadFilters() {
     } else {
       params.set('urgent_only', 'true')
     }
-    startTransition(() => router.push(`${pathname}?${params.toString()}`))
+    startTransition(() => router.replace(`${pathname}?${params.toString()}`))
   }
 
   function handleSearch(e: React.FormEvent<HTMLFormElement>) {

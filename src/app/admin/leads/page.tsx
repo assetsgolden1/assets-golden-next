@@ -145,8 +145,11 @@ export default async function LeadsPage({
         <LeadFilters />
       </Suspense>
 
-      {/* Tabla + Modal */}
-      <LeadsClientWrapper leads={leads} />
+      {/* Tabla + Modal — key fuerza remount cuando cambian los filtros */}
+      <LeadsClientWrapper
+        key={`${params.status ?? ''}-${params.source ?? ''}-${params.search ?? ''}-${params.urgent_only ?? ''}`}
+        leads={leads}
+      />
     </div>
   )
 }
