@@ -64,6 +64,55 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-29 — [FASE-4.G-P1] Dashboard /admin/leads
+
+**Contexto:** Implementar UI completa de gestión de leads dentro del admin para que Atilio gestione contactos sin acceder a Supabase o Google Sheets.
+
+**Trabajo hecho:**
+
+- **APIs creadas:**
+  - `GET /api/admin/leads` — lista con filtros (status, source, search, urgent_only, exclude_test). `migration_test` excluido por defecto. `is_urgent` computado (status='new' AND >24h).
+  - `PATCH /api/admin/leads/[id]` — actualiza status, notes, score. Valida status en lista permitida. Log audit.
+  - `GET /api/admin/leads/stats` — totales, nuevos, urgentes, contactados_hoy, by_source.
+
+- **Componentes creados** en `src/components/admin/leads/`:
+  - `LeadStatusBadge.tsx` — colores: azul/amarillo/naranja/verde/gris
+  - `UrgencyBadge.tsx` — rojo pulsante >24h, amarillo >6h
+  - `SourceBadge.tsx` — property_contact/demand_form/contacto/otros
+  - `LeadFilters.tsx` — chips de status + origen + toggle urgentes + búsqueda libre (URL params)
+  - `LeadsTable.tsx` — tabla con columnas clave, click en fila abre modal, botón WhatsApp inline
+  - `LeadDetailModal.tsx` — modal completo: contacto (email+WhatsApp), interés, mensaje, propiedad, score, notas editables, gestión status, acciones rápidas. Cierra con Esc o click afuera.
+
+- **Página /admin/leads** reescrita: 4 stat cards (total, nuevos, urgentes, contactados hoy) + LeadFilters + LeadsClientWrapper.
+
+- **Sidebar badge:** `AdminSidebar.tsx` acepta `urgentLeadsCount` prop. Badge rojo pulsante junto a "Leads" cuando hay leads urgentes. `layout.tsx` hace server fetch del count (Supabase directo).
+
+- **audit.ts:** agregado `'update_lead'` a `AuditAction`.
+
+**Archivos tocados:**
+- CREATED: `src/app/api/admin/leads/route.ts`
+- CREATED: `src/app/api/admin/leads/[id]/route.ts`
+- CREATED: `src/app/api/admin/leads/stats/route.ts`
+- CREATED: `src/components/admin/leads/LeadStatusBadge.tsx`
+- CREATED: `src/components/admin/leads/UrgencyBadge.tsx`
+- CREATED: `src/components/admin/leads/SourceBadge.tsx`
+- CREATED: `src/components/admin/leads/LeadFilters.tsx`
+- CREATED: `src/components/admin/leads/LeadsTable.tsx`
+- CREATED: `src/components/admin/leads/LeadDetailModal.tsx`
+- MODIFIED: `src/app/admin/leads/page.tsx`
+- MODIFIED: `src/app/admin/leads/LeadsClientWrapper.tsx`
+- MODIFIED: `src/components/admin/AdminSidebar.tsx`
+- MODIFIED: `src/app/admin/layout.tsx`
+- MODIFIED: `src/lib/audit.ts`
+
+**Commits:** `57a261c` — feat(admin): dashboard /admin/leads con modal, filtros y badge urgente
+
+**Nota assigned_to:** Columna `assigned_to` es UUID en DB. Dropdown de asignación en modal es UI cosmética (no persiste a DB en esta fase). Requiere UUIDs reales de usuarios admin para implementación completa.
+
+**Próximo paso sugerido:** Smoke test en producción tras push/deploy — verificar los 3 leads (Ivan, Rosa, Raja), filtros, modal, botón WhatsApp, y badge en sidebar.
+
+---
+
 ### Sesión 2026-05-28c — [FASE-4.F-P1] Migración Google Sheet de leads al Sheet nuevo de Ivan
 
 **Contexto:** Ivan creó un Sheet nuevo en su Drive personal con los 12 headers correctos y compartió como Editor con la Service Account. Se debía migrar `GOOGLE_SHEETS_LEADS_ID` del sheet huérfano al nuevo.
