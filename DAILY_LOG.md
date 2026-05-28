@@ -64,6 +64,35 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-29b — [FASE-4.G-P2] Fix bugs dashboard /admin/leads
+
+**Contexto:** Dos bugs detectados en producción tras deploy P1.
+
+**Root causes encontrados:**
+
+1. **BUG 1 (PATCH 500):** Tabla `leads` tenía CHECK constraint legacy con valores `['new','contacted','qualified','lost','converted']`. Los nuevos valores `in_progress`, `closed`, `discarded` eran rechazados por Postgres. Solo `new` y `contacted` pasaban → explica "primer PATCH 200, resto 500".
+   - Fix: migración DB `update_leads_status_check_constraint` — reemplaza constraint por `['new','contacted','in_progress','closed','discarded']`.
+   - Fix código: `console.error` en el handler antes del 500 para futuros debugs.
+
+2. **BUG 2 (filtros no aplican):** `page.tsx` sí consume `searchParams` y pasa a `fetchLeads`. El problema real: `LeadsClientWrapper` usa `useState(initial)` — React no reinicializa state cuando el server component re-renderiza con nuevas props (comportamiento estándar de React).
+   - Fix: `key` prop en `<LeadsClientWrapper>` basada en `status-source-search-urgent_only`. Cuando cambia cualquier filtro, React fuerza remount y reinicializa con los nuevos leads.
+   - Fix adicional: `router.replace()` en `LeadFilters` en lugar de `router.push()` (no acumula history).
+
+**T4:** 3 leads reseteados a `status='new'` via SQL directo. Confirmado: Ivan Alberini, Raja Melano, Rosa Melano → all `new`.
+
+**Archivos tocados:**
+- MODIFIED: `src/app/api/admin/leads/[id]/route.ts` (console.error)
+- MODIFIED: `src/app/admin/leads/page.tsx` (key prop en LeadsClientWrapper)
+- MODIFIED: `src/components/admin/leads/LeadFilters.tsx` (router.replace)
+- DB MIGRATION: `update_leads_status_check_constraint`
+
+**Commits:** `3e8b648` — fix(api): validator PATCH leads acepta todos los status correctos
+             `ca20a83` — fix(admin): /admin/leads consume searchParams — filtros chips aplicados
+
+**Próximo paso sugerido:** Smoke test completo: ciclo new→contacted→in_progress→closed→discarded→new + filtros por status/source/search/urgent_only.
+
+---
+
 ### Sesión 2026-05-29 — [FASE-4.G-P1] Dashboard /admin/leads
 
 **Contexto:** Implementar UI completa de gestión de leads dentro del admin para que Atilio gestione contactos sin acceder a Supabase o Google Sheets.
