@@ -10,7 +10,7 @@ export type AuditAction =
   | 'toggle_agent'           | 'send_password_reset'
   | 'create_blog_post'       | 'update_blog_post'        | 'delete_blog_post'
   | 'create_team_member'     | 'update_team_member'      | 'delete_team_member'
-  | 'delete_lead'
+  | 'delete_lead'             | 'update_lead'
   | 'sync_habihub_manual'
   | 'create_destination'     | 'update_destination'
 

@@ -1,198 +1,152 @@
+import { Suspense } from 'react'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { LeadStatusSelect } from '@/components/admin/LeadStatusSelect'
-import { DeleteLeadButton } from '@/components/admin/DeleteLeadButton'
+import { LeadFilters } from '@/components/admin/leads/LeadFilters'
 import LeadsClientWrapper from './LeadsClientWrapper'
 
 interface Lead {
   id: string
-  name: string
-  email: string
-  phone: string | null
-  source: string | null
-  message: string | null
-  status: string | null
   created_at: string
+  name: string
+  email: string | null
+  phone: string | null
+  neighborhood: string | null
+  property_value_range: string | null
+  sale_timeline: string | null
+  is_owner: boolean | null
   interest: string | null
+  message: string | null
   location: string | null
+  score: number | null
+  score_summary: string | null
+  status: string | null
+  source: string | null
+  assigned_to: string | null
+  notes: string | null
   property_id: string | null
   property_title: string | null
   property_url: string | null
 }
 
-const SOURCE_CONFIG: Record<string, { label: string; color: string }> = {
-  collaboration_form: { label: 'Colaboración', color: 'bg-purple-100 text-purple-700' },
-  property_contact: { label: 'Propiedad', color: 'bg-blue-100 text-blue-700' },
-  demand_form: { label: 'Demanda', color: 'bg-orange-100 text-orange-700' },
+const URGENT_MS = 24 * 60 * 60 * 1000
+
+async function fetchLeads(params: {
+  status?: string
+  source?: string
+  search?: string
+  urgent_only?: string
+}) {
+  let query = supabaseAdmin
+    .from('leads')
+    .select('*')
+    .neq('source', 'migration_test')
+    .order('created_at', { ascending: false })
+    .limit(200)
+
+  if (params.status) query = query.eq('status', params.status)
+  if (params.source) query = query.eq('source', params.source)
+  if (params.search) {
+    query = query.or(
+      `name.ilike.%${params.search}%,email.ilike.%${params.search}%,message.ilike.%${params.search}%`
+    )
+  }
+
+  const { data } = await query
+  const leads = ((data as Lead[]) ?? []).map((l) => ({
+    ...l,
+    is_urgent: l.status === 'new' && Date.now() - new Date(l.created_at).getTime() > URGENT_MS,
+  }))
+
+  if (params.urgent_only === 'true') {
+    return leads.filter((l) => l.is_urgent)
+  }
+  return leads
 }
 
-const STATUS_OPTIONS = [
-  { value: 'new', label: 'Nuevo' },
-  { value: 'contacted', label: 'Contactado' },
-  { value: 'qualified', label: 'Calificado' },
-  { value: 'closed', label: 'Cerrado' },
-]
+async function fetchStats() {
+  const { data } = await supabaseAdmin
+    .from('leads')
+    .select('id, status, source, created_at')
+    .neq('source', 'migration_test')
 
-function sourceInfo(source?: string | null) {
-  if (!source) return { label: 'Web', color: 'bg-gray-100 text-gray-600' }
-  return SOURCE_CONFIG[source] ?? { label: source, color: 'bg-gray-100 text-gray-600' }
+  const leads = data ?? []
+  const now = Date.now()
+  const startOfToday = new Date()
+  startOfToday.setHours(0, 0, 0, 0)
+
+  return {
+    total: leads.length,
+    new: leads.filter((l) => l.status === 'new').length,
+    urgent: leads.filter(
+      (l) => l.status === 'new' && now - new Date(l.created_at).getTime() > URGENT_MS
+    ).length,
+    contacted_today: leads.filter(
+      (l) => l.status === 'contacted' && new Date(l.created_at) >= startOfToday
+    ).length,
+  }
+}
+
+function StatCard({
+  label,
+  value,
+  accent,
+}: {
+  label: string
+  value: number
+  accent?: 'red' | 'blue' | 'green' | 'default'
+}) {
+  const colorMap = {
+    red: 'text-red-600',
+    blue: 'text-blue-600',
+    green: 'text-green-600',
+    default: 'text-gray-800',
+  }
+  return (
+    <div className="bg-white rounded-xl shadow-sm p-5">
+      <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-1">{label}</p>
+      <p className={`text-3xl font-bold ${colorMap[accent ?? 'default']}`}>{value}</p>
+    </div>
+  )
 }
 
 export default async function LeadsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ source?: string; status?: string; search?: string }>
+  searchParams: Promise<{ status?: string; source?: string; search?: string; urgent_only?: string }>
 }) {
   const params = await searchParams
-  const filterSource = params.source ?? ''
-  const filterStatus = params.status ?? ''
-  const searchText = params.search ?? ''
-
-  let query = supabaseAdmin
-    .from('leads')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(100)
-
-  if (filterSource) {
-    query = query.eq('source', filterSource)
-  }
-  if (filterStatus) {
-    query = query.eq('status', filterStatus)
-  }
-  if (searchText) {
-    query = query.or(`name.ilike.%${searchText}%,email.ilike.%${searchText}%`)
-  }
-
-  const { data } = await query
-  const leads = (data as Lead[]) ?? []
+  const [leads, stats] = await Promise.all([fetchLeads(params), fetchStats()])
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-6 flex items-center justify-between">
+      {/* Título */}
+      <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Leads</h1>
-        <LeadsClientWrapper leads={leads} />
+        <p className="text-sm text-gray-400 mt-0.5">Gestión de contactos y consultas</p>
       </div>
 
-      {/* Filtros — formulario GET puro */}
-      <form method="GET" action="/admin/leads" className="bg-white rounded-xl shadow-sm p-4 mb-5 flex flex-wrap gap-3">
-        <input
-          type="text"
-          name="search"
-          defaultValue={searchText}
-          placeholder="Buscar por nombre o email..."
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 min-w-[200px]"
+      {/* Stats cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <StatCard label="Total leads" value={stats.total} />
+        <StatCard
+          label="Nuevos sin atender"
+          value={stats.new}
+          accent={stats.new > 0 ? 'red' : 'default'}
         />
-        <select
-          name="source"
-          defaultValue={filterSource}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">Todos los orígenes</option>
-          {Object.entries(SOURCE_CONFIG).map(([value, { label }]) => (
-            <option key={value} value={value}>{label}</option>
-          ))}
-        </select>
-        <select
-          name="status"
-          defaultValue={filterStatus}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">Todos los estados</option>
-          {STATUS_OPTIONS.map((s) => (
-            <option key={s.value} value={s.value}>{s.label}</option>
-          ))}
-        </select>
-        <button
-          type="submit"
-          className="bg-[#0a1628] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#1a2638] transition-colors"
-        >
-          Filtrar
-        </button>
-      </form>
-
-      <div className="text-sm text-gray-500 mb-3">
-        {leads.length} leads encontrados
+        <StatCard
+          label="Urgentes (>24h)"
+          value={stats.urgent}
+          accent={stats.urgent > 0 ? 'red' : 'default'}
+        />
+        <StatCard label="Contactados hoy" value={stats.contacted_today} accent="green" />
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium">Fecha</th>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium">Nombre</th>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium">Email</th>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium">Teléfono</th>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium">Origen</th>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium">Propiedad</th>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium">Mensaje</th>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium">Estado</th>
-                <th className="text-right px-4 py-3 text-gray-600 font-medium">Acc.</th>
-              </tr>
-            </thead>
-            <tbody>
-              {leads.length === 0 ? (
-                <tr>
-                  <td colSpan={9} className="text-center py-8 text-gray-400">
-                    No se encontraron leads
-                  </td>
-                </tr>
-              ) : (
-                leads.map((lead) => {
-                  const src = sourceInfo(lead.source)
-                  return (
-                    <tr key={lead.id} className="border-t border-gray-50 hover:bg-gray-50">
-                      <td className="px-4 py-2.5 text-gray-400 text-xs whitespace-nowrap">
-                        {new Date(lead.created_at).toLocaleDateString('es-ES')}
-                      </td>
-                      <td className="px-4 py-2.5 font-medium text-gray-800">{lead.name}</td>
-                      <td className="px-4 py-2.5 text-gray-500">{lead.email}</td>
-                      <td className="px-4 py-2.5 text-gray-500">{lead.phone ?? '—'}</td>
-                      <td className="px-4 py-2.5">
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${src.color}`}>
-                          {src.label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2.5 max-w-[180px]">
-                        {lead.property_title ? (
-                          lead.property_url ? (
-                            <a
-                              href={lead.property_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-xs text-blue-600 hover:underline line-clamp-2"
-                              title={lead.property_title}
-                            >
-                              {lead.property_title}
-                            </a>
-                          ) : (
-                            <span className="text-xs text-gray-600 line-clamp-2">{lead.property_title}</span>
-                          )
-                        ) : (
-                          <span className="text-gray-300">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-2.5 text-gray-500 max-w-[200px]">
-                        <span className="truncate block">
-                          {lead.message
-                            ? lead.message.slice(0, 50) + (lead.message.length > 50 ? '...' : '')
-                            : '—'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <LeadStatusSelect id={lead.id} status={lead.status} />
-                      </td>
-                      <td className="px-4 py-2.5 text-right">
-                        <DeleteLeadButton id={lead.id} name={lead.name} />
-                      </td>
-                    </tr>
-                  )
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* Filtros */}
+      <Suspense fallback={<div className="h-28 bg-white rounded-xl shadow-sm mb-5 animate-pulse" />}>
+        <LeadFilters />
+      </Suspense>
+
+      {/* Tabla + Modal */}
+      <LeadsClientWrapper leads={leads} />
     </div>
   )
 }

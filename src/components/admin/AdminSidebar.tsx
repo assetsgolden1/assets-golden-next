@@ -8,7 +8,7 @@ import {
   Building2,
   Star,
   Newspaper,
-  Users,
+  Inbox,
   RefreshCw,
   UserCircle,
   Settings,
@@ -23,7 +23,7 @@ const navLinks = [
   { href: '/admin/nueva-propiedad', label: 'Nueva propiedad', icon: PlusCircle },
   { href: '/admin/destacadas', label: 'Destacadas', icon: Star },
   { href: '/admin/blog', label: 'Blog', icon: Newspaper },
-  { href: '/admin/leads', label: 'Leads', icon: Users },
+  { href: '/admin/leads', label: 'Leads', icon: Inbox, showUrgentBadge: true },
   { href: '/admin/agentes', label: 'Agentes', icon: UserCheck },
   { href: '/admin/sync', label: 'Sincronización', icon: RefreshCw },
   { href: '/admin/equipo', label: 'Equipo', icon: UserCircle },
@@ -31,7 +31,7 @@ const navLinks = [
   { href: '/admin/settings', label: 'Ajustes', icon: Settings },
 ]
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ urgentLeadsCount = 0 }: { urgentLeadsCount?: number }) {
   const pathname = usePathname()
   const router = useRouter()
   const [userEmail, setUserEmail] = useState('')
@@ -69,6 +69,7 @@ export default function AdminSidebar() {
           {navLinks.map((link) => {
             const active = isActive(link.href, link.exact)
             const Icon = link.icon
+            const showBadge = link.showUrgentBadge && urgentLeadsCount > 0
             return (
               <li key={link.href}>
                 <a
@@ -80,7 +81,12 @@ export default function AdminSidebar() {
                   }`}
                 >
                   <Icon size={18} />
-                  {link.label}
+                  <span className="flex-1">{link.label}</span>
+                  {showBadge && (
+                    <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold animate-pulse">
+                      {urgentLeadsCount > 9 ? '9+' : urgentLeadsCount}
+                    </span>
+                  )}
                 </a>
               </li>
             )
