@@ -42,3 +42,5 @@ next-env.d.ts
 
 # Inventario local (no commitear)
 outputs/inventario-servicios.md
+
+.vercel
