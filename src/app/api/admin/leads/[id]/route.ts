@@ -43,6 +43,7 @@ export async function PATCH(
     .single()
 
   if (error) {
+    console.error('[PATCH /api/admin/leads]', error.message, { id, updates })
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
