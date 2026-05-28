@@ -64,6 +64,46 @@ commits, próximo paso sugerido.
 
 ---
 
+### Sesión 2026-05-28c — [FASE-4.F-P1] Migración Google Sheet de leads al Sheet nuevo de Ivan
+
+**Contexto:** Ivan creó un Sheet nuevo en su Drive personal con los 12 headers correctos y compartió como Editor con la Service Account. Se debía migrar `GOOGLE_SHEETS_LEADS_ID` del sheet huérfano al nuevo.
+
+**Trabajo hecho:**
+
+- **PRE-FLIGHT** — Script `scripts/testSheetWrite.ts` verifica vía API el nombre real de la pestaña en el sheet nuevo:
+  - Resultado: pestaña `"Hoja 1"` ✅ confirmada — matchea el range `'Hoja 1'!A:L` del código.
+
+- **Tarea 1 — `.env.local`**:
+  - `GOOGLE_SHEETS_LEADS_ID`: `1aAt2bG7Xxx3zv89t5u-FMyOlKbEX05anfQ1eJptc-c8` → `1nkRaLHwnIz3RsLTA0A3zNnxErqVWMa4sm8dlwcSNRjQ`
+
+- **Tarea 2 — Vercel env vars** (3 entornos):
+  - Production: eliminada la vieja, añadida la nueva ✅
+  - Preview: no existía, añadida la nueva ✅
+  - Development: no existía, añadida la nueva ✅
+
+- **Tarea 3 — Redeploy**:
+  - Commit `8f4daee` pusheado → Vercel redeploy en curso
+
+- **Tarea 4 — Write test programático** (local con `.env.local` actualizado):
+  - Range devuelto: `'Hoja 1'!A2:L2`
+  - Fila escrita en email `test-migration@ibott.dev` — VERIFICAR manualmente en Sheet
+
+- **Sheet viejo** (`1aAt2bG7Xxx3zv89t5u-FMyOlKbEX05anfQ1eJptc-c8`): NO borrado — preservado según instrucción.
+
+**Nota operativa:** La variable `GOOGLE_SHEETS_LEADS_ID` solo estaba configurada en Production en Vercel (preview y development no la tenían). Ahora está en los 3 entornos.
+
+**Archivos tocados:**
+- MODIFIED `.env.local`
+- CREATED `scripts/testSheetWrite.ts`
+- MODIFIED `package.json` (añadidos scripts `check-sheet-owner` y `test-sheet-write`)
+- MODIFIED `.gitignore` (`.vercel` agregado automáticamente por `vercel link`)
+
+**Commits:** `8f4daee` — chore(env): migrar GOOGLE_SHEETS_LEADS_ID al sheet nuevo de Ivan
+
+**Próximo paso sugerido:** Ivan verifica manualmente que aparece la fila de test (`TEST migración Sheet`, `test-migration@ibott.dev`) en el Sheet nuevo. URL: https://docs.google.com/spreadsheets/d/1nkRaLHwnIz3RsLTA0A3zNnxErqVWMa4sm8dlwcSNRjQ/edit — Después, el próximo lead real de producción debería llegar al Sheet nuevo.
+
+---
+
 ### Sesión 2026-05-28b — [FASE-4.B-P2] Claims trayectoria conjunta socios fundadores
 
 **Contexto:** Atilio confirmó que los claims "+40 años" y "+1.500 propiedades" son trayectoria conjunta de los dos socios fundadores, no de la empresa (COVA FUMADA GROUP S.L.). Se reformula para atribuirlos correctamente como plural de socios.
