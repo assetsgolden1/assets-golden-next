@@ -35,6 +35,12 @@ export async function PATCH(
     return NextResponse.json({ error: 'Nada que actualizar' }, { status: 400 })
   }
 
+  const { data: before } = await supabaseAdmin
+    .from('leads')
+    .select('status, score')
+    .eq('id', id)
+    .single()
+
   const { data, error } = await supabaseAdmin
     .from('leads')
     .update(updates)
@@ -52,7 +58,17 @@ export async function PATCH(
     entity_type: 'lead',
     entity_id: id,
     entity_label: data?.name ?? null,
-    metadata: { fields_updated: Object.keys(updates) },
+    metadata: {
+      fields_updated: Object.keys(updates),
+      ...(status !== undefined && {
+        old_status: before?.status ?? null,
+        new_status: status,
+      }),
+      ...(score !== undefined && {
+        old_score: before?.score ?? null,
+        new_score: score,
+      }),
+    },
   })
 
   revalidatePath('/admin/leads')
