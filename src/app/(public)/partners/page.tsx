@@ -8,7 +8,7 @@ import { getLinkedin } from '@/lib/constants/linkedinMap'
 export const metadata: Metadata = {
   title: 'Red Internacional de Partners',
   description:
-    'Nuestra red global de colaboradores y agencias inmobiliarias en 11 países. Partner oficial de Nest Seekers International.',
+    'Red global de colaboradores y agencias inmobiliarias independientes en 11 países. Profesionales de primer nivel para operaciones de lujo internacional.',
   alternates: {
     canonical: '/partners',
   },
@@ -47,24 +47,6 @@ export default async function PartnersPage() {
           <p className="mt-4 text-white/60 max-w-2xl mx-auto text-sm">
             Trabajamos con profesionales de primer nivel en todo el mundo para ofrecer las mejores oportunidades inmobiliarias.
           </p>
-        </div>
-      </section>
-
-      {/* Nest Seekers banner */}
-      <section className="py-10 bg-muted/30 border-b border-border">
-        <div className="container-luxury">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 rounded-2xl bg-primary p-8">
-            <div>
-              <p className="text-xs tracking-widest text-gold uppercase mb-1">Partner oficial</p>
-              <h2 className="font-display text-2xl font-semibold text-white">Nest Seekers International</h2>
-              <p className="text-white/60 text-sm mt-2 max-w-xl">
-                Alianza estratégica con una de las agencias inmobiliarias de lujo más reconocidas del mundo. Acceso a portafolio exclusivo en más de 30 países.
-              </p>
-            </div>
-            <Link href="/sobre-nosotros" className={buttonVariants({ variant: 'gold', size: 'sm' })}>
-              Saber más
-            </Link>
-          </div>
         </div>
       </section>
 

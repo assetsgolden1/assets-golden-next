@@ -34,9 +34,9 @@ const STATIC_NEWS = [
     icon: Building2,
     date: '2026-02-28',
     category: 'Empresa',
-    title: 'Assets Golden refuerza su alianza estratégica con Nest Seekers International',
+    title: 'Assets Golden consolida su red de colaboradores con nuevas incorporaciones en Europa y Latinoamérica',
     content:
-      'La alianza amplía nuestra cartera de propiedades exclusivas a más de 30 países y consolida nuestra posición como referente en el inmobiliario de lujo internacional.',
+      'La expansión de nuestra red de partners independientes en 11 países refuerza nuestra capacidad para ofrecer oportunidades exclusivas en los mercados de lujo internacional.',
   },
   {
     id: 3,
