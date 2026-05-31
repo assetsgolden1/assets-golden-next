@@ -62,6 +62,50 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### Sesión 2026-05-31b — [FASE-4.H-P3] FIX G + FIX H — revalidate + form country obligatorio
+
+**Contexto:** Prevenir que vuelvan a entrar propiedades con country=null y que las nuevas se vean inmediato.
+
+**Trabajo hecho:**
+
+**T1 — FIX G: revalidatePropertyPaths helper**
+- Nuevo `src/lib/cache/revalidateProperties.ts` — `revalidatePropertyPaths()` invalida /, /propiedades, /destinos, /destinos/espana
+- Aplicado en: `create-property`, `update-property`, `sync-habihub` (solo !dryRun), `scrape-original`
+- `actions.ts`: todas las server actions de properties (toggle, delete, bulk, create) usan el helper
+- `updateFeaturedOrder` también invalida / (afecta home carousel)
+
+**T2 — FIX H: country obligatorio + normalización**
+- Nuevo `src/lib/utils/normalizeProperty.ts` — `normalizePropertyFields()`: country→trim, province→Title Case, location→normalizeLocation()
+- `create-property` y `update-property`: aplican normalizePropertyFields + rechazan 400 si country vacío
+- `nueva-propiedad/page.tsx`: campo País → `<select>` required con los 11 países activos
+- `propiedades/[id]/edit/page.tsx`: mismo dropdown con fallback para países fuera de lista
+- Validación client-side en handleSubmit de ambos formularios
+- `npx tsc --noEmit` y `npx next build` limpios ✓
+
+**Archivos creados:**
+- CREATED: `src/lib/cache/revalidateProperties.ts`
+- CREATED: `src/lib/utils/normalizeProperty.ts`
+
+**Archivos modificados:**
+- MODIFIED: `src/app/api/admin/create-property/route.ts`
+- MODIFIED: `src/app/api/admin/update-property/route.ts`
+- MODIFIED: `src/app/api/admin/sync-habihub/route.ts`
+- MODIFIED: `src/app/api/admin/scrape-original/route.ts`
+- MODIFIED: `src/app/admin/actions.ts`
+- MODIFIED: `src/app/admin/nueva-propiedad/page.tsx`
+- MODIFIED: `src/app/admin/propiedades/[id]/edit/page.tsx`
+- MODIFIED: `DAILY_LOG.md`
+
+**Commits:**
+- `2510756` — fix(cache): revalidatePropertyPaths helper
+- `d72406d` — fix(admin): country obligatorio + dropdown
+
+**Próximo paso sugerido:**
+- Sesión D: Auditar `src/scripts/scrapeOriginalWeb.ts` y `/api/admin/scrape-original` — confirmar si es el flujo que generó las 5 propiedades rotas con external_source='habihub' y country=null. Corregir normalización si es el caso.
+- Decisión pendiente Atilio: classification=NULL en 1.309 propiedades.
+
+---
+
 ### Sesión 2026-05-31 — [FASE-4.H-P1+P2] Diagnóstico y fix de catálogo inconsistente
 
 **Contexto:** Propiedades nuevas creadas en admin no aparecían en /destinos ni /propiedades, solo en /destacadas. También casing inconsistente en province/location.
