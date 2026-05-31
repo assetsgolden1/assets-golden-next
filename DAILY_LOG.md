@@ -62,6 +62,47 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### Sesión 2026-05-31f — [FASE-4.H-P5] Triggers SQL preventivos en properties
+
+**Contexto:** Blindar la tabla `properties` a nivel DB contra inserts/updates con country/province/location mal formateados, independientemente del origen (form, scraper, dashboard Supabase, SQL directo).
+
+**Trabajo hecho:**
+
+**PASO 1+2 — Migración `normalize_property_fields_trigger`:**
+- Función PL/pgSQL `normalize_property_fields()`:
+  - `country`: TRIM + vacío → NULL (casing preservado — "España", "Reino Unido")
+  - `province`: TRIM + INITCAP(LOWER()) — "BARCELONA" → "Barcelona"
+  - `location`: TRIM + INITCAP(LOWER()) — "SITGES" → "Sitges", vacío → NULL
+- Trigger `normalize_property_fields_trigger`: BEFORE INSERT OR UPDATE en `properties`, FOR EACH ROW
+- Migración aplicada vía Supabase MCP (versión en `supabase_migrations`)
+
+**PASO 3 — Smoke test (con ROLLBACK):**
+- INSERT con `'  España  '` / `'BARCELONA'` / `'SITGES'`
+- SELECT confirmó: `country='España'` / `province='Barcelona'` / `location='Sitges'` ✓
+- ROLLBACK limpio — sin datos de prueba en producción
+
+**PASO 4 — Edge cases verificados:**
+- `'Reino Unido'` → `'Reino Unido'` ✓
+- `'Emiratos Árabes Unidos'` → `'Emiratos Árabes Unidos'` ✓ (tildes respetadas)
+- `'LAS LAGUNAS DE MIJAS'` → `'Las Lagunas De Mijas'` ⚠️ ("De" capitalizada — aceptable, consistente)
+- `'BUENOS AIRES'` → `'Buenos Aires'` ✓
+- Espacios puros / vacío → NULL ✓
+
+**Cobertura total de la cadena H-P1→H-P5:**
+- H-P1: diagnóstico de propiedades rotas ✓
+- H-P2: normalización de las 4 propiedades existentes ✓
+- H-P3: form admin + revalidatePath + helper normalizePropertyFields ✓
+- H-P4: scrape-original normalizado + validación country ✓
+- H-P5: trigger DB — cobertura total independiente del origen ✓
+
+**Archivos tocados:** ninguno en el repo (migración aplicada directamente vía MCP)
+
+**Commits:** ninguno — solo entrada de log
+
+**Próximo paso sugerido:** FASE-4.H cerrada. Próxima prioridad: refactor pipeline leads (Resend — pendiente acceso Atilio) o páginas legales GDPR.
+
+---
+
 ### Sesión 2026-05-31e — [FASE-4.H-P4] Auditoría y normalización scrape-original
 
 **Contexto:** Blindar `/api/admin/scrape-original` contra la generación de propiedades con campos rotos (country=null, province en mayúsculas), análogo a lo hecho en H-P3 para el form admin.
