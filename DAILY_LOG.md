@@ -62,6 +62,63 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### Sesión 2026-05-31h — [FASE-2-P3] Sistema de priorización automática + carga leads Meta
+
+**Contexto:** Añadir columna "Prioridad" (J) al Sheet de seguimiento. Implementar función pura `categorizeLead` reutilizable para la sincronización automática futura. Los 7 leads ya cargados en sesión anterior (10 cols) quedan en filas A2:J8 con formato viejo — las nuevas 7 filas con 11 columnas se agregaron en A9:K15. Atilio debe limpiar las filas anteriores (A2:J8) manualmente.
+
+**Trabajo hecho:**
+
+**T1 — `src/lib/leads/prioritizeLead.ts` (NUEVO)**
+- `FREE_EMAIL_DOMAINS`: Set de ~20 dominios gratuitos (gmail, yahoo, hotmail, outlook, web.de, gmx, icloud...)
+- `COUNTRY_PHONE_PREFIXES`: mapa ISO 3166-1 → prefijo(s) (20 países: GB, DE, SE, DK, NO, PK, ES, FR, IT, NL, BE, AT, CH, US, CA, AU, AE, MX, AR, CO, BR)
+- `getBudgetLevel(presupuesto)`: convierte string de presupuesto a nivel numérico 1-5
+- `categorizeLead(lead)`: función pura → 'Alta' | 'Media' | 'Baja'
+  - REGLA 1 (Alta): timeline ≤3 meses, O budget ≥1M EUR, O email corporativo+timeline 3-6m
+  - REGLA 2 (Baja): purpose=Mix, O explorando+budget<500K, O inconsistencia país/teléfono, O free+Villa+budget≤500K
+  - REGLA 3 (Media): default
+- `getSpecialStateNotes(lead)`: "Validar por WhatsApp antes de llamar" si hay inconsistencia país/teléfono, null en otros casos
+
+**T2 — `src/lib/leads/prioritizeLead.test.ts` (NUEVO)**
+- 12 tests sin framework externo (tsx directo)
+- Un test por cada lead histórico (7 tests) + 2 tests getSpecialStateNotes + 3 tests edge cases
+- `npx tsx src/lib/leads/prioritizeLead.test.ts` → 12/12 ✅
+
+**T3 — `scripts/uploadMetaLeadsToSheet.ts` (ACTUALIZADO)**
+- Columnas A-K (11 cols): +Prioridad (J), Estado pasa a K
+- Import de `categorizeLead` y `getSpecialStateNotes`
+- Leads ordenados por fecha descendente
+- Tabla de verificación post-carga: prioridad asignada vs esperada
+- Ejecución: 7/7 filas agregadas, 7/7 prioridades correctas, 2.76s
+
+**Verificación de prioridades:**
+
+| Lead | Prioridad asignada | Prioridad esperada | Match |
+|------|---------------------|---------------------|-------|
+| Mary Larson Uhlin | Media | Media | ✅ |
+| Michael Johansen | Alta | Alta | ✅ |
+| Heather Meakin | Alta | Alta | ✅ |
+| Fabienne Richman | Media | Media | ✅ |
+| Beatrice Lenz | Baja | Baja | ✅ |
+| Saqlain Abbas | Baja | Baja | ✅ |
+| Andreas Langsch | Alta | Alta | ✅ |
+
+**Filas en Sheet:** A9:K15 (7 nuevas con 11 cols). Filas A2:J8 (sesión anterior, 10 cols) → Atilio las limpia manualmente.
+
+**Archivos creados/modificados:**
+- CREATED: `src/lib/leads/prioritizeLead.ts`
+- CREATED: `src/lib/leads/prioritizeLead.test.ts`
+- MODIFIED: `scripts/uploadMetaLeadsToSheet.ts`
+- MODIFIED: `DAILY_LOG.md`
+
+**Commits:** `7637fb1` — feat(leads): sistema de priorización automática + carga de leads históricos Meta
+
+**Próximo paso sugerido:**
+1. Atilio limpia filas A2:J8 del Sheet (formato viejo de 10 columnas de la sesión anterior)
+2. Atilio actualiza columna K (Estado) de Saqlain Abbas: debería tener "Validar por WhatsApp antes de llamar"
+3. FASE-2-P2: integrar `categorizeLead` en `src/lib/meta/leadParser.ts` cuando se desbloquee el System User Token
+
+---
+
 ### Sesión 2026-05-31g — [FASE-2-P3] Carga manual de 7 leads históricos de Meta al Sheet
 
 **Contexto:** 7 leads de la campaña Marbella-NewBuild-Leads-EN-v1 exportados manualmente desde Meta Lead Center. Se cargan al Sheet de seguimiento de Atilio mientras se desbloquea la conexión automática con Zapier / Meta API.
