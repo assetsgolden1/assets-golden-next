@@ -85,6 +85,8 @@ interface FeedProp {
   description_en: string | null
   image_url: string | null
   gallery_urls: string[]
+  habihub_dev_id: string | null
+  habihub_unit: string | null
 }
 
 interface ExistingProp {
@@ -165,6 +167,20 @@ function parseFeedProp(raw: Record<string, unknown>): FeedProp {
   const surfaceArea = raw.surface_area as Record<string, unknown> | undefined
   const deduped = dedupeImageUrls(images)
 
+  // Extraer dev_id y unit del tag <ref> (formato: "[dev_id]-[unit]")
+  const rawRef = String(raw.ref ?? '').trim()
+  let habihub_dev_id: string | null = null
+  let habihub_unit: string | null = null
+  if (rawRef.includes('-')) {
+    const dashIdx = rawRef.indexOf('-')
+    const dev = rawRef.substring(0, dashIdx)
+    const unit = rawRef.substring(dashIdx + 1)
+    if (/^\d+$/.test(dev)) {
+      habihub_dev_id = dev
+      habihub_unit = unit || null
+    }
+  }
+
   return {
     externalId: String(raw.id ?? '').trim(),
     title: town ? `${typeLabel} en ${town}` : typeLabel,
@@ -180,6 +196,8 @@ function parseFeedProp(raw: Record<string, unknown>): FeedProp {
     description_en: descEn,
     image_url: deduped[0] ?? null,
     gallery_urls: deduped,
+    habihub_dev_id,
+    habihub_unit,
   }
 }
 
@@ -434,6 +452,8 @@ export async function POST(request: NextRequest) {
             status: 'active',
             featured: false,
             is_development: true,
+            habihub_dev_id: fp.habihub_dev_id,
+            habihub_unit: fp.habihub_unit,
             last_synced_at: new Date().toISOString(),
           })
         } else {
@@ -450,6 +470,8 @@ export async function POST(request: NextRequest) {
               province: fp.province,
               description: fp.description,
               description_en: fp.description_en,
+              habihub_dev_id: fp.habihub_dev_id,
+              habihub_unit: fp.habihub_unit,
               // Defensiva: solo actualizar imágenes si el feed parseó valores válidos.
               // Evita destruir fotos existentes si un futuro cambio del feed rompe el extractor.
               ...(fp.image_url ? { image_url: fp.image_url } : {}),

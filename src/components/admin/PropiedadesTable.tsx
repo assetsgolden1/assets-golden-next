@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Copy } from 'lucide-react'
+import { toast } from 'sonner'
 import { bulkHideProperties, bulkDeleteProperties, bulkMarkAsSold } from '@/app/admin/actions'
 import { translatePropertyType } from '@/lib/propertyTypes'
 import { FeaturedToggleButton } from './FeaturedToggleButton'
@@ -24,6 +25,7 @@ export interface PropertyRow {
   slug: string | null
   ref_code: string | null
   external_id: string | null
+  habihub_dev_id: string | null
 }
 
 export function PropiedadesTable({
@@ -358,9 +360,24 @@ export function PropiedadesTable({
                       <span className="font-mono text-xs text-gray-500">{prop.ref_code ?? '—'}</span>
                     </td>
                     <td className="px-4 py-2">
-                      {prop.external_id
-                        ? <span className="font-mono text-xs bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">{prop.external_id}</span>
-                        : <span className="text-xs text-gray-300">—</span>}
+                      {prop.habihub_dev_id ? (
+                        <div className="flex items-center gap-1">
+                          <span className="font-mono text-xs text-gray-400">{prop.habihub_dev_id}</span>
+                          <button
+                            type="button"
+                            title="Pegar en buscador de HabiHub para encontrar el development"
+                            onClick={() => {
+                              navigator.clipboard.writeText(prop.habihub_dev_id!)
+                              toast.success(`Copiado: ${prop.habihub_dev_id}`)
+                            }}
+                            className="p-0.5 text-gray-300 hover:text-blue-500 transition-colors"
+                          >
+                            <Copy size={13} />
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-300">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-2 text-gray-600">
                       <span>{prop.country ?? '—'}</span>

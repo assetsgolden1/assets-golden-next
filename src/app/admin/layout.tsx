@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getUserRole } from '@/lib/auth/getUserRole'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import { Toaster } from 'sonner'
 
 const URGENT_MS = 24 * 60 * 60 * 1000
 
@@ -38,6 +39,7 @@ export default async function AdminLayout({
       <main className="flex-1 overflow-auto">
         {children}
       </main>
+      <Toaster position="bottom-right" richColors />
     </div>
   )
 }
