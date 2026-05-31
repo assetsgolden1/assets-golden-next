@@ -62,6 +62,24 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### Sesión 2026-05-31c — [FASE-4.H-P4] Auditoría scrape-original — sesión de diagnóstico, sin cambios
+
+**Contexto:** Verificar si /api/admin/scrape-original era el origen de las 4 propiedades rotas (country=null, province=BARCELONA, external_source='habihub').
+
+**Hallazgos:**
+
+- `scrapeOriginalWeb.ts` scrapes 9 URLs hardcodeadas de la web antigua Lovable (Indonesia/Paraguay). `external_source` = `'scraper-lovable'` (correcto). Province no se setea. Country nunca es null (default 'Indonesia'). `revalidatePropertyPaths()` ya presente desde H-P3.
+- `rescrapeDetails.ts` y `rescrapeRetry.ts` solo hacen UPDATEs de precio/descripción. No insertan propiedades nuevas, no tocan country/province.
+- **Veredicto: scrape-original NO es el origen de AG-04484/85/86/4385.**
+
+**Origen real identificado:** inserciones directas en el dashboard de Supabase con external_source='habihub' puesto manualmente, province='BARCELONA' (copiado de fuente externa), country=NULL (campo no completado). Las 4 propiedades ya fueron normalizadas en H-P2.
+
+**Código tocado:** ninguno. Sesión de solo lectura.
+
+**Próximo paso sugerido:** cerrar la FASE-4.H. La cadena de fixes H-P1→H-P4 está completa. Próxima prioridad: refactor pipeline leads (Resend — pendiente acceso Atilio) o páginas legales GDPR.
+
+---
+
 ### Sesión 2026-05-31b — [FASE-4.H-P3] FIX G + FIX H — revalidate + form country obligatorio
 
 **Contexto:** Prevenir que vuelvan a entrar propiedades con country=null y que las nuevas se vean inmediato.
