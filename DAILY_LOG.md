@@ -62,6 +62,84 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### Sesión 2026-05-31d — [FASE-2-P2] Sincronización automática Meta Lead Ads → Google Sheets
+
+**Contexto:** Campaña Marbella-NewBuild-Leads-EN-v1 activa. Leads quedan en Meta y hay que descargarlos manualmente. Implementar pipeline automático completo: pull desde Meta Graph API → parse → append al Google Sheet dedicado, con cron cada 15 min y deduplicación.
+
+**Trabajo hecho:**
+
+**T1 — `src/lib/meta/leadsApi.ts` (NUEVO)**
+- `fetchLeadsFromMeta(formId, sinceTimestamp)`: GET a `/{form_id}/leads` con paginación via `paging.next`
+- Graph API v19.0, fields: `id,created_time,ad_id,ad_name,field_data`
+- Timeout 15s por request, manejo de error con texto de respuesta incluido
+
+**T2 — `src/lib/meta/leadParser.ts` (NUEVO)**
+- `parseMetaLead(raw)`: convierte `field_data` (array `{name, values}`) al formato del Sheet
+- Mapea: `full_name/first_name/name` → nombre, `email`, `phone_number/phone` → teléfono
+- Mapea preguntas custom: "Type of property", "Budget", "Timeline", "Purpose" (case-insensitive)
+- `extractVariant(adName)`: deduce variante A/B/C desde el nombre del anuncio via regex
+
+**T3 — `src/lib/meta/syncTracker.ts` (NUEVO)**
+- `getLastSyncedTimestamp(formId)`: query en `meta_sync_log` → último sync exitoso. Fallback: 30 días atrás (primer run importa histórico)
+- `recordSync(formId, leadsCount, status, details?)`: inserta fila en `meta_sync_log`
+
+**T4 — `src/app/api/leads/sync-meta/route.ts` (NUEVO)**
+- GET endpoint protegido con `Authorization: Bearer {CRON_SECRET}`
+- Flujo completo: getLastSyncedTimestamp → fetchLeadsFromMeta → parseMetaLead → appendLeadToMetaSheet → recordSync
+- Manejo de errores por-lead (no aborta el batch si falla 1)
+- Devuelve `{ ok, leadsFound, leadsProcessed, errors }`
+
+**T5 — `src/lib/googleSheets.ts` (MODIFICADO)**
+- Nueva función `appendLeadToMetaSheet(lead, spreadsheetId)`: 10 columnas A:J
+  Fecha | Nombre | Email | Teléfono | Tipo propiedad | Presupuesto | Timeline | Purpose | Variante | Estado
+- A diferencia de `appendLeadToSheets`, lanza error (no lo traga) para que el sync route cuente fallos correctamente
+
+**T6 — `vercel.json` (MODIFICADO)**
+- Añadido `crons: [{ path: "/api/leads/sync-meta", schedule: "*/15 * * * *" }]`
+
+**T7 — Migración Supabase (`create_meta_sync_log`)**
+- Tabla `meta_sync_log`: id, form_id, last_synced_at, leads_count, status, details, created_at
+- Índices en form_id y status
+
+**T8 — `.env.local` (MODIFICADO)**
+- Añadidos placeholders vacíos: META_SYSTEM_USER_TOKEN, META_LEAD_FORM_ID, META_LEADS_SHEET_ID, CRON_SECRET
+
+**T9 — `docs/meta-leads-sync.md` (NUEVO)**
+- Guía completa: estructura Sheet, cómo regenerar token, cambiar form_id/sheet_id, sync manual, deduplicación, diagnóstico
+
+**TypeScript:** `npx tsc --noEmit` limpio ✓
+
+**Variables de entorno pendientes de cargar en Vercel (SIN ángulos):**
+- `META_SYSTEM_USER_TOKEN` → Sensitive
+- `META_LEAD_FORM_ID`
+- `META_LEADS_SHEET_ID`
+- `CRON_SECRET`
+
+**Archivos creados:**
+- CREATED: `src/lib/meta/leadsApi.ts`
+- CREATED: `src/lib/meta/leadParser.ts`
+- CREATED: `src/lib/meta/syncTracker.ts`
+- CREATED: `src/app/api/leads/sync-meta/route.ts`
+- CREATED: `docs/meta-leads-sync.md`
+
+**Archivos modificados:**
+- MODIFIED: `src/lib/googleSheets.ts`
+- MODIFIED: `vercel.json`
+- MODIFIED: `.env.local`
+- MODIFIED: `DAILY_LOG.md`
+- DB MIGRATION: `create_meta_sync_log`
+
+**Commits:** `a847efd` — feat(leads): sincronización automática Meta Lead Ads → Google Sheets
+
+**Próximo paso sugerido:**
+1. Cargar las 4 variables nuevas en Vercel (token, form_id, sheet_id, cron_secret) — sin ángulos
+2. Redeploy en Vercel (automático tras el push)
+3. Sync manual de los 6 leads históricos: `curl -X GET https://assets-golden-next.vercel.app/api/leads/sync-meta -H "Authorization: Bearer {CRON_SECRET}"`
+4. Verificar que aparecen las 6 filas en el Sheet dedicado
+5. Verificar cron en Vercel Logs → Functions cada 15 min
+
+---
+
 ### Sesión 2026-05-31c — [FASE-4.H-P4] Auditoría scrape-original — sesión de diagnóstico, sin cambios
 
 **Contexto:** Verificar si /api/admin/scrape-original era el origen de las 4 propiedades rotas (country=null, province=BARCELONA, external_source='habihub').
