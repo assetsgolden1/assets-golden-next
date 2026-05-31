@@ -5,6 +5,21 @@ import { useRouter } from 'next/navigation'
 import { propertyTypeMap } from '@/lib/propertyTypes'
 
 const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF']
+
+const COUNTRIES = [
+  'Argentina',
+  'Costa Rica',
+  'Ecuador',
+  'Emiratos Árabes Unidos',
+  'España',
+  'Estados Unidos',
+  'Grecia',
+  'Indonesia',
+  'México',
+  'Paraguay',
+  'Reino Unido',
+]
+
 const CLASSIFICATIONS = [
   { value: '', label: 'Normal' },
   { value: 'promotion', label: 'Promoción' },
@@ -82,6 +97,11 @@ export default function NuevaPropiedadPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    if (!country) {
+      setErrorMsg("El campo 'país' es obligatorio")
+      setStatus('error')
+      return
+    }
     setStatus('loading')
     setErrorMsg('')
 
@@ -308,13 +328,18 @@ export default function NuevaPropiedadPage() {
           <h2 className="font-semibold text-gray-800 mb-4">Ubicación</h2>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">País</label>
-              <input
+              <label className="block text-xs font-medium text-gray-600 mb-1">País *</label>
+              <select
+                required
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
-                className={INPUT_CLS}
-                placeholder="España"
-              />
+                className={`${INPUT_CLS} bg-white`}
+              >
+                <option value="" disabled>Seleccionar país</option>
+                {COUNTRIES.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Provincia</label>
