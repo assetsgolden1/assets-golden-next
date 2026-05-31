@@ -62,6 +62,38 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### Sesión 2026-05-31g — [FASE-4.I-P2] Capturar dev_id HabiHub + UI copiar
+
+**Contexto:** El XML feed trae `<ref>` con `[dev_id]-[unit_num]` que el sync ignoraba. Atilio confirma que pegando el dev_id en HabiHub encuentra el development. Objetivo: guardar esos campos en DB, repoblar propiedades existentes y añadir botón "Copiar" en el admin.
+
+**T1 — Migración DB:** `habihub_dev_id TEXT`, `habihub_unit TEXT`, índice en `habihub_dev_id`. Backup previo: `properties_i_p2_backup` (2.277 filas).
+
+**T2 — sync-habihub/route.ts:** `parseFeedProp()` extrae `<ref>`, split por guión, popula `habihub_dev_id`/`habihub_unit` en INSERT y UPDATE por fingerprint.
+
+**T3 — scripts/repopulateHabihubDevIds.ts (NUEVO):** Dry-run: 2.152 matches, 125 sin match. Run real: 2.152 actualizadas, 0 errores, 897 developments únicos en DB.
+
+**T4 — UI /admin/propiedades:** Celda "Cód. HabiHub" reemplazada: muestra `habihub_dev_id` (gris, mono) + botón `<Copy>` (lucide) que copia al clipboard y dispara `toast.success`. `<Toaster>` de sonner añadido al admin layout.
+
+**T5 — Smoke test:** `npx tsc --noEmit` ✓ — `npx next build` ✓ — `git status` sin cambios sin stagear ✓
+
+**Cómo revertir:**
+```sql
+ALTER TABLE properties DROP COLUMN habihub_dev_id, DROP COLUMN habihub_unit;
+-- O restaurar desde properties_i_p2_backup si es necesario
+```
+
+**Archivos creados:** `scripts/repopulateHabihubDevIds.ts`
+
+**Archivos modificados:** `sync-habihub/route.ts`, `admin/layout.tsx`, `propiedades/page.tsx`, `PropiedadesTable.tsx`
+
+**DB:** migración `add_habihub_dev_id_unit_columns` + 2.152 UPDATEs + backup `properties_i_p2_backup`
+
+**Commits:** `5368aca` — feat(habihub): capturar dev_id + UI copiar en /admin/propiedades
+
+**Próximo paso sugerido:** Atilio prueba el workflow: copiar dev_id desde `/admin/propiedades` → pegar en HabiHub. Si quiere buscar todas las unidades de un development desde el admin, implementar I-P3 (búsqueda por `habihub_dev_id`).
+
+---
+
 ### Sesión 2026-05-31h — [FASE-2-P3] Sistema de priorización automática + carga leads Meta
 
 **Contexto:** Añadir columna "Prioridad" (J) al Sheet de seguimiento. Implementar función pura `categorizeLead` reutilizable para la sincronización automática futura. Los 7 leads ya cargados en sesión anterior (10 cols) quedan en filas A2:J8 con formato viejo — las nuevas 7 filas con 11 columnas se agregaron en A9:K15. Atilio debe limpiar las filas anteriores (A2:J8) manualmente.
