@@ -62,6 +62,46 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### Sesión 2026-05-31g — [FASE-2-P3] Carga manual de 7 leads históricos de Meta al Sheet
+
+**Contexto:** 7 leads de la campaña Marbella-NewBuild-Leads-EN-v1 exportados manualmente desde Meta Lead Center. Se cargan al Sheet de seguimiento de Atilio mientras se desbloquea la conexión automática con Zapier / Meta API.
+
+**Trabajo hecho:**
+
+- **T1 — Script `scripts/uploadMetaLeadsToSheet.ts` (NUEVO):**
+  - Pre-flight: detecta nombre de pestaña automáticamente (prueba "Hoja 1" y "Sheet1")
+  - Autenticación via `GOOGLE_SHEETS_CREDENTIALS_JSON` (service account)
+  - Batch append de 7 leads en `'Hoja 1'!A:J` (10 columnas)
+  - Logs individuales con prioridad y rango devuelto por la API
+  - Resumen final: filas agregadas, tiempo, errores
+
+- **T2 — Ejecución exitosa:**
+  - 7/7 filas agregadas sin errores
+  - Tiempo total: 2.85s
+  - Filas A2:J2 → A8:J8 (pestaña "Hoja 1" detectada correctamente)
+  - Sheet: https://docs.google.com/spreadsheets/d/1Q_PRvDe45XxRoB43JZGWVJyJli8Cqf0G2Ry8vJcvZcA/edit
+
+**Leads cargados (en orden de prioridad):**
+1. Heather Meakin — heathermeakin@thedentalbrokers.co.uk — Villa — 500K-1M EUR — En 3 meses
+2. Andreas Langsch — a.langsch@avr-gruppe.de — Penthouse — 1M-2M EUR — Solo explorando
+3. Michael Johansen — Michael@flexto.dk — Apartamento — 300K-500K EUR — 3-6 meses
+4. Mary Larson Uhlin — marylarsonuhlin@gmail.com — Cualquier tipo — 300K-500K EUR — 3-6 meses
+5. Fabienne Richman — fabiener@gmail.com — Apartamento — 500K-1M EUR — 3-6 meses
+6. Beatrice Lenz — Beatricelenz@web.de — Villa — 300K-500K EUR — 3-6 meses
+7. Saqlain Abbas — saqlainabbaspk834@gmail.com — Townhouse — 300K-500K EUR — Solo explorando ⚠️ Validar: email PK, teléfono ES
+
+**Archivos creados:**
+- CREATED: `scripts/uploadMetaLeadsToSheet.ts`
+- MODIFIED: `DAILY_LOG.md`
+
+**Commits:** `098a95b` — feat(leads): script one-shot para carga manual de leads históricos de Meta
+
+**Próximo paso sugerido:**
+1. Atilio verifica las 7 filas en el Sheet y actualiza la columna J (Estado) según contacto
+2. FASE-2-P2: cuando se desbloquee el System User Token de Meta, activar la sincronización automática (variables ya cargadas en `.env.local`): META_SYSTEM_USER_TOKEN, META_LEAD_FORM_ID, META_LEADS_SHEET_ID, CRON_SECRET
+
+---
+
 ### Sesión 2026-05-31f — [FASE-4.H-P5] Triggers SQL preventivos en properties
 
 **Contexto:** Blindar la tabla `properties` a nivel DB contra inserts/updates con country/province/location mal formateados, independientemente del origen (form, scraper, dashboard Supabase, SQL directo).
