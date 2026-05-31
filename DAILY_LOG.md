@@ -62,6 +62,41 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### Sesión 2026-05-31i — [FASE-4.J-P1] Destacar 4 propiedades Marbella en /destacadas
+
+**Contexto:** Ivan necesita marcar como featured=true las 4 propiedades del carrusel Marbella activas en ads de Meta para que aparezcan al inicio de /destacadas.
+
+**T1 — Estado pre-update:**
+- AG-03897: Ático en Marbella, 495.000€, active, hidden=false, sold=false, featured=false ✓
+- AG-04193: Apartamento en Marbella, 509.000€, active, hidden=false, sold=false, featured=false ✓
+- AG-00344: Ático en Marbella, 558.000€, active, hidden=false, sold=false, featured=false ✓
+- AG-04085: Apartamento en Marbella, 645.000€, active, hidden=false, sold=false, featured=false ✓
+- featured existentes antes del cambio: 34 (todas con featured_order=0)
+
+**T2 — UPDATE aplicado:**
+- Fórmula: `ROW_NUMBER() + MIN(featured_order) - 1 - 4` → asigna -4, -3, -2, -1
+- Las 4 nuevas quedan ANTES de las 34 existentes (order ASC)
+
+**T3 — Verificación post-update:**
+| ref_code | featured_order | posición |
+|---|---|---|
+| AG-03897 | -4 | 1° |
+| AG-04193 | -3 | 2° |
+| AG-00344 | -2 | 3° |
+| AG-04085 | -1 | 4° |
+- Total featured: 34 → **38** ✓
+- featured_order de las 34 existentes: intacto (todas en 0)
+
+**T4 — Cache:** Commit vacío `9616c64` pusheado → redeploy Vercel forzado → purga cache /destacadas y home carousel.
+
+**Archivos tocados:** ninguno (solo SQL + commit vacío)
+
+**Commits:** `9616c64` — chore: trigger redeploy — featured 4 Marbella
+
+**Próximo paso sugerido:** Ivan verifica `/destacadas` tras ~3 min de deploy. Las 4 propiedades Marbella deben aparecer primeras. Confirmar que el carrusel home también las muestra.
+
+---
+
 ### Sesión 2026-05-31g — [FASE-4.I-P2] Capturar dev_id HabiHub + UI copiar
 
 **Contexto:** El XML feed trae `<ref>` con `[dev_id]-[unit_num]` que el sync ignoraba. Atilio confirma que pegando el dev_id en HabiHub encuentra el development. Objetivo: guardar esos campos en DB, repoblar propiedades existentes y añadir botón "Copiar" en el admin.
