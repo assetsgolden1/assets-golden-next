@@ -62,6 +62,49 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### Sesión 2026-05-31e — [FASE-4.H-P4] Auditoría y normalización scrape-original
+
+**Contexto:** Blindar `/api/admin/scrape-original` contra la generación de propiedades con campos rotos (country=null, province en mayúsculas), análogo a lo hecho en H-P3 para el form admin.
+
+**T1 — Hallazgos auditoría:**
+- `scrapeOriginalWeb.ts` scrape Puppeteer de 9 URLs hardcodeadas en `assetsgolden.com/property/[uuid]` (web vieja Lovable, SPA, espera 6s)
+- `external_source` siempre fue `'scraper-lovable'` en todas las versiones del histórico git ✓
+- `revalidatePropertyPaths()` ya presente en `route.ts` desde H-P3 ✓
+- Issue real: `countryHint='Bali'` se insertaba tal cual (Bali es región, no país). `location=''` en lugar de null.
+- `province` no se setea (queda NULL — correcto)
+- `normalizePropertyFields` no era llamado
+
+**T2 — Origen propiedades rotas:**
+- Confirmado: scrape-original NO es el origen de AG-04484/85/86/4385
+- `external_source='habihub'` y `province='BARCELONA'` contradicen el flujo del scraper (que apunta a Indonesia/Paraguay)
+- Origen ya documentado en sesión 31c: inserciones manuales desde dashboard Supabase
+
+**T3 — Fixes aplicados en `src/scripts/scrapeOriginalWeb.ts`:**
+- Import `normalizePropertyFields` desde `@/lib/utils/normalizeProperty`
+- Map `'Bali'` → `'Indonesia'` antes de normalizar (Bali = región, no país)
+- `normalizePropertyFields({ country, location })` antes del INSERT
+- Rechazo explícito (skip + error log) si country queda vacío tras normalización
+- `location: normalized.location ?? null` (elimina string vacío)
+
+**T4:** No se tocaron datos existentes ✓
+
+**T5 — Smoke test:**
+- `npx tsc --noEmit` limpio ✓
+- `npx next build` limpio ✓
+- `git status` sin archivos sin stagear ✓
+
+**Archivos modificados:**
+- MODIFIED: `src/scripts/scrapeOriginalWeb.ts`
+- MODIFIED: `DAILY_LOG.md`
+
+**Commits:** `8560c45` — fix(scrape-original): normalizar campos + validar country obligatorio
+
+**Deploy URL:** https://assets-golden-next.vercel.app (deploy automático tras push a main)
+
+**Próximo paso sugerido:** Cadena FASE-4.H completa (H-P1→H-P4). Próxima prioridad: refactor pipeline leads (Resend — pendiente acceso Atilio) o páginas legales GDPR.
+
+---
+
 ### Sesión 2026-05-31d — [FASE-2-P2] Sincronización automática Meta Lead Ads → Google Sheets
 
 **Contexto:** Campaña Marbella-NewBuild-Leads-EN-v1 activa. Leads quedan en Meta y hay que descargarlos manualmente. Implementar pipeline automático completo: pull desde Meta Graph API → parse → append al Google Sheet dedicado, con cron cada 15 min y deduplicación.
