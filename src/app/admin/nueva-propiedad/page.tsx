@@ -3,6 +3,22 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { propertyTypeMap } from '@/lib/propertyTypes'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable'
+import { SortableImage } from '@/components/admin/SortableImage'
 
 const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF']
 
@@ -35,8 +51,7 @@ export default function NuevaPropiedadPage() {
   const formRef = useRef<HTMLFormElement>(null)
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
-  const [galleryFiles, setGalleryFiles] = useState<File[]>([])
-  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([])
+  const [galleryItems, setGalleryItems] = useState<{ file: File; preview: string }[]>([])
   const [isDev, setIsDev] = useState(false)
   const [isFeatured, setIsFeatured] = useState(false)
   const [classification, setClassification] = useState('')
@@ -63,32 +78,40 @@ export default function NuevaPropiedadPage() {
       })
   }, [country])
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    setGalleryItems((items) => {
+      const oldIndex = items.findIndex((x) => x.preview === active.id)
+      const newIndex = items.findIndex((x) => x.preview === over.id)
+      return arrayMove(items, oldIndex, newIndex)
+    })
+  }
+
   function handleFilesChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = Array.from(e.target.files ?? [])
-    if (galleryFiles.length + selected.length > MAX_PHOTOS) {
-      alert(`Máximo ${MAX_PHOTOS} fotos. Ya tenés ${galleryFiles.length}, intentás agregar ${selected.length}.`)
+    if (galleryItems.length + selected.length > MAX_PHOTOS) {
+      alert(`Máximo ${MAX_PHOTOS} fotos. Ya tenés ${galleryItems.length}, intentás agregar ${selected.length}.`)
       e.target.value = ''
       return
     }
-    const previews = selected.map((f) => URL.createObjectURL(f))
-    setGalleryFiles((prev) => [...prev, ...selected])
-    setGalleryPreviews((prev) => [...prev, ...previews])
+    const newItems = selected.map((file) => ({ file, preview: URL.createObjectURL(file) }))
+    setGalleryItems((prev) => [...prev, ...newItems])
     e.target.value = ''
   }
 
   function removePhoto(i: number) {
-    URL.revokeObjectURL(galleryPreviews[i])
-    setGalleryFiles((prev) => prev.filter((_, idx) => idx !== i))
-    setGalleryPreviews((prev) => prev.filter((_, idx) => idx !== i))
+    URL.revokeObjectURL(galleryItems[i].preview)
+    setGalleryItems((prev) => prev.filter((_, idx) => idx !== i))
   }
 
   function makeMain(i: number) {
-    setGalleryFiles((prev) => {
-      const next = [...prev]
-      const [item] = next.splice(i, 1)
-      return [item, ...next]
-    })
-    setGalleryPreviews((prev) => {
+    setGalleryItems((prev) => {
       const next = [...prev]
       const [item] = next.splice(i, 1)
       return [item, ...next]
@@ -111,7 +134,7 @@ export default function NuevaPropiedadPage() {
 
       // Subir fotos secuencialmente
       const uploadedUrls: string[] = []
-      for (const file of galleryFiles) {
+      for (const { file } of galleryItems) {
         const fd = new FormData()
         fd.append('file', file)
         const uploadRes = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
@@ -182,61 +205,29 @@ export default function NuevaPropiedadPage() {
           <p className="text-xs text-gray-400 mb-4">
             La primera foto será la imagen principal. Máximo {MAX_PHOTOS} fotos.
           </p>
-          {galleryPreviews.length > 0 && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 12 }}>
-              {galleryPreviews.map((src, i) => (
-                <div key={i} style={{ position: 'relative' }}>
-                  <img
-                    src={src}
-                    alt={`Foto ${i + 1}`}
-                    style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: 6 }}
-                  />
-                  {i === 0 && (
-                    <span style={{
-                      position: 'absolute', top: 4, left: 4,
-                      backgroundColor: '#D4AF37', color: '#131D2E',
-                      fontSize: 10, fontWeight: 700,
-                      padding: '2px 6px', borderRadius: 4,
-                    }}>
-                      Principal
-                    </span>
-                  )}
-                  {i !== 0 && (
-                    <button
-                      type="button"
-                      onClick={() => makeMain(i)}
-                      title="Hacer principal"
-                      style={{
-                        position: 'absolute', bottom: 4, left: 4,
-                        backgroundColor: '#D4AF37', color: '#131D2E',
-                        border: 'none', borderRadius: 4,
-                        fontSize: 10, fontWeight: 700,
-                        padding: '2px 5px', cursor: 'pointer',
-                      }}
-                    >
-                      ⭐ Principal
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => removePhoto(i)}
-                    style={{
-                      position: 'absolute', top: 4, right: 4,
-                      backgroundColor: '#dc2626', color: 'white',
-                      border: 'none', borderRadius: '50%',
-                      width: 20, height: 20, fontSize: 14,
-                      cursor: 'pointer', display: 'flex',
-                      alignItems: 'center', justifyContent: 'center',
-                      padding: 0, lineHeight: 1,
-                    }}
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
+          {galleryItems.length > 0 && (
+            <div>
+              <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 4 }}>
+                {galleryItems.length}/{MAX_PHOTOS} fotos — arrastrá para reordenar
+              </p>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={galleryItems.map((x) => x.preview)} strategy={rectSortingStrategy}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 12 }}>
+                    {galleryItems.map(({ preview }, i) => (
+                      <SortableImage
+                        key={preview}
+                        url={preview}
+                        index={i}
+                        onRemove={() => removePhoto(i)}
+                        onMakeMain={() => makeMain(i)}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </div>
           )}
-          {galleryFiles.length < MAX_PHOTOS ? (
+          {galleryItems.length < MAX_PHOTOS ? (
             <>
               <input
                 type="file"
@@ -247,8 +238,8 @@ export default function NuevaPropiedadPage() {
               />
               <p className="text-xs text-gray-400 mt-1.5">
                 JPG, PNG, WebP.{' '}
-                {galleryFiles.length > 0
-                  ? `${galleryFiles.length}/${MAX_PHOTOS} fotos seleccionadas.`
+                {galleryItems.length > 0
+                  ? `${galleryItems.length}/${MAX_PHOTOS} fotos seleccionadas.`
                   : `Podés seleccionar hasta ${MAX_PHOTOS} fotos.`}
               </p>
             </>
