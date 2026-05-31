@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { normalizePropertyFields } from '@/lib/utils/normalizeProperty'
 
 const PROPERTY_URLS = [
   'https://assetsgolden.com/property/0a2533a5-f8b0-4f33-a84b-f62abfa9515a',
@@ -166,6 +167,19 @@ async function importToSupabase(
 
   for (const prop of properties) {
     try {
+      // Bali es región de Indonesia, no país independiente
+      const countryRaw = prop.country === 'Bali' ? 'Indonesia' : prop.country
+      const normalized = normalizePropertyFields({
+        country: countryRaw,
+        location: prop.location || null,
+      })
+
+      if (!normalized.country) {
+        console.error(`✗ ${prop.title}: country vacío tras normalización — propiedad omitida`)
+        errors++
+        continue
+      }
+
       const slug = prop.title
         .toLowerCase()
         .normalize('NFD')
@@ -181,8 +195,8 @@ async function importToSupabase(
           slug: `${slug}-${Date.now()}`,
           price: prop.price,
           currency: prop.currency,
-          location: prop.location,
-          country: prop.country,
+          location: normalized.location ?? null,
+          country: normalized.country,
           description: prop.description,
           bedrooms: prop.bedrooms,
           bathrooms: prop.bathrooms,
