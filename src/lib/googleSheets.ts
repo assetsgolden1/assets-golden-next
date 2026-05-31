@@ -1,5 +1,56 @@
 import { google } from 'googleapis'
 
+// Columns for the Meta Leads sheet (10 columns, A:J)
+interface MetaLead {
+  fecha: string
+  nombre: string
+  email: string
+  telefono: string
+  tipo_propiedad: string
+  presupuesto: string
+  timeline: string
+  purpose: string
+  variante: string
+  estado: string
+}
+
+export async function appendLeadToMetaSheet(lead: MetaLead, spreadsheetId: string) {
+  const credentialsJson = process.env.GOOGLE_SHEETS_CREDENTIALS_JSON
+  if (!credentialsJson || !spreadsheetId) {
+    throw new Error('[Sheets-Meta] GOOGLE_SHEETS_CREDENTIALS_JSON o spreadsheetId no configurados')
+  }
+
+  const credentials = JSON.parse(credentialsJson)
+  const auth = new google.auth.GoogleAuth({
+    credentials,
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  })
+
+  const sheets = google.sheets({ version: 'v4', auth })
+
+  const result = await sheets.spreadsheets.values.append({
+    spreadsheetId,
+    range: "'Hoja 1'!A:J",
+    valueInputOption: 'USER_ENTERED',
+    requestBody: {
+      values: [[
+        lead.fecha,
+        lead.nombre,
+        lead.email,
+        lead.telefono,
+        lead.tipo_propiedad,
+        lead.presupuesto,
+        lead.timeline,
+        lead.purpose,
+        lead.variante,
+        lead.estado,
+      ]],
+    },
+  })
+
+  console.log('[Sheets-Meta] Lead añadido:', lead.email, '— updatedRange:', result.data.updates?.updatedRange)
+}
+
 export async function appendLeadToSheets(lead: {
   name: string
   email: string
