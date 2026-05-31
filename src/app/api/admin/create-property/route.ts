@@ -103,13 +103,12 @@ export async function POST(request: NextRequest) {
       await supabaseAdmin.from('country_destinations').insert({
         country_name: normalized.country,
         slug: countrySlug,
-        description: `Propiedades en ${country}`,
+        description: `Propiedades en ${normalized.country}`,
         active: true,
       })
     }
   }
 
-  revalidatePath('/admin/propiedades')
   revalidatePropertyPaths()
   return NextResponse.json({ success: true, slug })
 }
