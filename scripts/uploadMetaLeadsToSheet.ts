@@ -137,6 +137,14 @@ async function main() {
   }
   console.log(`   ✅ Pestaña activa: "${activeTab}"`)
 
+  // ─── LIMPIAR DATOS ANTERIORES (evitar duplicados) ─────────────────────────
+  console.log('\n🧹 Limpiando filas anteriores...')
+  await sheets.spreadsheets.values.clear({
+    spreadsheetId: SHEET_ID,
+    range: `'${activeTab}'!A2:K1000`,
+  })
+  console.log('   ✅ Datos anteriores eliminados')
+
   // ─── BATCH APPEND ─────────────────────────────────────────────────────────
   console.log(`\n📋 Cargando ${LEADS.length} leads (ordenados por fecha desc)...\n`)
   console.log('   #  Nombre                   Prioridad  Rango')
