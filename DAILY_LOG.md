@@ -59,8 +59,141 @@ reordena si la prioridad cambió.
 ## 📝 Historial de sesiones
 
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
+
+---
+
+### Sesión 2026-05-31 — [FASE-4.H-P1+P2] Diagnóstico y fix de catálogo inconsistente
+
+**Contexto:** Propiedades nuevas creadas en admin no aparecían en /destinos ni /propiedades, solo en /destacadas. También casing inconsistente en province/location.
+
+**Trabajo hecho:**
+
+- **H-P1 (diagnóstico puro):** Mapeadas 6 rutas públicas, 3 queries centralizadas, 1 formulario admin, sync HabiHub, script syncDestinations. 6 queries SQL de auditoría ejecutadas. Diagnóstico completo en reporte estructurado de sesión.
+
+- **Causa raíz identificada:** Propiedades con `country=NULL` o `country=''` excluidas por filtros ILIKE en todas las rutas de destino/país. Solo aparecían en `/destacadas` porque `getFeaturedProperties()` no filtra por country.
+
+- **Causa raíz origen:** Flujo de importación manual (probablemente scrape-original) que inserta propiedades con `external_source='habihub'` pero sin normalizar country/province, dejando country null/vacío y province en mayúsculas.
+
+- **H-P2 (fix datos):** Todos los fixes aplicados via SQL. NO se tocó código.
+
+**Propiedades corregidas (5 total):**
+
+| ref_code | Fix aplicado |
+|---|---|
+| AG-04486 | country NULL→España, province BARCELONA→Barcelona |
+| AG-04485 | country ''→España, province BARCELONA→Barcelona, classification ''→normal |
+| AG-04484 | country ''→España, province BARCELONA→Barcelona, classification ''→normal |
+| AG-04385 | country NULL→España (province ya era 'Barcelona' correcto) |
+| AG-01424 | province CÓRDOBA→Córdoba (Argentina) |
+
+**Propiedades con location normalizada (14 total):**
+- SITGES→Sitges: AG-00803, AG-00804 (2 props)
+- TULUM→Tulum: AG-00019, AG-00787, AG-00788, AG-00789, AG-00791, AG-00792, AG-00793 (7 props)
+- DUBAI→Dubai: AG-00817, AG-00018, AG-00806, AG-00794, AG-00810 (5 props)
+
+**Backup creado:** tabla `properties_fix_h_p2_backup` (20 filas en Supabase)
+
+**Para revertir si necesario:**
+```sql
+UPDATE properties p
+SET country = b.country, province = b.province,
+    location = b.location, classification = b.classification
+FROM properties_fix_h_p2_backup b
+WHERE p.id = b.id;
+```
+
+**Cache:** Endpoint `/api/revalidate` no existe. Se hizo commit vacío para forzar redeploy y purga de caché ISR.
+
+**Archivos tocados:**
+- MODIFIED: `DAILY_LOG.md`
+
+**Commits:**
+- (commit vacío de revalidate — ver hash abajo)
+
+**Próximo paso sugerido:**
+- Sesión C: Fix formulario admin `/admin/nueva-propiedad` — validar `country` como campo obligatorio, normalizar casing de province antes de guardar.
+- Sesión D: Investigar `/api/admin/scrape-original` — confirmar si es el flujo que genera `external_source='habihub'` sin normalizar country/province. Corregir si es el caso.
+- Pendiente decisión Atilio: clasificación de las 1.309 propiedades con `classification=NULL`.
+
+---
 Formato: fecha, contexto, decisiones tomadas, archivos tocados,
 commits, próximo paso sugerido.
+
+---
+
+### Sesión 2026-05-29d — [FASE-4.B-P3] Eliminar TODA referencia a Nest Seekers
+
+**Contexto:** Atilio pidió quitar Nest Seekers International. Eliminación estaba parcial — /partners seguía mostrando "Partner oficial" + meta description con claim.
+
+**Trabajo hecho:**
+
+- **T1 — Grep exhaustivo:** 4 archivos con menciones `nest.?seekers`. User-visible: 2 archivos. Técnico/DB-column: 2 archivos (no tocar).
+
+- **T2 — `src/app/(public)/partners/page.tsx`:**
+  - Eliminado bloque completo `{/* Nest Seekers banner */}` (sección py-10 con h2 "Nest Seekers International", descripción "Alianza estratégica..." y botón "Saber más")
+  - Página queda: hero → grid de partners por país → CTA colaborar (sin sección intermedia)
+
+- **T3 — Metadata `/partners`:**
+  - `description` reemplazada: `'Red global de colaboradores y agencias inmobiliarias independientes en 11 países. Profesionales de primer nivel para operaciones de lujo internacional.'` (159 chars)
+  - `og:description`/`twitter:description` heredan el nuevo valor automáticamente (Next.js)
+
+- **Extra — `src/app/(public)/noticias/page.tsx`:**
+  - Noticia estática #2 ("Assets Golden refuerza su alianza estratégica con Nest Seekers International") reemplazada por nueva noticia sobre expansión de red de partners independientes
+
+- **T4 — Grep final:** 0 menciones user-visible. Solo resta `nestseekers_url` en `types/index.ts` y `scripts/import-properties.ts` (nombre de columna DB — no modificar sin migración DB).
+
+- **T5:** `getPartners()` intacto → Carmen Artero y demás partners siguen apareciendo ✓
+
+- **T6:** Sin imágenes NS en `/public` ✓
+
+- **Build:** `npx next build` limpio, 1114 páginas generadas, /partners como `○ Static (revalidate 1h)` ✓
+
+**Archivos tocados:**
+- MODIFIED: `src/app/(public)/partners/page.tsx`
+- MODIFIED: `src/app/(public)/noticias/page.tsx`
+
+**Commits:**
+- `2df6d2a` — feat(partners): eliminar referencia a Nest Seekers del hero
+- `7c0cbba` — chore(seo): actualizar metadata /partners sin claim Nest Seekers
+
+**Próximo paso sugerido:** Smoke test en producción tras deploy Vercel: `grep -i "nest seekers"` en HTML de /partners y /noticias → 0 resultados. Verificar visual /partners (sin tarjeta azul oscuro de "Partner oficial").
+
+---
+
+### Sesión 2026-05-29c — [FASE-4.G-P3] Fix stat "Contactados hoy" + tracking status_changed_at
+
+**Contexto:** Stat "Contactados hoy" mostraba 0 con 2-3 leads en status='contacted'. Causa raíz: query filtraba por `created_at >= startOfToday` (UTC), nunca matcheaba leads creados en días previos.
+
+**Trabajo hecho:**
+
+- **T1 — Migración DB** (`add_status_changed_at_to_leads`):
+  - `ALTER TABLE leads ADD COLUMN status_changed_at TIMESTAMPTZ DEFAULT now()`
+  - Backfill todos los existentes con `created_at`
+  - Trigger `leads_status_changed_at_trigger` BEFORE UPDATE: actualiza `status_changed_at = now()` solo cuando `NEW.status IS DISTINCT FROM OLD.status`
+  - Índice parcial `idx_leads_status_changed_at` en `status != 'new'`
+  - One-time fix SQL: los 3 leads en `contacted` tenían `created_at` de mayo 13-21 pero fueron cambiados hoy (sesión P2) → `UPDATE ... SET status_changed_at = NOW() WHERE status = 'contacted'`
+
+- **T2 — Fix `/api/admin/leads/stats/route.ts`:**
+  - Añadido `getMadridTodayBounds()` — calcula límites UTC del día Madrid dinámicamente (CEST=UTC+2, CET=UTC+1) sin librerías externas
+  - `contactedToday` ahora filtra por `status_changed_at >= todayStart && < todayEnd`
+  - SELECT añade `status_changed_at` al query
+
+- **T3 (bonus) — Enriquecer audit log en PATCH `/api/admin/leads/[id]/route.ts`:**
+  - Fetch del lead antes del UPDATE para capturar `old_status`/`old_score`
+  - `metadata` incluye `old_status`, `new_status`, `old_score`, `new_score` cuando cambian
+
+- **T4 — Smoke test SQL:** `contacted_today = 3` confirmado via SQL equivalente en Supabase ✓
+
+**Archivos tocados:**
+- MODIFIED: `src/app/api/admin/leads/stats/route.ts`
+- MODIFIED: `src/app/api/admin/leads/[id]/route.ts`
+- DB MIGRATION: `add_status_changed_at_to_leads`
+
+**Commits:**
+- `e75c0e5` — chore(db): add status_changed_at column + trigger to leads
+- `3e5d7ff` — fix(stats): "Contactados hoy" usa status_changed_at en TZ Europe/Madrid
+
+**Próximo paso sugerido:** Smoke test en producción: (1) verificar que el card "Contactados hoy" muestra 3, (2) cambiar un lead a `in_progress` → esperar que baje a 2, (3) cambiar otro de `new` a `contacted` → sube a 3 de nuevo.
 
 ---
 
