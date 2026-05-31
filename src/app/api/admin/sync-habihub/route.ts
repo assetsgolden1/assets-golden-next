@@ -6,6 +6,7 @@ import { checkRateLimit, syncRateLimit, getIdentifier } from '@/lib/ratelimit'
 import { XMLParser } from 'fast-xml-parser'
 import { randomUUID } from 'node:crypto'
 import { logAdminAction } from '@/lib/audit'
+import { revalidatePropertyPaths } from '@/lib/cache/revalidateProperties'
 
 function slugify(text: string): string {
   return text
@@ -585,6 +586,8 @@ export async function POST(request: NextRequest) {
       actor: user ? { id: user.id, email: user.email ?? null } : undefined,
     })
   }
+
+  if (!dryRun) revalidatePropertyPaths()
 
   return NextResponse.json({
     success: true,

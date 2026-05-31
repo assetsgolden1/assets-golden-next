@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/auth/getUserRole'
 import { logAdminAction } from '@/lib/audit'
+import { revalidatePropertyPaths } from '@/lib/cache/revalidateProperties'
 
 // Propiedades
 export async function toggleFeatured(id: string, featured: boolean) {
@@ -23,6 +24,7 @@ export async function toggleFeatured(id: string, featured: boolean) {
   })
   revalidatePath('/admin/propiedades')
   revalidatePath('/admin/destacadas')
+  revalidatePropertyPaths()
 }
 
 export async function togglePropertyVisibility(id: string, hidden: boolean) {
@@ -42,7 +44,7 @@ export async function togglePropertyVisibility(id: string, hidden: boolean) {
     metadata: { hidden },
   })
   revalidatePath('/admin/propiedades')
-  revalidatePath('/propiedades')
+  revalidatePropertyPaths()
 }
 
 export async function deleteProperty(id: string) {
@@ -61,7 +63,7 @@ export async function deleteProperty(id: string) {
     entity_label: prop?.title ?? null,
   })
   revalidatePath('/admin/propiedades')
-  revalidatePath('/propiedades')
+  revalidatePropertyPaths()
 }
 
 export async function bulkHideProperties(ids: string[]) {
@@ -72,7 +74,7 @@ export async function bulkHideProperties(ids: string[]) {
   }
   await supabaseAdmin.from('properties').update({ hidden: true }).in('id', ids)
   revalidatePath('/admin/propiedades')
-  revalidatePath('/propiedades')
+  revalidatePropertyPaths()
 }
 
 export async function bulkDeleteProperties(ids: string[]) {
@@ -97,7 +99,7 @@ export async function bulkDeleteProperties(ids: string[]) {
     },
   })
   revalidatePath('/admin/propiedades')
-  revalidatePath('/propiedades')
+  revalidatePropertyPaths()
 }
 
 export async function togglePropertySold(id: string, sold: boolean) {
@@ -117,7 +119,7 @@ export async function togglePropertySold(id: string, sold: boolean) {
     metadata: { sold },
   })
   revalidatePath('/admin/propiedades')
-  revalidatePath('/propiedades')
+  revalidatePropertyPaths()
 }
 
 export async function bulkMarkAsSold(ids: string[]) {
@@ -133,7 +135,7 @@ export async function bulkMarkAsSold(ids: string[]) {
     metadata: { count: ids.length },
   })
   revalidatePath('/admin/propiedades')
-  revalidatePath('/propiedades')
+  revalidatePropertyPaths()
 }
 
 export async function updateFeaturedOrder(id: string, order: number) {
@@ -144,6 +146,7 @@ export async function updateFeaturedOrder(id: string, order: number) {
   }
   await supabaseAdmin.from('properties').update({ featured_order: order }).eq('id', id)
   revalidatePath('/admin/destacadas')
+  revalidatePath('/')
 }
 
 // Nueva propiedad
@@ -220,7 +223,7 @@ export async function createProperty(formData: FormData) {
     metadata: { slug },
   })
   revalidatePath('/admin/propiedades')
-  revalidatePath('/propiedades')
+  revalidatePropertyPaths()
   return { success: true, slug }
 }
 

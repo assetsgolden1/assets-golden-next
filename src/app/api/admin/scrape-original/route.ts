@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth/getUserRole'
 import { checkRateLimit, mutationRateLimit, getIdentifier } from '@/lib/ratelimit'
+import { revalidatePropertyPaths } from '@/lib/cache/revalidateProperties'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -27,6 +28,7 @@ export async function GET(request: NextRequest) {
     // Dynamic import prevents puppeteer from being bundled at build time
     const { runScraper } = await import('@/scripts/scrapeOriginalWeb')
     const result = await runScraper()
+    revalidatePropertyPaths()
     return NextResponse.json(result)
   } catch (error) {
     return NextResponse.json(

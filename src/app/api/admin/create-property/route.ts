@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { revalidatePath } from 'next/cache'
-import { normalizeLocation } from '@/lib/utils/normalizeLocation'
 import { requireAdmin } from '@/lib/auth/getUserRole'
 import { checkRateLimit, mutationRateLimit, getIdentifier } from '@/lib/ratelimit'
+import { revalidatePropertyPaths } from '@/lib/cache/revalidateProperties'
+import { normalizePropertyFields } from '@/lib/utils/normalizeProperty'
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,9 +39,19 @@ export async function POST(request: NextRequest) {
     .replace(/\s+/g, '-')
   const slug = `${baseSlug}-${Date.now().toString(36)}`
 
-  const country = data.country === 'Otro'
+  const rawCountry = data.country === 'Otro'
     ? (data.customCountry as string)?.trim() || null
     : data.country?.trim() || null
+
+  if (!rawCountry) {
+    return NextResponse.json({ error: "El campo 'país' es obligatorio" }, { status: 400 })
+  }
+
+  const normalized = normalizePropertyFields({
+    country: rawCountry,
+    province: data.province as string | null,
+    location: data.location as string | null,
+  })
 
   const { error } = await supabaseAdmin.from('properties').insert({
     title,
@@ -49,9 +59,9 @@ export async function POST(request: NextRequest) {
     description: data.description?.trim() || null,
     price: data.price ? Number(data.price) : null,
     currency: data.currency || 'EUR',
-    location: data.location?.trim() ? normalizeLocation(data.location.trim()) : null,
-    province: data.province?.trim() || null,
-    country,
+    location: normalized.location,
+    province: normalized.province,
+    country: normalized.country,
     bedrooms: data.bedrooms ? Number(data.bedrooms) : null,
     bathrooms: data.bathrooms ? Number(data.bathrooms) : null,
     area_sqm: data.area_sqm ? Number(data.area_sqm) : null,
@@ -74,8 +84,8 @@ export async function POST(request: NextRequest) {
   }
 
   // Auto-crear entrada en country_destinations si el país no existe
-  if (country) {
-    const countrySlug = country
+  if (normalized.country) {
+    const countrySlug = normalized.country
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
@@ -91,7 +101,7 @@ export async function POST(request: NextRequest) {
 
     if (!existing) {
       await supabaseAdmin.from('country_destinations').insert({
-        country_name: country,
+        country_name: normalized.country,
         slug: countrySlug,
         description: `Propiedades en ${country}`,
         active: true,
@@ -100,6 +110,6 @@ export async function POST(request: NextRequest) {
   }
 
   revalidatePath('/admin/propiedades')
-  revalidatePath('/propiedades')
+  revalidatePropertyPaths()
   return NextResponse.json({ success: true, slug })
 }
