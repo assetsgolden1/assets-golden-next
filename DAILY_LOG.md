@@ -62,6 +62,41 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### Sesión 2026-06-01 — [FASE-4.L-DEPLOY-DEBUG] Diagnóstico y fix deploy bloqueado
+
+**Contexto:** Múltiples commits sin llegar a producción. Deploy hook disparaba PENDING pero no materializaba. CLI fallaba silenciosamente.
+
+**Causa raíz encontrada:**
+`vercel.json` tenía `"schedule": "*/15 * * * *"` (cron cada 15 min). Vercel Hobby solo permite crons diarios (`0 0 * * *`). Este error bloqueaba **silenciosamente** todos los builds nuevos vía CLI, webhook y Deploy Hook.
+
+**Por qué los "redeploys" funcionaban:**
+El botón "Redeploy" del dashboard Vercel reutiliza el artifact de build existente (sin correr nuevo build), por lo tanto nunca validaba el cron. Los commits nuevos disparaban builds que fallaban antes de siquiera correr.
+
+**Fix aplicado:**
+- `vercel.json`: `*/15 * * * *` → `0 0 * * *` (medianoche UTC, 1× diario)
+- Impacto: cron `/api/leads/sync-meta` baja de cada 15min a 1× diaria
+- Para sync más frecuente: upgrade a Vercel Pro ($20/mo)
+
+**Deploy resultado:**
+- `dpl_673UTGq4jerUhDVKtbLPu1YV1WUV` — READY
+- Commit: `b4de300` (HEAD actual con i18n L-P2+L-P3)
+- Aliased: `assetsgolden.com` ✓ — código i18n EN vivo en producción
+
+**Webhook status:**
+Probablemente estaba conectado todo el tiempo pero los builds fallaban silenciosamente. Ahora que el cron es válido, los push futuros deberían auto-deployar. Si sigue sin funcionar: Vercel dashboard → Project → Settings → Git → Disconnect & Reconnect GitHub.
+
+**Archivos tocados:**
+- MODIFIED: `vercel.json` (schedule cron)
+
+**Commits:**
+- `b4de300` — fix(vercel): cambiar cron de */15 a 0 0 * * * (Hobby plan)
+
+**Push + Deploy:** `c8b2e1d..b4de300` → origin/main ✓ | `assetsgolden.com` ✓
+
+**Próximo paso:** Verificar que `assetsgolden.com/en` funciona correctamente (i18n EN en producción). Si el webhook sigue roto tras el siguiente push, reconectar en Vercel dashboard.
+
+---
+
 ### Sesión 2026-06-01 — [FASE-4.L-P3] i18n: traducción 8 páginas críticas + helpers bilingües
 
 **Contexto:** Con infraestructura next-intl de L-P2 lista, traducción completa de las 8 rutas críticas para Capa 1 i18n.
