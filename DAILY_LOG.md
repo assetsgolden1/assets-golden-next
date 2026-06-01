@@ -62,6 +62,45 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### Sesión 2026-06-01 — [FASE-4.L-P3-FIX] Fix logo deformado + LocaleSwitcher
+
+**Contexto:** Ivan reporta 2 bugs visuales post L-P2/L-P3.
+
+**Bug 1 — Logo deformado en ES:**
+Causa: `logo.png` es 500×500px (ratio 1:1 cuadrado). La clase `w-auto`
+con un `<img>` cuadrado hace que el browser calcule `width = height × ratio = 80 × 1 = 80px`
+→ logo se renderiza como 80×80 en vez de 200×80.
+Fix: inline `style={{ objectFit: 'contain', width: '200px' }}` sobrescribe `w-auto`,
+fuerza box 200×80 y `contain` muestra el logo sin deformación.
+
+**Bug 2 — LocaleSwitcher requería múltiples clicks:**
+Causa: `router.replace() + startTransition` → `disabled={isPending}` bloqueaba el botón
+durante la transición. Si la navegación soft no actualizaba `useLocale()` inmediatamente,
+el switch parecía no funcionar.
+Fix: Reescrito con `Link href={pathname} locale={loc}` de `@/i18n/navigation`.
+Navegación directa sin state intermedio → cambia al primer click.
+Diseño: pill redondeado, activo en gold/scale-110.
+
+**Build:** `npx tsc --noEmit` + `npx next build` → sin errores.
+
+**Webhook verificado:** El push disparó un deploy automático de Vercel
+(source: "git" — confirma que el webhook funciona tras el fix del cron).
+
+**Archivos tocados:**
+- MODIFIED: `src/components/LocaleSwitcher.tsx`
+- MODIFIED: `src/components/Header.tsx`
+
+**Commits:**
+- `80b6664` — fix(i18n): LocaleSwitcher con Link de next-intl + diseño pill
+- `984cb62` — fix(header): logo no se deforma — objectFit contain + width explícito
+
+**Deploy:** `dpl_A7cZXXoMhzC4N1DLbqoL3eogUPon` → commit `984cb62` → `assetsgolden.com` ✓
+(source: "git" — automático via webhook ✅)
+
+**Próximo paso:** [FASE-4.L-P4] hreflang + sitemap bilingüe. Verificar `assetsgolden.com/en` visualmente.
+
+---
+
 ### Sesión 2026-06-01 — [FASE-4.L-DEPLOY-DEBUG] Diagnóstico y fix deploy bloqueado
 
 **Contexto:** Múltiples commits sin llegar a producción. Deploy hook disparaba PENDING pero no materializaba. CLI fallaba silenciosamente.
