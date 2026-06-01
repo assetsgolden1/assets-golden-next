@@ -1,36 +1,52 @@
-'use client'
+'use client';
 
-import { useLocale } from 'next-intl'
-import { Link, usePathname } from '@/i18n/navigation'
-import { routing } from '@/i18n/routing'
-import { cn } from '@/lib/utils'
+import { useLocale } from 'next-intl';
+import { useRouter, usePathname } from '@/i18n/navigation';
+import { routing } from '@/i18n/routing';
+import { ChevronDown } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-const FLAGS: Record<string, string> = { es: '🇪🇸', en: '🇬🇧' }
-const LABELS: Record<string, string> = { es: 'Español', en: 'English' }
+const FLAGS: Record<string, string> = { es: '🇪🇸', en: '🇬🇧' };
+const LABELS: Record<string, string> = { es: 'Español', en: 'English' };
 
 export default function LocaleSwitcher() {
-  const locale = useLocale()
-  const pathname = usePathname()
+  const locale = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
-    <div className="flex items-center gap-0.5 rounded-full border border-primary-foreground/20 bg-primary-foreground/5 p-0.5">
-      {routing.locales.map((loc) => (
-        <Link
-          key={loc}
-          href={pathname}
-          locale={loc}
-          aria-label={LABELS[loc]}
-          title={LABELS[loc]}
-          className={cn(
-            'flex items-center justify-center w-8 h-8 rounded-full text-base leading-none transition-all duration-150',
-            locale === loc
-              ? 'bg-gold/30 scale-110 opacity-100'
-              : 'opacity-50 hover:opacity-90 hover:scale-105'
-          )}
-        >
-          <span aria-hidden="true">{FLAGS[loc]}</span>
-        </Link>
-      ))}
-    </div>
-  )
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        aria-label="Cambiar idioma"
+        className="inline-flex items-center gap-1 px-2 py-1.5 rounded-md hover:bg-white/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+      >
+        <span className="text-lg leading-none" aria-hidden="true">
+          {FLAGS[locale]}
+        </span>
+        <ChevronDown className="h-3 w-3 opacity-60" aria-hidden="true" />
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="min-w-[140px]">
+        {routing.locales.map((loc) => (
+          <DropdownMenuItem
+            key={loc}
+            onClick={() => router.replace(pathname, { locale: loc })}
+            disabled={loc === locale}
+            className="flex items-center gap-2 cursor-pointer"
+          >
+            <span className="text-base" aria-hidden="true">{FLAGS[loc]}</span>
+            <span className="flex-1">{LABELS[loc]}</span>
+            {loc === locale && (
+              <span className="text-xs text-muted-foreground">✓</span>
+            )}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
