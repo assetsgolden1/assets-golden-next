@@ -7,7 +7,7 @@
   "crons": [
     {
       "path": "/api/leads/sync-meta",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
