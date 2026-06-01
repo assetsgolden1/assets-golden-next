@@ -4,6 +4,7 @@ import "./globals.css";
 import GlobalSchemaOrg from "@/components/seo/GlobalSchemaOrg";
 import MetaPixelPageViewTracker from "@/components/analytics/MetaPixel";
 import CookieConsentInit from "@/components/cookies/CookieConsentInit";
+import { getLocale } from 'next-intl/server'
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -70,14 +71,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // getLocale() reads the locale set by next-intl middleware.
+  // Falls back to 'es' for routes outside the middleware matcher (admin, api, portal).
+  let locale = 'es'
+  try {
+    locale = await getLocale()
+  } catch {}
+
   return (
     <html
-      lang="es"
+      lang={locale}
       className={`${playfair.variable} ${dmSans.variable} h-full antialiased`}
     >
       <head>

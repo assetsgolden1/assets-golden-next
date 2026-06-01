@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from 'react'
 import Link from 'next/link'
-import { submitLeadAction, type ActionState } from '@/app/(public)/vender-tu-piso/actions'
+import { submitLeadAction, type ActionState } from '@/app/[locale]/(public)/vender-tu-piso/actions'
 
 const BARRIOS = [
   'Eixample',
