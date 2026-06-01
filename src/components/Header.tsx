@@ -1,29 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { Menu, X, Globe, Search, Star } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
+import { Menu, X, Search, Star } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import DemandDialog from "@/components/DemandDialog";
-
-const navLinks = [
-  { label: "Propiedades", labelEn: "Properties", href: "/propiedades" },
-  { label: "Destinos", labelEn: "Destinations", href: "/destinos" },
-  { label: "Servicios", labelEn: "Services", href: "/servicios" },
-  { label: "Nosotros", labelEn: "About us", href: "/sobre-nosotros" },
-  { label: "Inversiones", labelEn: "Investments", href: "/inversiones" },
-  { label: "Blog", labelEn: "Blog", href: "/blog" },
-  { label: "Contacto", labelEn: "Contact", href: "/contacto" },
-];
+import LocaleSwitcher from "@/components/LocaleSwitcher";
 
 export default function Header() {
+  const t = useTranslations("Header");
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [lang, setLang] = useState<"es" | "en">("es");
   const [demandOpen, setDemandOpen] = useState(false);
+
+  const navLinks = [
+    { label: t("nav_properties"), href: "/propiedades" },
+    { label: t("nav_destinations"), href: "/destinos" },
+    { label: t("nav_services"), href: "/servicios" },
+    { label: t("nav_about"), href: "/sobre-nosotros" },
+    { label: t("nav_investments"), href: "/inversiones" },
+    { label: t("nav_blog"), href: "/blog" },
+    { label: t("nav_contact"), href: "/contacto" },
+  ];
 
   return (
     <>
@@ -47,7 +48,7 @@ export default function Header() {
                     : "text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/5"
                 )}
               >
-                {lang === "es" ? link.label : link.labelEn}
+                {link.label}
               </Link>
             ))}
           </nav>
@@ -60,34 +61,27 @@ export default function Header() {
               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold/10 hover:bg-gold/20 border border-gold/30 rounded-full text-xs text-gold font-semibold uppercase tracking-wide transition-colors"
             >
               <Star className="h-3 w-3 fill-gold" />
-              Destacadas
+              {t("featured")}
             </Link>
 
             {/* Busco propiedad */}
             <button
               onClick={() => setDemandOpen(true)}
               className="flex items-center gap-1.5 text-sm text-primary-foreground/70 hover:text-gold transition-colors"
-              aria-label="Busco propiedad"
+              aria-label={t("search_aria")}
             >
               <Search className="h-4 w-4" />
-              <span>{lang === "es" ? "Busco propiedad" : "I'm looking"}</span>
+              <span>{t("search_property")}</span>
             </button>
 
             {/* Selector idioma */}
-            <button
-              onClick={() => setLang(lang === "es" ? "en" : "es")}
-              className="flex items-center gap-1.5 text-sm text-primary-foreground/70 hover:text-gold transition-colors"
-              aria-label="Cambiar idioma"
-            >
-              <Globe className="h-4 w-4" />
-              <span className="font-medium uppercase">{lang}</span>
-            </button>
+            <LocaleSwitcher />
 
             <Link
               href="/contacto"
               className={buttonVariants({ variant: "gold", size: "sm" })}
             >
-              {lang === "es" ? "Asesoría gratuita" : "Free consultation"}
+              {t("free_consultation")}
             </Link>
           </div>
 
@@ -95,7 +89,7 @@ export default function Header() {
           <button
             className="lg:hidden p-2 text-primary-foreground/70 hover:text-primary-foreground"
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Menú"
+            aria-label={t("menu_aria")}
           >
             {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -117,7 +111,7 @@ export default function Header() {
                       : "text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/5"
                   )}
                 >
-                  {lang === "es" ? link.label : link.labelEn}
+                  {link.label}
                 </Link>
               ))}
               {/* Accesos directos extra (solo mobile) */}
@@ -127,7 +121,7 @@ export default function Header() {
                 className="px-4 py-3 text-base font-medium rounded transition-colors text-gold hover:bg-primary-foreground/5 flex items-center gap-2"
               >
                 <Star className="h-4 w-4 fill-gold" />
-                {lang === "es" ? "Destacadas" : "Featured"}
+                {t("featured")}
               </Link>
               <Link
                 href="/mi-demanda"
@@ -139,7 +133,7 @@ export default function Header() {
                     : "text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/5"
                 )}
               >
-                {lang === "es" ? "Mi Demanda" : "My Search"}
+                {t("my_demand")}
               </Link>
               <div className="mt-4 pt-4 border-t border-primary-foreground/10 flex flex-col gap-3">
                 <button
@@ -147,21 +141,17 @@ export default function Header() {
                   className="flex items-center gap-2 px-4 py-2 text-sm text-primary-foreground/70 hover:text-gold transition-colors"
                 >
                   <Search className="h-4 w-4" />
-                  <span>{lang === "es" ? "Busco propiedad" : "I'm looking for a property"}</span>
+                  <span>{t("search_property_mobile")}</span>
                 </button>
-                <button
-                  onClick={() => setLang(lang === "es" ? "en" : "es")}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-primary-foreground/70 hover:text-gold transition-colors"
-                >
-                  <Globe className="h-4 w-4" />
-                  <span>{lang === "es" ? "Switch to English" : "Cambiar a Español"}</span>
-                </button>
+                <div className="px-4">
+                  <LocaleSwitcher />
+                </div>
                 <Link
                   href="/contacto"
                   onClick={() => setMobileOpen(false)}
                   className={cn(buttonVariants({ variant: "gold", size: "lg" }), "mx-4")}
                 >
-                  {lang === "es" ? "Asesoría gratuita" : "Free consultation"}
+                  {t("free_consultation")}
                 </Link>
               </div>
             </nav>
