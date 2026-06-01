@@ -62,6 +62,44 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### Sesión 2026-06-01 — [FASE-4.L-P3-FIX3] LocaleSwitcher dropdown + Header estable ES/EN
+
+**Contexto:** LocaleSwitcher en producción era pill con 2 banderas (fix anterior no se aplicó o se sobreescribió). Al cambiar a EN, traducciones como "Destinations" rompen el header a 2 líneas.
+
+**Diagnóstico:**
+- `LocaleSwitcher.tsx` tenía el pill original (commit 80b6664 aplicó Link-based navigation pero mantuvo el diseño pill)
+- `dropdown-menu.tsx` no existía en `/components/ui` (solo `button.tsx` y `carousel.tsx`)
+- Header: nav links sin `whitespace-nowrap`, sin `shrink-0` en logo/acciones → texto wrapeaba al encoger
+
+**Fixes aplicados:**
+
+1. **Instalado** `shadcn dropdown-menu` → `src/components/ui/dropdown-menu.tsx` (usa `@base-ui/react/menu`)
+
+2. **LocaleSwitcher reescrito** con DropdownMenu real:
+   - Trigger: solo 1 bandera activa + ChevronDown icon
+   - Dropdown: 2 opciones (ES/EN), activa marcada con ✓ y `disabled`
+   - Navegación: `router.replace(pathname, { locale: loc })` de `@/i18n/navigation`
+
+3. **Header fixes**:
+   - Logo Link: `shrink-0` → no se contrae
+   - Nav links: `whitespace-nowrap` + reducido `px-2 xl:px-3` → texto no wrappea
+   - Nav container: `gap-0.5 xl:gap-1 flex-nowrap`
+   - Actions div: `shrink-0`, gaps `gap-2 xl:gap-3`
+
+**Build:** `npx tsc --noEmit` → 0 errores. `npx next build` → OK (2186 páginas)
+
+**Archivos tocados:**
+- MODIFIED: `src/components/LocaleSwitcher.tsx`
+- MODIFIED: `src/components/Header.tsx`
+- CREATED: `src/components/ui/dropdown-menu.tsx`
+
+**Commits:**
+- `259b078` — fix(i18n): LocaleSwitcher dropdown + Header estable en ES/EN
+
+**Próximo paso:** Verificar visualmente en `npm run dev`: (a) header 1 línea en ES y EN, (b) logo estable, (c) dropdown abre con 1 click. Luego `git push` para deploy.
+
+---
+
 ### Sesión 2026-06-01 — [FASE-4.L-P3-FIX] Fix logo deformado + LocaleSwitcher
 
 **Contexto:** Ivan reporta 2 bugs visuales post L-P2/L-P3.
