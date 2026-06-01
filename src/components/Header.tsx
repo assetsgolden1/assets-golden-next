@@ -32,7 +32,7 @@ export default function Header() {
         <div className="container-luxury flex h-full items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <Image src="/logo.png" alt="Assets Golden" height={80} width={200} className="h-20 w-auto" />
+            <Image src="/logo.png" alt="Assets Golden" height={80} width={200} className="h-20 w-auto" style={{ objectFit: 'contain', width: '200px' }} priority />
           </Link>
 
           {/* Desktop nav */}
