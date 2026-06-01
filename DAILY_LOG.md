@@ -38,7 +38,7 @@ reordena si la prioridad cambió.
 - [ ] Limpiar variable zombie `conflictIds` del sync
 - [ ] Actualizar `fast-xml-parser` de `^5.5.12` a `^5.7.0` (vuln MODERATE: XML comment/CDATA injection)
 - [ ] Corregir `react-hooks/set-state-in-effect` en `PortalPropertiesGrid.tsx:341` (nueva regla React 19 en eslint-config-next@16.2.6) — nota: `nueva-propiedad/page.tsx` fue reescrito en sesión 9, verificar si el lint error persiste
-- [ ] Refactor: extraer `<PropertyGalleryUpload />` como componente compartido entre create y edit forms (hoy es copy-paste idéntico)
+- [x] Refactor: extraer `SortableImage` como componente compartido entre create y edit forms (sesión 2026-06-01)
 - [x] Borrar carpeta vacía `src/app/admin/destinos/`
 - [x] Borrar carpeta vacía `src/app/api/admin/update-destino/`
 - [x] CSP: remover `api.anthropic.com`
@@ -59,6 +59,96 @@ reordena si la prioridad cambió.
 ## 📝 Historial de sesiones
 
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
+
+---
+
+### Sesión 2026-06-01 — [FASE-4.L-P2] i18n: setup next-intl v4 + Header + Footer + LocaleSwitcher
+
+**Contexto:** Implementar Capa 1 de internacionalización: ES sin prefijo (default), EN con `/en/`. Diagnóstico L-P1 completado en sesión anterior.
+
+**T1 — Instalación:**
+- `next-intl@4.13.0` instalado
+
+**T2-T3 — Descubrimiento bloqueante:**
+- Next.js 16 usa `proxy.ts` en lugar de `middleware.ts`
+- Se eliminó `src/middleware.ts` creado inicialmente
+- Se fusionó la lógica i18n dentro del `src/proxy.ts` existente (que ya tenía auth guard de Supabase para admin)
+
+**T4 — Archivos de infraestructura creados:**
+- `src/i18n/routing.ts` — defineRouting: locales=['es','en'], defaultLocale='es', mode='as-needed'
+- `src/i18n/navigation.ts` — createNavigation: Link, usePathname, useRouter con locale automático
+- `src/i18n/request.ts` — getRequestConfig con carga dinámica de messages/{locale}.json
+- `messages/es.json` + `messages/en.json` — namespaces Header y Footer completos
+- `src/app/[locale]/layout.tsx` — NextIntlClientProvider + generateStaticParams
+
+**T5 — Movida estructura app/:**
+- `src/app/(public)/` → `src/app/[locale]/(public)/` (34 archivos, git los reconoce como R rename)
+- Fix import roto: `src/components/forms/VenderForm.tsx` → nueva ruta con `[locale]`
+
+**T6 — Componentes i18n:**
+- `Header.tsx` refactorizado: `useTranslations('Header')` + `useLocale()`, navLinks dentro del componente, `Link` de `@/i18n/navigation`
+- `Footer.tsx` refactorizado: `async` server component con `getTranslations('Footer')`, footerLinks con t()
+- `src/components/LocaleSwitcher.tsx` NUEVO: banderas 🇪🇸🇬🇧, activo resaltado en gold
+
+**T7 — Build:**
+- `npx tsc --noEmit` → sin errores
+- `npx next build` → exitoso, 2186 páginas (doble por 2 locales)
+
+**Archivos tocados:**
+- CREATED: `src/i18n/routing.ts`, `src/i18n/navigation.ts`, `src/i18n/request.ts`, `messages/es.json`, `messages/en.json`, `src/app/[locale]/layout.tsx`, `src/components/LocaleSwitcher.tsx`
+- MODIFIED: `next.config.ts`, `src/proxy.ts`, `src/app/layout.tsx`, `src/components/Header.tsx`, `src/components/Footer.tsx`, `src/components/forms/VenderForm.tsx`, `package.json`
+- RENAMED (34 archivos): `src/app/(public)/**` → `src/app/[locale]/(public)/**`
+
+**Commits:**
+- `5ff0b5a` — feat(i18n): setup next-intl v4 + estructura app/[locale] + proxy
+- `ce78034` — feat(i18n): traducir Header + Footer + LocaleSwitcher con banderas
+
+**Push:** `693576a..ce78034` → origin/main ✓
+
+**Webhook Vercel:** roto desde sesiones anteriores — Ivan debe hacer redeploy manual.
+
+**Próximo paso sugerido:** [FASE-4.L-P3] Traducir páginas core: /propiedades, /propiedades/[slug], /destinos/[slug], /destinos/espana, /contacto, /mi-demanda, home. Centralizar formateo de precios/fechas. Filtrar blog por locale.
+
+---
+
+### Sesión 2026-06-01 — [FASE-4.K-P1] ATILIO-1: drag-to-reorder fotos en nueva-propiedad
+
+**Contexto:** Atilio reportó que al crear una propiedad nueva no podía reordenar fotos por drag. El sprint A7 implementó drag-to-reorder en edit/page.tsx pero no se replicó al form de creación.
+
+**T1 — Análisis patrón A7:**
+- `SortableImage` estaba definido **inline** dentro de `edit/page.tsx` (no existía como componente separado)
+- Usa `existingImages: string[]` (URLs de Supabase) como estado
+- `handleDragEnd` llama `arrayMove` con el índice de la URL activa/over
+- ID de dnd-kit = la URL (única por construcción de Supabase)
+
+**T2 — Análisis nueva-propiedad:**
+- Estado: `galleryFiles: File[]` + `galleryPreviews: string[]` en paralelo
+- `makeMain(i)` manual (sin drag), `removePhoto(i)` revocaba ambos arrays
+- Upload en `handleSubmit` usando `galleryFiles` secuencialmente
+- Imagen principal = `uploadedUrls[0]`
+
+**T3 — Implementación (2 commits):**
+- **Commit 1**: Extraer `SortableImage` a `src/components/admin/SortableImage.tsx`. Actualizar `edit/page.tsx` para importarlo — comportamiento idéntico.
+- **Commit 2**: En `nueva-propiedad/page.tsx`, unificar estado en `galleryItems: {file, preview}[]` para mantener files y object URLs sincronizados al reordenar. Agregar DndContext + SortableContext + `handleDragEnd` usando el object URL como ID (único por `URL.createObjectURL`). Usar `SortableImage` compartido.
+
+**T4 — Smoke test:**
+- `npx tsc --noEmit` → sin errores
+- `npx next build` → compilación exitosa (1115 páginas estáticas)
+
+**Archivos tocados:**
+- CREATED: `src/components/admin/SortableImage.tsx`
+- MODIFIED: `src/app/admin/propiedades/[id]/edit/page.tsx`
+- MODIFIED: `src/app/admin/nueva-propiedad/page.tsx`
+
+**Commits:**
+- `2badee5` — refactor(admin): extraer SortableImage a componente compartido
+- `693576a` — feat(admin): drag-to-reorder fotos en nueva-propiedad (ATILIO-1)
+
+**Push:** `9afd8cb..693576a` → origin/main ✓
+
+**Pendiente:** Ivan debe hacer redeploy manual en Vercel dashboard (webhook GitHub→Vercel roto).
+
+**Próximo paso sugerido:** Ivan confirma que en `/admin/nueva-propiedad` se pueden arrastrar fotos para reordenar antes de guardar. Verificar también que `/admin/propiedades/[id]/edit` sigue funcionando igual (sin regresión).
 
 ---
 
