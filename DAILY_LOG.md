@@ -62,6 +62,57 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### Sesión 2026-06-01 — [FASE-4.L-P3] i18n: traducción 8 páginas críticas + helpers bilingües
+
+**Contexto:** Con infraestructura next-intl de L-P2 lista, traducción completa de las 8 rutas críticas para Capa 1 i18n.
+
+**T1 — Helpers creados:**
+- `src/lib/utils/format.ts` — formatPrice/formatNumber/formatDate con locale es-ES/en-GB
+- `src/lib/utils/translateGeography.ts` — mapas country/province ES→EN (Opción B diagnóstico)
+- `src/lib/propertyTypes.ts` refactorizado: propertyTypeMap con {es,en}, translatePropertyType(type, locale)
+
+**T2 — messages.json ampliados (~350 claves):**
+- 10 namespaces nuevos: Common, Sidebar, Home, Properties, PropertyDetail, Destinations, DestinationDetail, Spain, Contact, MyDemand, Filters, Team
+- Editorial de España en inglés (~600 palabras) en Spain namespace
+
+**T3 — Componentes traducidos (7):**
+- PropertyCard: async + getLocale() + formatPrice locale-aware
+- PropiedadesFilters + SpainFilters: useTranslations('Filters') + useLocale() + useRouter @/i18n/navigation
+- HomeSidebar: useTranslations('Sidebar') + Link de @/i18n/navigation
+- HomeTeamSection: bio_en/role_en según locale
+- DemandDialog: useTranslations('MyDemand')
+
+**T4 — 8 páginas críticas traducidas:**
+- /, /propiedades, /propiedades/[slug], /destinos, /destinos/[slug], /destinos/espana, /contacto, /mi-demanda
+- ContactForm + MiDemandaForm: useTranslations() con arrays de opciones traducidos
+- destinos/espana: editorial bilingüe inline (ES) + messages JSON (EN)
+- destinos/[slug]: description_en/tagline_en/highlights_en/market_info_en según locale
+
+**T5 — queries.ts blog:**
+- getBlogPosts(limit, locale), getBlogPostsByCategory(cat, locale), getAllBlogSlugs(locale) filtran por language
+
+**T6 — Admin fix:**
+- Admin propiedades edit/nueva-propiedad: `label.es` para compatibilidad con propertyTypeMap bilingüe
+
+**Build:** `npx tsc --noEmit` → sin errores | `npx next build` → 2186 páginas ✓
+
+**Archivos:**
+- CREATED: format.ts, translateGeography.ts
+- MODIFIED: propertyTypes.ts, queries.ts, messages/es.json, messages/en.json, 7 componentes, 10 páginas, 2 admin pages
+
+**Commits:**
+- `0797954` — feat(i18n): helpers centralizados
+- `44e00fd` — feat(i18n): messages.json namespaces completos
+- `4e1734e` — feat(i18n): traducir componentes
+- `0adbbec` — feat(i18n): traducir 8 páginas críticas + queries.ts blog locale
+
+**Push:** `1369aaf..0adbbec` → origin/main ✓
+**Webhook Vercel:** roto — Ivan redeploy manual.
+
+**Próximo paso:** [FASE-4.L-P4] hreflang + sitemap bilingüe + deploy. Verificar smoke test en producción tras redeploy.
+
+---
+
 ### Sesión 2026-06-01 — [FASE-4.L-P2] i18n: setup next-intl v4 + Header + Footer + LocaleSwitcher
 
 **Contexto:** Implementar Capa 1 de internacionalización: ES sin prefijo (default), EN con `/en/`. Diagnóstico L-P1 completado en sesión anterior.
