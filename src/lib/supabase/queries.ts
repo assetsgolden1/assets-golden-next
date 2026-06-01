@@ -389,24 +389,28 @@ export async function getTeamMembers() {
 
 // ─── Blog ──────────────────────────────────────────────────────
 
-export async function getBlogPosts(limit = 12) {
+export async function getBlogPosts(limit = 12, locale?: string) {
   const supabase = await createClient()
-  const { data, error } = await supabase
+  let query = supabase
     .from('blog_posts')
     .select('*')
     .eq('published', true)
+  if (locale) query = query.eq('language', locale)
+  const { data, error } = await query
     .order('published_at', { ascending: false })
     .limit(limit)
   return { data: (data ?? []) as BlogPost[], error }
 }
 
-export async function getBlogPostsByCategory(category: string, limit = 20) {
+export async function getBlogPostsByCategory(category: string, locale?: string, limit = 20) {
   const supabase = await createClient()
-  const { data, error } = await supabase
+  let query = supabase
     .from('blog_posts')
     .select('*')
     .eq('published', true)
     .eq('category', category)
+  if (locale) query = query.eq('language', locale)
+  const { data, error } = await query
     .order('published_at', { ascending: false })
     .limit(limit)
   return { data: (data ?? []) as BlogPost[], error }
@@ -423,13 +427,15 @@ export async function getBlogPostBySlug(slug: string) {
   return { data: data as BlogPost | null, error }
 }
 
-export async function getAllBlogSlugs() {
+export async function getAllBlogSlugs(locale?: string) {
   const supabase = createStaticClient()
-  const { data } = await supabase
+  let query = supabase
     .from('blog_posts')
     .select('slug')
     .eq('published', true)
     .not('slug', 'is', null)
+  if (locale) query = query.eq('language', locale)
+  const { data } = await query
   return (data ?? []).map((p) => p.slug as string)
 }
 

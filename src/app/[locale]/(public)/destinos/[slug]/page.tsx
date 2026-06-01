@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { redirect, notFound } from 'next/navigation'
 import type { ElementType } from 'react'
 import { MapPin, ArrowLeft, Sun, TrendingUp, Building2, Star, Globe, Shield, BarChart3 } from 'lucide-react'
 import Breadcrumb from '@/components/seo/Breadcrumb'
 import { buttonVariants } from '@/components/ui/button'
+import { getTranslations, getLocale } from 'next-intl/server'
+import { formatNumber } from '@/lib/utils/format'
 import {
   getAllDestinationSlugs,
   getDestinationBySlug,
@@ -21,13 +23,8 @@ import { getDestinoEditorial } from '@/lib/editorial/destinoEditorial'
 interface Props {
   params: Promise<{ slug: string }>
   searchParams: Promise<{
-    ciudad?: string
-    tipo?: string
-    precio_min?: string
-    precio_max?: string
-    habitaciones?: string
-    orden?: string
-    page?: string
+    ciudad?: string; tipo?: string; precio_min?: string
+    precio_max?: string; habitaciones?: string; orden?: string; page?: string
   }>
 }
 
@@ -48,33 +45,28 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const { slug } = await params
   const sp = await searchParams
   const { data } = await getDestinationBySlug(slug)
+  const t = await getTranslations('DestinationDetail')
+  const locale = await getLocale()
 
-  if (!data) return { title: 'Destino — Assets Golden' }
+  if (!data) return { title: `${t('investment_label')} — Assets Golden` }
 
   const ciudad = sp.ciudad ?? null
-  let title = `Propiedades en ${data.country_name}`
-  let description =
-    data.description?.slice(0, 160) ??
-    `Propiedades de lujo en ${data.country_name}: apartamentos, villas y áticos en los mejores barrios. Búsqueda personalizada y asesoramiento experto.`
+  const countryName = locale === 'en' ? (data.country_name === 'España' ? 'Spain' : data.country_name) : data.country_name
 
-  if (ciudad) {
-    title = `Propiedades en ${ciudad}, ${data.country_name}`
-    description = `Apartamentos, villas y áticos de lujo en ${ciudad}, ${data.country_name}. Selección exclusiva de propiedades premium con asesoramiento personalizado.`
-  }
+  const title = ciudad
+    ? t('meta_title_city', { city: ciudad, country: countryName })
+    : t('meta_title', { country: countryName })
+
+  const description = ciudad
+    ? t('meta_description_city', { city: ciudad, country: countryName })
+    : (locale === 'en' ? data.description_en : data.description)?.slice(0, 160) ?? t('meta_description', { country: countryName })
 
   return {
     title,
     description,
-    alternates: {
-      canonical: `/destinos/${slug}`,
-    },
-    openGraph: {
-      images: data.hero_image_url ? [{ url: data.hero_image_url }] : [],
-      url: `/destinos/${slug}`,
-    },
-    twitter: {
-      images: data.hero_image_url ? [data.hero_image_url] : undefined,
-    },
+    alternates: { canonical: `/destinos/${slug}` },
+    openGraph: { images: data.hero_image_url ? [{ url: data.hero_image_url }] : [], url: `/destinos/${slug}` },
+    twitter: { images: data.hero_image_url ? [data.hero_image_url] : undefined },
   }
 }
 
@@ -82,9 +74,10 @@ const LIMIT = 24
 
 export default async function DestinoPage({ params, searchParams }: Props) {
   const { slug } = await params
-
-  // España tiene su propia página estática
   if (slug === 'espana') redirect('/destinos/espana')
+
+  const t = await getTranslations('DestinationDetail')
+  const locale = await getLocale()
 
   const { data: destination } = await getDestinationBySlug(slug)
   if (!destination) notFound()
@@ -102,12 +95,7 @@ export default async function DestinoPage({ params, searchParams }: Props) {
   const countryName = destination.country_name
 
   const [{ data: properties, count }, cities, types] = await Promise.all([
-    getPropertiesForDestination(countryName, {
-      ciudad: ciudad || undefined,
-      tipo:   tipo   || undefined,
-      precioMin, precioMax, habitaciones, orden,
-      limit: LIMIT, offset,
-    }),
+    getPropertiesForDestination(countryName, { ciudad: ciudad || undefined, tipo: tipo || undefined, precioMin, precioMax, habitaciones, orden, limit: LIMIT, offset }),
     getCitiesForDestination(countryName),
     getPropertyTypesForDestination(countryName),
   ])
@@ -115,33 +103,34 @@ export default async function DestinoPage({ params, searchParams }: Props) {
   const totalCount = count ?? 0
   const totalPages = Math.ceil(totalCount / LIMIT)
 
-  const highlights = (destination.highlights ?? []) as Array<{
-    icon?: string; title?: string; value?: string
-  }>
-  const marketInfo = (destination.market_info ?? {}) as {
-    avgPrice?: string; rentalYield?: string; priceGrowth?: string; bestAreas?: string
-  }
-  const hasMarketInfo = Object.values(marketInfo).some(Boolean)
+  // Use locale-aware DB fields
+  const tagline = locale === 'en' ? (destination.tagline_en ?? destination.tagline) : destination.tagline
+  const description = locale === 'en' ? (destination.description_en ?? destination.description) : destination.description
+  const highlights = (locale === 'en' ? (destination.highlights_en ?? destination.highlights) : destination.highlights) as Array<{ icon?: string; title?: string; value?: string }>
+  const marketInfo = (locale === 'en' ? (destination.market_info_en ?? destination.market_info) : destination.market_info) as { avgPrice?: string; rentalYield?: string; priceGrowth?: string; bestAreas?: string }
+  const hasMarketInfo = Object.values(marketInfo ?? {}).some(Boolean)
 
   const currentFilters = { ciudad, tipo, precioMin, precioMax, habitaciones, orden }
-  const editorialContent = getDestinoEditorial(slug)
+  const editorialContent = locale === 'es' ? getDestinoEditorial(slug) : null
   const pageParams: Record<string, string | undefined> = {
-    ciudad:        ciudad       || undefined,
-    tipo:          tipo         || undefined,
-    precio_min:    precioMin    ? String(precioMin)    : undefined,
-    precio_max:    precioMax    ? String(precioMax)    : undefined,
-    habitaciones:  habitaciones ? String(habitaciones) : undefined,
-    orden:         orden !== 'reciente' ? orden : undefined,
+    ciudad: ciudad || undefined, tipo: tipo || undefined,
+    precio_min: precioMin ? String(precioMin) : undefined,
+    precio_max: precioMax ? String(precioMax) : undefined,
+    habitaciones: habitaciones ? String(habitaciones) : undefined,
+    orden: orden !== 'reciente' ? orden : undefined,
   }
+
+  // Result label
+  const resultLabel = `${formatNumber(totalCount, locale)} ${totalCount === 1 ? t('results_singular') : t('results_plural')} ${ciudad ? t('results_in_city', { city: ciudad }) : t('results_in_country', { country: countryName })}`
 
   return (
     <>
       <Breadcrumb
         variant="secondary"
         items={[
-          { name: 'Inicio', url: '/' },
-          { name: 'Destinos', url: '/destinos' },
-          { name: destination.country_name, url: `/destinos/${slug}` },
+          { name: locale === 'en' ? 'Home' : 'Inicio', url: '/' },
+          { name: locale === 'en' ? 'Destinations' : 'Destinos', url: '/destinos' },
+          { name: countryName, url: `/destinos/${slug}` },
           ...(ciudad ? [{ name: ciudad, url: `/destinos/${slug}?ciudad=${encodeURIComponent(ciudad)}` }] : []),
         ]}
       />
@@ -149,11 +138,7 @@ export default async function DestinoPage({ params, searchParams }: Props) {
       {/* Hero */}
       <section className="relative h-80 md:h-[420px] overflow-hidden">
         {(destination.hero_image_url ?? destination.card_image_url) ? (
-          <Image
-            src={(destination.hero_image_url ?? destination.card_image_url)!}
-            alt={destination.country_name}
-            fill unoptimized className="object-cover" priority sizes="100vw"
-          />
+          <Image src={(destination.hero_image_url ?? destination.card_image_url)!} alt={countryName} fill unoptimized className="object-cover" priority sizes="100vw" />
         ) : (
           <div className="absolute inset-0 gradient-navy" />
         )}
@@ -161,53 +146,46 @@ export default async function DestinoPage({ params, searchParams }: Props) {
         <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-transparent" />
 
         <div className="relative container-luxury h-full flex flex-col justify-end pb-12">
-          <Link
-            href="/destinos"
-            className="mb-6 inline-flex items-center gap-1.5 text-xs text-white/50 hover:text-gold transition-colors w-fit"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Volver a Destinos
+          <Link href="/destinos" className="mb-6 inline-flex items-center gap-1.5 text-xs text-white/50 hover:text-gold transition-colors w-fit">
+            <ArrowLeft className="h-3.5 w-3.5" /> {t('back')}
           </Link>
           <div className="flex items-center gap-2 text-gold text-xs tracking-widest uppercase mb-3">
             <MapPin className="h-4 w-4" />
-            <span>Destino de inversión</span>
+            <span>{t('investment_label')}</span>
           </div>
-          <h1 className="font-display text-4xl font-semibold text-white md:text-5xl lg:text-6xl leading-tight">
-            {destination.country_name}
-          </h1>
-          {destination.tagline && (
-            <p className="mt-3 text-white/70 text-base max-w-xl leading-relaxed">
-              {destination.tagline}
-            </p>
+          <h1 className="font-display text-4xl font-semibold text-white md:text-5xl lg:text-6xl leading-tight">{countryName}</h1>
+          {tagline && (
+            <p className="mt-3 text-white/70 text-base max-w-xl leading-relaxed">{tagline}</p>
           )}
           <p className="mt-4 inline-flex items-center gap-2 text-gold text-sm font-medium">
             <span className="h-px w-8 bg-gold" />
-            {totalCount.toLocaleString('es-ES')}{' '}
-            {totalCount === 1 ? 'propiedad disponible' : 'propiedades disponibles'}
+            {formatNumber(totalCount, locale)}{' '}
+            {totalCount === 1 ? t('properties_singular') : t('properties_plural')}
           </p>
         </div>
       </section>
 
-      {/* Stats mercado */}
-      {(marketInfo.avgPrice || marketInfo.rentalYield || marketInfo.priceGrowth) && (
+      {/* Market stats */}
+      {(marketInfo?.avgPrice || marketInfo?.rentalYield || marketInfo?.priceGrowth) && (
         <section className="bg-gold py-6">
           <div className="container-luxury">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
               {marketInfo.avgPrice && (
                 <div>
                   <span className="font-display text-2xl font-bold text-navy">{marketInfo.avgPrice}</span>
-                  <p className="text-xs text-navy/70 mt-1 uppercase tracking-wide">Precio medio</p>
+                  <p className="text-xs text-navy/70 mt-1 uppercase tracking-wide">{t('avg_price')}</p>
                 </div>
               )}
               {marketInfo.rentalYield && (
                 <div>
                   <span className="font-display text-2xl font-bold text-navy">{marketInfo.rentalYield}</span>
-                  <p className="text-xs text-navy/70 mt-1 uppercase tracking-wide">Rentabilidad</p>
+                  <p className="text-xs text-navy/70 mt-1 uppercase tracking-wide">{t('rental_yield')}</p>
                 </div>
               )}
               {marketInfo.priceGrowth && (
                 <div>
                   <span className="font-display text-2xl font-bold text-navy">{marketInfo.priceGrowth}</span>
-                  <p className="text-xs text-navy/70 mt-1 uppercase tracking-wide">Crecimiento</p>
+                  <p className="text-xs text-navy/70 mt-1 uppercase tracking-wide">{t('price_growth')}</p>
                 </div>
               )}
             </div>
@@ -215,23 +193,21 @@ export default async function DestinoPage({ params, searchParams }: Props) {
         </section>
       )}
 
-      {/* Descripción */}
-      {destination.description && (
+      {/* Description */}
+      {description && (
         <section className="py-12 bg-background">
           <div className="container-luxury max-w-3xl">
-            <p className="text-muted-foreground leading-relaxed text-base">
-              {destination.description}
-            </p>
+            <p className="text-muted-foreground leading-relaxed text-base">{description}</p>
           </div>
         </section>
       )}
 
       {/* Highlights */}
-      {highlights.length > 0 && (
+      {highlights && highlights.length > 0 && (
         <section className="py-12 bg-secondary">
           <div className="container-luxury">
             <div className="mb-8 text-center">
-              <h2 className="font-display text-2xl font-semibold">Por qué {destination.country_name}</h2>
+              <h2 className="font-display text-2xl font-semibold">{t('why_title', { country: countryName })}</h2>
               <div className="divider-gold mx-auto mt-4" />
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -252,40 +228,38 @@ export default async function DestinoPage({ params, searchParams }: Props) {
         </section>
       )}
 
-      {/* Mercado inmobiliario */}
+      {/* Market info */}
       {hasMarketInfo && (
         <section className="py-12 bg-background">
           <div className="container-luxury">
             <div className="mb-8">
-              <p className="text-xs tracking-[0.25em] text-gold uppercase mb-2">Datos del mercado</p>
-              <h2 className="font-display text-2xl font-semibold">Mercado inmobiliario</h2>
+              <p className="text-xs tracking-[0.25em] text-gold uppercase mb-2">{t('market_eyebrow')}</p>
+              <h2 className="font-display text-2xl font-semibold">{t('market_title')}</h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {marketInfo.avgPrice && (
+              {marketInfo?.avgPrice && (
                 <div className="rounded-xl border border-border bg-card p-5">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Precio medio</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t('avg_price')}</p>
                   <p className="font-display text-xl font-semibold text-gold">{marketInfo.avgPrice}</p>
                 </div>
               )}
-              {marketInfo.rentalYield && (
+              {marketInfo?.rentalYield && (
                 <div className="rounded-xl border border-border bg-card p-5">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Rentabilidad</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t('rental_yield')}</p>
                   <p className="font-display text-xl font-semibold text-gold">{marketInfo.rentalYield}</p>
                 </div>
               )}
-              {marketInfo.priceGrowth && (
+              {marketInfo?.priceGrowth && (
                 <div className="rounded-xl border border-border bg-card p-5">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Crecimiento</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t('price_growth')}</p>
                   <p className="font-display text-xl font-semibold text-gold">{marketInfo.priceGrowth}</p>
                 </div>
               )}
-              {marketInfo.bestAreas && (
+              {marketInfo?.bestAreas && (
                 <div className="rounded-xl border border-border bg-card p-5">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Mejores zonas</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t('best_areas')}</p>
                   <p className="text-sm font-medium">
-                    {Array.isArray(marketInfo.bestAreas)
-                      ? (marketInfo.bestAreas as string[]).join(', ')
-                      : marketInfo.bestAreas}
+                    {Array.isArray(marketInfo.bestAreas) ? (marketInfo.bestAreas as string[]).join(', ') : marketInfo.bestAreas}
                   </p>
                 </div>
               )}
@@ -294,37 +268,24 @@ export default async function DestinoPage({ params, searchParams }: Props) {
         </section>
       )}
 
-      {/* Contenido editorial — visible solo sin filtro de ciudad activo */}
+      {/* Editorial content — ES only */}
       {!ciudad && editorialContent && (
         <section className="section-padding bg-muted/30">
           <div className="container-luxury">
-            <article className="max-w-3xl mx-auto">
-              {editorialContent}
-            </article>
+            <article className="max-w-3xl mx-auto">{editorialContent}</article>
           </div>
         </section>
       )}
 
-      {/* Filtros + Grid */}
+      {/* Filters + grid */}
       <section className="bg-background py-12">
         <div className="container-luxury">
           <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-start">
-            <DestinationFilters
-              slug={slug}
-              cities={cities}
-              types={types}
-              currentFilters={currentFilters}
-              totalCount={totalCount}
-            />
+            <DestinationFilters slug={slug} cities={cities} types={types} currentFilters={currentFilters} totalCount={totalCount} />
 
             <div className="flex-1 min-w-0">
-              {/* Mobile trigger lives inside DestinationFilters, pero el contador aquí */}
               <div className="mb-6 flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
-                  <span className="font-semibold text-foreground">{totalCount.toLocaleString('es-ES')}</span>{' '}
-                  {totalCount === 1 ? 'propiedad encontrada' : 'propiedades encontradas'}
-                  {ciudad ? ` en ${ciudad}` : ` en ${destination.country_name}`}
-                </p>
+                <p className="text-sm text-muted-foreground">{resultLabel}</p>
               </div>
 
               {(properties ?? []).length > 0 ? (
@@ -342,23 +303,15 @@ export default async function DestinoPage({ params, searchParams }: Props) {
                       />
                     ))}
                   </div>
-
                   {totalPages > 1 && (
-                    <PaginationBar
-                      currentPage={page}
-                      totalPages={totalPages}
-                      basePath={`/destinos/${slug}`}
-                      currentParams={pageParams}
-                    />
+                    <PaginationBar currentPage={page} totalPages={totalPages} basePath={`/destinos/${slug}`} currentParams={pageParams} />
                   )}
                 </>
               ) : (
                 <div className="py-24 text-center">
-                  <p className="text-muted-foreground text-lg mb-4">
-                    No se encontraron propiedades con estos filtros.
-                  </p>
+                  <p className="text-muted-foreground text-lg mb-4">{t('no_results')}</p>
                   <Link href={`/destinos/${slug}`} className={buttonVariants({ variant: 'goldOutline' })}>
-                    Ver todas las propiedades en {destination.country_name}
+                    {t('view_all', { country: countryName })}
                   </Link>
                 </div>
               )}
@@ -370,15 +323,15 @@ export default async function DestinoPage({ params, searchParams }: Props) {
       {/* CTA */}
       <section className="gradient-navy py-16">
         <div className="container-luxury text-center">
-          <p className="text-xs tracking-[0.25em] text-gold uppercase mb-4">Asesoría gratuita</p>
+          <p className="text-xs tracking-[0.25em] text-gold uppercase mb-4">{t('cta_eyebrow')}</p>
           <h2 className="font-display text-2xl font-semibold text-white mb-4 md:text-3xl">
-            ¿Le interesa invertir en {destination.country_name}?
+            {t('cta_title', { country: countryName })}
           </h2>
           <p className="text-white/60 text-sm mb-8 max-w-md mx-auto leading-relaxed">
-            Nuestros especialistas le asesorarán sobre las mejores oportunidades y aspectos legales para invertir en {destination.country_name}.
+            {t('cta_subtitle', { country: countryName })}
           </p>
           <Link href="/contacto" className={buttonVariants({ variant: 'gold', size: 'lg' })}>
-            Solicitar información
+            {t('cta_button')}
           </Link>
         </div>
       </section>
