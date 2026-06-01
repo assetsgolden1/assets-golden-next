@@ -89,7 +89,7 @@ export default async function Footer() {
             </h4>
             <ul className="space-y-2">
               {footerLinks.servicios.map((link) => (
-                <li key={link.href}>
+                <li key={link.href + link.label}>
                   <Link
                     href={link.href}
                     className="text-sm text-primary-foreground/60 hover:text-gold transition-colors"
@@ -108,7 +108,7 @@ export default async function Footer() {
             </h4>
             <ul className="space-y-2">
               {footerLinks.destinos.map((link) => (
-                <li key={link.href}>
+                <li key={link.href + link.label}>
                   <Link
                     href={link.href}
                     className="text-sm text-primary-foreground/60 hover:text-gold transition-colors"
