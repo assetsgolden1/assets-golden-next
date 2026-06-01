@@ -264,7 +264,7 @@ export default function NuevaPropiedadPage() {
                 {Object.entries(propertyTypeMap)
                   .filter(([key]) => !key.includes('-') && !key.includes(' ') || key === 'ground_floor')
                   .map(([key, label]) => (
-                    <option key={key} value={key}>{label}</option>
+                    <option key={key} value={key}>{label.es}</option>
                   ))}
               </select>
             </div>
