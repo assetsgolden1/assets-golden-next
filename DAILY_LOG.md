@@ -53,12 +53,99 @@ reordena si la prioridad cambió.
 - [ ] Firma de contrato comercial formal
 - [ ] Decisión sobre infraestructura (cuentas IBott vs Assets Golden)
 - [ ] Acceso Meta Business Manager, Google Ads, GA4, Search Console (Fase 2)
+- [ ] Cargar en Vercel: META_SYSTEM_USER_TOKEN (Sensitive), META_LEAD_FORM_ID, META_LEADS_SHEET_ID, CRON_SECRET (Sensitive) — valores en .env.local
+- [ ] Test manual del sync: `POST /api/leads/sync-meta/manual` con `Authorization: Bearer [CRON_SECRET]`
+- [ ] Verificar que los 7 leads históricos se saltean todos (deduplicación por email)
+- [ ] Si se quiere sync cada 15min: upgrade Vercel Pro o configurar QStash/GitHub Actions (ver docs/meta-leads-sync-automation.md)
 
 ---
 
 ## 📝 Historial de sesiones
 
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
+
+---
+
+### Sesión 2026-06-02 — [FASE-2-P2] Sistema de sincronización automática Meta Lead Ads → Google Sheets (revisión completa)
+
+**Contexto:** Retomar la FASE-2-P2 implementada en sesión 2026-05-31d. Los archivos ya existían pero necesitaban revisión profunda: el parser no tenía `meta_lead_id`, la deduplicación era por timestamp (frágil), no había integración con `categorizeLead`/`getSpecialStateNotes`, faltaba la columna Prioridad en el Sheet, y el endpoint manual no existía.
+
+**Trabajo hecho:**
+
+**T1 — `src/lib/meta/leadsApi.ts` (ACTUALIZADO)**
+- `fetchLeadsFromMeta(formId, accessToken, sinceTimestamp?)` — accessToken ahora va en header `Authorization: Bearer` (no en URL — seguridad)
+- Campos ampliados: + `adset_id`, `adset_name`, `campaign_id`, `campaign_name`, `platform`
+- Paginación via `paging.cursors.after` (más robusta que `paging.next`)
+- Errores 401/403 con mensajes claros para debugging
+
+**T2 — `src/lib/meta/leadParser.ts` (ACTUALIZADO)**
+- `ParsedMetaLead` ahora incluye `meta_lead_id` (crítico para deduplicación)
+- Keys de field_data actualizadas a los nombres reales del formulario Meta:
+  `what_type_of_property_are_you_looking_for?`, `what's_your_budget_range?`, etc.
+- Mapeos de valores: `apartment` → `Apartamento`, `within_3_months` → `En 3 meses`, etc.
+- `extractVariant` actualizado: detecta `Carousel-A` → `Carrusel A`
+
+**T3 — `src/lib/meta/syncTracker.ts` (REESCRITO)**
+- Eliminada lógica de timestamp. Nuevo modelo de deduplicación por ID/email:
+- `getSyncedLeadIds(formId)` — lee de tabla `meta_leads_synced`
+- `getSyncedEmails(formId)` — lee de tabla `meta_leads_synced`
+- `recordSyncedLeads(leads)` — upsert en `meta_leads_synced`
+
+**T4 — `src/lib/meta/syncLog.ts` (NUEVO)**
+- `createSyncRun(formId)` — inserta en `meta_sync_runs` con status='running'
+- `updateSyncRun(id, update)` — actualiza contadores y finished_at
+
+**T5 — `src/lib/googleSheets.ts` (ACTUALIZADO)**
+- `appendLeadToMetaSheet` actualizado: 11 columnas A:K (+ Prioridad), `insertDataOption: 'INSERT_ROWS'`
+- `readMetaSheetEmails(spreadsheetId)` — nueva función, lee columna C para dedup de leads manuales
+
+**T6 — `src/app/api/leads/sync-meta/route.ts` (REESCRITO)**
+- Flujo completo: createSyncRun → dedup (Supabase + Sheet) → fetchLeads → parse → categorizeLead → append → recordSyncedLeads → updateSyncRun
+- Log detallado: `{ fetched, duplicated, added }`
+- Fallback: si falta `meta_lead_id`, usa `form_id` hardcodeado desde env o constante
+
+**T7 — `src/app/api/leads/sync-meta/manual/route.ts` (NUEVO)**
+- POST endpoint — mismo flujo que el cron
+- Acepta `Authorization: Bearer [CRON_SECRET]` o `X-Manual-Sync: [CRON_SECRET]`
+
+**T8 — `.env.local` (ACTUALIZADO)**
+- `META_LEAD_FORM_ID=1495878108643736`
+- `META_LEADS_SHEET_ID=1Q_PRvDe45XxRoB43JZGWVJyJli8Cqf0G2Ry8vJcvZcA`
+- `CRON_SECRET=PRI2MuQ9hOo1uIL8xyMFbtSJyWPHZ8mMMYvVICg-OWc=`
+
+**T9 — Migraciones Supabase (aplicadas via MCP)**
+- `meta_leads_synced` (meta_lead_id PK, form_id, email, created_time, synced_at)
+- `meta_sync_runs` (id uuid PK, form_id, started_at, finished_at, leads_fetched, leads_duplicated, leads_added, status, error_message, details)
+
+**T10 — `docs/meta-leads-sync-automation.md` (NUEVO)**
+- Arquitectura, variables de entorno, cómo regenerar token, cambiar form/sheet, sync manual, opciones de cron frecuente (Vercel Pro / QStash / GitHub Actions), queries de monitoreo
+
+**TypeScript:** `npx tsc --noEmit` → 0 errores ✓
+
+**Nota cron:** `vercel.json` mantiene `0 0 * * *` (Hobby plan). Cambiar a `*/15 * * * *` solo si upgrade a Vercel Pro o usar fallback QStash/GitHub Actions (documentado).
+
+**Archivos creados:**
+- CREATED: `src/lib/meta/syncLog.ts`
+- CREATED: `src/app/api/leads/sync-meta/manual/route.ts`
+- CREATED: `docs/meta-leads-sync-automation.md`
+
+**Archivos modificados:**
+- MODIFIED: `src/lib/meta/leadsApi.ts`
+- MODIFIED: `src/lib/meta/leadParser.ts`
+- MODIFIED: `src/lib/meta/syncTracker.ts`
+- MODIFIED: `src/lib/googleSheets.ts`
+- MODIFIED: `src/app/api/leads/sync-meta/route.ts`
+- MODIFIED: `.env.local`
+- DB MIGRATIONS: `create_meta_leads_synced`, `create_meta_sync_runs`
+
+**Commits:** pendiente de OK del usuario
+
+**Próximo paso sugerido:**
+1. Cargar en Vercel las 4 variables: `META_SYSTEM_USER_TOKEN` (Sensitive), `META_LEAD_FORM_ID`, `META_LEADS_SHEET_ID`, `CRON_SECRET` (Sensitive)
+2. Commit + push → deploy automático
+3. Test manual: `curl -X POST https://[dominio]/api/leads/sync-meta/manual -H "Authorization: Bearer PRI2MuQ9hOo1uIL8xyMFbtSJyWPHZ8mMMYvVICg-OWc="`
+4. Verificar que los 7 leads históricos se saltean (expected: `added: 0, duplicated: 7`)
+5. Si un lead nuevo llega desde Meta, debería aparecer en el Sheet en el próximo ciclo
 
 ---
 

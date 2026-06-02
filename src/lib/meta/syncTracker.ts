@@ -1,41 +1,51 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
-// First run fallback: pull leads from the last 30 days
-const FIRST_RUN_LOOKBACK_DAYS = 30
-
-export async function getLastSyncedTimestamp(formId: string): Promise<number> {
-  const { data } = await supabaseAdmin
-    .from('meta_sync_log')
-    .select('last_synced_at')
+export async function getSyncedLeadIds(formId: string): Promise<Set<string>> {
+  const { data, error } = await supabaseAdmin
+    .from('meta_leads_synced')
+    .select('meta_lead_id')
     .eq('form_id', formId)
-    .eq('status', 'ok')
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-
-  if (!data?.last_synced_at) {
-    const fallbackMs = Date.now() - FIRST_RUN_LOOKBACK_DAYS * 24 * 60 * 60 * 1000
-    return Math.floor(fallbackMs / 1000)
-  }
-
-  return Math.floor(new Date(data.last_synced_at).getTime() / 1000)
-}
-
-export async function recordSync(
-  formId: string,
-  leadsCount: number,
-  status: 'ok' | 'error',
-  details?: Record<string, unknown>,
-): Promise<void> {
-  const { error } = await supabaseAdmin.from('meta_sync_log').insert({
-    form_id: formId,
-    last_synced_at: new Date().toISOString(),
-    leads_count: leadsCount,
-    status,
-    details: details ?? null,
-  })
 
   if (error) {
-    console.error('[syncTracker] Error al insertar en meta_sync_log:', error.message)
+    console.error('[syncTracker] Error leyendo meta_lead_ids:', error.message)
+    return new Set()
+  }
+
+  return new Set(data?.map(r => r.meta_lead_id) ?? [])
+}
+
+export async function getSyncedEmails(formId: string): Promise<Set<string>> {
+  const { data, error } = await supabaseAdmin
+    .from('meta_leads_synced')
+    .select('email')
+    .eq('form_id', formId)
+    .not('email', 'is', null)
+
+  if (error) {
+    console.error('[syncTracker] Error leyendo emails:', error.message)
+    return new Set()
+  }
+
+  return new Set(data?.map(r => r.email?.toLowerCase()).filter(Boolean) ?? [])
+}
+
+export async function recordSyncedLeads(
+  leads: Array<{ meta_lead_id: string; email: string; created_time: string; form_id: string }>,
+): Promise<void> {
+  if (leads.length === 0) return
+
+  const rows = leads.map(l => ({
+    meta_lead_id: l.meta_lead_id,
+    form_id: l.form_id,
+    email: l.email || null,
+    created_time: l.created_time,
+  }))
+
+  const { error } = await supabaseAdmin
+    .from('meta_leads_synced')
+    .upsert(rows, { onConflict: 'meta_lead_id' })
+
+  if (error) {
+    console.error('[syncTracker] Error guardando leads sincronizados:', error.message)
   }
 }

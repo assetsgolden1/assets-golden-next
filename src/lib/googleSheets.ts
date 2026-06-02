@@ -1,7 +1,8 @@
 import { google } from 'googleapis'
 
-// Columns for the Meta Leads sheet (10 columns, A:J)
-interface MetaLead {
+// Columns for the Meta Leads sheet (11 columns, A:K)
+// Fecha | Nombre | Email | Teléfono | Tipo | Presupuesto | Timeline | Purpose | Variante | Prioridad | Estado
+interface MetaSheetRow {
   fecha: string
   nombre: string
   email: string
@@ -11,27 +12,32 @@ interface MetaLead {
   timeline: string
   purpose: string
   variante: string
+  prioridad: string
   estado: string
 }
 
-export async function appendLeadToMetaSheet(lead: MetaLead, spreadsheetId: string) {
-  const credentialsJson = process.env.GOOGLE_SHEETS_CREDENTIALS_JSON
-  if (!credentialsJson || !spreadsheetId) {
-    throw new Error('[Sheets-Meta] GOOGLE_SHEETS_CREDENTIALS_JSON o spreadsheetId no configurados')
-  }
-
+function buildSheetsClient(credentialsJson: string) {
   const credentials = JSON.parse(credentialsJson)
   const auth = new google.auth.GoogleAuth({
     credentials,
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   })
+  return google.sheets({ version: 'v4', auth })
+}
 
-  const sheets = google.sheets({ version: 'v4', auth })
+export async function appendLeadToMetaSheet(lead: MetaSheetRow, spreadsheetId: string) {
+  const credentialsJson = process.env.GOOGLE_SHEETS_CREDENTIALS_JSON
+  if (!credentialsJson || !spreadsheetId) {
+    throw new Error('[Sheets-Meta] GOOGLE_SHEETS_CREDENTIALS_JSON o spreadsheetId no configurados')
+  }
+
+  const sheets = buildSheetsClient(credentialsJson)
 
   const result = await sheets.spreadsheets.values.append({
     spreadsheetId,
-    range: "'Hoja 1'!A:J",
+    range: "'Hoja 1'!A:K",
     valueInputOption: 'USER_ENTERED',
+    insertDataOption: 'INSERT_ROWS',
     requestBody: {
       values: [[
         lead.fecha,
@@ -43,12 +49,37 @@ export async function appendLeadToMetaSheet(lead: MetaLead, spreadsheetId: strin
         lead.timeline,
         lead.purpose,
         lead.variante,
+        lead.prioridad,
         lead.estado,
       ]],
     },
   })
 
   console.log('[Sheets-Meta] Lead añadido:', lead.email, '— updatedRange:', result.data.updates?.updatedRange)
+}
+
+export async function readMetaSheetEmails(spreadsheetId: string): Promise<Set<string>> {
+  const credentialsJson = process.env.GOOGLE_SHEETS_CREDENTIALS_JSON
+  if (!credentialsJson || !spreadsheetId) return new Set()
+
+  try {
+    const sheets = buildSheetsClient(credentialsJson)
+    const res = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "'Hoja 1'!C:C",
+    })
+    const rows = res.data.values ?? []
+    // row[0] is the header "Email" — skip it
+    return new Set(
+      rows
+        .slice(1)
+        .map(r => (r[0] as string | undefined)?.toLowerCase().trim())
+        .filter((e): e is string => !!e),
+    )
+  } catch (err) {
+    console.error('[Sheets-Meta] Error leyendo emails existentes:', err)
+    return new Set()
+  }
 }
 
 export async function appendLeadToSheets(lead: {
