@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 import { Phone, Mail, MessageCircle, MapPin } from 'lucide-react'
 import { getTranslations, getLocale } from 'next-intl/server'
 import ContactForm from './ContactForm'
@@ -8,7 +9,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: t('meta_title'),
     description: t('meta_description'),
-    alternates: { canonical: '/contacto' },
+    alternates: buildAlternates('/contacto'),
     openGraph: { url: '/contacto' },
   }
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
 import { MapPin, ArrowLeft } from 'lucide-react'
@@ -47,7 +48,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   return {
     title,
     description,
-    alternates: { canonical: '/destinos/espana' },
+    alternates: buildAlternates('/destinos/espana'),
     openGraph: { title, description, url: '/destinos/espana' },
   }
 }

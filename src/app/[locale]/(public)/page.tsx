@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 import { MapPin } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import HomeSidebar from '@/components/HomeSidebar'
@@ -21,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: { absolute: t('meta_title') },
     description: t('meta_description'),
-    alternates: { canonical: 'https://assetsgolden.com' },
+    alternates: buildAlternates('/'),
     openGraph: { url: 'https://assetsgolden.com' },
   }
 }

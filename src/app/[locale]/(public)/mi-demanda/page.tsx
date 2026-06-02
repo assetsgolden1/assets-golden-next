@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 import { getTranslations } from 'next-intl/server'
 import MiDemandaForm from './MiDemandaForm'
 
@@ -7,7 +8,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: t('meta_title'),
     description: t('meta_description'),
-    alternates: { canonical: '/mi-demanda' },
+    alternates: buildAlternates('/mi-demanda'),
     openGraph: { url: '/mi-demanda' },
   }
 }

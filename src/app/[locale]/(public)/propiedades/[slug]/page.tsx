@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 import { Link } from '@/i18n/navigation'
 import { notFound, redirect } from 'next/navigation'
 import { ArrowLeft, Maximize, BedDouble, Bath, MapPin, ExternalLink } from 'lucide-react'
@@ -42,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: data.title,
     description,
-    alternates: { canonical: `/propiedades/${slug}` },
+    alternates: buildAlternates(`/propiedades/${slug}`),
     openGraph: {
       images: data.image_url ? [{ url: data.image_url }] : [],
       url: `/propiedades/${slug}`,

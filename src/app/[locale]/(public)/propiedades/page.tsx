@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 import { Link } from '@/i18n/navigation'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { formatNumber } from '@/lib/utils/format'
@@ -17,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: t('meta_title'),
     description: t('meta_description'),
-    alternates: { canonical: '/propiedades' },
+    alternates: buildAlternates('/propiedades'),
     openGraph: { url: '/propiedades' },
   }
 }

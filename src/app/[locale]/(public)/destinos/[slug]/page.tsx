@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
 import { redirect, notFound } from 'next/navigation'
@@ -64,7 +65,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   return {
     title,
     description,
-    alternates: { canonical: `/destinos/${slug}` },
+    alternates: buildAlternates(`/destinos/${slug}`),
     openGraph: { images: data.hero_image_url ? [{ url: data.hero_image_url }] : [], url: `/destinos/${slug}` },
     twitter: { images: data.hero_image_url ? [data.hero_image_url] : undefined },
   }
