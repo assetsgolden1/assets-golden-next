@@ -7,9 +7,9 @@ import { appendLeadToMetaSheet, readMetaSheetEmails } from '@/lib/googleSheets'
 import { categorizeLead, getSpecialStateNotes } from '@/lib/leads/prioritizeLead'
 
 // Manual trigger — same logic as GET /api/leads/sync-meta.
-// Protected with the same CRON_SECRET via Authorization: Bearer or X-Manual-Sync header.
+// Protected with the same META_LEADS_CRON_SECRET via Authorization: Bearer or X-Manual-Sync header.
 function isAuthorized(req: NextRequest): boolean {
-  const secret = process.env.CRON_SECRET
+  const secret = process.env.META_LEADS_CRON_SECRET
   if (!secret) return true
   const bearer = req.headers.get('authorization')
   const manual = req.headers.get('x-manual-sync')
@@ -21,12 +21,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const formId = process.env.META_LEAD_FORM_ID ?? '1495878108643736'
+  const formId = process.env.META_LEADS_FORM_ID ?? '1495878108643736'
   const sheetId = process.env.META_LEADS_SHEET_ID ?? '1Q_PRvDe45XxRoB43JZGWVJyJli8Cqf0G2Ry8vJcvZcA'
-  const token = process.env.META_SYSTEM_USER_TOKEN
+  const token = process.env.META_LEADS_SYNC_TOKEN
 
   if (!token) {
-    return NextResponse.json({ ok: false, error: 'META_SYSTEM_USER_TOKEN no configurado' }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'META_LEADS_SYNC_TOKEN no configurado' }, { status: 500 })
   }
 
   const runId = await createSyncRun(formId)

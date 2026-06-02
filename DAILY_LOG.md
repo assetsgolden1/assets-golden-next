@@ -53,8 +53,8 @@ reordena si la prioridad cambió.
 - [ ] Firma de contrato comercial formal
 - [ ] Decisión sobre infraestructura (cuentas IBott vs Assets Golden)
 - [ ] Acceso Meta Business Manager, Google Ads, GA4, Search Console (Fase 2)
-- [ ] Cargar en Vercel: META_SYSTEM_USER_TOKEN (Sensitive), META_LEAD_FORM_ID, META_LEADS_SHEET_ID, CRON_SECRET (Sensitive) — valores en .env.local
-- [ ] Test manual del sync: `POST /api/leads/sync-meta/manual` con `Authorization: Bearer [CRON_SECRET]`
+- [ ] Cargar en Vercel: META_LEADS_SYNC_TOKEN (Sensitive), META_LEADS_FORM_ID, META_LEADS_SHEET_ID, META_LEADS_CRON_SECRET (Sensitive) — valores en .env.local
+- [ ] Test manual del sync: `POST /api/leads/sync-meta/manual` con `Authorization: Bearer [META_LEADS_CRON_SECRET]`
 - [ ] Verificar que los 7 leads históricos se saltean todos (deduplicación por email)
 - [ ] Si se quiere sync cada 15min: upgrade Vercel Pro o configurar QStash/GitHub Actions (ver docs/meta-leads-sync-automation.md)
 
@@ -63,6 +63,37 @@ reordena si la prioridad cambió.
 ## 📝 Historial de sesiones
 
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
+
+---
+
+### Sesión 2026-06-02 — [FASE-2-P2-FIX] Rename env vars Meta Leads Sync con prefijo META_LEADS_
+
+**Contexto:** Las variables `META_SYSTEM_USER_TOKEN` y `CRON_SECRET` ya existían en Vercel asignadas a otros sistemas. Para evitar conflictos, renombrar las del sistema Meta Leads Sync con prefijo claro.
+
+**Trabajo hecho:**
+- `META_SYSTEM_USER_TOKEN` → `META_LEADS_SYNC_TOKEN` en todo el código
+- `META_LEAD_FORM_ID` → `META_LEADS_FORM_ID` en todo el código
+- `CRON_SECRET` → `META_LEADS_CRON_SECRET` solo en archivos del sistema sync-meta (sync-habihub intacto)
+- `META_LEADS_SHEET_ID` sin cambios (ya tenía el prefijo correcto)
+
+**Archivos modificados:**
+- MODIFIED: `src/lib/meta/leadsApi.ts` — mensaje de error 401
+- MODIFIED: `src/app/api/leads/sync-meta/route.ts` — 3 referencias
+- MODIFIED: `src/app/api/leads/sync-meta/manual/route.ts` — 3 referencias + comentario
+- MODIFIED: `.env.local` — renombradas las 3 variables + comentarios
+- MODIFIED: `docs/meta-leads-sync-automation.md` — todas las referencias
+- MODIFIED: `docs/meta-leads-sync.md` — todas las referencias
+- MODIFIED: `DAILY_LOG.md` — referencias en pendientes y sesiones anteriores
+
+**Verificaciones:**
+- `grep META_SYSTEM_USER_TOKEN src/**` → 0 resultados ✓
+- `grep META_LEAD_FORM_ID src/**` → 0 resultados ✓
+- `grep CRON_SECRET src/lib/meta/ src/app/api/leads/sync-meta/` → 0 resultados ✓
+- `grep CRON_SECRET src/app/api/admin/sync-habihub/route.ts` → 1 resultado (intacto) ✓
+
+**Próximo paso sugerido:**
+1. Cargar en Vercel con los nombres nuevos: `META_LEADS_SYNC_TOKEN` (Sensitive), `META_LEADS_FORM_ID`, `META_LEADS_SHEET_ID`, `META_LEADS_CRON_SECRET` (Sensitive)
+2. Commit + push → deploy
 
 ---
 
@@ -109,9 +140,9 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 - Acepta `Authorization: Bearer [CRON_SECRET]` o `X-Manual-Sync: [CRON_SECRET]`
 
 **T8 — `.env.local` (ACTUALIZADO)**
-- `META_LEAD_FORM_ID=1495878108643736`
+- `META_LEADS_FORM_ID=1495878108643736`
 - `META_LEADS_SHEET_ID=1Q_PRvDe45XxRoB43JZGWVJyJli8Cqf0G2Ry8vJcvZcA`
-- `CRON_SECRET=PRI2MuQ9hOo1uIL8xyMFbtSJyWPHZ8mMMYvVICg-OWc=`
+- `META_LEADS_CRON_SECRET=PRI2MuQ9hOo1uIL8xyMFbtSJyWPHZ8mMMYvVICg-OWc=`
 
 **T9 — Migraciones Supabase (aplicadas via MCP)**
 - `meta_leads_synced` (meta_lead_id PK, form_id, email, created_time, synced_at)
@@ -141,7 +172,7 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 **Commits:** pendiente de OK del usuario
 
 **Próximo paso sugerido:**
-1. Cargar en Vercel las 4 variables: `META_SYSTEM_USER_TOKEN` (Sensitive), `META_LEAD_FORM_ID`, `META_LEADS_SHEET_ID`, `CRON_SECRET` (Sensitive)
+1. Cargar en Vercel las 4 variables: `META_LEADS_SYNC_TOKEN` (Sensitive), `META_LEADS_FORM_ID`, `META_LEADS_SHEET_ID`, `META_LEADS_CRON_SECRET` (Sensitive)
 2. Commit + push → deploy automático
 3. Test manual: `curl -X POST https://[dominio]/api/leads/sync-meta/manual -H "Authorization: Bearer PRI2MuQ9hOo1uIL8xyMFbtSJyWPHZ8mMMYvVICg-OWc="`
 4. Verificar que los 7 leads históricos se saltean (expected: `added: 0, duplicated: 7`)
@@ -562,7 +593,7 @@ ALTER TABLE properties DROP COLUMN habihub_dev_id, DROP COLUMN habihub_unit;
 
 **Próximo paso sugerido:**
 1. Atilio verifica las 7 filas en el Sheet y actualiza la columna J (Estado) según contacto
-2. FASE-2-P2: cuando se desbloquee el System User Token de Meta, activar la sincronización automática (variables ya cargadas en `.env.local`): META_SYSTEM_USER_TOKEN, META_LEAD_FORM_ID, META_LEADS_SHEET_ID, CRON_SECRET
+2. FASE-2-P2: cuando se desbloquee el System User Token de Meta, activar la sincronización automática (variables ya cargadas en `.env.local`): META_LEADS_SYNC_TOKEN, META_LEADS_FORM_ID, META_LEADS_SHEET_ID, META_LEADS_CRON_SECRET
 
 ---
 
@@ -690,7 +721,7 @@ ALTER TABLE properties DROP COLUMN habihub_dev_id, DROP COLUMN habihub_unit;
 - Índices en form_id y status
 
 **T8 — `.env.local` (MODIFICADO)**
-- Añadidos placeholders vacíos: META_SYSTEM_USER_TOKEN, META_LEAD_FORM_ID, META_LEADS_SHEET_ID, CRON_SECRET
+- Añadidos placeholders vacíos: META_LEADS_SYNC_TOKEN, META_LEADS_FORM_ID, META_LEADS_SHEET_ID, META_LEADS_CRON_SECRET
 
 **T9 — `docs/meta-leads-sync.md` (NUEVO)**
 - Guía completa: estructura Sheet, cómo regenerar token, cambiar form_id/sheet_id, sync manual, deduplicación, diagnóstico
@@ -698,8 +729,8 @@ ALTER TABLE properties DROP COLUMN habihub_dev_id, DROP COLUMN habihub_unit;
 **TypeScript:** `npx tsc --noEmit` limpio ✓
 
 **Variables de entorno pendientes de cargar en Vercel (SIN ángulos):**
-- `META_SYSTEM_USER_TOKEN` → Sensitive
-- `META_LEAD_FORM_ID`
+- `META_LEADS_SYNC_TOKEN` → Sensitive
+- `META_LEADS_FORM_ID`
 - `META_LEADS_SHEET_ID`
 - `CRON_SECRET`
 

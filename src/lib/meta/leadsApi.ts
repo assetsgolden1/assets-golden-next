@@ -50,7 +50,7 @@ export async function fetchLeadsFromMeta(
 
     if (!res.ok) {
       const errText = await res.text()
-      if (res.status === 401) throw new Error('Meta token inválido o expirado (401). Regenerar META_SYSTEM_USER_TOKEN.')
+      if (res.status === 401) throw new Error('Meta token inválido o expirado (401). Regenerar META_LEADS_SYNC_TOKEN.')
       if (res.status === 403) throw new Error('Sin permiso leads_retrieval en Meta (403). Verificar permisos del System User.')
       throw new Error(`Meta Graph API error ${res.status}: ${errText}`)
     }

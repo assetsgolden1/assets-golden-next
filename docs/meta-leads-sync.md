@@ -9,14 +9,14 @@ El cron de Vercel dispara `/api/leads/sync-meta` cada 15 minutos.
 
 | Variable | Dónde conseguirla |
 |---|---|
-| `META_SYSTEM_USER_TOKEN` | Meta Business Manager → Configuración del negocio → Usuarios del sistema → Token |
-| `META_LEAD_FORM_ID` | Meta Ads Manager → Formularios de clientes potenciales → ID del form |
+| `META_LEADS_SYNC_TOKEN` | Meta Business Manager → Configuración del negocio → Usuarios del sistema → Token |
+| `META_LEADS_FORM_ID` | Meta Ads Manager → Formularios de clientes potenciales → ID del form |
 | `META_LEADS_SHEET_ID` | URL del Sheet: `docs.google.com/spreadsheets/d/**{ID}**/edit` |
-| `CRON_SECRET` | String aleatorio (ej: `openssl rand -hex 32`) |
+| `META_LEADS_CRON_SECRET` | String aleatorio (ej: `openssl rand -hex 32`) |
 | `GOOGLE_SHEETS_CREDENTIALS_JSON` | Ya configurado (Service Account compartida con el Sheet) |
 
 Cargar todas en `.env.local` (desarrollo) y en **Vercel → Settings → Environment Variables** (producción).  
-`META_SYSTEM_USER_TOKEN` debe marcarse como **Sensitive** en Vercel. Cargarlo **sin** ángulos `< >`.
+`META_LEADS_SYNC_TOKEN` debe marcarse como **Sensitive** en Vercel. Cargarlo **sin** ángulos `< >`.
 
 ---
 
@@ -49,14 +49,14 @@ Compartir el Sheet como **Editor** con la Service Account:
 3. Clic en **Generar nuevo token**
 4. Seleccionar la app y permisos: `leads_retrieval`, `ads_read`
 5. Copiar el token (sin ángulos)
-6. Actualizar `META_SYSTEM_USER_TOKEN` en Vercel → redeploy automático
+6. Actualizar `META_LEADS_SYNC_TOKEN` en Vercel → redeploy automático
 
 ---
 
 ## Cómo cambiar el formulario (nueva campaña)
 
 1. En Meta Ads Manager, abrir el formulario nuevo → copiar su ID numérico
-2. Actualizar `META_LEAD_FORM_ID` en Vercel
+2. Actualizar `META_LEADS_FORM_ID` en Vercel
 3. Si el Sheet destino también cambia, actualizar `META_LEADS_SHEET_ID`
 4. En el próximo ciclo de cron, el tracker buscará el historial del nuevo `form_id`  
    (primer sync recupera leads de los últimos 30 días)
@@ -77,13 +77,13 @@ Compartir el Sheet como **Editor** con la Service Account:
 ```bash
 # Desde terminal — sustituir {SECRET} y {URL}
 curl -X GET "{URL}/api/leads/sync-meta" \
-  -H "Authorization: Bearer {CRON_SECRET}"
+  -H "Authorization: Bearer {META_LEADS_CRON_SECRET}"
 ```
 
 En local (con `.env.local` cargado):
 ```bash
 curl http://localhost:3000/api/leads/sync-meta \
-  -H "Authorization: Bearer $(grep CRON_SECRET .env.local | cut -d= -f2)"
+  -H "Authorization: Bearer $(grep META_LEADS_CRON_SECRET .env.local | cut -d= -f2)"
 ```
 
 La respuesta devuelve:

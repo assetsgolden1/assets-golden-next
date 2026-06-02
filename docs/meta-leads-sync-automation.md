@@ -65,10 +65,10 @@ error_message    text
 
 | Variable | Descripción |
 |---|---|
-| `META_SYSTEM_USER_TOKEN` | Token del System User de Meta Business Manager |
-| `META_LEAD_FORM_ID` | ID del formulario (hardcodeado: `1495878108643736`) |
+| `META_LEADS_SYNC_TOKEN` | Token del System User de Meta Business Manager |
+| `META_LEADS_FORM_ID` | ID del formulario (hardcodeado: `1495878108643736`) |
 | `META_LEADS_SHEET_ID` | ID del Google Sheet (hardcodeado: `1Q_PRvDe45XxRoB43JZGWVJyJli8Cqf0G2Ry8vJcvZcA`) |
-| `CRON_SECRET` | Token de seguridad para el endpoint cron |
+| `META_LEADS_CRON_SECRET` | Token de seguridad para el endpoint cron |
 | `GOOGLE_SHEETS_CREDENTIALS_JSON` | Service account JSON de Google |
 
 ---
@@ -85,9 +85,9 @@ error_message    text
    - `pages_show_list`
    - `pages_read_engagement`
 5. Copiar el token generado (solo se muestra una vez)
-6. Actualizar `META_SYSTEM_USER_TOKEN` en:
+6. Actualizar `META_LEADS_SYNC_TOKEN` en:
    - `.env.local` (desarrollo local)
-   - Vercel → Project Settings → Environment Variables → `META_SYSTEM_USER_TOKEN` (Production + Preview + Development)
+   - Vercel → Project Settings → Environment Variables → `META_LEADS_SYNC_TOKEN` (Production + Preview + Development)
 7. Redeploy en Vercel para que tome el nuevo token
 
 ---
@@ -97,7 +97,7 @@ error_message    text
 Si lanzás una nueva campaña con un formulario distinto:
 
 1. En **Meta Ads Manager** → Lead Forms → copiar el ID del nuevo formulario
-2. Actualizar `META_LEAD_FORM_ID` en `.env.local` y Vercel
+2. Actualizar `META_LEADS_FORM_ID` en `.env.local` y Vercel
 3. Los leads del formulario anterior quedan registrados en `meta_leads_synced` con el `form_id` viejo — no afectan al nuevo
 
 ---
@@ -116,11 +116,11 @@ Si lanzás una nueva campaña con un formulario distinto:
 ```bash
 # Con curl (local o producción)
 curl -X POST https://[dominio]/api/leads/sync-meta/manual \
-  -H "Authorization: Bearer [CRON_SECRET]"
+  -H "Authorization: Bearer [META_LEADS_CRON_SECRET]"
 
 # O con el header alternativo
 curl -X POST https://[dominio]/api/leads/sync-meta/manual \
-  -H "X-Manual-Sync: [CRON_SECRET]"
+  -H "X-Manual-Sync: [META_LEADS_CRON_SECRET]"
 ```
 
 La respuesta es:
@@ -146,7 +146,7 @@ El cron está configurado en `vercel.json` como `0 0 * * *` (medianoche UTC, 1 v
 ```
 Dashboard: console.upstash.com → QStash → Schedules
 Endpoint: POST https://[dominio]/api/leads/sync-meta/manual
-Headers: Authorization: Bearer [CRON_SECRET]
+Headers: Authorization: Bearer [META_LEADS_CRON_SECRET]
 Schedule: */15 * * * *
 ```
 
@@ -162,7 +162,7 @@ jobs:
     steps:
       - run: |
           curl -X POST ${{ secrets.SITE_URL }}/api/leads/sync-meta/manual \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+            -H "Authorization: Bearer ${{ secrets.META_LEADS_CRON_SECRET }}"
 ```
 
 ---
@@ -182,7 +182,7 @@ Solo se usa `APPEND` con `insertDataOption: INSERT_ROWS` — **nunca** se borran
 
 | Error | Causa | Solución |
 |---|---|---|
-| `Meta token inválido (401)` | Token expirado | Regenerar META_SYSTEM_USER_TOKEN |
+| `Meta token inválido (401)` | Token expirado | Regenerar META_LEADS_SYNC_TOKEN |
 | `Sin permiso leads_retrieval (403)` | Token sin permisos suficientes | Regenerar token con permisos correctos |
 | `GOOGLE_SHEETS_CREDENTIALS_JSON no configurado` | Falta variable env | Verificar variable en Vercel |
 | `duplicate key value violates unique constraint` | Bug en deduplicación | Revisar logs de la run en `meta_sync_runs` |
