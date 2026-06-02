@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { propertyTypeMap } from '@/lib/propertyTypes'
+import { COUNTRIES } from '@/lib/constants/countries'
 import {
   DndContext,
   closestCenter,
@@ -21,20 +22,6 @@ import {
 import { SortableImage } from '@/components/admin/SortableImage'
 
 const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF']
-
-const COUNTRIES = [
-  'Argentina',
-  'Costa Rica',
-  'Ecuador',
-  'Emiratos Árabes Unidos',
-  'España',
-  'Estados Unidos',
-  'Grecia',
-  'Indonesia',
-  'México',
-  'Paraguay',
-  'Reino Unido',
-]
 
 const CLASSIFICATIONS = [
   { value: '', label: 'Normal' },

@@ -77,6 +77,7 @@ export async function POST(request: NextRequest) {
     hidden: false,
     sold: false,
     classification: data.classification ?? null,
+    external_source: 'manual',
   })
 
   if (error) {
@@ -100,11 +101,13 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (!existing) {
+      const firstImage = data.image_url ?? null
       await supabaseAdmin.from('country_destinations').insert({
         country_name: normalized.country,
         slug: countrySlug,
         description: `Propiedades en ${normalized.country}`,
         active: true,
+        ...(firstImage ? { hero_image_url: firstImage, card_image_url: firstImage } : {}),
       })
     }
   }

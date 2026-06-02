@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState, useRef } from 'react'
 import { propertyTypeMap } from '@/lib/propertyTypes'
+import { COUNTRIES } from '@/lib/constants/countries'
 import { toSentenceCase } from '@/lib/utils/normalizeText'
 import {
   DndContext,
@@ -21,20 +22,6 @@ import {
 import { SortableImage } from '@/components/admin/SortableImage'
 
 const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF']
-
-const COUNTRIES = [
-  'Argentina',
-  'Costa Rica',
-  'Ecuador',
-  'Emiratos Árabes Unidos',
-  'España',
-  'Estados Unidos',
-  'Grecia',
-  'Indonesia',
-  'México',
-  'Paraguay',
-  'Reino Unido',
-]
 
 const CLASSIFICATIONS = [
   { value: '', label: 'Normal' },
