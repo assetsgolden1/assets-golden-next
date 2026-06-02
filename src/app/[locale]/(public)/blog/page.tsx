@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Coffee } from 'lucide-react'
 import { getBlogPosts } from '@/lib/supabase/queries'
+import { getLocale } from 'next-intl/server'
 
 export const metadata: Metadata = {
   title: 'Blog Inmobiliario',
@@ -40,7 +41,8 @@ function formatDate(dateStr: string | null): string {
 }
 
 export default async function BlogPage() {
-  const { data: posts } = await getBlogPosts(20)
+  const locale = await getLocale()
+  const { data: posts } = await getBlogPosts(20, locale)
 
   const featured = posts[0]
   const rest = posts.slice(1)

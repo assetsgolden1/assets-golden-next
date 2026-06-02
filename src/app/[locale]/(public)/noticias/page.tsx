@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Calendar, TrendingUp, Building2, MapPin } from 'lucide-react'
 import { getBlogPostsByCategory } from '@/lib/supabase/queries'
+import { getLocale } from 'next-intl/server'
 
 export const metadata: Metadata = {
   title: 'Noticias del Mercado Inmobiliario',
@@ -65,7 +66,8 @@ function formatDate(dateStr: string): string {
 }
 
 export default async function NoticiasPage() {
-  const { data: posts } = await getBlogPostsByCategory('news')
+  const locale = await getLocale()
+  const { data: posts } = await getBlogPostsByCategory('news', locale)
 
   return (
     <>

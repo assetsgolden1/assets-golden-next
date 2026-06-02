@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getBlogPostBySlug, getAllBlogSlugs } from '@/lib/supabase/queries'
+import { routing } from '@/i18n/routing'
 import type { BlogPost } from '@/types'
 import Breadcrumb from '@/components/seo/Breadcrumb'
 import { buttonVariants } from '@/components/ui/button'
@@ -11,12 +12,17 @@ import { RelatedProperties } from '@/components/RelatedProperties'
 import { addInternalLinks } from '@/lib/utils/blogInternalLinks'
 
 interface Props {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string; locale: string }>
 }
 
 export async function generateStaticParams() {
-  const slugs = await getAllBlogSlugs()
-  return slugs.map((slug) => ({ slug }))
+  const results = await Promise.all(
+    routing.locales.map(async (locale) => {
+      const slugs = await getAllBlogSlugs(locale)
+      return slugs.map((slug) => ({ locale, slug }))
+    })
+  )
+  return results.flat()
 }
 
 export const dynamicParams = true
@@ -56,10 +62,10 @@ function resolveOgImage(post: BlogPost): string | undefined {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params
+  const { slug, locale } = await params
   const { data: post } = await getBlogPostBySlug(slug)
 
-  if (!post) return { title: 'Artículo no encontrado — Assets Golden' }
+  if (!post || post.language !== locale) return { title: 'Artículo no encontrado — Assets Golden' }
 
   const ogImage = resolveOgImage(post)
 
@@ -134,10 +140,10 @@ function extractFAQs(html: string): Array<{ question: string; answer: string }> 
 }
 
 export default async function BlogPostPage({ params }: Props) {
-  const { slug } = await params
+  const { slug, locale } = await params
   const { data: post } = await getBlogPostBySlug(slug)
 
-  if (!post) notFound()
+  if (!post || post.language !== locale) notFound()
 
   const heroImage = post.banner_image_url ?? post.cover_image ?? null
   const faqs = post.content ? extractFAQs(post.content) : []
