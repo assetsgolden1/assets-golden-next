@@ -6,6 +6,7 @@ import { Globe, ChevronDown, ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import type { CountryDestination, TeamMember } from '@/types'
+import { translateCountry } from '@/lib/utils/translateGeography'
 import CollaborateDialog from '@/components/CollaborateDialog'
 import DemandDialog from '@/components/DemandDialog'
 import AssetFormDialog from '@/components/AssetFormDialog'
@@ -14,9 +15,10 @@ interface Props {
   destinations: CountryDestination[]
   propertyCounts: Record<string, number>
   partners: TeamMember[]
+  locale: string
 }
 
-export default function HomeSidebar({ destinations, propertyCounts, partners }: Props) {
+export default function HomeSidebar({ destinations, propertyCounts, partners, locale }: Props) {
   const t = useTranslations('Sidebar')
   const [countriesOpen, setCountriesOpen] = useState(false)
   const [collaborateOpen, setCollaborateOpen] = useState(false)
@@ -91,7 +93,7 @@ export default function HomeSidebar({ destinations, propertyCounts, partners }: 
                           onClick={() => setCountriesOpen(false)}
                           className="group flex items-center justify-between w-full py-3 px-8 text-sm text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/5 transition-all duration-300"
                         >
-                          <span className="font-medium tracking-wide uppercase text-xs">{dest.country_name}</span>
+                          <span className="font-medium tracking-wide uppercase text-xs">{translateCountry(dest.country_name, locale)}</span>
                           <div className="flex items-center gap-2">
                             {count > 0 && <span className="text-[10px] text-gold/60">{count}</span>}
                             <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-gold" />

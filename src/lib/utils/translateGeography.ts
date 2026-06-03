@@ -23,6 +23,24 @@ const PROVINCE_MAP: Record<string, string> = {
   'Canarias': 'Canary Islands',
   'Aragón': 'Aragon',
   'Navarra': 'Navarre',
+  'Málaga': 'Malaga',
+  'Almería': 'Almeria',
+  'Cádiz': 'Cadiz',
+  'Córdoba': 'Cordoba',
+}
+
+const COUNTRY_ISO: Record<string, string> = {
+  'España': 'ES',
+  'México': 'MX',
+  'Indonesia': 'ID',
+  'Emiratos Árabes Unidos': 'AE',
+  'Argentina': 'AR',
+  'Estados Unidos': 'US',
+  'Grecia': 'GR',
+  'Ecuador': 'EC',
+  'Costa Rica': 'CR',
+  'Paraguay': 'PY',
+  'Reino Unido': 'GB',
 }
 
 export function translateCountry(country: string, locale: string): string {
@@ -33,4 +51,8 @@ export function translateCountry(country: string, locale: string): string {
 export function translateProvince(province: string, locale: string): string {
   if (locale !== 'en') return province
   return PROVINCE_MAP[province] ?? province
+}
+
+export function countryToISO(country: string): string {
+  return COUNTRY_ISO[country] ?? 'ES'
 }

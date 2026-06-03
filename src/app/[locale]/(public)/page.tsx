@@ -53,6 +53,7 @@ function isValidCountry(name: string): boolean {
 
 export default async function HomePage() {
   const t = await getTranslations('Home')
+  const locale = await getLocale()
 
   const [{ data: featured }, { data: team }, { data: destinations }, propertyCounts, { data: partners }] =
     await Promise.all([
@@ -87,7 +88,7 @@ export default async function HomePage() {
         className="hero-section"
         style={{ height: '100vh', minHeight: '600px', display: 'flex', position: 'relative', overflow: 'hidden', marginTop: '-80px', width: '100%' }}
       >
-        <HomeSidebar destinations={destinations} propertyCounts={propertyCounts} partners={partners ?? []} />
+        <HomeSidebar destinations={destinations} propertyCounts={propertyCounts} partners={partners ?? []} locale={locale} />
         <div style={{ flex: 1, position: 'relative', overflow: 'hidden', minHeight: 0 }}>
           <HeroImageCarousel />
         </div>
@@ -104,7 +105,7 @@ export default async function HomePage() {
 
           {featured.length > 0 ? (
             <>
-              <HomePropertiesCarousel properties={featured} />
+              <HomePropertiesCarousel properties={featured} locale={locale} />
               <div className="mt-12 text-center">
                 <Link href="/propiedades?destacadas=true" className={buttonVariants({ variant: 'goldOutline', size: 'lg' })}>
                   {t('cta_view_all_featured')}
@@ -159,7 +160,7 @@ export default async function HomePage() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {filteredDestinations.map((dest) => (
-                <DestinationCard3D key={dest.id} dest={dest} count={countFor(dest.country_name)} />
+                <DestinationCard3D key={dest.id} dest={dest} count={countFor(dest.country_name)} locale={locale} />
               ))}
             </div>
 

@@ -2,9 +2,10 @@ import type { Metadata } from 'next'
 import { buildAlternates } from '@/lib/utils/seoAlternates'
 import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, getLocale } from 'next-intl/server'
 import { buttonVariants } from '@/components/ui/button'
 import { getDestinations, getPropertyCountsByCountry } from '@/lib/supabase/queries'
+import { translateCountry } from '@/lib/utils/translateGeography'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('Destinations')
@@ -20,6 +21,7 @@ export const revalidate = 3600
 
 export default async function DestinosPage() {
   const t = await getTranslations('Destinations')
+  const locale = await getLocale()
   const [{ data: destinations }, propertyCounts] = await Promise.all([
     getDestinations(),
     getPropertyCountsByCountry(),
@@ -60,7 +62,7 @@ export default async function DestinosPage() {
                       {(dest.card_image_url ?? dest.hero_image_url) ? (
                         <Image
                           src={(dest.card_image_url ?? dest.hero_image_url)!}
-                          alt={dest.country_name}
+                          alt={translateCountry(dest.country_name, locale)}
                           fill unoptimized
                           className="object-cover transition-transform duration-700 group-hover:scale-105"
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
@@ -71,7 +73,7 @@ export default async function DestinosPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent" />
                       <div className="absolute bottom-4 left-4 right-4">
                         <h2 className="font-display text-xl font-semibold text-white group-hover:text-gold transition-colors">
-                          {dest.country_name}
+                          {translateCountry(dest.country_name, locale)}
                         </h2>
                         {count > 0 && (
                           <p className="text-xs text-white/60 mt-1">

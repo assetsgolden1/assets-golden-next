@@ -5,6 +5,7 @@ import { useTransition } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
 import { translatePropertyType } from '@/lib/propertyTypes'
+import { translateCountry } from '@/lib/utils/translateGeography'
 import { formatNumber } from '@/lib/utils/format'
 import { ZONE_SLUGS, getCitiesInZone } from '@/lib/constants/spainZones'
 
@@ -168,7 +169,7 @@ export function PropiedadesFilters({
       <FilterBlock title={t('country')}>
         <select value={currentFilters.pais ?? ''} onChange={(e) => applyFilter('pais', e.target.value, ['zona', 'ciudad'])} style={selectStyle}>
           <option value="">{t('all_countries')}</option>
-          {countries.map((c) => <option key={c} value={c}>{c}</option>)}
+          {countries.map((c) => <option key={c} value={c}>{translateCountry(c, locale)}</option>)}
         </select>
       </FilterBlock>
 

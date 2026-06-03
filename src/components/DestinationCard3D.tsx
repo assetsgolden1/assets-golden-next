@@ -4,13 +4,15 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { CountryDestination } from '@/types'
+import { translateCountry } from '@/lib/utils/translateGeography'
 
 interface Props {
   dest: CountryDestination
   count: number
+  locale: string
 }
 
-export default function DestinationCard3D({ dest, count }: Props) {
+export default function DestinationCard3D({ dest, count, locale }: Props) {
   const [transform, setTransform] = useState('')
   const [glow, setGlow] = useState({ x: 50, y: 50 })
   const [hovered, setHovered] = useState(false)
@@ -49,7 +51,7 @@ export default function DestinationCard3D({ dest, count }: Props) {
       {(dest.card_image_url ?? dest.hero_image_url) ? (
         <Image
           src={dest.card_image_url ?? dest.hero_image_url!}
-          alt={dest.country_name}
+          alt={translateCountry(dest.country_name, locale)}
           fill
           unoptimized
           className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -71,7 +73,7 @@ export default function DestinationCard3D({ dest, count }: Props) {
       <div className="overlay-dark" />
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
         <span className="font-display text-lg font-semibold text-white group-hover:text-gold transition-colors">
-          {dest.country_name}
+          {translateCountry(dest.country_name, locale)}
         </span>
         {count > 0 && (
           <span className="mt-1 text-xs text-white/60">

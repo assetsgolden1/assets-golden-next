@@ -7,6 +7,7 @@ import { MapPin, Maximize2, Building2 } from 'lucide-react'
 import Autoplay from 'embla-carousel-autoplay'
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel'
 import type { Property } from '@/types'
+import { translateCountry, translateProvince } from '@/lib/utils/translateGeography'
 
 const typeLabels: Record<string, string> = {
   villa: 'Villa',
@@ -31,9 +32,10 @@ function formatPrice(price: number | null, currency: string | null): string {
 
 interface Props {
   properties: Property[]
+  locale: string
 }
 
-export default function HomePropertiesCarousel({ properties }: Props) {
+export default function HomePropertiesCarousel({ properties, locale }: Props) {
   const autoplay = useRef(
     Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true })
   )
@@ -97,7 +99,7 @@ export default function HomePropertiesCarousel({ properties }: Props) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-muted-foreground text-sm">
                       <MapPin className="h-4 w-4 text-gold shrink-0" />
-                      <span className="line-clamp-1">{property.location ?? property.province ?? 'España'}</span>
+                      <span className="line-clamp-1">{property.location ?? (property.province ? translateProvince(property.province, locale) : null) ?? translateCountry('España', locale)}</span>
                     </div>
                     {property.area_sqm && (
                       <div className="flex items-center gap-1 text-muted-foreground text-sm shrink-0">

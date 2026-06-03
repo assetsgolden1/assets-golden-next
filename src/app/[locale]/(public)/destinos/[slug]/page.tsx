@@ -20,6 +20,7 @@ import { DestinationFilters } from '@/components/DestinationFilters'
 import { PaginationBar } from '@/components/PaginationBar'
 import PropertyCard from '@/components/properties/PropertyCard'
 import { getDestinoEditorial } from '@/lib/editorial/destinoEditorial'
+import { translateCountry, translateProvince } from '@/lib/utils/translateGeography'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -52,7 +53,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   if (!data) return { title: `${t('investment_label')} — Assets Golden` }
 
   const ciudad = sp.ciudad ?? null
-  const countryName = locale === 'en' ? (data.country_name === 'España' ? 'Spain' : data.country_name) : data.country_name
+  const countryName = translateCountry(data.country_name, locale)
 
   const title = ciudad
     ? t('meta_title_city', { city: ciudad, country: countryName })
@@ -94,6 +95,7 @@ export default async function DestinoPage({ params, searchParams }: Props) {
   const offset       = (page - 1) * LIMIT
 
   const countryName = destination.country_name
+  const countryLabel = translateCountry(countryName, locale)
 
   const [{ data: properties, count }, cities, types] = await Promise.all([
     getPropertiesForDestination(countryName, { ciudad: ciudad || undefined, tipo: tipo || undefined, precioMin, precioMax, habitaciones, orden, limit: LIMIT, offset }),
@@ -122,7 +124,7 @@ export default async function DestinoPage({ params, searchParams }: Props) {
   }
 
   // Result label
-  const resultLabel = `${formatNumber(totalCount, locale)} ${totalCount === 1 ? t('results_singular') : t('results_plural')} ${ciudad ? t('results_in_city', { city: ciudad }) : t('results_in_country', { country: countryName })}`
+  const resultLabel = `${formatNumber(totalCount, locale)} ${totalCount === 1 ? t('results_singular') : t('results_plural')} ${ciudad ? t('results_in_city', { city: ciudad }) : t('results_in_country', { country: countryLabel })}`
 
   return (
     <>
@@ -131,7 +133,7 @@ export default async function DestinoPage({ params, searchParams }: Props) {
         items={[
           { name: locale === 'en' ? 'Home' : 'Inicio', url: '/' },
           { name: locale === 'en' ? 'Destinations' : 'Destinos', url: '/destinos' },
-          { name: countryName, url: `/destinos/${slug}` },
+          { name: countryLabel, url: `/destinos/${slug}` },
           ...(ciudad ? [{ name: ciudad, url: `/destinos/${slug}?ciudad=${encodeURIComponent(ciudad)}` }] : []),
         ]}
       />
@@ -139,7 +141,7 @@ export default async function DestinoPage({ params, searchParams }: Props) {
       {/* Hero */}
       <section className="relative h-80 md:h-[420px] overflow-hidden">
         {(destination.hero_image_url ?? destination.card_image_url) ? (
-          <Image src={(destination.hero_image_url ?? destination.card_image_url)!} alt={countryName} fill unoptimized className="object-cover" priority sizes="100vw" />
+          <Image src={(destination.hero_image_url ?? destination.card_image_url)!} alt={countryLabel} fill unoptimized className="object-cover" priority sizes="100vw" />
         ) : (
           <div className="absolute inset-0 gradient-navy" />
         )}
@@ -154,7 +156,7 @@ export default async function DestinoPage({ params, searchParams }: Props) {
             <MapPin className="h-4 w-4" />
             <span>{t('investment_label')}</span>
           </div>
-          <h1 className="font-display text-4xl font-semibold text-white md:text-5xl lg:text-6xl leading-tight">{countryName}</h1>
+          <h1 className="font-display text-4xl font-semibold text-white md:text-5xl lg:text-6xl leading-tight">{countryLabel}</h1>
           {tagline && (
             <p className="mt-3 text-white/70 text-base max-w-xl leading-relaxed">{tagline}</p>
           )}
@@ -208,7 +210,7 @@ export default async function DestinoPage({ params, searchParams }: Props) {
         <section className="py-12 bg-secondary">
           <div className="container-luxury">
             <div className="mb-8 text-center">
-              <h2 className="font-display text-2xl font-semibold">{t('why_title', { country: countryName })}</h2>
+              <h2 className="font-display text-2xl font-semibold">{t('why_title', { country: countryLabel })}</h2>
               <div className="divider-gold mx-auto mt-4" />
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -296,7 +298,7 @@ export default async function DestinoPage({ params, searchParams }: Props) {
                       <PropertyCard
                         key={p.id} id={p.id} title={p.title}
                         slug={p.slug ?? p.id}
-                        location={p.location ?? p.province ?? countryName}
+                        location={p.location ?? (p.province ? translateProvince(p.province, locale) : countryLabel)}
                         price={p.price} currency={p.currency}
                         area_sqm={p.area_sqm} bedrooms={p.bedrooms}
                         bathrooms={p.bathrooms} property_type={p.property_type}
@@ -312,7 +314,7 @@ export default async function DestinoPage({ params, searchParams }: Props) {
                 <div className="py-24 text-center">
                   <p className="text-muted-foreground text-lg mb-4">{t('no_results')}</p>
                   <Link href={`/destinos/${slug}`} className={buttonVariants({ variant: 'goldOutline' })}>
-                    {t('view_all', { country: countryName })}
+                    {t('view_all', { country: countryLabel })}
                   </Link>
                 </div>
               )}
@@ -326,10 +328,10 @@ export default async function DestinoPage({ params, searchParams }: Props) {
         <div className="container-luxury text-center">
           <p className="text-xs tracking-[0.25em] text-gold uppercase mb-4">{t('cta_eyebrow')}</p>
           <h2 className="font-display text-2xl font-semibold text-white mb-4 md:text-3xl">
-            {t('cta_title', { country: countryName })}
+            {t('cta_title', { country: countryLabel })}
           </h2>
           <p className="text-white/60 text-sm mb-8 max-w-md mx-auto leading-relaxed">
-            {t('cta_subtitle', { country: countryName })}
+            {t('cta_subtitle', { country: countryLabel })}
           </p>
           <Link href="/contacto" className={buttonVariants({ variant: 'gold', size: 'lg' })}>
             {t('cta_button')}

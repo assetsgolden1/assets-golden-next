@@ -9,6 +9,7 @@ import { getPropertyBySlug, getAllPropertySlugs } from '@/lib/supabase/queries'
 import PropertyGalleryClient from '@/components/PropertyGalleryClient'
 import PropertyDescriptionExpand from '@/components/properties/PropertyDescriptionExpand'
 import { translatePropertyType, translatePropertyTitle } from '@/lib/propertyTypes'
+import { translateProvince, countryToISO } from '@/lib/utils/translateGeography'
 import { formatPrice } from '@/lib/utils/format'
 import { toSentenceCase } from '@/lib/utils/normalizeText'
 import PropertyContactModal from '@/components/PropertyContactModal'
@@ -38,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const description =
     (locale === 'en' ? data.description_en : data.description)?.slice(0, 160) ??
-    `${translatePropertyType(data.property_type, locale) || t('meta_fallback_type')} in ${data.location ?? data.province ?? t('meta_fallback_country')}${data.bedrooms ? `, ${data.bedrooms} ${locale === 'en' ? 'bedrooms' : 'habitaciones'}` : ''}${data.area_sqm ? `, ${data.area_sqm} m²` : ''}`.slice(0, 160)
+    `${translatePropertyType(data.property_type, locale) || t('meta_fallback_type')} in ${data.location ?? (data.province ? translateProvince(data.province, locale) : null) ?? t('meta_fallback_country')}${data.bedrooms ? `, ${data.bedrooms} ${locale === 'en' ? 'bedrooms' : 'habitaciones'}` : ''}${data.area_sqm ? `, ${data.area_sqm} m²` : ''}`.slice(0, 160)
 
   return {
     title: data.title,
@@ -82,7 +83,7 @@ export default async function PropertyDetailPage({ params }: Props) {
         '@type': 'PostalAddress',
         addressLocality: property.location,
         ...(property.province && { addressRegion: property.province }),
-        addressCountry: property.country ?? 'ES',
+        addressCountry: property.country ? countryToISO(property.country) : 'ES',
       },
     }),
     ...(property.price && {
@@ -162,7 +163,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                 {(property.location || property.province) && (
                   <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
                     <MapPin className="h-4 w-4 text-gold" />
-                    {[property.location, property.province].filter(Boolean).join(', ')}
+                    {[property.location, property.province ? translateProvince(property.province, locale) : null].filter(Boolean).join(', ')}
                   </span>
                 )}
               </div>

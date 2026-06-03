@@ -10,6 +10,7 @@ import {
 } from '@/lib/supabase/queries'
 import PropertyCard from '@/components/properties/PropertyCard'
 import { buttonVariants } from '@/components/ui/button'
+import { translateCountry, translateProvince } from '@/lib/utils/translateGeography'
 import { PropiedadesFilters } from '@/components/PropiedadesFilters'
 import { PaginationBar } from '@/components/PaginationBar'
 
@@ -94,7 +95,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
   } else {
     const foundKey = countNum === 1 ? 'results_found_singular' : 'results_found_plural'
     resultLabel = `${formatNumber(countNum, locale)} ${t(foundKey)}`
-    if (params.pais) resultLabel += ` ${t('results_in_country', { country: params.pais })}`
+    if (params.pais) resultLabel += ` ${t('results_in_country', { country: translateCountry(params.pais, locale) })}`
     if (params.ciudad) resultLabel += `${t('results_in_city', { city: params.ciudad })}`
   }
 
@@ -147,7 +148,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
                         id={property.id}
                         title={property.title}
                         slug={property.slug ?? property.id}
-                        location={property.location ?? property.province ?? ''}
+                        location={property.location ?? (property.province ? translateProvince(property.province, locale) : '')}
                         price={property.price}
                         currency={property.currency}
                         area_sqm={property.area_sqm}
