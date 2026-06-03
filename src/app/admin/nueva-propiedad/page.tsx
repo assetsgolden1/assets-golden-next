@@ -415,7 +415,7 @@ export default function NuevaPropiedadPage() {
           </div>
           <div className="mt-4">
             <label className="block text-xs font-medium text-gray-600 mb-1">URL de Idealista (opcional)</label>
-            <input name="idealista_url" type="url" className={INPUT_CLS} placeholder="https://www.idealista.com/inmueble/..." />
+            <input name="idealista_url" type="text" className={INPUT_CLS} placeholder="https://www.idealista.com/inmueble/..." />
           </div>
         </div>
 

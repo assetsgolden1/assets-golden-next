@@ -45,7 +45,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 })
     }
 
-    const ext = file.name.split('.').pop() ?? 'jpg'
+    const rawExt = file.name.includes('.') ? (file.name.split('.').pop() ?? '') : ''
+    const ext = /^[a-zA-Z0-9]{1,5}$/.test(rawExt) ? rawExt.toLowerCase() : 'jpg'
     const folder = bucket === 'destination-images' ? ''
       : bucket === 'blog-images' ? 'blog/'
       : bucket === 'team-photos' ? ''

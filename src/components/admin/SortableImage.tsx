@@ -51,7 +51,7 @@ export function SortableImage({
             padding: '2px 5px', cursor: 'pointer',
           }}
         >
-          ⭐ Principal
+          ★ Hacer principal
         </button>
       )}
       <button
