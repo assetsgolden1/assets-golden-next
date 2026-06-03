@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { getBlogPostsByCategory } from '@/lib/supabase/queries'
-import { getLocale } from 'next-intl/server'
 import BlogCategoryGrid from '@/components/blog/BlogCategoryGrid'
 
 export const metadata: Metadata = {
@@ -16,8 +15,12 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600
 
-export default async function BlogNoticiasPage() {
-  const locale = await getLocale()
+interface Props {
+  params: Promise<{ locale: string }>
+}
+
+export default async function BlogNoticiasPage({ params }: Props) {
+  const { locale } = await params
   const { data: posts } = await getBlogPostsByCategory('news', locale)
   return <BlogCategoryGrid posts={posts} category="noticias" />
 }

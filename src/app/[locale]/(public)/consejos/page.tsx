@@ -3,7 +3,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { CheckCircle } from 'lucide-react'
 import { getBlogPostsByCategory } from '@/lib/supabase/queries'
-import { getLocale } from 'next-intl/server'
 import { buttonVariants } from '@/components/ui/button'
 
 export const metadata: Metadata = {
@@ -75,8 +74,12 @@ function formatDate(dateStr: string | null): string {
   })
 }
 
-export default async function ConsejosPage() {
-  const locale = await getLocale()
+interface Props {
+  params: Promise<{ locale: string }>
+}
+
+export default async function ConsejosPage({ params }: Props) {
+  const { locale } = await params
   const { data: posts } = await getBlogPostsByCategory('tip', locale)
 
   return (

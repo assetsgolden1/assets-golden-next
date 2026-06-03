@@ -42,5 +42,6 @@ next-env.d.ts
 
 # Inventario local (no commitear)
 outputs/inventario-servicios.md
+outputs/meta-token-diagnosis-*.json
 
 .vercel
