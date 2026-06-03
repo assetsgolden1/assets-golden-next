@@ -66,6 +66,53 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-03 — SEO bilingüe (P2→P4) + fix alta de propiedades
+
+#### SEO bilingüe — COMPLETO y verificado en prod
+- **P2 hreflang + sitemap** (e4ba2b0): helper buildAlternates() en src/lib/utils/seoAlternates.ts; hreflang en 8 páginas core; sitemap bilingüe con xhtml:link (1.043 URLs × 2 = 2.086 alternates).
+- **P3 blog por locale** (34fd730; intento fallido previo e9ce4c8): el bug NO estaba en queries.ts (ya filtraba por language), sino en el origen del locale — getLocale() de next-intl v4 devolvía undefined porque el proyecto no tiene src/middleware.ts (solo proxy.ts), así que el filtro no se aplicaba. Fix: getLocale() → (await params).locale en los 7 listados (blog + noticias + consejos). Verificado: /en/blog = 10 posts EN, /blog (ES, sin prefijo) = 14 posts ES, /es/blog/<post-EN> = 404. /blog sin prefijo resuelve locale=es vía rewrite; no hace falta middleware.ts.
+- **P4 geografía en vistas EN** (4a1f015): conectadas translateCountry/translateProvince (existían pero sin usar) a todos los call sites EN. Regla: traducir solo display, nunca valores de query/URL/option-value/keys; location (ciudad) no se traduce. Reemplazado el hardcode España→Spain en destinos/[slug]. +4 provincias con tilde al PROVINCE_MAP (Málaga/Almería/Cádiz/Córdoba) + COUNTRY_ISO. addressCountry del JSON-LD pasa a ISO (antes mandaba "España"). Verificado: /en/destinos/mexico → "Mexico"; /en/propiedades?pais=México → filtra 9 + "in Mexico" (value crudo OK); propiedad MX → addressCountry "MX"; control ES /destinos/mexico → "México" intacto.
+
+#### Incidente Meta Leads (resuelto en otro chat; documentado)
+- c96fcb6 (ajeno a esta línea) renombró 3 env vars del sync con prefijo META_LEADS_. Repo/rama/proyecto Vercel compartidos → los pushes de SEO redeployaron todo y activaron el refactor. El sync quedó caído en silencio desde el primer push de SEO (e4ba2b0): las 4 env vars META_LEADS_* estaban en Vercel pero con valor vacío. Resuelto: vercel env rm+add, redeploy --force, validado con sync manual {ok:true, fetched:8, added:1}; cron 02:00 OK. Sin pérdida de leads (el pull recupera el histórico del form).
+
+#### Fix alta de propiedades (1d1a60a)
+- Atilio reportó "The string did not match the expected pattern" al crear una propiedad (Samaná, Rep. Dominicana). Causa real: upload-image/route.ts sacaba la extensión con file.name.split('.').pop(); con un archivo SIN extensión y nombre con tilde ("SAMANÁ"), la key de Storage quedaba ...SAMANÁ (no-ASCII) y Supabase la rechazaba. Descartada la hipótesis del campo type="url" (estaba vacío; el error salía en el banner de la app, no en burbuja del navegador). Fix: extensión robusta /^[a-zA-Z0-9]{1,5}$/ → fallback 'jpg'. Blindaje: idealista_url type=url→text. Cosmético: botón "⭐ Principal" → "★ Hacer principal". Verificación funcional pendiente de Atilio.
+
+#### Pendientes / mañana
+- Confirmar con Atilio que ya crea la propiedad (1d1a60a en prod).
+- Cosmético: areaServed del JSON-LD de Organization sigue en español en páginas EN (es un array fijo, no viene de properties).
+- Heredados: UI de edición de destinos en /admin; marcar featured AG-03897/04193/00344/04085; investigar ref_code formato número plano; salvaguarda del sync HabiHub (no borrar external_id IS NULL); remediaciones de seguridad (rotación service role key, Upstash, BotID, proyectos Supabase huérfanos, CSP).
+
+---
+
+### Sesión 2026-06-03 — [FASE-4.L-P4-P3-FIX] Fix filtro locale en listados blog (params.locale)
+
+**Contexto:** En producción (deploy e9ce4c8), `/en/blog` mostraba 20 posts mixtos (10 EN + 10 ES). El fix anterior (e9ce4c8) usó `getLocale()` de next-intl, pero el filtro seguía sin aplicarse.
+
+**Trabajo hecho:**
+- Diagnóstico completo: `queries.ts` ya tenía el filtro `if (locale) query.eq('language', locale)` desde commit 0adbbec — el bug no era en queries sino en cómo llega el locale.
+- Causa raíz identificada: `getLocale()` de next-intl v4 lee el header `X-NEXT-INTL-LOCALE` que solo setea el middleware de next-intl. En este proyecto existe `proxy.ts` pero NO `middleware.ts` — Next.js no lo reconoce → middleware-manifest.json muestra `"middleware": {}`. Sin header, `getLocale()` retorna undefined, `if (locale)` es false, la query devuelve todos los posts sin filtrar.
+- DB confirmada vía Supabase MCP: 14 posts ES + 10 posts EN publicados.
+- Fix aplicado: reemplazar `getLocale()` por `params.locale` (del segmento URL `[locale]`) en los 7 listados del blog — mismo patrón que `blog/[slug]/page.tsx` que ya funcionaba.
+- `npx tsc --noEmit` limpio.
+
+**Archivos tocados:**
+- MODIFIED: `src/app/[locale]/(public)/blog/page.tsx`
+- MODIFIED: `src/app/[locale]/(public)/blog/consejos/page.tsx`
+- MODIFIED: `src/app/[locale]/(public)/blog/inversiones/page.tsx`
+- MODIFIED: `src/app/[locale]/(public)/blog/noticias/page.tsx`
+- MODIFIED: `src/app/[locale]/(public)/blog/mercado/page.tsx`
+- MODIFIED: `src/app/[locale]/(public)/consejos/page.tsx`
+- MODIFIED: `src/app/[locale]/(public)/noticias/page.tsx`
+- MODIFIED: `.gitignore` (outputs/meta-token-diagnosis-*.json)
+
+**Commits:** `34fd730` — fix(blog): usar params.locale en listados (getLocale sin middleware retorna undefined)
+
+**Próximo paso sugerido:** Verificar en producción que `/en/blog` muestra solo posts EN y `/es/blog` (o `/blog`) muestra solo posts ES. Si se quiere corregir el routing del locale para rutas sin prefijo (/blog, /consejos, /noticias en español), crear `src/middleware.ts` que exporte la función `proxy` como `default export middleware`.
+
+---
+
 ### Sesión 2026-06-02 — [FASE-2-P2-FIX] Rename env vars Meta Leads Sync con prefijo META_LEADS_
 
 **Contexto:** Las variables `META_SYSTEM_USER_TOKEN` y `CRON_SECRET` ya existían en Vercel asignadas a otros sistemas. Para evitar conflictos, renombrar las del sistema Meta Leads Sync con prefijo claro.
