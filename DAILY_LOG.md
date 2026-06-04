@@ -66,6 +66,29 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-04 — [FASE-2-CRON-FIX] Diagnóstico y fix cron sync Meta Leads
+
+**Contexto:** El cron diario `0 0 * * *` no se disparó a las 00:00 UTC del 4-jun. Verificado por ausencia de registro en `meta_sync_runs` entre 2026-06-03T19:41 y 2026-06-04T08:12, y ausencia en Vercel runtime logs (query "sync-meta", últimas 14h).
+
+**Diagnóstico — todo correcto, nada que cambiar en código:**
+- `vercel.json` ✅ — sección `crons` existe, path `/api/leads/sync-meta` (sin `/manual`), schedule `"0 0 * * *"`
+- Endpoint `route.ts` ✅ — método GET, auth lee `META_LEADS_CRON_SECRET`, si no está definida permite todo (fallback seguro)
+- Plan Hobby ✅ — proyecto tiene exactamente 1 cron (límite: 2), frecuencia diaria (límite mínimo Hobby respetado)
+- Auth mismatch ✅ descartado — no hay runtime log en absoluto para las 00:00 UTC → el request nunca llegó al endpoint. Si hubiera llegado con 401, aparecería la entrada de log.
+
+**Causa raíz:** El cron no se disparó. Hipótesis más probable: des-registro del cron en el scheduler de Vercel tras actividad de deploy intensa el 3-jun (deploys en ráfaga en ~77 minutos: dpl_HDggTvTa4 → dpl_7Yk8VQyB). Vercel re-registra los crons en cada deploy pero puede perder el schedule en condiciones de alta frecuencia.
+
+**Fix aplicado:** Commit trivial (esta entrada de DAILY_LOG) para forzar redeploy limpio y re-registrar el cron en el scheduler de Vercel.
+
+**Archivos tocados:**
+- MODIFIED: `DAILY_LOG.md`
+
+**Commits:** (ver hash abajo)
+
+**Verificación mañana:** Revisar `meta_sync_runs` en Supabase a las 00:01 UTC del 2026-06-05 — debe aparecer fila con `status='ok'` y `created_at` ≈ `2026-06-05 00:00:xx UTC`. También: Vercel Dashboard → proyecto `assets-golden-next` → Settings → Cron Jobs → confirmar que aparece `/api/leads/sync-meta` con "Next run" programado para mañana.
+
+---
+
 ### 2026-06-03 — SEO bilingüe (P2→P4) + fix alta de propiedades
 
 #### SEO bilingüe — COMPLETO y verificado en prod
