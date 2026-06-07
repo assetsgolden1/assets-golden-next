@@ -10,6 +10,7 @@ const COUNTRY_MAP: Record<string, string> = {
   'Indonesia': 'Indonesia',
   'Ecuador': 'Ecuador',
   'Paraguay': 'Paraguay',
+  'República Dominicana': 'Dominican Republic',
 }
 
 const PROVINCE_MAP: Record<string, string> = {
@@ -41,6 +42,7 @@ const COUNTRY_ISO: Record<string, string> = {
   'Costa Rica': 'CR',
   'Paraguay': 'PY',
   'Reino Unido': 'GB',
+  'República Dominicana': 'DO',
 }
 
 export function translateCountry(country: string, locale: string): string {
