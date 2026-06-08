@@ -25,6 +25,7 @@ export interface PropertyRow {
   slug: string | null
   ref_code: string | null
   external_id: string | null
+  external_source: string | null
   habihub_dev_id: string | null
 }
 
@@ -358,6 +359,9 @@ export function PropiedadesTable({
                     </td>
                     <td className="px-4 py-2">
                       <span className="font-mono text-xs text-gray-500">{prop.ref_code ?? '—'}</span>
+                      {prop.external_source === 'habihub' && prop.external_id && /^\d+$/.test(prop.external_id) && (
+                        <p className="font-mono text-xs text-blue-500 mt-0.5">{prop.external_id}</p>
+                      )}
                     </td>
                     <td className="px-4 py-2">
                       {prop.habihub_dev_id ? (

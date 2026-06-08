@@ -252,12 +252,14 @@ export default function EditPropertyPage({
             <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Ref. interna</span>
             <span className="font-mono text-gray-700">{meta.ref_code ?? '—'}</span>
           </div>
-          <div>
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Cód. HabiHub</span>
-            {meta.external_id
-              ? <span className="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">{meta.external_id}</span>
-              : <span className="text-gray-400">—</span>}
-          </div>
+          {meta.external_source === 'habihub' && (
+            <div>
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Código HabiHub</span>
+              {meta.external_id && /^\d+$/.test(meta.external_id)
+                ? <span className="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">{meta.external_id}</span>
+                : <span className="text-gray-400 italic text-xs">No disponible</span>}
+            </div>
+          )}
           <div>
             <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Fuente</span>
             <span className="text-gray-600">{meta.external_source ?? 'manual'}</span>

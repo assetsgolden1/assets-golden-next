@@ -64,7 +64,7 @@ export default async function PropiedadesPage({
       let q = supabaseAdmin
         .from('properties')
         .select(
-          'id,title,location,country,price,currency,property_type,featured,hidden,sold,status,image_url,slug,ref_code,external_id,habihub_dev_id',
+          'id,title,location,country,price,currency,property_type,featured,hidden,sold,status,image_url,slug,ref_code,external_id,external_source,habihub_dev_id',
           { count: 'exact' }
         )
         .order('created_at', { ascending: false })
