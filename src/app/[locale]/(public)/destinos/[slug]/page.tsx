@@ -126,6 +126,11 @@ export default async function DestinoPage({ params, searchParams }: Props) {
   // Result label
   const resultLabel = `${formatNumber(totalCount, locale)} ${totalCount === 1 ? t('results_singular') : t('results_plural')} ${ciudad ? t('results_in_city', { city: ciudad }) : t('results_in_country', { country: countryLabel })}`
 
+  // Primer párrafo como intro corta; el resto va al pie (SEO text)
+  const descParagraphs = description ? description.split(/\n\n+/).filter(Boolean) : []
+  const descIntro = descParagraphs[0] ?? null
+  const descRest = descParagraphs.slice(1)
+
   return (
     <>
       <Breadcrumb
@@ -196,91 +201,16 @@ export default async function DestinoPage({ params, searchParams }: Props) {
         </section>
       )}
 
-      {/* Description */}
-      {description && (
+      {/* Intro: primer párrafo de la descripción */}
+      {descIntro && (
         <section className="py-12 bg-background">
           <div className="container-luxury max-w-3xl">
-            <p className="text-muted-foreground leading-relaxed text-base">{description}</p>
+            <p className="text-muted-foreground leading-relaxed text-base">{descIntro}</p>
           </div>
         </section>
       )}
 
-      {/* Highlights */}
-      {highlights && highlights.length > 0 && (
-        <section className="py-12 bg-secondary">
-          <div className="container-luxury">
-            <div className="mb-8 text-center">
-              <h2 className="font-display text-2xl font-semibold">{t('why_title', { country: countryLabel })}</h2>
-              <div className="divider-gold mx-auto mt-4" />
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {highlights.map((h, i) => (
-                <div key={i} className="card-premium rounded-xl p-6 text-center">
-                  {h.icon && (() => {
-                    const Icon = ICON_MAP[h.icon!]
-                    return Icon
-                      ? <Icon className="w-8 h-8 text-gold mx-auto mb-3" />
-                      : <div className="text-3xl mb-3">{h.icon}</div>
-                  })()}
-                  {h.value && <p className="font-display text-2xl font-semibold text-gold">{h.value}</p>}
-                  {h.title && <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{h.title}</p>}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Market info */}
-      {hasMarketInfo && (
-        <section className="py-12 bg-background">
-          <div className="container-luxury">
-            <div className="mb-8">
-              <p className="text-xs tracking-[0.25em] text-gold uppercase mb-2">{t('market_eyebrow')}</p>
-              <h2 className="font-display text-2xl font-semibold">{t('market_title')}</h2>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {marketInfo?.avgPrice && (
-                <div className="rounded-xl border border-border bg-card p-5">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t('avg_price')}</p>
-                  <p className="font-display text-xl font-semibold text-gold">{marketInfo.avgPrice}</p>
-                </div>
-              )}
-              {marketInfo?.rentalYield && (
-                <div className="rounded-xl border border-border bg-card p-5">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t('rental_yield')}</p>
-                  <p className="font-display text-xl font-semibold text-gold">{marketInfo.rentalYield}</p>
-                </div>
-              )}
-              {marketInfo?.priceGrowth && (
-                <div className="rounded-xl border border-border bg-card p-5">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t('price_growth')}</p>
-                  <p className="font-display text-xl font-semibold text-gold">{marketInfo.priceGrowth}</p>
-                </div>
-              )}
-              {marketInfo?.bestAreas && (
-                <div className="rounded-xl border border-border bg-card p-5">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t('best_areas')}</p>
-                  <p className="text-sm font-medium">
-                    {Array.isArray(marketInfo.bestAreas) ? (marketInfo.bestAreas as string[]).join(', ') : marketInfo.bestAreas}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Editorial content — ES only */}
-      {!ciudad && editorialContent && (
-        <section className="section-padding bg-muted/30">
-          <div className="container-luxury">
-            <article className="max-w-3xl mx-auto">{editorialContent}</article>
-          </div>
-        </section>
-      )}
-
-      {/* Filters + grid */}
+      {/* Filters + grid — propiedades primero */}
       <section className="bg-background py-12">
         <div className="container-luxury">
           <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-start">
@@ -322,6 +252,92 @@ export default async function DestinoPage({ params, searchParams }: Props) {
           </div>
         </div>
       </section>
+
+      {/* Highlights — al pie, tras las propiedades */}
+      {highlights && highlights.length > 0 && (
+        <section className="py-12 bg-secondary">
+          <div className="container-luxury">
+            <div className="mb-8 text-center">
+              <h2 className="font-display text-2xl font-semibold">{t('why_title', { country: countryLabel })}</h2>
+              <div className="divider-gold mx-auto mt-4" />
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {highlights.map((h, i) => (
+                <div key={i} className="card-premium rounded-xl p-6 text-center">
+                  {h.icon && (() => {
+                    const Icon = ICON_MAP[h.icon!]
+                    return Icon
+                      ? <Icon className="w-8 h-8 text-gold mx-auto mb-3" />
+                      : <div className="text-3xl mb-3">{h.icon}</div>
+                  })()}
+                  {h.value && <p className="font-display text-2xl font-semibold text-gold">{h.value}</p>}
+                  {h.title && <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{h.title}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Market info — al pie, tras las propiedades */}
+      {hasMarketInfo && (
+        <section className="py-12 bg-background">
+          <div className="container-luxury">
+            <div className="mb-8">
+              <p className="text-xs tracking-[0.25em] text-gold uppercase mb-2">{t('market_eyebrow')}</p>
+              <h2 className="font-display text-2xl font-semibold">{t('market_title')}</h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {marketInfo?.avgPrice && (
+                <div className="rounded-xl border border-border bg-card p-5">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t('avg_price')}</p>
+                  <p className="font-display text-xl font-semibold text-gold">{marketInfo.avgPrice}</p>
+                </div>
+              )}
+              {marketInfo?.rentalYield && (
+                <div className="rounded-xl border border-border bg-card p-5">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t('rental_yield')}</p>
+                  <p className="font-display text-xl font-semibold text-gold">{marketInfo.rentalYield}</p>
+                </div>
+              )}
+              {marketInfo?.priceGrowth && (
+                <div className="rounded-xl border border-border bg-card p-5">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t('price_growth')}</p>
+                  <p className="font-display text-xl font-semibold text-gold">{marketInfo.priceGrowth}</p>
+                </div>
+              )}
+              {marketInfo?.bestAreas && (
+                <div className="rounded-xl border border-border bg-card p-5">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t('best_areas')}</p>
+                  <p className="text-sm font-medium">
+                    {Array.isArray(marketInfo.bestAreas) ? (marketInfo.bestAreas as string[]).join(', ') : marketInfo.bestAreas}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Editorial content — al pie, ES only */}
+      {!ciudad && editorialContent && (
+        <section className="section-padding bg-muted/30">
+          <div className="container-luxury">
+            <article className="max-w-3xl mx-auto">{editorialContent}</article>
+          </div>
+        </section>
+      )}
+
+      {/* Texto SEO: párrafos restantes de la descripción */}
+      {descRest.length > 0 && (
+        <section className="py-12 bg-background">
+          <div className="container-luxury max-w-3xl space-y-4">
+            {descRest.map((p, i) => (
+              <p key={i} className="text-muted-foreground leading-relaxed text-base">{p}</p>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="gradient-navy py-16">

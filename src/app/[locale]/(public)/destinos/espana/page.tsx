@@ -157,7 +157,15 @@ export default async function EspanaPage({ searchParams }: Props) {
         </section>
       )}
 
-      {/* Editorial content — locale-aware */}
+      {/* Filters + grid — propiedades primero */}
+      <section className="container-luxury py-12">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-start">
+          <SpainFilters zones={Object.entries(ZONE_SLUGS)} cities={citiesForFilter} types={types} currentFilters={currentFilters} />
+          <SpainPropertiesGrid properties={properties ?? []} totalCount={totalCount} currentPage={page} totalPages={totalPages} currentFilters={currentFilters} />
+        </div>
+      </section>
+
+      {/* Editorial content — al pie, tras las propiedades */}
       {!zona && (
         <section className="section-padding bg-muted/30">
           <div className="container-luxury">
@@ -301,14 +309,6 @@ export default async function EspanaPage({ searchParams }: Props) {
           </div>
         </section>
       )}
-
-      {/* Filters + grid */}
-      <section className="container-luxury py-12">
-        <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-start">
-          <SpainFilters zones={Object.entries(ZONE_SLUGS)} cities={citiesForFilter} types={types} currentFilters={currentFilters} />
-          <SpainPropertiesGrid properties={properties ?? []} totalCount={totalCount} currentPage={page} totalPages={totalPages} currentFilters={currentFilters} />
-        </div>
-      </section>
 
       {/* CTA */}
       <section className="gradient-navy py-16">
