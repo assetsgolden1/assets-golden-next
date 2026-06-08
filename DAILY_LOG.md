@@ -66,6 +66,29 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-08 — Cierre carga Bali + Samaná
+
+**Contexto:** Cierre de la fase de carga masiva de propiedades Bali (partner Prestige) y alta de Samaná (país nuevo).
+
+**Cargas completadas y verificadas en producción:**
+- Bali (Indonesia), partner Prestige: 27 propiedades nuevas en total (`external_source='prestige-bali'`), ref_codes AG-04519 a AG-04543 (primera tanda) + AG-04575/04576/04577 (últimas 3).
+  - Últimas 4 cargadas desde ZIPs del Drive: PV261 (AG-04575, Uluwatu, 30 fotos), PV163 (AG-04576, Ungasan, 38 fotos), PD199 (AG-04577, Berawa, 14 fotos), PV656 (AG-04543, Canggu — UPDATE de galería de 5 a 36 fotos).
+  - Indonesia ahora: 35 propiedades visibles (8 originales + 27 Bali).
+- Samaná (República Dominicana, país nuevo): My Dream Samaná, AG-04542, `external_source='my-dream-samana'`. País agregado a `translateGeography.ts` (COUNTRY_MAP + COUNTRY_ISO='DO', commit b83f6b4). Destino creado en `country_destinations` (slug `republica-dominicana`).
+
+**Aprendizajes nuevos:**
+- Las carpetas de Drive con acceso restringido por archivo no se pueden bajar automáticamente; Ivan las baja a mano como ZIP (Google las exporta así). Los ZIPs vienen etiquetados con el external_id en el nombre, lo que permite mapear cada uno a su propiedad sin ambigüedad.
+- El script de carga NO convierte HEIC ni comprime por defecto. Para cargas con fotos del Drive hay que: convertir HEIC/HEIF a JPG (pillow-heif + exif_transpose, q90) y comprimir las pesadas a max 2000px / q85 ANTES de subir, o no renderizan en navegador (caso PV924) o pesan de más (caso Samaná, foto de 27MB).
+- PD199 quedó con 14 fotos (el portal listaba ~29); el ZIP solo traía esas. No bloqueante.
+
+**Pendiente:**
+- Completar fotos de PD199 si se quiere (pedir a Prestige).
+- Próxima cola de carga: Cervera/Miami (EEUU, portal cerverabrokerportal.com).
+
+**Archivos tocados:** `scripts/load_bali_pendientes.py` (CREATED), `scripts/diag_downloads_fotos.py` (CREATED), `scripts/output/bali-carga-log.json` (MODIFIED), `scripts/output/bali-fotos-pendientes/` (CREATED)
+
+---
+
 ### 2026-06-04 — [FASE-2-CRON-FIX] Diagnóstico y fix cron sync Meta Leads
 
 **Contexto:** El cron diario `0 0 * * *` no se disparó a las 00:00 UTC del 4-jun. Verificado por ausencia de registro en `meta_sync_runs` entre 2026-06-03T19:41 y 2026-06-04T08:12, y ausencia en Vercel runtime logs (query "sync-meta", últimas 14h).
