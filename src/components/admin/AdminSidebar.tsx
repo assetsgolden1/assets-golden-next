@@ -15,6 +15,7 @@ import {
   PlusCircle,
   UserCheck,
   ClipboardList,
+  MapPin,
 } from 'lucide-react'
 
 const navLinks = [
@@ -25,6 +26,7 @@ const navLinks = [
   { href: '/admin/blog', label: 'Blog', icon: Newspaper },
   { href: '/admin/leads', label: 'Leads', icon: Inbox, showUrgentBadge: true },
   { href: '/admin/agentes', label: 'Agentes', icon: UserCheck },
+  { href: '/admin/destinos', label: 'Destinos', icon: MapPin },
   { href: '/admin/sync', label: 'Sincronización', icon: RefreshCw },
   { href: '/admin/equipo', label: 'Equipo', icon: UserCircle },
   { href: '/admin/audit', label: 'Auditoría', icon: ClipboardList },
