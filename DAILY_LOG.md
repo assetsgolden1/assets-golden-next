@@ -66,6 +66,34 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-09 — FASE-5-P5: Salvaguarda sync HabiHub (hidden_by_sync + scope numérico)
+
+**Contexto:** El sync hacía DELETE físico de filas. Riesgo de borrar propiedades que no vienen del feed (manual, prestige-bali, my-dream-samana, scraper-lovable). Columna `hidden_by_sync` ya existía en prod.
+
+**Trabajo hecho:**
+- `sync-habihub/route.ts`: el loading query ahora filtra `external_source='habihub'` (quitado `country='España'`). Fingerprint matching restringido a `external_source='habihub'`. UPDATE por external_id incluye `hidden_by_sync=false` (reactivación automática). Fase 4 reemplaza `.delete()` por `.update({ hidden_by_sync: true })`. Nuevo scope: `external_source='habihub' AND external_id numérico (/^\d+$/) AND featured!=true`. Salvaguarda 80% mantenida. version_code='v6-hide'. Dry-run sigue funcionando sin escribir.
+- `types/index.ts`: agregado `hidden_by_sync: boolean | null` al tipo `Property`.
+- `lib/supabase/queries.ts`: 10 funciones públicas (getProperties, getPropertiesForSpain, getPropertyTypesForSpain, getPropertiesForDestination, getCitiesForDestination, getPropertyTypesForDestination, getFeaturedProperties, getAllPropertySlugs, getPropertiesByCountry, getPropertyCountsByCountry) — todas con `.not('hidden_by_sync', 'eq', true)`.
+- `lib/blogProperties.ts`: getRelatedProperties y getBannerProperty — mismo filtro.
+- `api/portal/search-properties/route.ts`: 4 queries (ref_code exacto, número solo, UUID, búsqueda normal).
+- `api/portal/filters-metadata/route.ts`: query de tipos.
+- `supabase/migrations/20260609000000_add_hidden_by_sync.sql`: migración idempotente (ADD COLUMN IF NOT EXISTS).
+
+**Archivos tocados (7):**
+- MODIFIED: `src/app/api/admin/sync-habihub/route.ts`
+- MODIFIED: `src/types/index.ts`
+- MODIFIED: `src/lib/supabase/queries.ts`
+- MODIFIED: `src/lib/blogProperties.ts`
+- MODIFIED: `src/app/api/portal/search-properties/route.ts`
+- MODIFIED: `src/app/api/portal/filters-metadata/route.ts`
+- CREATED: `supabase/migrations/20260609000000_add_hidden_by_sync.sql`
+
+**Commits:** `e8bc986` — fix(sync): ocultar en vez de borrar (hidden_by_sync) + scope por external_id del feed + no secuestrar fuentes manuales
+
+**Próximo paso sugerido:** Refactor pipeline de leads (eliminar n8n, consolidar en processLead, agregar Resend) — depende de acceso Resend de Atilio.
+
+---
+
 ### 2026-06-09 — [LEADS-CRON-P02] Sync de leads cada hora + eliminar cron Vercel duplicado
 
 **Contexto:** El cron diario `0 0 * * *` corría el sync 1 vez al día (~4 AM local), lo que dejaba los leads del día esperando hasta la madrugada siguiente. Se sube frecuencia a cada hora y se elimina el cron duplicado de Vercel que disparaba el mismo endpoint en paralelo.
