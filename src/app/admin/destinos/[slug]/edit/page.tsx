@@ -1,10 +1,29 @@
 'use client'
 
 import { use, useEffect, useState } from 'react'
-import { ArrowLeft, Upload } from 'lucide-react'
+import { ArrowLeft, Upload, Info } from 'lucide-react'
+
+// Slugs con bloque editorial extenso gestionado desde el código (no editable desde el panel).
+// Keys de EDITORIAL_MAP en src/lib/editorial/destinoEditorial.tsx + 'espana'.
+const HARDCODED_EDITORIAL_SLUGS = new Set([
+  'mexico',
+  'indonesia',
+  'emiratos-arabes-unidos',
+  'argentina',
+  'estados-unidos',
+  'costa-rica',
+  'reino-unido',
+  'ecuador',
+  'grecia',
+  'paraguay',
+  'espana',
+])
 
 interface FormState {
   description: string
+  description_en: string
+  tagline: string
+  tagline_en: string
   hero_image_url: string
   card_image_url: string
 }
@@ -101,6 +120,9 @@ export default function EditDestinoPage({
   const [countryName, setCountryName] = useState('')
   const [form, setForm] = useState<FormState>({
     description: '',
+    description_en: '',
+    tagline: '',
+    tagline_en: '',
     hero_image_url: '',
     card_image_url: '',
   })
@@ -108,6 +130,8 @@ export default function EditDestinoPage({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
+
+  const hasHardcodedEditorial = HARDCODED_EDITORIAL_SLUGS.has(slug)
 
   useEffect(() => {
     async function load() {
@@ -119,6 +143,9 @@ export default function EditDestinoPage({
         setCountryName(d.country_name ?? slug)
         setForm({
           description: d.description ?? '',
+          description_en: d.description_en ?? '',
+          tagline: d.tagline ?? '',
+          tagline_en: d.tagline_en ?? '',
           hero_image_url: d.hero_image_url ?? '',
           card_image_url: d.card_image_url ?? '',
         })
@@ -140,6 +167,9 @@ export default function EditDestinoPage({
       body: JSON.stringify({
         slug,
         description: form.description || null,
+        description_en: form.description_en || null,
+        tagline: form.tagline || null,
+        tagline_en: form.tagline_en || null,
         hero_image_url: form.hero_image_url || null,
         card_image_url: form.card_image_url || null,
       }),
@@ -178,6 +208,17 @@ export default function EditDestinoPage({
         <p className="text-xs text-gray-400 mt-1 font-mono">slug: {slug}</p>
       </div>
 
+      {hasHardcodedEditorial && (
+        <div className="flex gap-3 bg-blue-50 border border-blue-200 text-blue-800 rounded-xl px-4 py-3 text-sm mb-5">
+          <Info size={16} className="flex-shrink-0 mt-0.5" />
+          <p>
+            Este destino tiene un bloque editorial extenso gestionado desde el código, que no se edita
+            desde el panel. Los campos de abajo (subtítulo, descripción e imágenes) sí se guardan
+            normalmente.
+          </p>
+        </div>
+      )}
+
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-4">
           {error}
@@ -190,20 +231,63 @@ export default function EditDestinoPage({
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Descripción */}
-        <div className="bg-white rounded-xl shadow-sm p-5">
-          <h2 className="font-semibold text-gray-800 mb-4">Descripción</h2>
-          <label className="block text-xs font-medium text-gray-600 mb-1">
-            Texto de presentación del destino
-          </label>
-          <textarea
-            rows={8}
-            value={form.description}
-            onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
-            placeholder="Descripción del destino. Usá líneas en blanco para separar párrafos."
-          />
-          <p className="text-xs text-gray-400 mt-1">
+        {/* Subtítulos del hero */}
+        <div className="bg-white rounded-xl shadow-sm p-5 space-y-4">
+          <h2 className="font-semibold text-gray-800">Subtítulo del hero</h2>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Subtítulo (Español)
+            </label>
+            <input
+              type="text"
+              value={form.tagline}
+              onChange={(e) => setForm((f) => ({ ...f, tagline: e.target.value }))}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Ej: El paraíso del Caribe"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Subtítulo (Inglés)
+            </label>
+            <input
+              type="text"
+              value={form.tagline_en}
+              onChange={(e) => setForm((f) => ({ ...f, tagline_en: e.target.value }))}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Eg: The Caribbean Paradise"
+            />
+          </div>
+        </div>
+
+        {/* Descripciones */}
+        <div className="bg-white rounded-xl shadow-sm p-5 space-y-4">
+          <h2 className="font-semibold text-gray-800">Descripción</h2>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Descripción (Español)
+            </label>
+            <textarea
+              rows={8}
+              value={form.description}
+              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+              placeholder="Descripción del destino en español. Usá líneas en blanco para separar párrafos."
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Descripción (Inglés)
+            </label>
+            <textarea
+              rows={8}
+              value={form.description_en}
+              onChange={(e) => setForm((f) => ({ ...f, description_en: e.target.value }))}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+              placeholder="Destination description in English. Use blank lines to separate paragraphs."
+            />
+          </div>
+          <p className="text-xs text-gray-400">
             Los párrafos separados por línea en blanco se muestran como bloques independientes en la web.
           </p>
         </div>

@@ -16,7 +16,7 @@ export async function GET(
 
   const { data, error } = await supabaseAdmin
     .from('country_destinations')
-    .select('slug,country_name,description,hero_image_url,card_image_url,active')
+    .select('slug,country_name,description,description_en,tagline,tagline_en,hero_image_url,card_image_url,active')
     .eq('slug', slug)
     .maybeSingle()
 
