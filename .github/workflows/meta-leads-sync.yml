@@ -2,7 +2,7 @@ name: Meta Leads — Sync diario
 
 on:
   schedule:
-    - cron: '0 0 * * *'   # 00:00 UTC = 02:00 Madrid (hora de verano)
+    - cron: '0 * * * *'   # cada hora en punto (UTC)
   workflow_dispatch:        # permite disparar manualmente desde GitHub UI
 
 jobs:

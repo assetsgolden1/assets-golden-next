@@ -4,10 +4,5 @@
   "outputDirectory": ".next",
   "installCommand": "npm install",
   "regions": ["cdg1"],
-  "crons": [
-    {
-      "path": "/api/leads/sync-meta",
-      "schedule": "0 0 * * *"
-    }
-  ]
+  "crons": []
 }
