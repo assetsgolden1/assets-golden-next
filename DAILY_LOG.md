@@ -66,6 +66,88 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-09 — FASE-5-P4: Editor de destinos bilingüe + aviso editorial hardcodeado
+
+**Contexto:** El editor de destinos (commit 6b44f15) solo editaba description, hero_image_url y card_image_url. Las páginas de destino usan también description_en, tagline y tagline_en. Además, 11 destinos tienen un bloque editorial extenso en el código que no debe editarse desde el panel.
+
+**Trabajo hecho:**
+- `GET /api/admin/get-destination/[slug]`: ampliado el SELECT para devolver también `description_en`, `tagline` y `tagline_en`.
+- `POST /api/admin/update-destination`: acepta y guarda los 3 campos nuevos (`description_en`, `tagline`, `tagline_en`). Audit log actualizado con los 6 campos.
+- `/admin/destinos/[slug]/edit`: formulario ampliado con sección "Subtítulo del hero" (2 inputs cortos: ES + EN) y sección "Descripción" con dos textareas (Español + Inglés). Banner informativo azul (icono Info) para los 11 slugs con editorial hardcodeada: mexico, indonesia, emiratos-arabes-unidos, argentina, estados-unidos, costa-rica, reino-unido, ecuador, grecia, paraguay, espana. Para los demás destinos no aparece ningún aviso.
+
+**Archivos tocados:**
+- MODIFIED: `src/app/admin/destinos/[slug]/edit/page.tsx`
+- MODIFIED: `src/app/api/admin/update-destination/route.ts`
+- MODIFIED: `src/app/api/admin/get-destination/[slug]/route.ts`
+
+**Commits:** `e889632` — feat(admin): editor de destinos bilingue (desc/tagline ES+EN) + aviso editorial hardcodeado
+
+**Próximo paso sugerido:** Refactor pipeline de leads (eliminar n8n, consolidar en processLead, agregar Resend) — depende de acceso Resend de Atilio.
+
+---
+
+### 2026-06-09 — FASE-5-P3: UI de edición de destinos en el admin
+
+**Contexto:** Atilio no podía editar descripción ni imágenes de los destinos (ej: República Dominicana/Samaná). La vista /admin/destinos fue eliminada en su momento.
+
+**Trabajo hecho:**
+- `/admin/destinos`: listado de todos los destinos de `country_destinations` con miniatura de `card_image_url`, nombre, slug, estado activo/inactivo y botón Editar. Protegido con `requireAdmin()` (SSR).
+- `/admin/destinos/[slug]/edit`: formulario client-side con textarea de descripción (multilínea, preserva párrafos), uploader de imagen hero (panorámica) y uploader de imagen card (miniatura). Preview de imagen actual + botón "Quitar imagen". Sube al bucket `destination-images` vía el endpoint `/api/admin/upload-image` existente.
+- `GET /api/admin/get-destination/[slug]`: devuelve los campos editables del destino para pre-popular el form. Protegido con `requireAdmin()`.
+- `POST /api/admin/update-destination`: actualiza SOLO `description`, `hero_image_url`, `card_image_url` en `country_destinations` por slug. No toca `country_name`, `slug` ni `active`. Con rate limit, audit log.
+- Sidebar del admin: agregado link "Destinos" con ícono MapPin, entre Agentes y Sincronización.
+
+**Archivos creados/tocados:**
+- CREATED: `src/app/admin/destinos/page.tsx`
+- CREATED: `src/app/admin/destinos/[slug]/edit/page.tsx`
+- CREATED: `src/app/api/admin/get-destination/[slug]/route.ts`
+- CREATED: `src/app/api/admin/update-destination/route.ts`
+- MODIFIED: `src/components/admin/AdminSidebar.tsx`
+
+**Commits:** `6b44f15` — feat(admin): UI de edicion de destinos (descripcion + hero/card image)
+
+**Próximo paso sugerido:** Continuar con FASE-5 siguiente tarea.
+
+---
+
+### 2026-06-08 — FASE-5-P2: Descripción de destino reubicada al pie
+
+**Contexto:** Las páginas de destino mostraban el texto largo primero, empujando las propiedades hacia abajo. Patrón deseado: fichas arriba, texto SEO al fondo (como portales inmobiliarios).
+
+**Trabajo hecho:**
+- **Genérica** (`/destinos/[slug]`): Split de `description` por `\n\n`. El primer párrafo permanece como intro corta inmediatamente tras el hero/market stats. El grid de propiedades + filtros sube a continuación. Highlights, Market info, Editorial content y los párrafos restantes quedan al pie. Todo renderizado SSR, sin `display:none`.
+- **España** (`/destinos/espana`): El bloque editorial completo (es + en, ~150 líneas de JSX) se movió completo al pie. El grid de propiedades + filtros por zona queda inmediatamente tras el hero. Los filtros por zona no fueron tocados.
+
+**Archivos tocados:**
+- MODIFIED: `src/app/[locale]/(public)/destinos/[slug]/page.tsx`
+- MODIFIED: `src/app/[locale]/(public)/destinos/espana/page.tsx`
+
+**Commits:** `7d047a2` — feat: reubicar descripcion de destino al pie (propiedades primero)
+
+**Próximo paso sugerido:** Continuar con FASE-5 siguiente tarea.
+
+---
+
+### 2026-06-08 — FASE-5-P1: Código HabiHub en admin de propiedades
+
+**Contexto:** Atilio necesitaba ver el `external_id` (código numérico HabiHub, ej: "18909") en el panel admin para poder localizar propiedades en el portal de HabiHub.
+
+**Trabajo hecho:**
+- Edit form (`/admin/propiedades/[id]/edit`): el bloque de identificadores de solo lectura ahora muestra "Código HabiHub" solo cuando `external_source='habihub'`. Si `external_id` es numérico → muestra el código en azul. Si es UUID/null → "No disponible". Para otras fuentes (prestige-bali, my-dream-samana, etc.) → el campo no aparece.
+- Tabla listado (`/admin/propiedades`): el `external_id` numérico aparece como texto secundario azul debajo del ref_code (AG-XXXXX), solo para propiedades habihub. No agrega columna extra — usa la celda existente.
+- Query listado: se añadió `external_source` al SELECT de Supabase para habilitar el filtro de presentación.
+
+**Archivos tocados:**
+- MODIFIED: `src/app/admin/propiedades/[id]/edit/page.tsx`
+- MODIFIED: `src/app/admin/propiedades/page.tsx`
+- MODIFIED: `src/components/admin/PropiedadesTable.tsx`
+
+**Commits:** `c461dea` — feat: mostrar codigo HabiHub (external_id) en admin de propiedades
+
+**Próximo paso sugerido:** Continuar con FASE-5 siguiente tarea, o verificar en producción que el código aparece correctamente en propiedades habihub existentes.
+
+---
+
 ### 2026-06-08 — Cierre carga Bali + Samaná
 
 **Contexto:** Cierre de la fase de carga masiva de propiedades Bali (partner Prestige) y alta de Samaná (país nuevo).
