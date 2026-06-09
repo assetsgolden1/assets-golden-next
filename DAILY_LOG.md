@@ -56,13 +56,32 @@ reordena si la prioridad cambió.
 - [ ] Cargar en Vercel: META_LEADS_SYNC_TOKEN (Sensitive), META_LEADS_FORM_ID, META_LEADS_SHEET_ID, META_LEADS_CRON_SECRET (Sensitive) — valores en .env.local
 - [ ] Test manual del sync: `POST /api/leads/sync-meta/manual` con `Authorization: Bearer [META_LEADS_CRON_SECRET]`
 - [ ] Verificar que los 7 leads históricos se saltean todos (deduplicación por email)
-- [ ] Si se quiere sync cada 15min: upgrade Vercel Pro o configurar QStash/GitHub Actions (ver docs/meta-leads-sync-automation.md)
+- [x] Si se quiere sync cada 15min: upgrade Vercel Pro o configurar QStash/GitHub Actions — resuelto con GitHub Actions cada hora (0 * * * *)
 
 ---
 
 ## 📝 Historial de sesiones
 
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
+
+---
+
+### 2026-06-09 — [LEADS-CRON-P02] Sync de leads cada hora + eliminar cron Vercel duplicado
+
+**Contexto:** El cron diario `0 0 * * *` corría el sync 1 vez al día (~4 AM local), lo que dejaba los leads del día esperando hasta la madrugada siguiente. Se sube frecuencia a cada hora y se elimina el cron duplicado de Vercel que disparaba el mismo endpoint en paralelo.
+
+**Trabajo hecho:**
+- `.github/workflows/meta-leads-sync.yml`: cron `0 0 * * *` → `0 * * * *` (cada hora en punto, UTC). `workflow_dispatch`, job, auth header y secret intactos.
+- `vercel.json`: eliminada la entrada `crons[0]` (path `/api/leads/sync-meta`, schedule `0 0 * * *`). El array queda vacío `"crons": []`. Framework, buildCommand, regions y demás campos intactos.
+- PASO 3 — Otros disparadores hallados: ninguno adicional. `scripts/diagnoseMetaToken.ts` es script diagnóstico one-shot (no scheduler). `src/app/api/leads/sync-meta/manual/route.ts` es endpoint POST manual (no scheduler). El único scheduler activo ahora es el GitHub Actions workflow.
+
+**Archivos tocados:**
+- MODIFIED: `.github/workflows/meta-leads-sync.yml`
+- MODIFIED: `vercel.json`
+
+**Commits:** `6aa7a15` — chore: sync de leads cada hora + remover cron Vercel duplicado
+
+**Próximo paso sugerido:** Cuando Atilio dé acceso a Resend, implementar envío de email al recibir lead nuevo (siguiente prompt pendiente). Verificar en GitHub Actions que el primer run de la hora ejecuta sin errores.
 
 ---
 
