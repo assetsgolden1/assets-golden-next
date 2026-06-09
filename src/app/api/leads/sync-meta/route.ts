@@ -5,6 +5,7 @@ import { getSyncedLeadIds, getSyncedEmails, recordSyncedLeads } from '@/lib/meta
 import { createSyncRun, updateSyncRun } from '@/lib/meta/syncLog'
 import { appendLeadToMetaSheet, readMetaSheetEmails } from '@/lib/googleSheets'
 import { categorizeLead, getSpecialStateNotes } from '@/lib/leads/prioritizeLead'
+import { sendWelcomeEmail } from '@/lib/email/sendWelcomeEmail'
 
 function isAuthorized(req: NextRequest): boolean {
   const secret = process.env.META_LEADS_CRON_SECRET
@@ -106,6 +107,8 @@ export async function GET(req: NextRequest) {
         created_time: new Date().toISOString(),
         form_id: formId,
       })
+
+      await sendWelcomeEmail(parsed.email, parsed.nombre)
     }
 
     if (synced.length > 0) {
