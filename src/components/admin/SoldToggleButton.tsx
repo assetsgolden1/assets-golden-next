@@ -21,7 +21,7 @@ export function SoldToggleButton({ id, sold }: { id: string; sold: boolean }) {
           : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'
       }`}
     >
-      {pending ? '...' : sold ? 'Vendida' : 'Marcar vendida'}
+      {pending ? '...' : sold ? 'Vendida' : 'Vender'}
     </button>
   )
 }

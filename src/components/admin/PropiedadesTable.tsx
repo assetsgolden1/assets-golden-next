@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { ExternalLink, Copy } from 'lucide-react'
+import { ExternalLink, Copy, Pencil } from 'lucide-react'
 import { toast } from 'sonner'
 import { bulkHideProperties, bulkDeleteProperties, bulkMarkAsSold } from '@/app/admin/actions'
 import { translatePropertyType } from '@/lib/propertyTypes'
@@ -288,10 +288,10 @@ export function PropiedadesTable({
       {/* Tabla */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 w-10">
+                <th className="px-2 py-2 w-8">
                   <input
                     type="checkbox"
                     checked={selected.size === properties.length && properties.length > 0}
@@ -299,17 +299,17 @@ export function PropiedadesTable({
                     className="cursor-pointer w-4 h-4"
                   />
                 </th>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium w-14">Img</th>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium">Título</th>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium">Ref.</th>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium">Cód. HabiHub</th>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium">País / Ciudad</th>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium">Precio</th>
-                <th className="text-left px-4 py-3 text-gray-600 font-medium">Tipo</th>
-                <th className="text-center px-4 py-3 text-gray-600 font-medium">Destacada</th>
-                <th className="text-center px-4 py-3 text-gray-600 font-medium">Visible</th>
-                <th className="text-center px-4 py-3 text-gray-600 font-medium">Vendida</th>
-                <th className="text-center px-4 py-3 text-gray-600 font-medium">Acciones</th>
+                <th className="text-left px-2 py-2 text-gray-600 font-medium" style={{ width: 50 }}>Img</th>
+                <th className="text-left px-2 py-2 text-gray-600 font-medium" style={{ width: 145 }}>Título</th>
+                <th className="text-left px-2 py-2 text-gray-600 font-medium" style={{ width: 76 }}>Ref.</th>
+                <th className="text-left px-2 py-2 text-gray-600 font-medium" style={{ width: 92 }}>Cód. HabiHub</th>
+                <th className="text-left px-2 py-2 text-gray-600 font-medium" style={{ width: 108 }}>País / Ciudad</th>
+                <th className="text-left px-2 py-2 text-gray-600 font-medium" style={{ width: 96 }}>Precio</th>
+                <th className="text-left px-2 py-2 text-gray-600 font-medium" style={{ width: 76 }}>Tipo</th>
+                <th className="text-center px-1 py-2 text-gray-600 font-medium" style={{ width: 58 }}>★</th>
+                <th className="text-center px-1 py-2 text-gray-600 font-medium" style={{ width: 68 }}>Visible</th>
+                <th className="text-center px-1 py-2 text-gray-600 font-medium" style={{ width: 76 }}>Vendida</th>
+                <th className="text-center px-1 py-2 text-gray-600 font-medium" style={{ width: 66 }}>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -327,7 +327,7 @@ export function PropiedadesTable({
                       selected.has(prop.id) ? 'bg-blue-50' : prop.hidden ? 'bg-red-50 opacity-70' : ''
                     }`}
                   >
-                    <td className="px-4 py-2">
+                    <td className="px-2 py-2">
                       <input
                         type="checkbox"
                         checked={selected.has(prop.id)}
@@ -335,38 +335,38 @@ export function PropiedadesTable({
                         className="cursor-pointer w-4 h-4"
                       />
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-2 py-2">
                       <img
                         src={prop.image_url ?? '/placeholder-property.svg'}
                         alt=""
-                        className="w-10 h-10 object-cover rounded-lg"
+                        className="w-9 h-9 object-cover rounded-md"
                         onError={(e) => { e.currentTarget.src = '/placeholder-property.svg' }}
                       />
                     </td>
-                    <td className="px-4 py-2 max-w-[200px]">
-                      <p className="font-medium text-gray-800 truncate">{prop.title}</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
+                    <td className="px-2 py-2 overflow-hidden">
+                      <p className="font-medium text-gray-800 truncate text-xs" title={prop.title}>{prop.title}</p>
+                      <div className="flex flex-wrap gap-0.5 mt-0.5">
                         {prop.sold
-                          ? <span className="text-xs px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-semibold">VENDIDA</span>
+                          ? <span className="text-[10px] px-1 py-0.5 rounded bg-red-100 text-red-700 font-semibold">VEND.</span>
                           : prop.hidden
-                            ? <span className="text-xs px-1.5 py-0.5 rounded bg-gray-200 text-gray-500">OCULTA</span>
-                            : <span className="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700">VISIBLE</span>
+                            ? <span className="text-[10px] px-1 py-0.5 rounded bg-gray-200 text-gray-500">OCU.</span>
+                            : <span className="text-[10px] px-1 py-0.5 rounded bg-green-100 text-green-700">VIS.</span>
                         }
                         {prop.featured && (
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">★ DEST.</span>
+                          <span className="text-[10px] px-1 py-0.5 rounded bg-amber-100 text-amber-700">★</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-2 py-2">
                       <span className="font-mono text-xs text-gray-500">{prop.ref_code ?? '—'}</span>
                       {prop.external_source === 'habihub' && prop.external_id && /^\d+$/.test(prop.external_id) && (
                         <p className="font-mono text-xs text-blue-500 mt-0.5">{prop.external_id}</p>
                       )}
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-2 py-2 overflow-hidden">
                       {prop.habihub_dev_id ? (
-                        <div className="flex items-center gap-1">
-                          <span className="font-mono text-xs text-gray-400">{prop.habihub_dev_id}</span>
+                        <div className="flex items-center gap-0.5">
+                          <span className="font-mono text-xs text-gray-400 truncate" title={prop.habihub_dev_id}>{prop.habihub_dev_id}</span>
                           <button
                             type="button"
                             title="Pegar en buscador de HabiHub para encontrar el development"
@@ -374,65 +374,62 @@ export function PropiedadesTable({
                               navigator.clipboard.writeText(prop.habihub_dev_id!)
                               toast.success(`Copiado: ${prop.habihub_dev_id}`)
                             }}
-                            className="p-0.5 text-gray-300 hover:text-blue-500 transition-colors"
+                            className="flex-shrink-0 p-0.5 text-gray-300 hover:text-blue-500 transition-colors"
                           >
-                            <Copy size={13} />
+                            <Copy size={12} />
                           </button>
                         </div>
                       ) : (
                         <span className="text-xs text-gray-300">—</span>
                       )}
                     </td>
-                    <td className="px-4 py-2 text-gray-600">
-                      <span>{prop.country ?? '—'}</span>
-                      {prop.location && <span className="text-gray-400"> / {prop.location}</span>}
+                    <td className="px-2 py-2 overflow-hidden">
+                      <div
+                        className="truncate text-xs text-gray-600"
+                        title={[prop.country, prop.location].filter(Boolean).join(' / ')}
+                      >
+                        {prop.country ?? '—'}{prop.location && <span className="text-gray-400"> / {prop.location}</span>}
+                      </div>
                     </td>
-                    <td className="px-4 py-2 text-gray-700 whitespace-nowrap">
+                    <td className="px-2 py-2 text-gray-700 text-xs whitespace-nowrap">
                       {prop.price
                         ? `${prop.currency ?? 'EUR'} ${prop.price.toLocaleString('es-ES')}`
                         : '—'}
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-2 py-2 overflow-hidden">
                       {prop.property_type
-                        ? <span className="bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded-full">
+                        ? <span className="bg-blue-50 text-blue-700 text-[10px] px-1.5 py-0.5 rounded-full truncate block">
                             {translatePropertyType(prop.property_type)}
                           </span>
                         : '—'}
                     </td>
-                    <td className="px-4 py-2 text-center">
+                    <td className="px-1 py-2 text-center">
                       <FeaturedToggleButton id={prop.id} featured={prop.featured} />
                     </td>
-                    <td className="px-4 py-2 text-center">
+                    <td className="px-1 py-2 text-center">
                       <PropertyVisibilityToggle id={prop.id} hidden={prop.hidden ?? false} />
                     </td>
-                    <td className="px-4 py-2 text-center">
+                    <td className="px-1 py-2 text-center">
                       <SoldToggleButton id={prop.id} sold={prop.sold ?? false} />
                     </td>
-                    <td className="px-4 py-2 text-center">
-                      <div className="flex items-center justify-center gap-2">
+                    <td className="px-1 py-2 text-center">
+                      <div className="flex items-center justify-center gap-1.5">
                         <a
                           href={`/admin/propiedades/${prop.id}/edit`}
-                          style={{
-                            fontSize: 12,
-                            color: '#131D2E',
-                            textDecoration: 'none',
-                            padding: '3px 8px',
-                            border: '1px solid #d1d5db',
-                            borderRadius: 4,
-                            backgroundColor: '#f9fafb',
-                          }}
+                          className="text-gray-500 hover:text-[#131D2E] p-1 rounded border border-gray-200 hover:border-gray-400 transition-colors"
+                          title="Editar propiedad"
                         >
-                          ✏️ Editar
+                          <Pencil size={14} />
                         </a>
                         {prop.slug && (
                           <a
                             href={`/propiedades/${prop.slug}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="text-blue-500 hover:text-blue-700 p-1"
+                            className="text-blue-400 hover:text-blue-600 p-1"
                             title="Ver en sitio"
                           >
-                            <ExternalLink size={15} />
+                            <ExternalLink size={14} />
                           </a>
                         )}
                       </div>
