@@ -119,7 +119,7 @@ export default function SyncPage() {
     const matchedByFp = lastDryRun.stats?.matched_by_fingerprint ?? 0
     const insertedNew = lastDryRun.stats?.inserted_new ?? 0
     const conflicts = lastDryRun.stats?.conflicts ?? 0
-    const deletedCount = lastDryRun.deletedCount ?? lastDryRun.stats?.deleted_count ?? 0
+    const hiddenCount = lastDryRun.deletedCount ?? lastDryRun.stats?.deleted_count ?? 0
     const updates = matchedById + matchedByFp
 
     const message =
@@ -127,8 +127,8 @@ export default function SyncPage() {
       `Según el último dry-run:\n` +
       `  • ${updates} propiedades se ACTUALIZARÁN\n` +
       `  • ${insertedNew} propiedades nuevas se AGREGARÁN\n` +
-      `  • ${deletedCount} propiedades obra nueva ES se BORRARÁN\n` +
-      `  • ${conflicts} con huella ambigua (se insertó la del feed, los viejos caen en BORRADO)\n\n` +
+      `  • ${hiddenCount} propiedades se OCULTARÁN (hidden_by_sync=true, reversible)\n` +
+      `  • ${conflicts} con huella ambigua (se insertó la del feed, los viejos quedan OCULTOS)\n\n` +
       `Backup en properties_backup_20260429 (1.757 filas).\n\n` +
       `¿Continuar?`
 
@@ -240,10 +240,10 @@ export default function SyncPage() {
                   { label: 'Nuevas', value: lastResult.stats.inserted_new, color: 'text-green-700' },
                   { label: 'Conflictos', value: lastResult.stats.conflicts, color: 'text-orange-600' },
                   {
-                    label: 'Borradas',
+                    label: 'Ocultadas',
                     value: lastResult.deletedCount ?? lastResult.stats.deleted_count ?? 0,
                     color: (lastResult.deletedCount ?? lastResult.stats.deleted_count ?? 0) > 0
-                      ? 'text-red-600 font-bold'
+                      ? 'text-amber-600 font-bold'
                       : 'text-gray-400',
                   },
                   { label: 'Errores', value: lastResult.stats.errors, color: 'text-red-600' },
@@ -290,7 +290,7 @@ export default function SyncPage() {
                   <th className="text-right px-2">Huella</th>
                   <th className="text-right px-2">Nuevas</th>
                   <th className="text-right px-2">Conflictos</th>
-                  <th className="text-right px-2">Borradas</th>
+                  <th className="text-right px-2">Ocultadas</th>
                   <th className="text-right px-2">Errores</th>
                   <th className="text-right pl-2">Duración</th>
                   <th className="w-6"></th>
@@ -315,7 +315,7 @@ export default function SyncPage() {
                       <td className="text-right px-2 text-purple-600">{log.matched_by_fingerprint}</td>
                       <td className="text-right px-2 text-green-600">{log.inserted_new}</td>
                       <td className="text-right px-2 text-orange-500">{log.conflicts}</td>
-                      <td className={`text-right px-2 ${(log.deleted_count ?? 0) > 0 ? 'text-red-600 font-bold' : 'text-gray-400'}`}>
+                      <td className={`text-right px-2 ${(log.deleted_count ?? 0) > 0 ? 'text-amber-600 font-bold' : 'text-gray-400'}`}>
                         {log.deleted_count ?? 0}
                       </td>
                       <td className="text-right px-2 text-red-500">{log.errors}</td>
@@ -366,8 +366,8 @@ export default function SyncPage() {
 
                             {log.details.deleted_sample && log.details.deleted_sample.length > 0 && (
                               <div>
-                                <p className="text-xs font-semibold text-red-600 mb-2">
-                                  Borradas — muestra ({log.details.deleted_sample.length})
+                                <p className="text-xs font-semibold text-amber-600 mb-2">
+                                  Ocultadas — muestra ({log.details.deleted_sample.length})
                                 </p>
                                 <div className="space-y-1 max-h-40 overflow-y-auto">
                                   {log.details.deleted_sample.map((p) => (
