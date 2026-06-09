@@ -41,6 +41,7 @@ export async function getProperties(filters?: GetPropertiesFilters) {
     .select('*', { count: 'exact' })
     .in('status', ['active', 'available'])
     .not('hidden', 'eq', true)
+    .not('hidden_by_sync', 'eq', true)
 
   if (filters?.excludeTypes && filters.excludeTypes.length > 0)
     query = query.not('property_type', 'in', `(${filters.excludeTypes.join(',')})`)
@@ -118,6 +119,7 @@ export async function getPropertiesForSpain(filters: GetSpainPropertiesFilters =
     let qq = q
       .or('country.ilike.%España%,country.ilike.%Spain%,country.ilike.%espana%')
       .not('hidden', 'eq', true)
+      .not('hidden_by_sync', 'eq', true)
     if (filters.ciudad) qq = qq.ilike('location', `%${filters.ciudad}%`)
     if (filters.tipo)   qq = qq.eq('property_type', filters.tipo)
     if (filters.precioMin) qq = qq.gte('price', filters.precioMin)
@@ -209,6 +211,7 @@ export async function getPropertyTypesForSpain(): Promise<string[]> {
     .select('property_type')
     .or('country.ilike.%España%,country.ilike.%Spain%')
     .not('hidden', 'eq', true)
+    .not('hidden_by_sync', 'eq', true)
   const types = [
     ...new Set((data ?? []).map((d: { property_type: string | null }) => d.property_type).filter(Boolean)),
   ] as string[]
@@ -237,6 +240,7 @@ export async function getPropertiesForDestination(
     .select('*', { count: 'exact' })
     .ilike('country', `%${countryName}%`)
     .not('hidden', 'eq', true)
+    .not('hidden_by_sync', 'eq', true)
 
   if (filters.ciudad)      query = query.ilike('location', `%${filters.ciudad}%`)
   if (filters.tipo)        query = query.eq('property_type', filters.tipo)
@@ -262,6 +266,7 @@ export async function getCitiesForDestination(countryName: string): Promise<stri
     .select('location')
     .ilike('country', `%${countryName}%`)
     .not('hidden', 'eq', true)
+    .not('hidden_by_sync', 'eq', true)
     .not('location', 'is', null)
   const cities = [
     ...new Set(
@@ -280,6 +285,7 @@ export async function getPropertyTypesForDestination(countryName: string): Promi
     .select('property_type')
     .ilike('country', `%${countryName}%`)
     .not('hidden', 'eq', true)
+    .not('hidden_by_sync', 'eq', true)
     .not('property_type', 'is', null)
   const types = [
     ...new Set((data ?? []).map((d: { property_type: string | null }) => d.property_type).filter(Boolean)),
@@ -305,6 +311,7 @@ export async function getFeaturedProperties() {
     .eq('featured', true)
     .in('status', ['active', 'available'])
     .not('hidden', 'eq', true)
+    .not('hidden_by_sync', 'eq', true)
     .not('sold', 'eq', true)
     .order('featured_order', { ascending: true, nullsFirst: false })
     .order('created_at', { ascending: false })
@@ -318,6 +325,7 @@ export async function getAllPropertySlugs() {
     .select('slug')
     .in('status', ['active', 'available'])
     .not('hidden', 'eq', true)
+    .not('hidden_by_sync', 'eq', true)
     .not('slug', 'is', null)
   return (data ?? []).map((p) => p.slug as string)
 }
@@ -499,6 +507,7 @@ export async function getPropertiesByCountry(slug: string) {
       .select('*')
       .in('status', ['active', 'available'])
       .not('hidden', 'eq', true)
+      .not('hidden_by_sync', 'eq', true)
       .ilike('country', countryName)
       .order('province', { ascending: true, nullsFirst: false })
       .order('location', { ascending: true })
@@ -522,6 +531,7 @@ export async function getPropertyCountsByCountry(): Promise<Record<string, numbe
     .select('country')
     .in('status', ['active', 'available'])
     .not('hidden', 'eq', true)
+    .not('hidden_by_sync', 'eq', true)
     .not('country', 'is', null)
 
   const counts: Record<string, number> = {}

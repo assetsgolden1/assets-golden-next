@@ -41,6 +41,7 @@ export async function GET(request: NextRequest) {
       .select('*', { count: 'exact' })
       .eq('ref_code', code)
       .not('hidden', 'eq', true)
+      .not('hidden_by_sync', 'eq', true)
       .not('sold', 'eq', true)
       .limit(1)
 
@@ -63,6 +64,7 @@ export async function GET(request: NextRequest) {
       .select('*', { count: 'exact' })
       .eq('ref_code', code)
       .not('hidden', 'eq', true)
+      .not('hidden_by_sync', 'eq', true)
       .not('sold', 'eq', true)
       .limit(1)
 
@@ -85,6 +87,7 @@ export async function GET(request: NextRequest) {
       .select('*')
       .eq('id', q)
       .not('hidden', 'eq', true)
+      .not('hidden_by_sync', 'eq', true)
       .not('sold', 'eq', true)
       .limit(1)
 

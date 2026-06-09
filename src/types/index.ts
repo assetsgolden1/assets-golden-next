@@ -31,6 +31,7 @@ export interface Property {
   ref_code: string | null
   sold: boolean | null
   hidden: boolean | null
+  hidden_by_sync: boolean | null
   external_source: string | null
   last_synced_at: string | null
   featured_order: number | null

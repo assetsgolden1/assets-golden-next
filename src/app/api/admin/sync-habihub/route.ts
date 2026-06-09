@@ -296,7 +296,7 @@ export async function POST(request: NextRequest) {
       const { data, error } = await supabaseAdmin
         .from('properties')
         .select('id,ref_code,external_id,price,status,location,province,property_type,bedrooms,bathrooms,area_sqm,country,is_development,external_source,featured')
-        .eq('country', 'España')
+        .eq('external_source', 'habihub')
         .range(from, to)
 
       if (error) {
@@ -393,6 +393,7 @@ export async function POST(request: NextRequest) {
               price: fp.price,
               description: fp.description,
               description_en: fp.description_en,
+              hidden_by_sync: false, // reactivar si había sido ocultada en un sync previo
               // Defensiva: solo actualizar imágenes si el feed parseó valores válidos.
               // Evita destruir fotos existentes si un futuro cambio del feed rompe el extractor.
               ...(fp.image_url ? { image_url: fp.image_url } : {}),
@@ -404,7 +405,7 @@ export async function POST(request: NextRequest) {
         }
 
         // 2 — Filtrar candidatos por huella digital
-        const fpCandidates = allExisting.filter((e) => fingerprintMatch(e, fp))
+        const fpCandidates = allExisting.filter((e) => e.external_source === 'habihub' && fingerprintMatch(e, fp))
 
         // 2.b — Huella ambigua: el feed es la fuente de verdad. Logueamos
         // el conflict y caemos al flujo de INSERT que sigue. Los candidatos
@@ -486,46 +487,48 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Fase 4 — calcular borrado selectivo
-    const deleteScopeAll = allExisting.filter((p) =>
-      p.country === 'España' &&
-      p.is_development === true &&
+    // Fase 4 — ocultado reversible (hidden_by_sync=true) en lugar de borrado físico.
+    // Scope: external_source='habihub' + external_id numérico (único discriminador fiable
+    // de que la propiedad vino del feed). No filtra por country ni is_development —
+    // esos filtros son frágiles. Excluye destacadas.
+    const NUMERIC_ID = /^\d+$/
+    const hideScopeAll = allExisting.filter((p) =>
       p.external_source === 'habihub' &&
+      NUMERIC_ID.test(p.external_id ?? '') &&
       p.featured !== true
     )
-    totalInScope = deleteScopeAll.length
+    totalInScope = hideScopeAll.length
 
-    const toDelete = deleteScopeAll.filter((p) => !processedIds.has(p.id))
-    const deletedCount = toDelete.length
-    stats.deleted_count = deletedCount
+    const toHide = hideScopeAll.filter((p) => !processedIds.has(p.id))
+    const hiddenCount = toHide.length
+    stats.deleted_count = hiddenCount // reutilizado para compatibilidad con UI y sync_logs
 
-    if (deletedCount > 0) {
-      const deletePct = (deletedCount / Math.max(deleteScopeAll.length, 1)) * 100
+    if (hiddenCount > 0) {
+      const hidePct = (hiddenCount / Math.max(hideScopeAll.length, 1)) * 100
 
-      deletedSample = toDelete.slice(0, 50).map((p) => ({
+      deletedSample = toHide.slice(0, 50).map((p) => ({
         id: p.id,
         ref_code: p.ref_code ?? null,
         location: p.location ?? '',
         title: `${p.property_type ?? '?'} en ${p.location ?? '?'}`,
       }))
 
-      // El dry-run debe poder mostrar "borraría N propiedades" siempre,
-      // incluso si N es enorme — es la señal de alerta que el usuario
-      // necesita ver. La salvaguarda solo bloquea el DELETE real.
+      // El dry-run muestra cuántas se ocultarían sin escribir nada.
+      // La salvaguarda solo bloquea el ocultado real.
       if (!dryRun) {
-        if (deletePct > 80 && deleteScopeAll.length > 100) {
+        if (hidePct > 80 && hideScopeAll.length > 100) {
           throw new Error(
-            `Salvaguarda activada: borraría ${deletedCount} de ${deleteScopeAll.length} ` +
-            `(${deletePct.toFixed(1)}%). Posible feed corrupto. Sync abortado.`
+            `Salvaguarda activada: ocultaría ${hiddenCount} de ${hideScopeAll.length} ` +
+            `(${hidePct.toFixed(1)}%). Posible feed corrupto. Sync abortado.`
           )
         }
 
-        // Borrado selectivo en lotes de 50
-        for (let i = 0; i < toDelete.length; i += 50) {
-          const batchIds = toDelete.slice(i, i + 50).map((p) => p.id)
+        // Ocultado selectivo en lotes de 50 (reversible: hidden_by_sync=false al reaparecer)
+        for (let i = 0; i < toHide.length; i += 50) {
+          const batchIds = toHide.slice(i, i + 50).map((p) => p.id)
           const { error } = await supabaseAdmin
             .from('properties')
-            .delete()
+            .update({ hidden_by_sync: true })
             .in('id', batchIds)
           if (error) throw error
         }
@@ -535,12 +538,12 @@ export async function POST(request: NextRequest) {
     stats.updated_count = stats.matched_by_external_id + stats.matched_by_fingerprint
 
     diagnostics = {
-      code_version: 'v5-stable',
+      code_version: 'v6-hide',
       all_existing_count: allExisting.length,
       deduped_feed_count: dedupedFeed.length,
-      delete_scope_all_count: deleteScopeAll.length,
+      hide_scope_all_count: hideScopeAll.length,
       processed_ids_size: processedIds.size,
-      to_delete_count: toDelete.length,
+      to_hide_count: toHide.length,
       to_update_by_id_size: toUpdateById.length,
       to_update_by_fp_size: toUpdateByFp.length,
       to_insert_size: toInsert.length,

@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
     .from('properties')
     .select('property_type')
     .not('hidden', 'eq', true)
+    .not('hidden_by_sync', 'eq', true)
     .not('sold', 'eq', true)
     .not('property_type', 'is', null)
 
