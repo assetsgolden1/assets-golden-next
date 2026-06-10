@@ -66,6 +66,34 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-11 — FASE-5-P9: Match por slug (resync external_id reasignado) + fallback fila-por-fila en INSERT
+
+**Contexto:** Tras P8 quedó visible que las "nuevas" del feed fallaban por `properties_slug_key`. Hipótesis de entrada: ~298 colisiones por external_ids reasignados por HabiHub. Objetivo: agregar un nivel de match por slug antes de tratar una fila como nueva, + fallback fila-por-fila en el INSERT.
+
+**Trabajo hecho (`src/app/api/admin/sync-habihub/route.ts`):**
+- **Nivel 3 de match (slug):** orden ahora es 1º external_id, 2º huella, 3º (nuevo) slug, y recién lo que sobra va al INSERT. Se genera `candidateSlug = slugify(title)-external_id` (mismo helper que el INSERT) y se busca en un nuevo mapa `bySlug`. Si existe y la fila no fue ya procesada → es la misma con external_id reasignado: UPDATE resincronizando `external_id` + price/gallery/descripción/province/dev_id/unit + `hidden_by_sync=false` + `last_synced_at`, se agrega a `processedIds` (la Fase 4 no la oculta) y se cuenta en `matched_by_slug`. NO se toca el slug existente.
+- `slug` agregado al SELECT de candidatos y a la interfaz `ExistingProp`. Nuevo array `toUpdateBySlug` aplicado en Fase 5 en lotes de 50. `matched_by_slug` sumado a `stats`, a `updated_count` y a `sync_logs`.
+- **Fallback fila-por-fila en el INSERT:** los lotes de 50 de P8 ahora, si fallan (INSERT atómico → rollback total), reintentan fila por fila para aislar la/s mala/s y NO perder las buenas. Cada fila que aún falle se loguea en `sync_logs.details.insert_errors` con su `slug`.
+- Diagnósticos nuevos: `to_update_by_slug_size`, `insert_slug_already_exists`, `insert_slug_collision_sample`. `code_version='v7-slugmatch'`.
+
+**DB:** `ALTER TABLE sync_logs ADD COLUMN IF NOT EXISTS matched_by_slug integer NOT NULL DEFAULT 0` (aplicado a prod vía MCP + migración `supabase/migrations/20260611000000_add_matched_by_slug_to_sync_logs.sql`). **Importante:** sin esta columna el UPDATE de `sync_logs` (`...stats`) fallaba entero y NO guardaba details/diagnostics — por eso los primeros dry-runs de P9 dejaban `diagnostics=null`.
+
+**Resultado DRY-RUN (sin escribir, logId `f8850f48`):**
+- matched_by_external_id = 2075 · matched_by_fingerprint = 67 · **matched_by_slug = 3** · **nuevas reales = 297** · a ocultar = 36 · errors = 0.
+- **La premisa era incorrecta:** NO había ~298 colisiones. `insert_slug_already_exists = 4` → de las 297 "nuevas", solo **4** tienen slug ya existente; las otras **~293 son genuinamente nuevas**. En P8 las ~7 filas que sí colisionan (3 resync + 4 doble-referencia) envenenaban los 6 lotes atómicos → 0 entraban. Con el fallback fila-por-fila, en el REAL deberían entrar ~293 y fallar+loguearse solo 4.
+- Los 4 que aún colisionan (`villa-en-ciudad-quesada-31960`, `atico-en-los-alcazares-31025`, `villa-en-san-juan-de-los-terreros-34968`, `atico-en-estepona-25745`) son filas cuyo slug-destino YA fue reclamado por otro match por id (el feed trae el id sincronizado *y* uno stale). Quedan logueadas para revisión humana; no se pierden datos.
+
+**Archivos tocados:**
+- MODIFIED: `src/app/api/admin/sync-habihub/route.ts`
+- CREATED: `supabase/migrations/20260611000000_add_matched_by_slug_to_sync_logs.sql`
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** `feat(sync): match por slug para resincronizar external_id reasignado + fallback fila-por-fila en INSERT` (solo `route.ts` por el comando indicado; migración + DAILY_LOG quedaron sin commitear — ver nota).
+
+**Próximo paso sugerido:** correr el sync REAL (lo pidió diferido el usuario): debería sumar ~293 propiedades nuevas + resync de 3 + ocultar 36, con 4 filas logueadas en `insert_errors`. Verificar el total de propiedades visibles sube. Luego decidir si los 4 doble-referenciados son duplicados del feed (ignorar) o ameritan slug con sufijo único.
+
+---
+
 ### 2026-06-11 — FASE-5-P8: INSERT de nuevas del sync en lotes + contador real + log del error de Supabase
 
 **Contexto:** El sync real corría bien (ocultado/match OK), pero el INSERT de las nuevas fallaba ENTERO y mentía: reportaba `inserted_new=298, errors=1` cuando NINGUNA entraba (0 verificadas en la DB). Causa: INSERT en un único batch atómico (una fila inválida tira las 298), `inserted_new` se incrementaba en el loop de matching sin verificar éxito, y el error real de Supabase no se logueaba.
