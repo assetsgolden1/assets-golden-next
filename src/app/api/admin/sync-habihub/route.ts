@@ -91,6 +91,7 @@ interface FeedProp {
 
 interface ExistingProp {
   id: string
+  slug: string | null
   ref_code: string | null
   external_id: string | null
   price: number | null
@@ -269,6 +270,7 @@ export async function POST(request: NextRequest) {
     total_in_feed: 0,
     matched_by_external_id: 0,
     matched_by_fingerprint: 0,
+    matched_by_slug: 0,
     inserted_new: 0,
     conflicts: 0,
     errors: 0,
@@ -277,8 +279,9 @@ export async function POST(request: NextRequest) {
   }
   const conflictDetails: ConflictInfo[] = []
   const insertedSample: { externalId: string; title: string }[] = []
-  // Detalle de errores por lote de INSERT (se persiste en sync_logs.details para debugging)
-  const insertErrors: { batch: number; from: number; count: number; error: string }[] = []
+  // Detalle de errores de INSERT (se persiste en sync_logs.details para debugging).
+  // Con el fallback fila-por-fila, registramos el slug de cada fila que aún falle.
+  const insertErrors: { batch: number; slug: string; error: string }[] = []
   let deletedSample: DeletedSample[] = []
   let totalInScope = 0
   // Métricas internas persistidas para auditoría (se rellenan al final de Fase 4)
@@ -297,7 +300,7 @@ export async function POST(request: NextRequest) {
 
       const { data, error } = await supabaseAdmin
         .from('properties')
-        .select('id,ref_code,external_id,price,status,location,province,property_type,bedrooms,bathrooms,area_sqm,country,is_development,external_source,featured')
+        .select('id,slug,ref_code,external_id,price,status,location,province,property_type,bedrooms,bathrooms,area_sqm,country,is_development,external_source,featured')
         .eq('external_source', 'habihub')
         .range(from, to)
 
@@ -312,8 +315,10 @@ export async function POST(request: NextRequest) {
       if (data.length < PAGE_SIZE) break // última página
     }
     const byExternalId = new Map<string, ExistingProp>()
+    const bySlug = new Map<string, ExistingProp>()
     for (const p of allExisting) {
       if (p.external_id) byExternalId.set(p.external_id, p)
+      if (p.slug) bySlug.set(p.slug, p)
     }
 
     const parser = new XMLParser({
@@ -380,6 +385,7 @@ export async function POST(request: NextRequest) {
     const processedIds = new Set<string>()
     const toUpdateById: { id: string; data: Record<string, unknown> }[] = []
     const toUpdateByFp: { id: string; data: Record<string, unknown> }[] = []
+    const toUpdateBySlug: { id: string; data: Record<string, unknown> }[] = []
     const toInsert: Record<string, unknown>[] = []
 
     for (const fp of dedupedFeed) {
@@ -427,9 +433,46 @@ export async function POST(request: NextRequest) {
         }
 
         // 3 — Si hay exactamente 1 match: UPDATE por huella.
-        //     Si no (0 candidatos o >1 ya logueado arriba): INSERT.
+        //     Si no (0 candidatos o >1 ya logueado arriba): probar match por slug
+        //     antes de tratarla como nueva.
         if (fpCandidates.length !== 1) {
-          // INSERT — cubre tanto length === 0 como length > 1 (conflict resuelto).
+          // 2.5 — Match por slug (HabiHub reasigna external_ids): el slug que
+          // generaría el INSERT (slugify(title)-external_id del feed) ya existe en
+          // la DB => es la MISMA propiedad con el external_id reasignado, no una
+          // nueva. Resincronizamos esa fila (UPDATE) y la marcamos como procesada
+          // para que la Fase 4 no la oculte. Sin esto cae al INSERT y choca con
+          // properties_slug_key.
+          const candidateSlug = `${slugify(fp.title)}-${fp.externalId}`
+          const slugMatch = bySlug.get(candidateSlug)
+          if (slugMatch && !processedIds.has(slugMatch.id)) {
+            stats.matched_by_slug++
+            processedIds.add(slugMatch.id)
+            toUpdateBySlug.push({
+              id: slugMatch.id,
+              data: {
+                external_id: fp.externalId, // resincronizar al id reasignado del feed
+                external_source: 'habihub',
+                title: fp.title,
+                price: fp.price,
+                province: fp.province,
+                description: fp.description,
+                description_en: fp.description_en,
+                habihub_dev_id: fp.habihub_dev_id,
+                habihub_unit: fp.habihub_unit,
+                hidden_by_sync: false,
+                // NO tocamos el slug existente (P9 punto 4).
+                // Defensiva: solo actualizar imágenes si el feed parseó valores válidos.
+                ...(fp.image_url ? { image_url: fp.image_url } : {}),
+                ...(fp.gallery_urls && fp.gallery_urls.length > 0 ? { gallery_urls: fp.gallery_urls } : {}),
+                last_synced_at: new Date().toISOString(),
+              },
+            })
+            // Mantener mapas consistentes para filas posteriores del mismo run.
+            byExternalId.set(fp.externalId, { ...slugMatch, external_id: fp.externalId })
+            continue
+          }
+
+          // INSERT — genuinamente nueva (no matcheó por id, huella ni slug).
           // NO incrementamos inserted_new acá: el contador real se calcula en la
           // Fase 5 contando solo las filas que Supabase confirma como insertadas.
           const newId = randomUUID()
@@ -539,10 +582,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    stats.updated_count = stats.matched_by_external_id + stats.matched_by_fingerprint
+    stats.updated_count = stats.matched_by_external_id + stats.matched_by_fingerprint + stats.matched_by_slug
 
     diagnostics = {
-      code_version: 'v6-hide',
+      code_version: 'v7-slugmatch',
       all_existing_count: allExisting.length,
       deduped_feed_count: dedupedFeed.length,
       hide_scope_all_count: hideScopeAll.length,
@@ -550,7 +593,17 @@ export async function POST(request: NextRequest) {
       to_hide_count: toHide.length,
       to_update_by_id_size: toUpdateById.length,
       to_update_by_fp_size: toUpdateByFp.length,
+      to_update_by_slug_size: toUpdateBySlug.length,
       to_insert_size: toInsert.length,
+      // De las "nuevas", cuántas tienen un slug que YA existe en la DB (su fila
+      // destino quedó reclamada por un match por id/huella anterior, así que el
+      // match por slug no la pudo tomar). Estas fallarán en el INSERT y quedan
+      // logueadas fila-por-fila con su slug en insert_errors.
+      insert_slug_already_exists: toInsert.filter((r) => bySlug.has(String(r.slug ?? ''))).length,
+      insert_slug_collision_sample: toInsert
+        .filter((r) => bySlug.has(String(r.slug ?? '')))
+        .slice(0, 10)
+        .map((r) => String(r.slug ?? '')),
     }
 
     // Fase 5 — aplicar cambios si no es dry-run
@@ -578,48 +631,76 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // Inserts en lotes de 50 (NO en un único batch atómico: una fila inválida
-      // tiraba las 298). Cada lote es independiente: si uno falla, capturamos el
-      // error de Supabase, lo logueamos y seguimos con los demás lotes.
+      // Updates por slug (external_id reasignado) — lotes de 50 en paralelo
+      for (let i = 0; i < toUpdateBySlug.length; i += 50) {
+        const batch = toUpdateBySlug.slice(i, i + 50)
+        await Promise.all(
+          batch.map(({ id, data }) =>
+            supabaseAdmin.from('properties').update(data).eq('id', id)
+          )
+        )
+      }
+
+      // Inserts en lotes de 50 (NO en un único batch atómico). Si un lote falla,
+      // el INSERT es atómico => ninguna fila entró, así que reintentamos fila por
+      // fila para aislar la/s mala/s (slug duplicado) y NO perder las buenas.
       // inserted_new cuenta solo las filas que Supabase confirma (.select('id')).
+      const insertErrDetail = (e: unknown): string => {
+        if (e && typeof e === 'object') {
+          const o = e as { message?: string; details?: string; hint?: string }
+          const parts = [o.message, o.details, o.hint].filter(Boolean)
+          if (parts.length > 0) return parts.join(' | ')
+        }
+        return e instanceof Error ? e.message : String(e)
+      }
+
       for (let i = 0; i < toInsert.length; i += 50) {
         const batch = toInsert.slice(i, i + 50)
         const batchNum = Math.floor(i / 50) + 1
+
+        let batchErr: unknown = null
+        let confirmed = 0
         try {
-          const { data: insertedRows, error: insertErr } = await supabaseAdmin
+          const { data, error } = await supabaseAdmin
             .from('properties')
             .insert(batch)
             .select('id')
-
-          if (insertErr) {
-            const detail = [insertErr.message, insertErr.details, insertErr.hint]
-              .filter(Boolean)
-              .join(' | ')
-            console.error(
-              `INSERT lote ${batchNum} (filas ${i}–${i + batch.length - 1}) falló: ${detail}`
-            )
-            insertErrors.push({ batch: batchNum, from: i, count: batch.length, error: detail })
-            stats.errors += batch.length
-            continue
-          }
-
-          const confirmed = insertedRows?.length ?? 0
-          stats.inserted_new += confirmed
-          // Si Supabase confirmó menos filas que las enviadas, el resto se considera error.
-          if (confirmed < batch.length) {
-            const missing = batch.length - confirmed
-            stats.errors += missing
-            const detail = `Supabase confirmó ${confirmed}/${batch.length} filas (faltan ${missing})`
-            console.error(`INSERT lote ${batchNum}: ${detail}`)
-            insertErrors.push({ batch: batchNum, from: i, count: missing, error: detail })
-          }
+          if (error) batchErr = error
+          else confirmed = data?.length ?? 0
         } catch (e) {
-          const detail = e instanceof Error ? e.message : String(e)
-          console.error(
-            `INSERT lote ${batchNum} (filas ${i}–${i + batch.length - 1}) excepción: ${detail}`
-          )
-          insertErrors.push({ batch: batchNum, from: i, count: batch.length, error: detail })
-          stats.errors += batch.length
+          batchErr = e
+        }
+
+        if (!batchErr) {
+          stats.inserted_new += confirmed
+          continue
+        }
+
+        // El lote falló (rollback total): reintentar fila por fila.
+        console.error(
+          `INSERT lote ${batchNum} falló (reintentando fila por fila): ${insertErrDetail(batchErr)}`
+        )
+        for (const row of batch) {
+          const slug = String(row.slug ?? '')
+          try {
+            const { data, error } = await supabaseAdmin
+              .from('properties')
+              .insert([row])
+              .select('id')
+            if (error) {
+              const detail = insertErrDetail(error)
+              console.error(`  fila slug=${slug} falló: ${detail}`)
+              insertErrors.push({ batch: batchNum, slug, error: detail })
+              stats.errors++
+            } else {
+              stats.inserted_new += data?.length ?? 0
+            }
+          } catch (e) {
+            const detail = insertErrDetail(e)
+            console.error(`  fila slug=${slug} excepción: ${detail}`)
+            insertErrors.push({ batch: batchNum, slug, error: detail })
+            stats.errors++
+          }
         }
       }
     }
