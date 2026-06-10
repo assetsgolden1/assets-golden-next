@@ -43,5 +43,12 @@ next-env.d.ts
 # Inventario local (no commitear)
 outputs/inventario-servicios.md
 outputs/meta-token-diagnosis-*.json
+outputs/meta-block-diagnosis-*.json
+
+# Scripts de diagnóstico de una sola vez (no commitear)
+scripts/diagnoseMetaBlock.ts
+
+# Outputs de scripts de carga (fotos pesadas, datasets) — no commitear
+scripts/output/
 
 .vercel

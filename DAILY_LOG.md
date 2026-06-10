@@ -66,6 +66,58 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-10 — Email de bienvenida (Resend) + sync leads horario + copy final
+
+**Contexto:** Continuación del refactor del pipeline de leads. Se concreta el envío de email de primer contacto vía Resend al recibir un lead nuevo, y se cierra el copy definitivo del email con links a las zonas costeras.
+
+**Trabajo hecho:**
+- **Sync Meta Leads → GitHub Actions horario:** migrado el disparo del sync de cron Vercel diario a GitHub Actions cada hora (`0 * * * *`), eliminando el cron Vercel duplicado (commits `c0ffe04`, `6aa7a15`).
+- **Resend operativo:** dominio `assetsgolden.com` verificado en la cuenta Resend, `RESEND_API_KEY` cargada en Vercel. `sendWelcomeEmail.ts` implementado e invocado desde ambos routes de ingreso de leads (commit `0797ba8`).
+- **Copy final del email de bienvenida** (`src/lib/email/sendWelcomeEmail.ts`): nuevo subject ("Your Costa del Sol new-build selection") y body con links a 3 zonas costeras (Costa del Sol, Costa de la Luz, Costa de Almería). Multipart `html` (con `&amp;` escapado en href) + `text` plano. `from`, `replyTo`, lógica de envío y manejo de errores sin cambios. `{NOMBRE}` = primer nombre del lead o "there" (commit `68918af`).
+- **Higiene de repo:** `scripts/output/` agregado a `.gitignore` (contenía ~4 GB de fotos de carga que `git add -A` casi mete al repo). Commit `68918af` se rehízo para incluir solo el archivo del email.
+
+**Archivos tocados:**
+- MODIFIED: `src/lib/email/sendWelcomeEmail.ts` (copy final)
+- MODIFIED: `.gitignore` (+`scripts/output/`)
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** `68918af` — feat: copy final email bienvenida con links a zonas costeras · (esta entrada) — chore: gitignore scripts/output + cierre daily log
+
+**PENDIENTE de activar el flujo de email:**
+1. Test end-to-end del envío real (lead nuevo → email recibido).
+2. Avisar a Atilio que el primer contacto automático está activo.
+3. Re-habilitar el workflow de GitHub Actions del sync de leads.
+
+**Próximo paso sugerido:** Ejecutar el test del email de bienvenida y, si pasa, re-habilitar el workflow de GitHub Actions y avisar a Atilio.
+
+---
+
+### 2026-06-09 — FASE-5-P7: Tabla /admin/propiedades sin scroll horizontal
+
+**Contexto:** La tabla tenía demasiadas columnas y generaba scroll horizontal en pantallas ~1280px. Sidebar w-64=256px + padding p-6×2=48px → espacio disponible ~976px.
+
+**Trabajo hecho:**
+- `PropiedadesTable.tsx`: tabla convertida a `table-fixed`; anchos fijos por columna (total ~943px): checkbox 32, img 50, título 145, ref 76, habihub 92, país/ciudad 108, precio 96, tipo 76, destacada 58, visible 68, vendida 76, acciones 66.
+- Padding reducido de `px-4 py-3` → `px-2 py-2` en todas las celdas.
+- Columna Título: `truncate text-xs` + `title={prop.title}` (tooltip al hover). Badges de estado compactados a abreviaturas (VEND./OCU./VIS./★).
+- Columna País/Ciudad: `truncate` + `title` con texto completo.
+- Columna Cód. HabiHub: `truncate` + `title` en el span.
+- Columna Tipo: badge con `truncate block`.
+- Columna Acciones: reemplazado "✏️ Editar" por ícono `<Pencil size={14}>` (importado de lucide-react). ExternalLink reducido a size={14}.
+- Imagen miniatura: `w-10 h-10` → `w-9 h-9`.
+- Header columna "Destacada" simplificado a "★".
+- `SoldToggleButton.tsx`: etiqueta "Marcar vendida" → "Vender" (presentación, no lógica).
+
+**Archivos tocados:**
+- MODIFIED: `src/components/admin/PropiedadesTable.tsx`
+- MODIFIED: `src/components/admin/SoldToggleButton.tsx`
+
+**Commits:** `37db841` — fix(admin): tabla de propiedades sin scroll horizontal (anchos + truncado)
+
+**Próximo paso sugerido:** Verificar en pantalla real 1280px que no reaparezca el scroll. Si "Marcar vendida" era confuso al pasarle el hover, el `title` del botón sigue diciendo "Marcar como vendida".
+
+---
+
 ### 2026-06-09 — FASE-5-P5: Salvaguarda sync HabiHub (hidden_by_sync + scope numérico)
 
 **Contexto:** El sync hacía DELETE físico de filas. Riesgo de borrar propiedades que no vienen del feed (manual, prestige-bali, my-dream-samana, scraper-lovable). Columna `hidden_by_sync` ya existía en prod.
