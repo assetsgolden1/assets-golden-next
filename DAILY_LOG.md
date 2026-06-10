@@ -66,6 +66,33 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-11 — FASE-5-P8: INSERT de nuevas del sync en lotes + contador real + log del error de Supabase
+
+**Contexto:** El sync real corría bien (ocultado/match OK), pero el INSERT de las nuevas fallaba ENTERO y mentía: reportaba `inserted_new=298, errors=1` cuando NINGUNA entraba (0 verificadas en la DB). Causa: INSERT en un único batch atómico (una fila inválida tira las 298), `inserted_new` se incrementaba en el loop de matching sin verificar éxito, y el error real de Supabase no se logueaba.
+
+**Trabajo hecho (`src/app/api/admin/sync-habihub/route.ts`):**
+- INSERT partido en **lotes de 50** con `try/catch` por lote. Cada lote usa `.insert(batch).select('id')`; si falla, se captura `error.message | error.details | error.hint`, se loguea con `console.error` y se guarda en `sync_logs.details.insert_errors`. Un lote fallido NO aborta los demás.
+- **Contadores reales:** quitado el `stats.inserted_new++` del loop de matching. Ahora `inserted_new` suma solo las filas que Supabase confirma (`insertedRows.length`); `errors` suma las filas que fallan de verdad (incluye el caso confirmadas < enviadas). En dry-run, `inserted_new` se setea a `toInsert.length` como proyección.
+- Nuevo array `insertErrors[]` persistido en `sync_logs.details.insert_errors`.
+- Comentario de la Fase 4 corregido: aclara que los candidatos viejos NO se borran, se OCULTAN (`hidden_by_sync=true`). Confirmado: 0 llamadas `.delete()` en el archivo (solo un comentario).
+
+**Resolución de conflictos `insert_new_drop_old`:** cuando una huella matchea >1 candidato (29 conflictos), se loguea el conflict y la fila del feed cae al INSERT (fuente de verdad). Los candidatos viejos NO se borran: quedan fuera de `processedIds` y la Fase 4 los oculta si están en scope. El nombre "drop_old" es histórico (de cuando había DELETE físico); hoy es "ocultar_viejo".
+
+**Resultado del sync REAL (logId `496ed068`):** insertadas REALES = **0**, errors = **300**, ocultadas = 36. Todos los lotes fallan por el MISMO error (antes invisible):
+`duplicate key value violates unique constraint "properties_slug_key"` — ej. `Key (slug)=(villa-en-ciudad-quesada-31960) already exists`.
+
+**Causa raíz descubierta (→ P9, NO arreglada acá):** el slug se arma `slugify(title)-external_id`, pero las ~300 filas existentes tienen un slug cuyo sufijo numérico NO coincide con su `external_id` actual (ej. slug `...-31960` pero `external_id=31959`). HabiHub les reasignó el `external_id`, así que no matchean ni por id ni por huella y caen al INSERT como "nuevas", colisionando con el slug ya usado. **OJO:** forzar el INSERT (slug con sufijo random) crearía ~300 DUPLICADOS — lo correcto en P9 es matchearlas como UPDATE, decisión que toca match/scope (fuera de scope de P8). Nota: como cada lote de 50 sigue siendo atómico, un slug-dup tira las 50; algunas de las 300 podrían ser genuinamente nuevas pero arrastradas por el lote. Salvarlas requeriría fallback fila-por-fila (evaluar en P9).
+
+**Archivos tocados:**
+- MODIFIED: `src/app/api/admin/sync-habihub/route.ts`
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** `fix(sync): INSERT de nuevas en lotes con manejo de error + contador real + log del error de Supabase`
+
+**Próximo paso sugerido (P9):** resolver el slug-collision matcheando esas ~300 filas re-IDeadas como UPDATE en vez de INSERT (ej. matchear por slug o por `habihub_dev_id+unit` cuando external_id no matchea), en vez de tratarlas como nuevas. Decidir con Atilio si son la misma propiedad re-IDeada (UPDATE) o realmente nuevas (slug con sufijo único).
+
+---
+
 ### 2026-06-10 — Email de bienvenida (Resend) + sync leads horario + copy final
 
 **Contexto:** Continuación del refactor del pipeline de leads. Se concreta el envío de email de primer contacto vía Resend al recibir un lead nuevo, y se cierra el copy definitivo del email con links a las zonas costeras.

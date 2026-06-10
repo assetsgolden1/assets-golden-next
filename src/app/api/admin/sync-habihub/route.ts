@@ -277,6 +277,8 @@ export async function POST(request: NextRequest) {
   }
   const conflictDetails: ConflictInfo[] = []
   const insertedSample: { externalId: string; title: string }[] = []
+  // Detalle de errores por lote de INSERT (se persiste en sync_logs.details para debugging)
+  const insertErrors: { batch: number; from: number; count: number; error: string }[] = []
   let deletedSample: DeletedSample[] = []
   let totalInScope = 0
   // Métricas internas persistidas para auditoría (se rellenan al final de Fase 4)
@@ -409,7 +411,8 @@ export async function POST(request: NextRequest) {
 
         // 2.b — Huella ambigua: el feed es la fuente de verdad. Logueamos
         // el conflict y caemos al flujo de INSERT que sigue. Los candidatos
-        // viejos caerán en el DELETE de Fase 4 si están dentro del scope.
+        // viejos NO se borran: quedan fuera de processedIds y la Fase 4 los
+        // OCULTA (hidden_by_sync=true, reversible) si están dentro del scope.
         if (fpCandidates.length > 1) {
           stats.conflicts++
           if (conflictDetails.length < 100) {
@@ -426,8 +429,9 @@ export async function POST(request: NextRequest) {
         // 3 — Si hay exactamente 1 match: UPDATE por huella.
         //     Si no (0 candidatos o >1 ya logueado arriba): INSERT.
         if (fpCandidates.length !== 1) {
-          // INSERT — cubre tanto length === 0 como length > 1 (conflict resuelto)
-          stats.inserted_new++
+          // INSERT — cubre tanto length === 0 como length > 1 (conflict resuelto).
+          // NO incrementamos inserted_new acá: el contador real se calcula en la
+          // Fase 5 contando solo las filas que Supabase confirma como insertadas.
           const newId = randomUUID()
           processedIds.add(newId)
           if (insertedSample.length < 50) insertedSample.push({ externalId: fp.externalId, title: fp.title })
@@ -550,7 +554,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Fase 5 — aplicar cambios si no es dry-run
-    if (!dryRun) {
+    if (dryRun) {
+      // Proyección: no se escribe nada, pero reportamos cuántas se insertarían.
+      stats.inserted_new = toInsert.length
+    } else {
       // Updates por external_id — lotes de 50 en paralelo
       for (let i = 0; i < toUpdateById.length; i += 50) {
         const batch = toUpdateById.slice(i, i + 50)
@@ -571,14 +578,48 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // Inserts en un solo batch
-      if (toInsert.length > 0) {
-        const { error: insertErr } = await supabaseAdmin
-          .from('properties')
-          .insert(toInsert)
-        if (insertErr) {
-          console.error('Batch insert error:', insertErr.message)
-          stats.errors++
+      // Inserts en lotes de 50 (NO en un único batch atómico: una fila inválida
+      // tiraba las 298). Cada lote es independiente: si uno falla, capturamos el
+      // error de Supabase, lo logueamos y seguimos con los demás lotes.
+      // inserted_new cuenta solo las filas que Supabase confirma (.select('id')).
+      for (let i = 0; i < toInsert.length; i += 50) {
+        const batch = toInsert.slice(i, i + 50)
+        const batchNum = Math.floor(i / 50) + 1
+        try {
+          const { data: insertedRows, error: insertErr } = await supabaseAdmin
+            .from('properties')
+            .insert(batch)
+            .select('id')
+
+          if (insertErr) {
+            const detail = [insertErr.message, insertErr.details, insertErr.hint]
+              .filter(Boolean)
+              .join(' | ')
+            console.error(
+              `INSERT lote ${batchNum} (filas ${i}–${i + batch.length - 1}) falló: ${detail}`
+            )
+            insertErrors.push({ batch: batchNum, from: i, count: batch.length, error: detail })
+            stats.errors += batch.length
+            continue
+          }
+
+          const confirmed = insertedRows?.length ?? 0
+          stats.inserted_new += confirmed
+          // Si Supabase confirmó menos filas que las enviadas, el resto se considera error.
+          if (confirmed < batch.length) {
+            const missing = batch.length - confirmed
+            stats.errors += missing
+            const detail = `Supabase confirmó ${confirmed}/${batch.length} filas (faltan ${missing})`
+            console.error(`INSERT lote ${batchNum}: ${detail}`)
+            insertErrors.push({ batch: batchNum, from: i, count: missing, error: detail })
+          }
+        } catch (e) {
+          const detail = e instanceof Error ? e.message : String(e)
+          console.error(
+            `INSERT lote ${batchNum} (filas ${i}–${i + batch.length - 1}) excepción: ${detail}`
+          )
+          insertErrors.push({ batch: batchNum, from: i, count: batch.length, error: detail })
+          stats.errors += batch.length
         }
       }
     }
@@ -596,6 +637,7 @@ export async function POST(request: NextRequest) {
         conflict_details: conflictDetails.slice(0, 100),
         inserted_sample: insertedSample,
         deleted_sample: deletedSample,
+        insert_errors: insertErrors,
         diagnostics,
       },
     })
