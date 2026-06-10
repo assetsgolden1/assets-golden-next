@@ -14,26 +14,45 @@ export async function sendWelcomeEmail(email: string, nombre: string): Promise<v
   const firstName = firstNameFrom(nombre)
 
   const html = `<p>Hi ${firstName},</p>
+<p>I'm Atilio, from Assets Golden International. We specialise in newly built apartments and villas along the Spanish coast.</p>
+<p>You recently showed interest in a property on the Costa del Sol, so I wanted to reach out personally.</p>
+<p>Here you can browse what we have available along the Spanish coast:</p>
+<ul>
+<li><a href="https://assetsgolden.com/en/propiedades?pais=Espa%C3%B1a&amp;zona=costa-del-sol">Costa del Sol</a></li>
+<li><a href="https://assetsgolden.com/en/propiedades?pais=Espa%C3%B1a&amp;zona=costa-de-la-luz">Costa de la Luz</a></li>
+<li><a href="https://assetsgolden.com/en/propiedades?pais=Espa%C3%B1a&amp;zona=costa-de-almeria">Costa de Almería</a></li>
+</ul>
+<p>If you tell me your budget and preferred area, I'll put together a tailored shortlist for you.</p>
+<p>Happy to help, just reply with any questions.</p>
+<p>Best regards,<br>Atilio Montironi<br>Assets Golden | International Real Estate Consulting</p>`
 
-<p>Thanks for your interest in new-build properties on the Costa del Sol.</p>
+  const text = `Hi ${firstName},
 
-<p>At Assets Golden we don't list everything. We curate a short selection matched to what each
-client is looking for, so you only see properties worth your time.</p>
+I'm Atilio, from Assets Golden International. We specialise in newly built apartments and villas along the Spanish coast.
 
-<p>To put one together for you, just reply with your budget and preferred area. Prefer a quick
-call instead? Reply and we'll set one up.</p>
+You recently showed interest in a property on the Costa del Sol, so I wanted to reach out personally.
 
-<p>Best regards,<br>
-Atilio Montironi<br>
-Assets Golden - International Real Estate Consulting</p>`
+Here you can browse what we have available along the Spanish coast:
+- Costa del Sol: https://assetsgolden.com/en/propiedades?pais=Espa%C3%B1a&zona=costa-del-sol
+- Costa de la Luz: https://assetsgolden.com/en/propiedades?pais=Espa%C3%B1a&zona=costa-de-la-luz
+- Costa de Almería: https://assetsgolden.com/en/propiedades?pais=Espa%C3%B1a&zona=costa-de-almeria
+
+If you tell me your budget and preferred area, I'll put together a tailored shortlist for you.
+
+Happy to help, just reply with any questions.
+
+Best regards,
+Atilio Montironi
+Assets Golden | International Real Estate Consulting`
 
   try {
     await resend.emails.send({
       from: 'Assets Golden <info@assetsgolden.com>',
       replyTo: 'atilio@assetsgolden.com',
       to: email,
-      subject: 'Your curated Costa del Sol selection',
+      subject: 'Your Costa del Sol new-build selection',
       html,
+      text,
     })
     console.log(`[sendWelcomeEmail] Email enviado a ${email}`)
   } catch (err) {
