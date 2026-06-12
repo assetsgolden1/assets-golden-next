@@ -51,4 +51,25 @@ scripts/diagnoseMetaBlock.ts
 # Outputs de scripts de carga (fotos pesadas, datasets) — no commitear
 scripts/output/
 
+# scripts one-off de cargas/diagnosticos puntuales (no producto)
+scripts/load_bali_pendientes.py
+scripts/load_pv656.py
+scripts/load_pv656_resume.py
+scripts/load_samana.py
+scripts/loadBaliAll.ts
+scripts/loadBaliPV821.ts
+scripts/_gen_loadBaliAll.py
+scripts/bali-scrape-raw.py
+scripts/bali-patch-data.py
+scripts/patch_bali_dataset.py
+scripts/bali-generate-csv.py
+scripts/download_bali_fotos.py
+scripts/recover_bali_fotos.py
+scripts/bali-fotos-status.py
+scripts/diag_downloads_fotos.py
+scripts/convertHeicPV924.py
+scripts/fixPV924Photos.ts
+scripts/reuploadPV924.ts
+scripts/diagnoseMetaToken.ts
+
 .vercel
