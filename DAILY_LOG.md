@@ -66,6 +66,34 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-13 — FASE-5-P10/P11: Sync REAL (slug-match + fallback) + seguridad Supabase + cierre
+
+**Contexto:** Ejecutar el sync REAL diferido de P9 (con match por slug + fallback fila-por-fila) y aplicar las remediaciones de seguridad pendientes en Supabase. Cierre de sesión + identificación de scripts de carga puntual que se colaron al repo en P8.
+
+**Sync REAL (P10) — resultado:**
+- Total de propiedades **2207 → 2500** (**+293 nuevas reales** insertadas con el fallback fila-por-fila).
+- **3 resincronizadas por slug** (`matched_by_slug`): external_id reasignado por HabiHub, resueltas como UPDATE (no como duplicado).
+- **36 ocultadas** (`hidden_by_sync=true`, fuera del feed actual).
+- **4 colisiones** = duplicados del propio feed (doble-referencia id sincronizado + stale). Aisladas y logueadas en `sync_logs.details.insert_errors`; no se perdió data ni se crearon duplicados. Confirma la proyección del dry-run de P9 (293 entran, 4 fallan).
+
+**Seguridad Supabase:**
+- **RLS activado** en `meta_leads_synced` y `meta_sync_runs` (estaban sin RLS; solo se acceden vía service role desde el backend).
+- **5 tablas backup dropeadas.** Se **mantiene** `properties_backup_20260429` (sigue en cuarentena hasta 1-2 crons sin issues).
+- **`search_path=public` fijado** en 6 funciones (mitiga el advisor de `function_search_path_mutable`).
+
+**Scripts de carga puntual a sacar del repo (P11 — identificados, NO removidos aún):**
+- En el commit de P8 (`4980425`) se colaron **19 scripts** `.py`/`.ts` de carga one-off de Bali/Samaná, ninguno importado por `src/` ni parte del producto. Lista confirmada (ver detalle en el chat). Próximo paso: `git rm --cached` + entrada en `.gitignore`. Los scripts de producto/seed (`import-*.ts`, `seed-blog-posts.ts`, `uploadMetaLeadsToSheet.ts`, `optimize-hero.mjs`, etc.) se mantienen.
+
+**Archivos tocados:**
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+- DB (vía MCP, sin migración de código): RLS en 2 tablas, DROP de 5 backups, `search_path` en 6 funciones.
+
+**Commits:** `chore: cierre DAILY_LOG sesion sync P10 + seguridad supabase` (solo DAILY_LOG, push).
+
+**Próximo paso sugerido:** Sacar los 19 scripts del repo con `git rm --cached` + `.gitignore` (confirmar lista primero). Evaluar si los 4 duplicados del feed ameritan ignore permanente. Continuar con refactor pipeline de leads (depende de acceso Resend de Atilio).
+
+---
+
 ### 2026-06-11 — FASE-5-P9: Match por slug (resync external_id reasignado) + fallback fila-por-fila en INSERT
 
 **Contexto:** Tras P8 quedó visible que las "nuevas" del feed fallaban por `properties_slug_key`. Hipótesis de entrada: ~298 colisiones por external_ids reasignados por HabiHub. Objetivo: agregar un nivel de match por slug antes de tratar una fila como nueva, + fallback fila-por-fila en el INSERT.
