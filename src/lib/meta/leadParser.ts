@@ -64,10 +64,10 @@ function mapValue(raw: string, map: Record<string, string>): string {
 
 function extractVariant(adName?: string): string {
   if (!adName) return ''
-  const match = adName.match(/[Cc]arousel[-_]([A-Ca-c])/i)
+  const match = adName.match(/[Cc]arousel[-_]([A-Za-z])/i)
   if (match) return `Carrusel ${match[1].toUpperCase()}`
   // fallback: letter at end of name segment e.g. "...EN-v1-A"
-  const fallback = adName.match(/[-_]([A-Ca-c])(?:[-_]|$)/)
+  const fallback = adName.match(/[-_]([A-Za-z])(?:[-_]|$)/)
   return fallback ? `Carrusel ${fallback[1].toUpperCase()}` : ''
 }
 
