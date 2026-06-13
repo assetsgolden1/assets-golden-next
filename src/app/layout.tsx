@@ -89,7 +89,7 @@ export default async function RootLayout({
       className={`${playfair.variable} ${dmSans.variable} h-full antialiased`}
     >
       <head>
-        <GlobalSchemaOrg />
+        <GlobalSchemaOrg locale={locale} />
         <link rel="preconnect" href="https://mromkwpqrxpxbbxhdofs.supabase.co" />
         <link rel="preconnect" href="https://wloneprkibfjioxwypaw.supabase.co" />
         <link rel="preconnect" href="https://medianewbuild.com" />
