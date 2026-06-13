@@ -24,6 +24,7 @@ reordena si la prioridad cambió.
 - [ ] DNS de Atilio para conectar dominio assetsgolden.com
 
 ### Importantes (post go-live)
+- [ ] [LEADS-SEQ-P03] Cron de secuencia de nurture sobre `meta_leads`: derivar segmento A/B por `presupuesto_raw`, 3 plantillas de email, envío escalonado con `seq_email1/2/3_sent_at` + respeto de `seq_paused`. Revisar antes el solapamiento de rangos `2m_5m_eur`/`above_2m_eur` contra el form real de Meta. (tabla `meta_leads` ya creada y poblándose desde P02)
 - [x] Audit log de cambios admin
 - [ ] EL-1/F — Sección "Propiedades similares" en /propiedades/[slug] (diferido de Fase 3.A — Bloque 4)
 - [ ] Migración de 166 imágenes legacy de Lovable a Supabase actual
@@ -63,6 +64,36 @@ reordena si la prioridad cambió.
 ## 📝 Historial de sesiones
 
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
+
+---
+
+### 2026-06-13 — [LEADS-SEQ-P01/P02] Relevamiento parser Meta + persistir leads en tabla `meta_leads`
+
+**Contexto:** Base para una secuencia de nurture ramificada por presupuesto para leads de Meta. P01 fue relevamiento de solo lectura del parser; P02 persiste cada lead nuevo de Meta en una tabla nueva con sus campos parseados, ADICIONAL al Sheet + `meta_leads_synced` + welcome email (sin tocar dedup ni el append al Sheet).
+
+**P01 — Relevamiento (solo lectura, sin cambios):**
+- `leadParser.ts` extrae del `field_data`: nombre (`full_name`/`first_name`+`last_name`/`name`), `email`, `phone_number`/`phone`, tipo de propiedad, presupuesto, timeline, purpose. Derivados: `meta_lead_id` (raw.id), `fecha` (created_time formateado), `variante` (regex sobre `ad_name`).
+- **Presupuesto:** existe, `BUDGET_MAP` con 6 rangos en EUR (`under_300k_eur`…`above_2m_eur`). ⚠️ Solapamiento detectado entre `2m_5m_eur` ("2M-5M") y `above_2m_eur` ("Más de 2M") — revisar con el form real antes de ramificar.
+- **Zona/ubicación:** NO se captura en el form ni en el parser. Si la secuencia la necesita, hay que agregar la pregunta en Meta + campo nuevo.
+- Mapeo al Sheet `'Hoja 1'!A:K` (11 cols): Fecha, Nombre, Email, Teléfono, Tipo, Presupuesto, Timeline, Purpose, Variante, Prioridad, Estado (Prioridad/Estado se calculan en la ruta con `categorizeLead`/`getSpecialStateNotes`).
+- Confirmado: los leads de Meta **nunca** se insertan en la tabla `leads` (eso es exclusivo del form web `/api/leads`). Meta → Sheet + `meta_leads_synced` (tracking) + welcome email.
+
+**P02 — Persistencia (cambios):**
+- **Tabla `meta_leads`** (migración `20260613000000_create_meta_leads.sql`, aplicada a prod vía MCP): `id` uuid PK, `meta_lead_id` text unique not null, email/nombre/telefono, tipo_propiedad, `presupuesto_raw` (crudo, ej `1m_2m_eur`) + `presupuesto` (etiqueta), timeline, purpose, variante, created_time, synced_at default now(), `seq_email1/2/3_sent_at`, `seq_paused` bool default false. RLS habilitado SIN policy (solo service_role, igual que `meta_leads_synced`). Índices en `created_time` (DESC) y `email`.
+- `leadParser.ts`: `ParsedMetaLead` ahora expone `created_time` (ISO crudo de Meta) y `presupuesto_raw` (antes del `BUDGET_MAP`). El Sheet sigue usando `presupuesto` mapeado — sin cambio de comportamiento.
+- `syncTracker.ts`: nueva `upsertMetaLead(parsed)` → upsert a `meta_leads` con `onConflict: 'meta_lead_id'` (idempotente); captura su error y NO lanza (no rompe Sheet/dedup si falla).
+- `sync-meta/route.ts` y `sync-meta/manual/route.ts`: import + `await upsertMetaLead(parsed)` dentro del loop de leads nuevos, justo después de `appendLeadToMetaSheet`. Solo leads NUEVOS (los que pasan la dedup) — sin backfill de históricos.
+- NO se calcula el segmento A/B acá (se derivará en el cron). `npx tsc --noEmit` → 0 errores.
+
+**Archivos tocados:**
+- CREATED: `supabase/migrations/20260613000000_create_meta_leads.sql`
+- MODIFIED: `src/lib/meta/leadParser.ts`, `src/lib/meta/syncTracker.ts`, `src/app/api/leads/sync-meta/route.ts`, `src/app/api/leads/sync-meta/manual/route.ts`
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+- DB (vía MCP): tabla `meta_leads` creada con RLS + índices en prod.
+
+**Commits:** `d8a2edb` — feat(leads): persistir leads Meta en tabla meta_leads para secuencia nurture (push a `main` OK, `04a2233..d8a2edb`).
+
+**Próximo paso sugerido:** Armar el cron de la secuencia de nurture: derivar el segmento A/B por `presupuesto_raw`, redactar las 3 plantillas de email, y la lógica de envío escalonado con `seq_email1/2/3_sent_at` + respeto de `seq_paused`. Revisar antes el solapamiento de rangos `2m_5m_eur`/`above_2m_eur` contra el form real de Meta.
 
 ---
 
