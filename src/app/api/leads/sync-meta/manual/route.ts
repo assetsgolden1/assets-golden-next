@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { fetchLeadsFromMeta } from '@/lib/meta/leadsApi'
 import { parseMetaLead } from '@/lib/meta/leadParser'
-import { getSyncedLeadIds, getSyncedEmails, recordSyncedLeads } from '@/lib/meta/syncTracker'
+import { getSyncedLeadIds, getSyncedEmails, recordSyncedLeads, upsertMetaLead } from '@/lib/meta/syncTracker'
 import { createSyncRun, updateSyncRun } from '@/lib/meta/syncLog'
 import { appendLeadToMetaSheet, readMetaSheetEmails } from '@/lib/googleSheets'
 import { categorizeLead, getSpecialStateNotes } from '@/lib/leads/prioritizeLead'
@@ -91,6 +91,9 @@ export async function POST(req: NextRequest) {
         },
         sheetId,
       )
+
+      // Persistir en meta_leads (base de la secuencia). Adicional al Sheet.
+      await upsertMetaLead(parsed)
 
       synced.push({
         meta_lead_id: parsed.meta_lead_id,

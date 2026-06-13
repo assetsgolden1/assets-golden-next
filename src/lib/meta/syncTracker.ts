@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import type { ParsedMetaLead } from './leadParser'
 
 export async function getSyncedLeadIds(formId: string): Promise<Set<string>> {
   const { data, error } = await supabaseAdmin
@@ -47,5 +48,31 @@ export async function recordSyncedLeads(
 
   if (error) {
     console.error('[syncTracker] Error guardando leads sincronizados:', error.message)
+  }
+}
+
+// Persiste el lead parseado en meta_leads (base de la secuencia de nurture).
+// Idempotente vía onConflict: 'meta_lead_id'. ADICIONAL al Sheet + meta_leads_synced.
+// No calcula el segmento A/B: eso se deriva en el cron de la secuencia.
+export async function upsertMetaLead(lead: ParsedMetaLead): Promise<void> {
+  const { error } = await supabaseAdmin.from('meta_leads').upsert(
+    {
+      meta_lead_id: lead.meta_lead_id,
+      email: lead.email || null,
+      nombre: lead.nombre || null,
+      telefono: lead.telefono || null,
+      tipo_propiedad: lead.tipo_propiedad || null,
+      presupuesto_raw: lead.presupuesto_raw || null,
+      presupuesto: lead.presupuesto || null,
+      timeline: lead.timeline || null,
+      purpose: lead.purpose || null,
+      variante: lead.variante || null,
+      created_time: lead.created_time || null,
+    },
+    { onConflict: 'meta_lead_id' },
+  )
+
+  if (error) {
+    console.error('[syncTracker] Error guardando meta_lead:', error.message)
   }
 }

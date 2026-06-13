@@ -2,11 +2,13 @@ import { MetaLeadRaw } from './leadsApi'
 
 export interface ParsedMetaLead {
   meta_lead_id: string
+  created_time: string
   fecha: string
   nombre: string
   email: string
   telefono: string
   tipo_propiedad: string
+  presupuesto_raw: string
   presupuesto: string
   timeline: string
   purpose: string
@@ -127,11 +129,13 @@ export function parseMetaLead(raw: MetaLeadRaw): ParsedMetaLead {
 
   return {
     meta_lead_id: id,
+    created_time,
     fecha,
     nombre,
     email,
     telefono,
     tipo_propiedad: mapValue(rawPropertyType, PROPERTY_TYPE_MAP),
+    presupuesto_raw: rawBudget,
     presupuesto: mapValue(rawBudget, BUDGET_MAP),
     timeline: mapValue(rawTimeline, TIMELINE_MAP),
     purpose: mapValue(rawPurpose, PURPOSE_MAP),
