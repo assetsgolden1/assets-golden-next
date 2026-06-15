@@ -24,7 +24,7 @@ reordena si la prioridad cambió.
 - [ ] DNS de Atilio para conectar dominio assetsgolden.com
 
 ### Importantes (post go-live)
-- [ ] [LEADS-SEQ-P03] Cron de secuencia de nurture sobre `meta_leads`: derivar segmento A/B por `presupuesto_raw`, 3 plantillas de email, envío escalonado con `seq_email1/2/3_sent_at` + respeto de `seq_paused`. Revisar antes el solapamiento de rangos `2m_5m_eur`/`above_2m_eur` contra el form real de Meta. (tabla `meta_leads` ya creada y poblándose desde P02)
+- [x] [LEADS-SEQ-P03] Motor de secuencia de nurture sobre `meta_leads`: segmento A/B por `presupuesto_raw`, 5 plantillas de email (no 3), envío escalonado con `seq_email1..5_sent_at` + respeto de `seq_paused`, endpoint cron + workflow (schedule SIN activar). **Pendiente de activación (Atilio/Iván):** cargar `META_LEADS_CRON_SECRET` en Vercel (sin ella el endpoint queda abierto) y descomentar el `schedule` de `.github/workflows/meta-leads-sequence.yml`.
 - [x] Audit log de cambios admin
 - [ ] EL-1/F — Sección "Propiedades similares" en /propiedades/[slug] (diferido de Fase 3.A — Bloque 4)
 - [ ] Migración de 166 imágenes legacy de Lovable a Supabase actual
@@ -64,6 +64,35 @@ reordena si la prioridad cambió.
 ## 📝 Historial de sesiones
 
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
+
+---
+
+### 2026-06-15 — [LEADS-SEQ-P03] Motor de la secuencia de nurture (infra + lógica + envío)
+
+**Contexto:** Implementar el motor de la secuencia de nurture de 5 correos sobre `meta_leads`, a partir del spec `Downloads/LEADS-SEQ-contenido.md` (fuente de verdad del copy y la ramificación). Consigna: dejar el cron LISTO pero NO activarlo en prod; verificar los params reales de `/propiedades` antes de armar los links.
+
+**Trabajo hecho:**
+- **Migración** `20260615000000_add_seq_email4_5_to_meta_leads.sql`: agrega `seq_email4_sent_at` / `seq_email5_sent_at` (timestamptz, `ADD COLUMN IF NOT EXISTS`). **Aplicada a prod vía MCP** y verificada (las 5 columnas `seq_emailN_sent_at` + `seq_paused` presentes).
+- **Helpers** (`src/lib/email/nurtureHelpers.ts`): `deriveSegment` (A hasta €1M / B €1M+), `formatBudgetRange` (frase EN), `formatPropertyType` (frase EN, "a new build home" para any/null), `buildFilteredLink`, `derivePurposeBlock` (investment/second_home/neutral para Email 2), `firstNameFrom`. **Robustos al formato real**: en `meta_leads`, `tipo_propiedad` y `purpose` se guardan MAPEADOS a español (el parser aplica los MAP), no crudos; los helpers aceptan ambos. `presupuesto_raw` sí está crudo.
+- **Params reales de `/propiedades`** (verificados en `src/app/[locale]/(public)/propiedades/page.tsx` + `queries.ts`): `pais`, `zona`, `precio_min`, `precio_max`, `tipo`. ⚠️ `queries.ts:56` solo aplica `zona` si `pais` incluye "espa" → siempre se incluye `pais=España&zona=costa-del-sol`. SÍ existe filtro por precio. `tipo` usa el valor EN (`apartment|villa|penthouse|townhouse`); si es any/null no se agrega.
+- **Plantillas** (`src/lib/email/sequenceTemplates.ts`): una función por correo → `{subject, html, text}`, copy exacto del spec. HTML email-safe (tablas + CSS inline, shell 600px, botón CTA bulletproof, SIN imágenes) + texto plano. Email 1 ramifica A/B; Email 2 = común + 3 stats HTML/CSS + bloque por purpose; Emails 3/4/5 comunes.
+- **Endpoint cron** `GET /api/leads/sequence` (`src/app/api/leads/sequence/route.ts`): protegido con `META_LEADS_CRON_SECRET` (mismo patrón que el sync). Lee `meta_leads` con `seq_paused=false`, `dias=floor(now-created_time)`, umbrales E1≥3/E2≥8/E3≥15/E4≥22/E5≥60, envía SOLO el próximo pendiente (1 por lead/corrida), marca `seq_emailN_sent_at=now()` tras OK por Resend, idempotente. Reusa infra Resend vía `sendSequenceEmail.ts`.
+- **Workflow** `.github/workflows/meta-leads-sequence.yml`: diario `0 9 * * *` pero con el `schedule` COMENTADO (NO activado). `workflow_dispatch` activo para test manual.
+- `npx tsc --noEmit` → 0 errores.
+
+**Archivos tocados:**
+- CREATED: `supabase/migrations/20260615000000_add_seq_email4_5_to_meta_leads.sql`, `src/lib/email/nurtureHelpers.ts`, `src/lib/email/sequenceTemplates.ts`, `src/lib/email/sendSequenceEmail.ts`, `src/app/api/leads/sequence/route.ts`, `.github/workflows/meta-leads-sequence.yml`
+- DB (vía MCP): columnas `seq_email4/5_sent_at` en `meta_leads`.
+- MODIFIED: `DAILY_LOG.md` (esta entrada)
+
+**Commits:** `a7a8abd` — feat(leads): motor de secuencia de nurture (helpers + plantillas + cron) (push a `main`, `73a0204..a7a8abd`).
+
+**Avisos / cosas a revisar antes de activar:**
+- `META_LEADS_CRON_SECRET` sigue sin cargar en Vercel (pendiente operativo): sin ella, `isAuthorized` devuelve `true` y el endpoint queda ABIERTO (igual fallback que `sync-meta`). Cargarla antes de activar.
+- El cron NO está activado (schedule comentado). El push deja el endpoint accesible pero nada lo dispara solo.
+- Fallback de `formatBudgetRange` para presupuesto desconocido = "your" (lee "in the your range"); solo aplica si el lead no tiene presupuesto (campo requerido en el form).
+
+**Próximo paso sugerido:** Test manual del endpoint vía `workflow_dispatch` (o `GET /api/leads/sequence` con `Authorization: Bearer …`) contra un lead de prueba, validar render de los 5 correos en cliente real, y recién entonces cargar `META_LEADS_CRON_SECRET` en Vercel + descomentar el `schedule` del workflow. Considerar también monitoreo/alertas del nuevo cron.
 
 ---
 
