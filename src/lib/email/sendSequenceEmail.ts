@@ -7,6 +7,10 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 /**
  * Envía un correo de la secuencia. Devuelve true solo si Resend confirma el envío
  * (sin lanzar): el cron usa este booleano para decidir si marca seq_emailN_sent_at.
+ *
+ * P05: se envía SOLO texto plano (sin campo `html`) para maximizar la chance de caer
+ * en Principal y no en Promociones. Resend acepta envíos con solo `text`. El link va
+ * como URL completa dentro del texto; los clientes la autolinkean.
  */
 export async function sendSequenceEmail(email: string, content: EmailContent): Promise<boolean> {
   if (!email) return false
@@ -17,7 +21,6 @@ export async function sendSequenceEmail(email: string, content: EmailContent): P
       replyTo: 'atilio@assetsgolden.com',
       to: email,
       subject: content.subject,
-      html: content.html,
       text: content.text,
     })
     if (error) {
