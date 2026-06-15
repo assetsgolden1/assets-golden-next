@@ -13,7 +13,7 @@ export async function sendSequenceEmail(email: string, content: EmailContent): P
 
   try {
     const { error } = await resend.emails.send({
-      from: 'Assets Golden <info@assetsgolden.com>',
+      from: 'Atilio Montironi <atilio@assetsgolden.com>',
       replyTo: 'atilio@assetsgolden.com',
       to: email,
       subject: content.subject,
