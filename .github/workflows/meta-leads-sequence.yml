@@ -1,0 +1,41 @@
+name: Meta Leads — Secuencia de nurture (diario)
+
+# ⚠️ NO ACTIVADO. El bloque `schedule` está comentado a propósito (LEADS-SEQ-P03):
+# dejamos el cron LISTO pero sin correr en producción hasta confirmar.
+# Para activarlo: descomentar el bloque `schedule` de abajo y hacer push.
+# Mientras tanto, se puede disparar a mano desde la pestaña Actions (workflow_dispatch)
+# para probar.
+
+on:
+  # schedule:
+  #   - cron: '0 9 * * *'   # 1 vez al día, 09:00 UTC
+  workflow_dispatch:          # disparo manual desde la UI de GitHub
+
+jobs:
+  sequence:
+    name: Enviar próximo correo de la secuencia
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Llamar endpoint /api/leads/sequence
+        env:
+          CRON_SECRET: ${{ secrets.META_LEADS_CRON_SECRET }}
+        run: |
+          HTTP_STATUS=$(curl \
+            --silent \
+            --show-error \
+            --max-time 120 \
+            --write-out "%{http_code}" \
+            --output response.txt \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "https://assets-golden-next.vercel.app/api/leads/sequence")
+
+          echo "HTTP status: $HTTP_STATUS"
+          echo "Response:"
+          cat response.txt
+
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "ERROR: El endpoint devolvió HTTP $HTTP_STATUS (esperado 200)"
+            exit 1
+          fi
