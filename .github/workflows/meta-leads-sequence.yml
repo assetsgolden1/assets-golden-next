@@ -7,8 +7,8 @@ name: Meta Leads — Secuencia de nurture (diario)
 # para probar.
 
 on:
-  # schedule:
-  #   - cron: '0 9 * * *'   # 1 vez al día, 09:00 UTC
+  schedule:
+    - cron: '0 9 * * *'   # 1 vez al día, 09:00 UTC
   workflow_dispatch:          # disparo manual desde la UI de GitHub
 
 jobs:
