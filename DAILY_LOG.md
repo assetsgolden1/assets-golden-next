@@ -24,7 +24,7 @@ reordena si la prioridad cambió.
 - [ ] DNS de Atilio para conectar dominio assetsgolden.com
 
 ### Importantes (post go-live)
-- [x] [LEADS-SEQ-P03] Motor de secuencia de nurture sobre `meta_leads`: segmento A/B por `presupuesto_raw`, 5 plantillas de email (no 3), envío escalonado con `seq_email1..5_sent_at` + respeto de `seq_paused`, endpoint cron + workflow (schedule SIN activar). **Pendiente de activación (Atilio/Iván):** cargar `META_LEADS_CRON_SECRET` en Vercel (sin ella el endpoint queda abierto) y descomentar el `schedule` de `.github/workflows/meta-leads-sequence.yml`.
+- [x] [LEADS-SEQ-P03] Motor de secuencia de nurture sobre `meta_leads`: segmento A/B por `presupuesto_raw`, 5 plantillas de email (no 3), envío escalonado con `seq_email1..5_sent_at` + respeto de `seq_paused`, endpoint cron + workflow. **ACTIVADO 2026-06-16** (commit `e5be41a`): `schedule` descomentado → cron diario **09:00 UTC** vivo. `META_LEADS_CRON_SECRET` ya operativo en Vercel (el endpoint validó el Bearer hoy con HTTP 200). Primera corrida automática: 2026-06-17 09:00 UTC.
 - [x] Audit log de cambios admin
 - [ ] EL-1/F — Sección "Propiedades similares" en /propiedades/[slug] (diferido de Fase 3.A — Bloque 4)
 - [ ] Migración de 166 imágenes legacy de Lovable a Supabase actual
@@ -64,6 +64,29 @@ reordena si la prioridad cambió.
 ## 📝 Historial de sesiones
 
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
+
+---
+
+### 2026-06-16 — [LEADS-SEQ] Disparo manual del Email 1 + activación del cron diario
+
+**Contexto:** El usuario pidió (1) disparar la secuencia en prod para que `dennis@ibizaliveradio.com` reciba el Email 1 (Claude ya había ajustado su `created_time` a 3 días atrás con `seq_email1_sent_at` NULL; consigna explícita de NO tocar la base) y (2) activar el cron diario descomentando el `schedule` del workflow. Sesión puramente operativa: sin cambios de lógica de aplicación.
+
+**Trabajo hecho:**
+- **Disparo manual del endpoint de prod** `GET https://assetsgolden.com/api/leads/sequence` con `Authorization: Bearer <META_LEADS_CRON_SECRET>` (leído de `.env.local`). Respuesta: `ok:true, scanned:18, sent:2, failed:0`. `sentByEmail.1 = 2`. Enviados: `dennis@ibizaliveradio.com` (Email 1) y `cherhardy@aol.com` (Email 1, lead de aol que se reintentó OK). Confirma que el endpoint y el secret están operativos en prod (HTTP 200).
+- **Activación del cron**: descomentado el bloque `schedule` (`cron: '0 9 * * *'`, 09:00 UTC) en `.github/workflows/meta-leads-sequence.yml`. `workflow_dispatch` se mantiene intacto. El secret `${{ secrets.META_LEADS_CRON_SECRET }}` se referencia igual que en `meta-leads-sync.yml:17`.
+
+**Archivos tocados:**
+- MODIFIED: `.github/workflows/meta-leads-sequence.yml` (2 líneas: schedule descomentado), `DAILY_LOG.md` (esta entrada).
+- DB: NO se tocó (el ajuste de `created_time` de dennis@ lo hizo Claude en una sesión previa).
+
+**Commits:** `e5be41a` — Activar cron diario de la secuencia de nurture de leads (push a `main`, `101078b..e5be41a`).
+
+**Avisos / cosas a revisar:**
+- **`gh` CLI no está instalado** en la máquina → no se pudo verificar directamente que `META_LEADS_CRON_SECRET` exista en GitHub Actions secrets. Evidencia indirecta fuerte: el sync usa el mismo secret y corre cada hora en prod. Confirmar 100% en GitHub → Settings → Secrets and variables → Actions si hay dudas. Si la primera corrida automática del 2026-06-17 falla con HTTP 401/403, ese secret es el primer sospechoso.
+- El **header comment** del workflow (líneas 3-7) sigue diciendo "NO ACTIVADO… comentado a propósito" → quedó desactualizado. No se tocó porque la consigna era solo descomentar el `schedule`. Limpiarlo en un commit aparte cuando convenga.
+- Primera corrida automática: **2026-06-17 09:00 UTC**.
+
+**Próximo paso sugerido:** Monitorear la primera corrida automática (2026-06-17 09:00 UTC) desde la pestaña Actions; verificar HTTP 200 y `sent`. Atacar el pendiente "Monitoreo del cron y alertas". Opcional: actualizar el header comment desactualizado del workflow.
 
 ---
 
