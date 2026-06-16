@@ -72,14 +72,14 @@ function email1(lead: SequenceLead): EmailContent {
     const subject = `${firstName}, a private Costa del Sol shortlist`
     const html = renderHtml([
       p(`Hi ${fn},`),
-      p(`A few days ago you told us you were looking for ${propertyType} in the ${budgetRange} range along the Costa del Sol. I have prepared a first selection in line with that.`),
+      p(`When you got in touch, you mentioned you were looking for ${propertyType} in the ${budgetRange} range along the Costa del Sol. I have prepared a first selection in line with that.`),
       p(`At this level the focus is on villas and penthouses with privacy and sea views, in Marbella, Benahavís and Estepona. Several are off market and not listed publicly, which is where we tend to add the most value.`),
       p(textLink('View your selection', link)),
       p(`If you would like, I can prepare a more tailored shortlist around your priorities.`),
     ])
     const text = `Hi ${firstName},
 
-A few days ago you told us you were looking for ${propertyType} in the ${budgetRange} range along the Costa del Sol. I have prepared a first selection in line with that.
+When you got in touch, you mentioned you were looking for ${propertyType} in the ${budgetRange} range along the Costa del Sol. I have prepared a first selection in line with that.
 
 At this level the focus is on villas and penthouses with privacy and sea views, in Marbella, Benahavís and Estepona. Several are off market and not listed publicly, which is where we tend to add the most value.
 
@@ -95,14 +95,14 @@ ${SIGNATURE_TEXT}`
   const subject = `${firstName}, your Costa del Sol shortlist`
   const html = renderHtml([
     p(`Hi ${fn},`),
-    p(`A few days ago you told us you were looking for ${propertyType} in the ${budgetRange} range along the Costa del Sol. I have pulled together a first selection that fits.`),
+    p(`When you got in touch, you mentioned you were looking for ${propertyType} in the ${budgetRange} range along the Costa del Sol. I have pulled together a first selection that fits.`),
     p(`You will find new build apartments and townhouses, many ready to move in or close to completion, in established coastal areas like Estepona, Fuengirola and Mijas.`),
     p(textLink('View your selection', link)),
     p(`If you tell me a bit more about what matters most to you, I can narrow it down further.`),
   ])
   const text = `Hi ${firstName},
 
-A few days ago you told us you were looking for ${propertyType} in the ${budgetRange} range along the Costa del Sol. I have pulled together a first selection that fits.
+When you got in touch, you mentioned you were looking for ${propertyType} in the ${budgetRange} range along the Costa del Sol. I have pulled together a first selection that fits.
 
 You will find new build apartments and townhouses, many ready to move in or close to completion, in established coastal areas like Estepona, Fuengirola and Mijas.
 
