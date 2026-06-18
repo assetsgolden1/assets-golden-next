@@ -24,7 +24,15 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { absolute: t('meta_title') },
     description: t('meta_description'),
     alternates: buildAlternates('/', locale),
-    openGraph: { url: 'https://assetsgolden.com' },
+    openGraph: {
+      url: 'https://assetsgolden.com',
+      title: t('meta_title'),
+      description: t('meta_description'),
+    },
+    twitter: {
+      title: t('meta_title'),
+      description: t('meta_description'),
+    },
   }
 }
 
