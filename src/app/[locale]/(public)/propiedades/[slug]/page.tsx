@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: data.title,
     description,
-    alternates: buildAlternates(`/propiedades/${slug}`),
+    alternates: buildAlternates(`/propiedades/${slug}`, locale),
     openGraph: {
       images: data.image_url ? [{ url: data.image_url }] : [],
       url: `/propiedades/${slug}`,

@@ -6,10 +6,11 @@ import ContactForm from './ContactForm'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('Contact')
+  const locale = await getLocale()
   return {
     title: t('meta_title'),
     description: t('meta_description'),
-    alternates: buildAlternates('/contacto'),
+    alternates: buildAlternates('/contacto', locale),
     openGraph: { url: '/contacto' },
   }
 }

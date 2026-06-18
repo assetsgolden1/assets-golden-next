@@ -16,10 +16,11 @@ import { PaginationBar } from '@/components/PaginationBar'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('Properties')
+  const locale = await getLocale()
   return {
     title: t('meta_title'),
     description: t('meta_description'),
-    alternates: buildAlternates('/propiedades'),
+    alternates: buildAlternates('/propiedades', locale),
     openGraph: { url: '/propiedades' },
   }
 }

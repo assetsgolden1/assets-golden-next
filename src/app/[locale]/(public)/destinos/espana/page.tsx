@@ -31,6 +31,7 @@ interface Props {
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const params = await searchParams
   const t = await getTranslations('Spain')
+  const locale = await getLocale()
   const zoneName = params.zona ? ZONE_SLUGS[params.zona] : null
   const ciudad = params.ciudad ?? null
 
@@ -48,7 +49,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   return {
     title,
     description,
-    alternates: buildAlternates('/destinos/espana'),
+    alternates: buildAlternates('/destinos/espana', locale),
     openGraph: { title, description, url: '/destinos/espana' },
   }
 }

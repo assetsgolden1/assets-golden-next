@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: '/admin/',
+        disallow: ['/admin/', '/portal/'],
       },
     ],
     sitemap: 'https://assetsgolden.com/sitemap.xml',

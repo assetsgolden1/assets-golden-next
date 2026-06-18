@@ -80,12 +80,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           ? post.excerpt.slice(0, post.excerpt.lastIndexOf(' ', 160) || 160)
           : post.excerpt)
         : undefined,
+    // Cada post de blog existe en UN solo idioma (no hay par ES/EN para el
+    // mismo slug), así que el canonical es self-referencing a su propia URL
+    // en su idioma: EN -> /en/blog/slug, ES -> /blog/slug.
     alternates: {
-      canonical: `/blog/${slug}`,
+      canonical: post.language === 'en' ? `/en/blog/${slug}` : `/blog/${slug}`,
       languages: post.language === 'en'
         ? {
-            en: `https://assetsgolden.com/blog/${slug}`,
-            'x-default': 'https://assetsgolden.com',
+            en: `https://assetsgolden.com/en/blog/${slug}`,
+            'x-default': `https://assetsgolden.com/en/blog/${slug}`,
           }
         : {
             'es-ES': `https://assetsgolden.com/blog/${slug}`,

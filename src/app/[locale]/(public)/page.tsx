@@ -19,10 +19,11 @@ import {
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('Home')
+  const locale = await getLocale()
   return {
     title: { absolute: t('meta_title') },
     description: t('meta_description'),
-    alternates: buildAlternates('/'),
+    alternates: buildAlternates('/', locale),
     openGraph: { url: 'https://assetsgolden.com' },
   }
 }

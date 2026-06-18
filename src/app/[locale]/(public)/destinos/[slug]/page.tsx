@@ -66,7 +66,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   return {
     title,
     description,
-    alternates: buildAlternates(`/destinos/${slug}`),
+    alternates: buildAlternates(`/destinos/${slug}`, locale),
     openGraph: { images: data.hero_image_url ? [{ url: data.hero_image_url }] : [], url: `/destinos/${slug}` },
     twitter: { images: data.hero_image_url ? [data.hero_image_url] : undefined },
   }

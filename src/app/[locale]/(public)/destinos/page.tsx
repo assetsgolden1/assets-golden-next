@@ -9,10 +9,11 @@ import { translateCountry } from '@/lib/utils/translateGeography'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('Destinations')
+  const locale = await getLocale()
   return {
     title: t('meta_title'),
     description: t('meta_description'),
-    alternates: buildAlternates('/destinos'),
+    alternates: buildAlternates('/destinos', locale),
     openGraph: { url: '/destinos' },
   }
 }

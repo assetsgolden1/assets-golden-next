@@ -320,14 +320,26 @@ export async function getFeaturedProperties() {
 
 export async function getAllPropertySlugs() {
   const supabase = createStaticClient()
-  const { data } = await supabase
-    .from('properties')
-    .select('slug')
-    .in('status', ['active', 'available'])
-    .not('hidden', 'eq', true)
-    .not('hidden_by_sync', 'eq', true)
-    .not('slug', 'is', null)
-  return (data ?? []).map((p) => p.slug as string)
+  // Supabase limita cada SELECT a 1000 filas. Paginamos con .range() en
+  // lotes de 1000 para traer TODAS las propiedades visibles (el sitemap
+  // listaba solo 1000 de ~2400 por este límite).
+  const PAGE_SIZE = 1000
+  const slugs: string[] = []
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await supabase
+      .from('properties')
+      .select('slug')
+      .in('status', ['active', 'available'])
+      .not('hidden', 'eq', true)
+      .not('hidden_by_sync', 'eq', true)
+      .not('slug', 'is', null)
+      .order('slug', { ascending: true })
+      .range(from, from + PAGE_SIZE - 1)
+    if (error || !data || data.length === 0) break
+    slugs.push(...data.map((p) => p.slug as string))
+    if (data.length < PAGE_SIZE) break
+  }
+  return slugs
 }
 
 // ─── Team / Partners ───────────────────────────────────────────
