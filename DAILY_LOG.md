@@ -67,6 +67,40 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-18 — [FASE-SEO-P0 + FASE-SEO-A] GA4 + Fotocasa + canonical self / sitemap paginado / robots
+
+**Contexto:** Dos fases SEO en una sesión. P0: instalar GA4 (no había ningún tag de analytics medible en la web aparte del Meta Pixel consent-gated) y sumar Fotocasa al footer + `sameAs`. A: arreglar sitemap (listaba solo 1000 de ~2400 propiedades), canonical self-referencing por idioma (las páginas EN canonicalizaban a la ES), `Disallow: /portal/` en robots y confirmar hreflang en propiedades.
+
+**Trabajo hecho — P0:**
+- **GA4**: `npm install @next/third-parties` (v16.2.9). En el layout RAÍZ (`src/app/layout.tsx`, el que tiene `<html>/<body>`) se importa `{ GoogleAnalytics }` y se renderiza `<GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-5E27WGKEDF'} />` como hermano de `<body>` (patrón oficial Next.js). ID usado: **G-5E27WGKEDF**.
+- **Env**: `NEXT_PUBLIC_GA_MEASUREMENT_ID=G-5E27WGKEDF` agregado a `.env.local` (no trackeado) y a un **`.env.example` nuevo** (no existía). Como `.gitignore` ignoraba `.env*`, se agregó excepción `!.env.example` para trackear el template.
+- **CSP**: ya permitía `googletagmanager.com` (script-src) + `google-analytics.com`/`*.analytics.google.com` (img/connect-src). NO se tocó. Confirmado en `next.config.ts:83-89`.
+- **Fotocasa en footer** (`src/components/Footer.tsx`): el footer NO tenía ninguna red social. Se agregó una fila de redes en la columna de marca con LinkedIn, Instagram y Fotocasa. `lucide-react@1.8.0` ya NO exporta los íconos de marca `Linkedin`/`Instagram` (solo quedó `Building2`), así que LinkedIn e Instagram se renderizan con SVG inline (paths simple-icons) y Fotocasa con el ícono `Building2`. Todos con `target=_blank`, `rel=noopener noreferrer`, `aria-label`+`title`.
+- **sameAs** (`src/components/seo/GlobalSchemaOrg.tsx`): pasó de `['linkedin']` a `[LinkedIn, Fotocasa, Instagram]`. NO se agregó Facebook (no hay URL en el sitio) ni Habitaclia.
+
+**Trabajo hecho — A:**
+- **Sitemap** (`src/lib/supabase/queries.ts` → `getAllPropertySlugs`): paginado con `.range(from, from+999)` en lotes de 1000 + `.order('slug')` hasta agotar; antes traía solo 1000 por el cap de Supabase. Mantiene los filtros visibles (`status in active/available`, `NOT hidden`, `NOT hidden_by_sync`, `slug NOT null`). Beneficio colateral: `generateStaticParams` de propiedades ahora genera todos los slugs, no 1000.
+- **Canonical self por idioma** (`src/lib/utils/seoAlternates.ts`): `buildAlternates(path, locale='es')` ahora pone `canonical = locale==='en' ? /en+path : path` (antes siempre el ES). `languages` (hreflang) sigue apuntando a ambas versiones + `x-default` al ES. Call sites actualizados para pasar `locale`: home, propiedades (lista + [slug]), destinos (lista + [slug] + espana), contacto, mi-demanda. Blog `[slug]` tiene alternates propios (cada post existe en 1 solo idioma): se corrigió el canonical a self (EN → `/en/blog/slug`, ES → `/blog/slug`) y la URL `en:` del hreflang a la que le faltaba el prefijo `/en`.
+- **robots** (`src/app/robots.ts`): `disallow` pasó de `'/admin/'` a `['/admin/', '/portal/']`.
+- **hreflang propiedades**: ya viene cubierto — `propiedades/[slug]` usa `buildAlternates`, que devuelve `alternates.languages`.
+
+**Verificación:** `npx tsc --noEmit` → 0 errores. ESLint en archivos tocados → limpio (los 2 errores `any` en `queries.ts:118,150` son PREEXISTENTES, fuera de mi cambio).
+
+**Archivos tocados:**
+- MODIFIED: `src/app/layout.tsx`, `src/components/Footer.tsx`, `src/components/seo/GlobalSchemaOrg.tsx`, `.gitignore`, `package.json`, `package-lock.json`, `src/lib/utils/seoAlternates.ts`, `src/lib/supabase/queries.ts`, `src/app/robots.ts`, y los `generateMetadata` de: `[locale]/(public)/page.tsx`, `propiedades/page.tsx`, `propiedades/[slug]/page.tsx`, `destinos/page.tsx`, `destinos/[slug]/page.tsx`, `destinos/espana/page.tsx`, `contacto/page.tsx`, `mi-demanda/page.tsx`, `blog/[slug]/page.tsx`.
+- CREATED: `.env.example`.
+
+**Commits:** `ff48cb6` — feat(seo/analytics): instalar GA4 + Fotocasa en footer y sameAs · `ca01059` — fix(seo): sitemap paginado completo + canonical self por idioma + Disallow /portal/ + hreflang en propiedades. Ambos pusheados a `main` (`3d40373..ca01059`).
+
+**Avisos / cosas a revisar:**
+- **GA4 sin consent-gating**: el resto del sitio gatea el Meta Pixel tras consentimiento de marketing (vanilla-cookieconsent); GA4 quedó SIEMPRE activo (decisión explícita del prompt). Si se requiere cumplimiento GDPR estricto, evaluar gatearlo igual que el Pixel.
+- `scripts/importHistoricalLeads.ts` apareció untracked y NO se commiteó (no relacionado con SEO). Decidir si va al repo o al `.gitignore`.
+- Verificar en prod: GA4 dispara `page_view` (Realtime de GA), el sitemap.xml lista ~2400 propiedades, y las páginas `/en/...` muestran su propio canonical.
+
+**Próximo paso sugerido:** Validar GA4 en GA Realtime y el conteo del sitemap en prod. Retomar bloqueantes go-live (refactor pipeline de leads / páginas legales / DNS).
+
+---
+
 ### 2026-06-16 — [LEADS-SEQ] Disparo manual del Email 1 + activación del cron diario
 
 **Contexto:** El usuario pidió (1) disparar la secuencia en prod para que `dennis@ibizaliveradio.com` reciba el Email 1 (Claude ya había ajustado su `created_time` a 3 días atrás con `seq_email1_sent_at` NULL; consigna explícita de NO tocar la base) y (2) activar el cron diario descomentando el `schedule` del workflow. Sesión puramente operativa: sin cambios de lógica de aplicación.
