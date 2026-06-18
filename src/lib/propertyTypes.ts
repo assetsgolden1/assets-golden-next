@@ -24,23 +24,39 @@ export function translatePropertyType(type: string | null | undefined, locale = 
   return locale === 'en' ? entry.en : entry.es
 }
 
-const titlePrefixesEN: Record<string, string> = {
-  'Apartment': 'Apartamento',
-  'Penthouse': 'Ático',
-  'Ground-floor': 'Planta baja',
-  'Ground floor': 'Planta baja',
-  'Villa': 'Villa',
-  'House': 'Casa',
-  'Studio': 'Estudio',
-  'Duplex': 'Dúplex',
-  'Townhouse': 'Adosado',
+// Los títulos de propiedad se guardan en español en la DB con el patrón
+// "{Tipo} en {Ciudad}" (auto-generado por el sync). En la vista EN se
+// traduce SOLO el tipo (prefijo); la ciudad se deja tal cual. Claves
+// normalizadas a minúscula y sin acentos.
+const TITLE_TYPE_EN: Record<string, string> = {
+  apartamento: 'Apartment',
+  piso: 'Apartment',
+  villa: 'Villa',
+  chalet: 'Villa',
+  atico: 'Penthouse',
+  penthouse: 'Penthouse',
+  adosado: 'Townhouse',
+  casa: 'House',
+  duplex: 'Duplex',
+  estudio: 'Studio',
+  bungalow: 'Bungalow',
+  finca: 'Country house',
+  terreno: 'Plot',
+  parcela: 'Plot',
+  local: 'Commercial unit',
 }
 
 export function translatePropertyTitle(title: string, locale = 'es'): string {
-  // In EN mode return title as-is (already in English from the feed)
-  if (locale === 'en') return title
-  for (const [en, es] of Object.entries(titlePrefixesEN)) {
-    if (title.startsWith(en)) return title.replace(en, es)
-  }
-  return title
+  // Solo en EN; en ES (o cualquier otro) se devuelve el título tal cual.
+  if (locale !== 'en' || !title) return title
+  const m = title.match(/^(.+?)\s+en\s+(.+)$/i)
+  if (!m) return title
+  const typeKey = m[1]
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+  const en = TITLE_TYPE_EN[typeKey]
+  if (!en) return title
+  return `${en} in ${m[2].trim()}`
 }

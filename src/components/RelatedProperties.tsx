@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { RelatedProperty } from '@/lib/blogProperties'
+import { translatePropertyTitle } from '@/lib/propertyTypes'
 
 interface Props {
   properties: RelatedProperty[]
@@ -57,7 +58,7 @@ export function RelatedProperties({ properties, language = 'es' }: Props) {
             </div>
             <div className="p-4">
               <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1 group-hover:text-gold transition-colors">
-                {prop.title}
+                {translatePropertyTitle(prop.title, language)}
               </h3>
               <p className="text-xs text-muted-foreground mb-3">
                 {[prop.location, prop.country].filter(Boolean).join(' · ')}

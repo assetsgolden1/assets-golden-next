@@ -8,6 +8,8 @@ import Autoplay from 'embla-carousel-autoplay'
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel'
 import type { Property } from '@/types'
 import { translateCountry, translateProvince } from '@/lib/utils/translateGeography'
+import { translatePropertyTitle } from '@/lib/propertyTypes'
+import { toSentenceCase } from '@/lib/utils/normalizeText'
 
 const typeLabels: Record<string, string> = {
   villa: 'Villa',
@@ -94,7 +96,7 @@ export default function HomePropertiesCarousel({ properties, locale }: Props) {
                 {/* Content */}
                 <div className="p-5">
                   <h3 className="font-display text-lg text-foreground mb-2 group-hover:text-gold transition-colors line-clamp-1">
-                    {property.title}
+                    {toSentenceCase(translatePropertyTitle(property.title, locale))}
                   </h3>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-muted-foreground text-sm">

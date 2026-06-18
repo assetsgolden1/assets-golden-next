@@ -41,15 +41,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     (locale === 'en' ? data.description_en : data.description)?.slice(0, 160) ??
     `${translatePropertyType(data.property_type, locale) || t('meta_fallback_type')} in ${data.location ?? (data.province ? translateProvince(data.province, locale) : null) ?? t('meta_fallback_country')}${data.bedrooms ? `, ${data.bedrooms} ${locale === 'en' ? 'bedrooms' : 'habitaciones'}` : ''}${data.area_sqm ? `, ${data.area_sqm} m²` : ''}`.slice(0, 160)
 
+  const localizedTitle = translatePropertyTitle(data.title, locale)
+
   return {
-    title: data.title,
+    title: localizedTitle,
     description,
     alternates: buildAlternates(`/propiedades/${slug}`, locale),
     openGraph: {
+      title: localizedTitle,
       images: data.image_url ? [{ url: data.image_url }] : [],
       url: `/propiedades/${slug}`,
     },
-    twitter: { images: data.image_url ? [data.image_url] : undefined },
+    twitter: { title: localizedTitle, images: data.image_url ? [data.image_url] : undefined },
   }
 }
 
@@ -70,11 +73,13 @@ export default async function PropertyDetailPage({ params }: Props) {
     ? (property.description_en ?? property.description)
     : property.description
 
+  const localizedTitle = translatePropertyTitle(property.title, locale)
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'RealEstateListing',
     '@id': `https://assetsgolden.com/propiedades/${slug}`,
-    name: property.title,
+    name: localizedTitle,
     description: description ?? undefined,
     url: `https://assetsgolden.com/propiedades/${slug}`,
     image: allImages.length > 0 ? allImages : undefined,
@@ -113,7 +118,7 @@ export default async function PropertyDetailPage({ params }: Props) {
       <Breadcrumb items={[
         { name: t('breadcrumb_home'), url: '/' },
         { name: t('breadcrumb_properties'), url: '/propiedades' },
-        { name: property.title, url: `/propiedades/${slug}` },
+        { name: localizedTitle, url: `/propiedades/${slug}` },
       ]} />
 
       <div className="container-luxury pb-2">
