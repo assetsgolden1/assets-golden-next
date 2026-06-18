@@ -49,7 +49,7 @@ export function RelatedProperties({ properties, language = 'es' }: Props) {
             <div className="relative h-48 w-full bg-muted overflow-hidden">
               <Image
                 src={prop.image_url!}
-                alt={prop.title}
+                alt={translatePropertyTitle(prop.title, language)}
                 fill
                 unoptimized
                 className="object-cover group-hover:scale-105 transition-transform duration-300"

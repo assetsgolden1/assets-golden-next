@@ -58,7 +58,7 @@ export default async function PropertyCard({
         {image_url ? (
           <Image
             src={image_url}
-            alt={title}
+            alt={translatePropertyTitle(title, locale)}
             fill
             unoptimized
             className={`object-cover transition-transform duration-700 group-hover:scale-110 ${sold ? 'opacity-60' : ''}`}

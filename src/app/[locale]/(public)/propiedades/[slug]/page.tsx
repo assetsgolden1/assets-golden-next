@@ -130,7 +130,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 
       <div className="relative">
         {allImages.length > 0 ? (
-          <PropertyGalleryClient images={allImages} title={property.title} />
+          <PropertyGalleryClient images={allImages} title={localizedTitle} />
         ) : (
           <section className="bg-muted">
             <div className="h-64 gradient-navy flex items-center justify-center">

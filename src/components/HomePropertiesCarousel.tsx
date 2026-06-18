@@ -63,7 +63,7 @@ export default function HomePropertiesCarousel({ properties, locale }: Props) {
                   {property.image_url ? (
                     <Image
                       src={property.image_url}
-                      alt={property.title}
+                      alt={translatePropertyTitle(property.title, locale)}
                       fill
                       unoptimized
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
