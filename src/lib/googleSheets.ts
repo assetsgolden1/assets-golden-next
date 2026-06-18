@@ -35,7 +35,7 @@ export async function appendLeadToMetaSheet(lead: MetaSheetRow, spreadsheetId: s
 
   const result = await sheets.spreadsheets.values.append({
     spreadsheetId,
-    range: "'Hoja 1'!A:K",
+    range: "'LEADS'!A:K",
     valueInputOption: 'USER_ENTERED',
     insertDataOption: 'INSERT_ROWS',
     requestBody: {
@@ -66,7 +66,7 @@ export async function readMetaSheetEmails(spreadsheetId: string): Promise<Set<st
     const sheets = buildSheetsClient(credentialsJson)
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "'Hoja 1'!C:C",
+      range: "'LEADS'!C:C",
     })
     const rows = res.data.values ?? []
     // row[0] is the header "Email" — skip it
