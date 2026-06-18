@@ -67,6 +67,42 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-18 — [FASE-SEO-P1 + FASE-SEO-P2] Verificación Search Console (meta) + cierre de fase SEO + limpieza
+
+**Contexto:** Cierre del bloque SEO del día. P1: verificación de Google Search Console por dos vías (meta en el `<head>` + archivo HTML en `public/`). P2: limpieza — el archivo de verificación HTML resultó no servible por el routing de next-intl, así que se quita y se deja SOLO la meta (que ya quedó en prod); además se saca del tracking un script one-off que se había colado en un commit previo.
+
+**Trabajo hecho — P1 (verificación):**
+- **Meta de verificación** (`src/app/layout.tsx`, layout RAÍZ): se agregó `verification: { google: '_PodCQHuUTmkjLHShE5nV4Pm3DYb3XqxXCzC_Cqx5Gg' }` al export `metadata`. Next emite `<meta name="google-site-verification" content="…">` en TODAS las páginas. Esta es la vía de verificación definitiva.
+- **Archivo HTML** (`public/google0f1c578b5bda96a4.html`): se creó en P1 pero en P2 se DESCARTÓ — el routing de next-intl no lo sirve en `https://assetsgolden.com/google0f1c578b5bda96a4.html`, así que era inútil. La verificación queda cubierta 100% por la meta del head.
+
+**Trabajo hecho — P2 (limpieza):**
+- **`scripts/importHistoricalLeads.ts`**: salió del tracking con `git rm --cached` (sigue en disco, no se borró) y se agregó al `.gitignore` en el bloque de scripts one-off. Se había colado por el `git add -A` del commit `7e30894` (verificación), ya estaba marcado como "decidir si va al repo" desde la sesión SEO-P0/A.
+- **`public/google0f1c578b5bda96a4.html`**: borrado del disco y del repo.
+
+**Resumen del bloque SEO completo del día (P0 + A + P1 + P2):**
+- **GA4** instalado (ID **G-5E27WGKEDF**) vía `@next/third-parties`, siempre activo (no consent-gated, decisión explícita).
+- **Sitemap**: paginado de **1000 → 2464** propiedades (`getAllPropertySlugs` con `.range()` en lotes de 1000).
+- **Canonical self por idioma**: las páginas EN ahora canonicalizan a su propia URL `/en/...` (antes a la ES).
+- **robots**: `Disallow: /portal/` (sumado a `/admin/`).
+- **hreflang** confirmado en propiedades (vía `buildAlternates`).
+- **Footer + `sameAs`**: redes agregadas (LinkedIn, Instagram, Fotocasa).
+- **Verificación Search Console**: por meta `google-site-verification` en el `<head>` (vía `metadata.verification.google`).
+
+**Archivos tocados:**
+- MODIFIED: `src/app/layout.tsx` (campo `verification`), `.gitignore` (+`scripts/importHistoricalLeads.ts`), `DAILY_LOG.md` (esta entrada).
+- CREATED y luego DELETED: `public/google0f1c578b5bda96a4.html`.
+- UNTRACKED (rm --cached, sigue en disco): `scripts/importHistoricalLeads.ts`.
+
+**Commits:** `7e30894` — chore(seo): verificacion Search Console (meta + archivo) · (esta sesión) — chore(seo): cierre fase + sacar script one-off + quitar archivo de verificacion no servible. Ambos a `main`.
+
+**Avisos / cosas a revisar:**
+- Tras el deploy, completar la verificación del dominio en Google Search Console (la propiedad debería verificar sola al detectar la meta). Si Google pide el método de archivo HTML, NO usarlo: next-intl no lo sirve — usar la meta o un registro DNS.
+- Pendiente de prod (heredado de SEO-P0/A): validar GA4 en Realtime, conteo del sitemap (~2464) y canonical de las `/en/...`.
+
+**Próximo paso sugerido:** Verificar la propiedad en Search Console una vez deployado. Retomar bloqueantes go-live (refactor pipeline de leads / páginas legales GDPR / DNS de Atilio).
+
+---
+
 ### 2026-06-18 — [FASE-SEO-P0 + FASE-SEO-A] GA4 + Fotocasa + canonical self / sitemap paginado / robots
 
 **Contexto:** Dos fases SEO en una sesión. P0: instalar GA4 (no había ningún tag de analytics medible en la web aparte del Meta Pixel consent-gated) y sumar Fotocasa al footer + `sameAs`. A: arreglar sitemap (listaba solo 1000 de ~2400 propiedades), canonical self-referencing por idioma (las páginas EN canonicalizaban a la ES), `Disallow: /portal/` en robots y confirmar hreflang en propiedades.

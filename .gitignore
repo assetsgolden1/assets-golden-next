@@ -73,5 +73,6 @@ scripts/convertHeicPV924.py
 scripts/fixPV924Photos.ts
 scripts/reuploadPV924.ts
 scripts/diagnoseMetaToken.ts
+scripts/importHistoricalLeads.ts
 
 .vercel
