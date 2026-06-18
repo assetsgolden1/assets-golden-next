@@ -67,6 +67,44 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-19 — [FASE-SEO-B1 + B2 + B2.1] Reposicionamiento internacional home + traducción de títulos/alt de propiedad en EN
+
+**Contexto:** Bloque "B" del SEO: (B1) reescribir title/description de la home hacia un posicionamiento internacional (off-market, 12 países) en vez del foco "Barcelona"; (B2) traducir en runtime los títulos de propiedad en la vista EN (en la DB están en español, patrón "{Tipo} en {Ciudad}", auto-generados por el sync) sin tocar la DB ni el ES; (B2.1) extender esa traducción también al `alt` de las imágenes.
+
+**Trabajo hecho — B1 (home title/description):**
+- El `generateMetadata` de la home (`src/app/[locale]/(public)/page.tsx`) lee `Home.meta_title` / `Home.meta_description` de next-intl. Se reemplazaron en AMBOS idiomas:
+  - ES: `Propiedades de Lujo en España y el Mundo | Assets Golden` + description off-market / 12 países.
+  - EN: `Luxury Property in Spain & Worldwide | Assets Golden` + description off-market / 12 countries / Book a consultation.
+- El `openGraph` de la home solo definía `url` (title/description heredaban del layout). Se extendió con `title`/`description` + bloque `twitter`, reusando las mismas traducciones, para coherencia del preview social por idioma.
+- NO se tocó H1/hero ni texto visible — solo metadata.
+
+**Trabajo hecho — B2 (títulos de propiedad en EN):**
+- **Hallazgo:** ya existía `translatePropertyTitle` en `src/lib/propertyTypes.ts`, pero su lógica estaba ROTA para los datos reales (asumía feed en inglés: `if (locale==='en') return title`), por eso la web EN mostraba los títulos en español. Se REESCRIBIÓ esa función (no se creó duplicado) con la lógica correcta: si `locale!=='en'` o título vacío → tal cual; match case-insensitive `^(<tipo>)\s+en\s+(.+)$`; mapa de 15 tipos (apartamento/piso→Apartment, villa/chalet→Villa, ático→Penthouse, adosado→Townhouse, casa→House, dúplex→Duplex, estudio→Studio, bungalow→Bungalow, finca→Country house, terreno/parcela→Plot, local→Commercial unit, penthouse→Penthouse), clave normalizada a minúscula+sin acento; si matchea → `${TipoEN} in ${ciudad}` (ciudad SIN traducir); si no → título sin cambios.
+- Como el `PropertyCard` central (`src/components/properties/PropertyCard.tsx`) ya llamaba `translatePropertyTitle(title, locale)`, todos los listados que lo usan quedaron cubiertos automáticamente al arreglar la función: `/propiedades`, `/inversiones`, `/promociones`, `/destinos/[slug]` y España (`SpainPropertiesGrid`).
+- Puntos que mostraban el título crudo y se corrigieron a mano: `HomePropertiesCarousel.tsx` (carousel destacadas, ya recibía `locale`), `RelatedProperties.tsx` (relacionadas del blog, recibe `language`), y en el detalle `propiedades/[slug]/page.tsx`: `<title>` + `og:title` + `twitter.title` del `generateMetadata`, `name` del JSON-LD `RealEstateListing` y el último crumb del breadcrumb. El H1 del detalle ya usaba el helper con locale.
+
+**Trabajo hecho — B2.1 (alt de imágenes en EN):**
+- Se aplicó `translatePropertyTitle(title, locale)` al `alt` en: `PropertyCard` (cubre todos los listados), `HomePropertiesCarousel`, `RelatedProperties`, y la galería del detalle (`PropertyGalleryClient` usa el título solo para el alt → se le pasa `title={localizedTitle}` ya traducido desde el server). Las palabras del template del alt ("imagen"/"miniatura") quedan en español (fuera de scope).
+
+**Verificación:** `npx tsc --noEmit` → 0 errores (en B2 y B2.1). JSON de mensajes válido (B1). Prueba de la lógica del helper con 10 casos reales: tipos conocidos traducen (ciudad intacta), ES sin cambios, tipos fuera del mapa ("Loft en Valencia") y títulos ya en inglés ("Penthouse in Marbella") quedan igual.
+
+**No tocado (correcto):** portal de agentes (`PortalPropertiesGrid`/`PortalPropertyDetail` llaman al helper con default `'es'` → sin cambio de comportamiento), admin, PDFs, DB y la vista ES. `LocationBrowser` no se modificó (código muerto, no renderizado, sin locale en scope).
+
+**Archivos tocados:**
+- MODIFIED: `messages/es.json`, `messages/en.json`, `src/app/[locale]/(public)/page.tsx` (B1).
+- MODIFIED: `src/lib/propertyTypes.ts`, `src/components/HomePropertiesCarousel.tsx`, `src/components/RelatedProperties.tsx`, `src/app/[locale]/(public)/propiedades/[slug]/page.tsx` (B2).
+- MODIFIED: `src/components/properties/PropertyCard.tsx`, `src/components/HomePropertiesCarousel.tsx`, `src/components/RelatedProperties.tsx`, `src/app/[locale]/(public)/propiedades/[slug]/page.tsx` (B2.1).
+
+**Commits (todos a `main`):** `0c6fb35` — feat(seo): title+description home internacional ES/EN + OG · `e95a268` — feat(seo): traducir titulos de propiedad en vista EN (runtime, sin tocar DB) · `d18cd1c` — fix(seo): traducir alt de imagenes de propiedad en vista EN.
+
+**Avisos / cosas a revisar:**
+- El badge de tipo en `HomePropertiesCarousel` (`typeLabels`, línea ~82) sigue en español hardcodeado — fuera de scope de estas fases (solo títulos/alt). Evaluar si se quiere traducir el badge en EN.
+- Verificar en prod: home EN/ES con el nuevo title; una propiedad en `/en/propiedades/...` con el título traducido en H1, `<title>`, breadcrumb y alt de las imágenes.
+
+**Próximo paso sugerido:** Validar en prod los títulos EN y el nuevo posicionamiento de la home. Retomar bloqueantes go-live (refactor pipeline de leads / páginas legales GDPR / DNS de Atilio).
+
+---
+
 ### 2026-06-18 — [FASE-SEO-P1 + FASE-SEO-P2] Verificación Search Console (meta) + cierre de fase SEO + limpieza
 
 **Contexto:** Cierre del bloque SEO del día. P1: verificación de Google Search Console por dos vías (meta en el `<head>` + archivo HTML en `public/`). P2: limpieza — el archivo de verificación HTML resultó no servible por el routing de next-intl, así que se quita y se deja SOLO la meta (que ya quedó en prod); además se saca del tracking un script one-off que se había colado en un commit previo.
