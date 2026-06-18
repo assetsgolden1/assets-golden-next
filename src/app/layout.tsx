@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
 import GlobalSchemaOrg from "@/components/seo/GlobalSchemaOrg";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import MetaPixelPageViewTracker from "@/components/analytics/MetaPixel";
 import CookieConsentInit from "@/components/cookies/CookieConsentInit";
 import { getLocale } from 'next-intl/server'
@@ -111,6 +112,14 @@ export default async function RootLayout({
         */}
         <CookieConsentInit />
       </body>
+      {/*
+        GoogleAnalytics (GA4) — inyecta el tag gtag.js. El gaId usa la env
+        pública NEXT_PUBLIC_GA_MEASUREMENT_ID con fallback hardcodeado al ID
+        de producción (es público) para garantizar medición aunque la env no
+        esté cargada en Vercel. El CSP ya permite googletagmanager.com y
+        google-analytics.com.
+      */}
+      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-5E27WGKEDF"} />
     </html>
   );
 }
