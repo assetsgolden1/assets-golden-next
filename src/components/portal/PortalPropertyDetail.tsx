@@ -25,10 +25,14 @@ export function PortalPropertyDetail({ property }: Props) {
   const [downloading, setDownloading] = useState(false)
 
   const gallery = Array.isArray(property.gallery_urls) ? property.gallery_urls : []
-  const allImages = [
-    ...(property.image_url ? [property.image_url] : []),
-    ...gallery,
-  ]
+  // image_url suele ser idéntica a gallery_urls[0] → deduplicar por URL exacta
+  // preservando el orden de aparición (solo render, la base no se toca).
+  const allImages = Array.from(
+    new Set([
+      ...(property.image_url ? [property.image_url] : []),
+      ...gallery,
+    ].filter(Boolean))
+  )
 
   async function handleDownload() {
     setDownloading(true)

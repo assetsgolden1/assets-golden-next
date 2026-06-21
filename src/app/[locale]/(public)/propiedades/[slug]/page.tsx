@@ -67,7 +67,11 @@ export default async function PropertyDetailPage({ params }: Props) {
   if (!property) notFound()
 
   const gallery = Array.isArray(property.gallery_urls) ? property.gallery_urls : []
-  const allImages = [...(property.image_url ? [property.image_url] : []), ...gallery]
+  // image_url suele ser idéntica a gallery_urls[0] → deduplicar por URL exacta
+  // preservando el orden de aparición (solo render, la base no se toca).
+  const allImages = Array.from(
+    new Set([...(property.image_url ? [property.image_url] : []), ...gallery].filter(Boolean))
+  )
 
   const description = locale === 'en'
     ? (property.description_en ?? property.description)
