@@ -250,17 +250,17 @@ export default async function EspanaPage({ searchParams }: Props) {
                 <>
                   {/* Spanish editorial content (original) */}
                   <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-6">
-                    España: panorama del mercado inmobiliario de lujo
+                    España: panorama del mercado inmobiliario exclusivo
                   </h2>
                   <div className="space-y-4 text-muted-foreground leading-relaxed">
-                    <p>España ocupa una posición consolidada entre los destinos preferidos del comprador internacional de alto patrimonio. La combinación de un marco jurídico europeo estable, una infraestructura de servicios de primer nivel y una diversidad geográfica sin equivalente en el Mediterráneo occidental explica la demanda sostenida que registra el segmento residencial de lujo a lo largo de sus costas y principales ciudades.</p>
+                    <p>España ocupa una posición consolidada entre los destinos preferidos del comprador internacional de alto patrimonio. La combinación de un marco jurídico europeo estable, una infraestructura de servicios de primer nivel y una diversidad geográfica sin equivalente en el Mediterráneo occidental explica la demanda sostenida que registra el segmento residencial exclusivo a lo largo de sus costas y principales ciudades.</p>
                     <p>El mercado español atrae perfiles de comprador diferenciados. Por un lado, la adquisición de segunda residencia por compradores europeos, principalmente del norte de Europa y el Reino Unido, que priorizan calidad de vida con conexión directa a sus países de origen. Por otro, el inversor latinoamericano y de Oriente Medio que ve en España una plataforma de entrada a Europa con exposición a un mercado inmobiliario maduro y con liquidez contrastada.</p>
-                    <p>En todos los mercados de lujo españoles, la oferta de producto verdaderamente exclusivo (villas frente al mar, áticos en primera línea de playa, obra nueva con especificaciones premium) presenta una escasez estructural que sostiene la demanda a largo plazo.</p>
+                    <p>En todos los mercados exclusivos españoles, la oferta de producto verdaderamente exclusivo (villas frente al mar, áticos en primera línea de playa, obra nueva con especificaciones premium) presenta una escasez estructural que sostiene la demanda a largo plazo.</p>
                   </div>
 
                   <div className="h-px w-12 bg-gold my-10" />
 
-                  <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-8">Las principales zonas costeras de lujo</h2>
+                  <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-8">Las principales zonas costeras exclusivas</h2>
                   <div className="space-y-8">
                     <div>
                       <h3 className="font-display text-xl font-semibold mb-3"><Link href="/destinos/espana?zona=costa-del-sol" className="hover:text-gold transition-colors">Costa del Sol</Link></h3>
@@ -268,7 +268,7 @@ export default async function EspanaPage({ searchParams }: Props) {
                     </div>
                     <div>
                       <h3 className="font-display text-xl font-semibold mb-3"><Link href="/destinos/espana?zona=costa-blanca" className="hover:text-gold transition-colors">Costa Blanca</Link></h3>
-                      <p className="text-muted-foreground leading-relaxed">La Costa Blanca ofrece un espectro amplio dentro del lujo. El norte (Jávea, Moraira, Altea) atrae a un comprador europeo que valora la privacidad y el entorno natural sobre la concentración de servicios. El sur presenta mayor diversidad de producto y acceso, con propiedades en primera línea cuyo precio de entrada es comparativamente inferior al de la Costa del Sol, lo que genera oportunidades para perfiles inversores con visión de medio plazo.</p>
+                      <p className="text-muted-foreground leading-relaxed">La Costa Blanca ofrece un espectro amplio dentro de la exclusividad. El norte (Jávea, Moraira, Altea) atrae a un comprador europeo que valora la privacidad y el entorno natural sobre la concentración de servicios. El sur presenta mayor diversidad de producto y acceso, con propiedades en primera línea cuyo precio de entrada es comparativamente inferior al de la Costa del Sol, lo que genera oportunidades para perfiles inversores con visión de medio plazo.</p>
                     </div>
                     <div>
                       <h3 className="font-display text-xl font-semibold mb-3"><Link href="/destinos/espana?zona=cataluna" className="hover:text-gold transition-colors">Cataluña</Link></h3>
@@ -280,7 +280,7 @@ export default async function EspanaPage({ searchParams }: Props) {
                     </div>
                     <div>
                       <h3 className="font-display text-xl font-semibold mb-3"><Link href="/destinos/espana?zona=costa-de-la-luz" className="hover:text-gold transition-colors">Costa de la Luz</Link></h3>
-                      <p className="text-muted-foreground leading-relaxed">La Costa de la Luz, con Sotogrande como referente histórico de lujo en la provincia de Cádiz, ofrece un segmento caracterizado por menor presión urbanística respecto al litoral mediterráneo. Las fincas con amplias parcelas, las propiedades singulares y los desarrollos de polo, golf y náutica mantienen su atractivo para un comprador que prioriza la exclusividad y la privacidad sobre la concentración de servicios.</p>
+                      <p className="text-muted-foreground leading-relaxed">La Costa de la Luz, con Sotogrande como referente histórico exclusivo en la provincia de Cádiz, ofrece un segmento caracterizado por menor presión urbanística respecto al litoral mediterráneo. Las fincas con amplias parcelas, las propiedades singulares y los desarrollos de polo, golf y náutica mantienen su atractivo para un comprador que prioriza la exclusividad y la privacidad sobre la concentración de servicios.</p>
                     </div>
                   </div>
 
@@ -301,8 +301,8 @@ export default async function EspanaPage({ searchParams }: Props) {
                   <dl className="space-y-5">
                     <div><dt className="font-semibold text-foreground">Conectividad.</dt><dd className="text-muted-foreground leading-relaxed mt-1">Los aeropuertos de Madrid, Barcelona, Málaga, Palma de Mallorca y Alicante operan con rutas directas a los principales destinos europeos y transatlánticos, con frecuencias que permiten gestionar una agenda internacional sin fricciones de movilidad.</dd></div>
                     <div><dt className="font-semibold text-foreground">Seguridad jurídica.</dt><dd className="text-muted-foreground leading-relaxed mt-1">Como Estado miembro de la Unión Europea, España ofrece un marco de protección de derechos de propiedad alineado con los estándares del mercado continental y una trazabilidad registral consolidada.</dd></div>
-                    <div><dt className="font-semibold text-foreground">Infraestructura de servicios.</dt><dd className="text-muted-foreground leading-relaxed mt-1">Las principales zonas de lujo cuentan con una red de colegios internacionales, clínicas privadas, marinas, campos de golf de referencia y restauración de nivel que permite un estándar de vida sin concesiones.</dd></div>
-                    <div><dt className="font-semibold text-foreground">Comunidad internacional establecida.</dt><dd className="text-muted-foreground leading-relaxed mt-1">Los principales destinos de lujo en España cuentan con comunidades de residentes extranjeros consolidadas desde hace décadas, lo que reduce significativamente la curva de adaptación para nuevos compradores internacionales.</dd></div>
+                    <div><dt className="font-semibold text-foreground">Infraestructura de servicios.</dt><dd className="text-muted-foreground leading-relaxed mt-1">Las principales zonas exclusivas cuentan con una red de colegios internacionales, clínicas privadas, marinas, campos de golf de referencia y restauración de nivel que permite un estándar de vida sin concesiones.</dd></div>
+                    <div><dt className="font-semibold text-foreground">Comunidad internacional establecida.</dt><dd className="text-muted-foreground leading-relaxed mt-1">Los principales destinos exclusivos en España cuentan con comunidades de residentes extranjeros consolidadas desde hace décadas, lo que reduce significativamente la curva de adaptación para nuevos compradores internacionales.</dd></div>
                   </dl>
                 </>
               )}

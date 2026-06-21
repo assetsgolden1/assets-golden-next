@@ -7,11 +7,11 @@ function MexicoContent() {
   return (
     <>
       <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-6">
-        México: panorama del mercado inmobiliario de lujo
+        México: panorama del mercado inmobiliario exclusivo
       </h2>
       <div className="space-y-4 text-muted-foreground leading-relaxed">
         <p>
-          México ocupa un lugar singular en la cartografía del lujo latinoamericano.
+          México ocupa un lugar singular en la cartografía de la exclusividad latinoamericana.
           La diversidad geográfica del país (costas en dos océanos, ciudades coloniales
           y destinos de playa con proyección internacional) genera un espectro de
           oportunidades que atrae tanto al comprador latinoamericano como al
@@ -19,7 +19,7 @@ function MexicoContent() {
           fiscal propio y dinamismo contrastado.
         </p>
         <p>
-          El mercado residencial de lujo en México se concentra en destinos que
+          El mercado residencial exclusivo en México se concentra en destinos que
           combinan infraestructura turística consolidada, conectividad aérea directa
           y una demanda sostenida por parte de no residentes. El comprador
           internacional que opera en este mercado suele valorar la proximidad
@@ -69,7 +69,7 @@ function MexicoContent() {
           </h3>
           <p className="text-muted-foreground leading-relaxed">
             Los Cabos (la conurbación de San José del Cabo y Cabo San Lucas) es el
-            destino de lujo de mayor penetración entre el comprador norteamericano.
+            destino exclusivo de mayor penetración entre el comprador norteamericano.
             Los complejos residenciales vinculados a campos de golf, la oferta de
             marinas y una infraestructura hotelera de primer nivel explican la
             concentración de producto premium en esta zona del Pacífico mexicano.
@@ -84,7 +84,7 @@ function MexicoContent() {
             Puerto Vallarta y la Riviera Nayarit configuran un mercado costero con
             una comunidad internacional establecida desde hace décadas. El perfil
             del comprador es diverso: desde la segunda residencia de retiro hasta
-            el inversor orientado al mercado de alquiler vacacional de lujo. La
+            el inversor orientado al mercado de alquiler vacacional exclusivo. La
             zona cuenta con acceso directo por el Aeropuerto Internacional Licenciado
             Gustavo Díaz Ordaz.
           </p>
@@ -95,7 +95,7 @@ function MexicoContent() {
             Ciudad de México
           </h3>
           <p className="text-muted-foreground leading-relaxed">
-            Ciudad de México alberga un mercado residencial de lujo urbano con
+            Ciudad de México alberga un mercado residencial exclusivo urbano con
             características propias. Las colonias Polanco, Lomas de Chapultepec,
             Santa Fe y el corredor Roma-Condesa concentran la oferta de apartamentos
             y penthouses premium para un perfil comprador que combina el uso
@@ -151,12 +151,12 @@ function IndonesiaContent() {
   return (
     <>
       <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-6">
-        Indonesia: panorama del mercado inmobiliario de lujo
+        Indonesia: panorama del mercado inmobiliario exclusivo
       </h2>
       <div className="space-y-4 text-muted-foreground leading-relaxed">
         <p>
           Indonesia, y Bali en particular, ocupa un lugar único en el mercado
-          inmobiliario de lujo del sudeste asiático. La isla ha evolucionado desde
+          inmobiliario exclusivo del sudeste asiático. La isla ha evolucionado desde
           un destino turístico convencional hacia un ecosistema residencial con
           atractivo estructural para un perfil de comprador internacional que
           combina la búsqueda de estilo de vida con perspectivas de revalorización
@@ -193,7 +193,7 @@ function IndonesiaContent() {
           </h3>
           <p className="text-muted-foreground leading-relaxed">
             El corredor Seminyak-Canggu concentra la mayor densidad de producto
-            residencial de lujo en Bali. Villas privadas con piscina, diseño
+            residencial exclusivo en Bali. Villas privadas con piscina, diseño
             arquitectónico de autor y proximidad a la costa son los atributos
             definitorios. Canggu ha experimentado una transformación significativa
             en la última década, pasando de zona de surf a destino residencial con
@@ -210,7 +210,7 @@ function IndonesiaContent() {
             Ubud representa la vertiente cultural y de bienestar del mercado balinés.
             A diferencia de la costa, ofrece un entorno de selva y arrozales que
             atrae a un comprador que prioriza la privacidad, la naturaleza y la
-            experiencia inmersiva. Los retiros de lujo, los spa-resorts residenciales
+            experiencia inmersiva. Los retiros exclusivos, los spa-resorts residenciales
             y las villas integradas en el paisaje tropical son los productos
             dominantes en este segmento.
           </p>
@@ -223,7 +223,7 @@ function IndonesiaContent() {
           <p className="text-muted-foreground leading-relaxed">
             La Península de Bukit, con Uluwatu, Ungasan y Bingin como referentes,
             se ha consolidado como el sector de mayor crecimiento en el segmento
-            de lujo. Las villas en acantilado con vistas al océano Índico
+            exclusivo. Las villas en acantilado con vistas al océano Índico
             representan algunos de los productos más exclusivos del mercado balinés.
             La oferta está orientada principalmente al alquiler vacacional de alta
             gama y a la segunda residencia premium.
@@ -306,12 +306,12 @@ function EmiratosContent() {
   return (
     <>
       <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-6">
-        Emiratos Árabes Unidos: panorama del mercado inmobiliario de lujo
+        Emiratos Árabes Unidos: panorama del mercado inmobiliario exclusivo
       </h2>
       <div className="space-y-4 text-muted-foreground leading-relaxed">
         <p>
           Los Emiratos Árabes Unidos, y Dubai en particular, representan uno de
-          los mercados de lujo de mayor dinamismo a escala global. La capacidad del
+          los mercados exclusivos de mayor dinamismo a escala global. La capacidad del
           emirato para atraer capital internacional, su posición como hub de
           conectividad entre Europa, Asia y África, y una política activa de
           apertura al inversor extranjero explican la atracción sostenida que ejerce
@@ -348,7 +348,7 @@ function EmiratosContent() {
             Palm Jumeirah
           </h3>
           <p className="text-muted-foreground leading-relaxed">
-            Palm Jumeirah es el referente icónico del lujo inmobiliario de Dubai.
+            Palm Jumeirah es el referente icónico de la exclusividad inmobiliaria de Dubai.
             Las villas en primera línea y los apartamentos en las frondas del
             archipiélago artificial mantienen su posición como producto aspiracional
             para el comprador internacional. La concentración de hoteles de cinco
@@ -363,7 +363,7 @@ function EmiratosContent() {
           </h3>
           <p className="text-muted-foreground leading-relaxed">
             El centro urbano de Dubai, con el Burj Khalifa, Dubai Mall y el canal
-            como ejes, concentra la mayor densidad de torres residenciales de lujo.
+            como ejes, concentra la mayor densidad de torres residenciales exclusivas.
             Los penthouses y apartamentos de grandes superficies en este distrito
             son demandados tanto por el comprador que prioriza el uso urbano como
             por el orientado al mercado de alquiler a corto plazo de alto standing.
@@ -446,7 +446,7 @@ function ArgentinaContent() {
   return (
     <>
       <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-6">
-        Argentina: panorama del mercado de lujo
+        Argentina: panorama del mercado exclusivo
       </h2>
       <div className="space-y-4 text-muted-foreground leading-relaxed">
         <p>
@@ -458,7 +458,7 @@ function ArgentinaContent() {
           internacional.
         </p>
         <p>
-          El mercado porteño de lujo se concentra en barrios como Palermo Chico,
+          El mercado porteño exclusivo se concentra en barrios como Palermo Chico,
           Recoleta y Puerto Madero en la ciudad, y en el corredor de countries y
           clubes de campo del Gran Buenos Aires (Nordelta, San Isidro, Pilar), donde
           las casas con parcela, acceso a golf y seguridad privada configuran el
@@ -478,7 +478,7 @@ function ArgentinaContent() {
             Buenos Aires — barrios premium
           </h3>
           <p className="text-muted-foreground leading-relaxed">
-            En la ciudad de Buenos Aires, el perfil del comprador de lujo busca
+            En la ciudad de Buenos Aires, el perfil del comprador exclusivo busca
             apartamentos de gran superficie en edificios con amenities completos o
             en propiedades de categoría patrimonial en Recoleta y Palermo. Puerto
             Madero, como desarrollo moderno sobre el Río de la Plata, aporta torres
@@ -492,7 +492,7 @@ function ArgentinaContent() {
             Patagonia y destinos de naturaleza
           </h3>
           <p className="text-muted-foreground leading-relaxed">
-            Argentina cuenta también con un segmento de lujo vinculado a sus
+            Argentina cuenta también con un segmento exclusivo vinculado a sus
             destinos de naturaleza excepcional. San Carlos de Bariloche y la región
             de los lagos patagónicos albergan propiedades de alta gama orientadas
             al turismo y la residencia estacional, con una estética y un entorno
@@ -539,11 +539,11 @@ function EstadosUnidosContent() {
   return (
     <>
       <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-6">
-        Estados Unidos: panorama del mercado de lujo
+        Estados Unidos: panorama del mercado exclusivo
       </h2>
       <div className="space-y-4 text-muted-foreground leading-relaxed">
         <p>
-          El mercado inmobiliario de lujo en Estados Unidos es el de mayor
+          El mercado inmobiliario exclusivo en Estados Unidos es el de mayor
           profundidad y liquidez a escala mundial. Su diversidad de destinos abarca
           desde los centros financieros y culturales de la costa este hasta los
           enclaves de sol y bienestar de Florida y California, pasando por los
@@ -585,7 +585,7 @@ function EstadosUnidosContent() {
             California — Los Ángeles y costa del Pacífico
           </h3>
           <p className="text-muted-foreground leading-relaxed">
-            California alberga el mercado de lujo con mayor concentración de
+            California alberga el mercado exclusivo con mayor concentración de
             producto arquitectónico singular: casas de diseño de autor, propiedades
             en acantilado con vistas al Pacífico y comunidades de alto standing en
             Beverly Hills, Bel Air y la costa de Malibu configuran la oferta
@@ -631,7 +631,7 @@ function CostaRicaContent() {
       </h2>
       <div className="space-y-4 text-muted-foreground leading-relaxed">
         <p>
-          Costa Rica ocupa un lugar propio en el mapa del lujo centroamericano.
+          Costa Rica ocupa un lugar propio en el mapa de la exclusividad centroamericana.
           El país combina estabilidad política e institucional (notable en el
           contexto regional), una naturaleza de excepcional biodiversidad y un
           modelo de turismo que ha atraído a lo largo de décadas un perfil de
@@ -639,7 +639,7 @@ function CostaRicaContent() {
           estándar de vida vinculado al entorno natural.
         </p>
         <p>
-          El mercado de lujo costarricense se concentra principalmente en el
+          El mercado exclusivo costarricense se concentra principalmente en el
           corredor del Pacífico norte (Guanacaste, Tamarindo, Papagayo), donde
           los desarrollos residenciales frente al mar conviven con resorts de
           cinco estrellas, y en el Valle Central, con San José y sus áreas
@@ -687,7 +687,7 @@ function ReinoUnidoContent() {
       </h2>
       <div className="space-y-4 text-muted-foreground leading-relaxed">
         <p>
-          El mercado inmobiliario de lujo del Reino Unido está dominado por
+          El mercado inmobiliario exclusivo del Reino Unido está dominado por
           Londres, que mantiene su condición de uno de los mercados prime más
           profundos del mundo. Prime Central London (los distritos de Mayfair,
           Belgravia, Knightsbridge, Chelsea y Kensington) concentra una demanda
@@ -789,10 +789,10 @@ function GreciaContent() {
       <div className="space-y-4 text-muted-foreground leading-relaxed">
         <p>
           Grecia combina un patrimonio cultural sin equivalente en Europa con un
-          mercado inmobiliario de lujo concentrado en sus islas más reconocidas
+          mercado inmobiliario exclusivo concentrado en sus islas más reconocidas
           internacionalmente: Mykonos, Santorini, Creta y las islas del
           Dodecaneso. El segmento de villas privadas con piscina y vistas al Egeo
-          representa el producto icónico del lujo griego. Atenas, por su parte,
+          representa el producto icónico de la exclusividad griega. Atenas, por su parte,
           ha experimentado una recuperación notable del mercado residencial de alta
           gama en la última década, especialmente en el barrio de Kolonaki, la
           riviera sur y el área de Glyfada.
