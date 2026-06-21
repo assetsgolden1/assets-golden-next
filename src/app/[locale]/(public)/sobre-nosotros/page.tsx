@@ -7,7 +7,7 @@ import { buttonVariants } from '@/components/ui/button'
 export const metadata: Metadata = {
   title: 'Sobre Nosotros',
   description:
-    'Socios fundadores con más de 40 años de trayectoria conjunta en inmobiliaria de lujo internacional. Más de 1.500 operaciones acompañadas en 11 países. Conozca Assets Golden.',
+    'Socios fundadores con más de 40 años de trayectoria conjunta en propiedades exclusivas a nivel internacional. Más de 1.500 operaciones acompañadas en 12 países. Conozca Assets Golden.',
   alternates: {
     canonical: '/sobre-nosotros',
   },
@@ -29,7 +29,7 @@ const VALUES = [
   {
     icon: Globe,
     title: 'Alcance global',
-    desc: 'Presencia activa en los principales mercados inmobiliarios internacionales, con red de partners en 11 países.',
+    desc: 'Presencia activa en los principales mercados inmobiliarios internacionales, con red de partners en 12 países.',
   },
   {
     icon: Users,
@@ -89,7 +89,7 @@ export default async function SobreNosotrosPage() {
             Detrás de Assets Golden hay un equipo con más de 40 años de trayectoria conjunta en el sector inmobiliario, acumulada por sus socios fundadores entre operaciones en España y mercados internacionales. A lo largo de esa trayectoria hemos acompañado más de 1.500 operaciones inmobiliarias, desde viviendas residenciales hasta activos comerciales y de inversión.
           </p>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            En Assets Golden International conectamos a inversores, compradores y vendedores con las mejores oportunidades inmobiliarias del mercado global. Nuestra red de partners en 11 países nos permite ofrecer un servicio integral y adaptado a cada perfil de cliente.
+            En Assets Golden International conectamos a inversores, compradores y vendedores con las mejores oportunidades inmobiliarias del mercado global. Nuestra red de partners en 12 países nos permite ofrecer un servicio integral y adaptado a cada perfil de cliente.
           </p>
           <p className="text-muted-foreground leading-relaxed">
             Operamos en España, México, Indonesia, Emiratos Árabes Unidos, Argentina, Estados Unidos, Costa Rica, Reino Unido, Ecuador, Grecia y Paraguay. Permanentemente abrimos nuevos mercados en busca de mejores y más rentables oportunidades para nuestros clientes.
@@ -149,7 +149,7 @@ export default async function SobreNosotrosPage() {
               <p className="text-xs tracking-widest text-gold uppercase mb-2">Presencia global</p>
               <h3 className="font-display text-2xl font-semibold mb-4">Red de partners independientes</h3>
               <p className="text-white/70 text-sm leading-relaxed">
-                Contamos con una red consolidada de agentes y partners en 11 países, lo que nos permite ofrecer oportunidades exclusivas y acceso a compradores e inversores de alto perfil en cualquier parte del mundo.
+                Contamos con una red consolidada de agentes y partners en 12 países, lo que nos permite ofrecer oportunidades exclusivas y acceso a compradores e inversores de alto perfil en cualquier parte del mundo.
               </p>
               <Link
                 href="/partners"

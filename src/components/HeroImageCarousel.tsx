@@ -10,9 +10,9 @@ import heroMansion from '@/assets/hero-mansion.jpg'
 import heroModern from '@/assets/hero-modern.jpg'
 
 const images = [
-  { src: heroVilla,     alt: 'Villa de lujo con piscina' },
+  { src: heroVilla,     alt: 'Villa exclusiva con piscina' },
   { src: heroBeach,     alt: 'Villa en primera línea de playa' },
-  { src: heroPenthouse, alt: 'Ático de lujo en ciudad' },
+  { src: heroPenthouse, alt: 'Ático exclusivo en ciudad' },
   { src: heroMansion,   alt: 'Mansión exclusiva' },
   { src: heroModern,    alt: 'Propiedad moderna de diseño' },
 ]

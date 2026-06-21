@@ -17,7 +17,7 @@ import { buttonVariants } from '@/components/ui/button'
 export const metadata: Metadata = {
   title: 'Servicios Inmobiliarios',
   description:
-    'Asesoramiento experto en compra, venta e inversión de propiedades de lujo en España y mercados internacionales. Due diligence completo en cada operación.',
+    'Asesoramiento experto en compra, venta e inversión de propiedades exclusivas en España y mercados internacionales. Due diligence completo en cada operación.',
   alternates: {
     canonical: '/servicios',
   },
@@ -85,7 +85,7 @@ const SERVICES = [
   {
     icon: Trees,
     title: 'Fincas Rústicas',
-    desc: 'Propiedades rurales de lujo: fincas, masías, cortijos y viñedos en los entornos naturales más privilegiados.',
+    desc: 'Propiedades rurales exclusivas: fincas, masías, cortijos y viñedos en los entornos naturales más privilegiados.',
     benefits: [
       'Valoración agronómica',
       'Análisis de explotación',
@@ -124,7 +124,7 @@ export default function ServiciosPage() {
             Soluciones Inmobiliarias
           </h1>
           <p className="mt-4 text-white/60 max-w-2xl mx-auto text-sm leading-relaxed">
-            Somos un equipo de profesionales con amplia experiencia en el sector inmobiliario e inversiones en todo el mundo. Disponemos de partners en 11 países.
+            Somos un equipo de profesionales con amplia experiencia en el sector inmobiliario e inversiones en todo el mundo. Disponemos de partners en 12 países.
           </p>
         </div>
       </section>

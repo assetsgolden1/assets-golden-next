@@ -36,7 +36,7 @@ const STATIC_NEWS = [
     category: 'Empresa',
     title: 'Assets Golden consolida su red de colaboradores con nuevas incorporaciones en Europa y Latinoamérica',
     content:
-      'La expansión de nuestra red de partners independientes en 11 países refuerza nuestra capacidad para ofrecer oportunidades exclusivas en los mercados de lujo internacional.',
+      'La expansión de nuestra red de partners independientes en 12 países refuerza nuestra capacidad para ofrecer oportunidades exclusivas en los mercados internacionales.',
   },
   {
     id: 3,

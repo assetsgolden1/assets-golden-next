@@ -191,7 +191,7 @@ export default function CollaborateDialog({ open, initialType = null, onClose }:
                 )}
                 <div className="col-span-2">
                   <label className="block text-sm font-medium mb-1" htmlFor="cs">Especialidad / Área de trabajo *</label>
-                  <input id="cs" required maxLength={100} placeholder="Ej: Obra nueva, Lujo, Retail..." value={form.specialty}
+                  <input id="cs" required maxLength={100} placeholder="Ej: Obra nueva, Exclusivo, Retail..." value={form.specialty}
                     onChange={(e) => setForm({ ...form, specialty: e.target.value })}
                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-gold focus:outline-none" />
                 </div>

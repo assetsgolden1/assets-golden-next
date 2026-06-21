@@ -24,11 +24,11 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "Assets Golden — Inmobiliaria de Lujo Internacional",
+    default: "Assets Golden — Inmobiliaria Internacional de Propiedades Exclusivas",
     template: "%s — Assets Golden",
   },
   description:
-    "Propiedades exclusivas en los mejores destinos del mundo. Compra, vende e invierte con expertos en inmobiliaria de lujo internacional.",
+    "Propiedades exclusivas en los mejores destinos del mundo. Compra, vende e invierte con expertos en propiedades exclusivas a nivel internacional.",
   metadataBase: new URL("https://assetsgolden.com"),
 
   icons: {
@@ -42,9 +42,9 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     url: 'https://assetsgolden.com',
     siteName: 'Assets Golden',
-    title: 'Assets Golden — Inmobiliaria de Lujo Internacional',
+    title: 'Assets Golden — Inmobiliaria Internacional de Propiedades Exclusivas',
     description:
-      'Propiedades exclusivas en los mejores destinos del mundo. Compra, vende e invierte con expertos en inmobiliaria de lujo internacional.',
+      'Propiedades exclusivas en los mejores destinos del mundo. Compra, vende e invierte con expertos en propiedades exclusivas a nivel internacional.',
     images: [
       {
         // España hero image — used as global og:image fallback for pages
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
         url: 'https://wloneprkibfjioxwypaw.supabase.co/storage/v1/object/public/property-images/1766763271521.png',
         width: 1200,
         height: 630,
-        alt: 'Assets Golden — Inmobiliaria de Lujo Internacional',
+        alt: 'Assets Golden — Inmobiliaria Internacional de Propiedades Exclusivas',
       },
     ],
   },

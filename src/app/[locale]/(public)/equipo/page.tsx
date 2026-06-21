@@ -7,7 +7,7 @@ import { getLocalPhoto } from '@/lib/constants/photoMap'
 export const metadata: Metadata = {
   title: 'Equipo',
   description:
-    'Profesionales especializados en inmobiliaria de lujo con trayectoria internacional. Conozca al equipo de expertos en Barcelona y en los principales destinos del mundo.',
+    'Profesionales especializados en propiedades exclusivas con trayectoria internacional. Conozca al equipo de expertos en Barcelona y en los principales destinos del mundo.',
   alternates: {
     canonical: '/equipo',
   },
@@ -45,7 +45,7 @@ export default async function EquipoPage() {
           <div className="h-px w-12 bg-gold mx-auto mt-6" />
           <p className="mt-6 text-white/60 max-w-lg mx-auto">
             Profesionales con trayectoria internacional y profundo conocimiento
-            del mercado de lujo en Barcelona y 11 países.
+            del mercado exclusivo en Barcelona y 12 países.
           </p>
         </div>
       </section>

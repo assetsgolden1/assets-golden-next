@@ -41,7 +41,7 @@
     "language_aria": "Cambiar idioma"
   },
   "Footer": {
-    "tagline": "Expertos en inmobiliaria de lujo internacional. Conectamos inversores con las mejores oportunidades en 11 países.",
+    "tagline": "Expertos en propiedades exclusivas a nivel internacional. Conectamos inversores con las mejores oportunidades en 12 países.",
     "address": "Barcelona, España",
     "section_company": "Empresa",
     "section_services": "Servicios",
@@ -76,8 +76,8 @@
     "our_partners": "Nuestros Partners"
   },
   "Home": {
-    "meta_title": "Propiedades de Lujo en España y el Mundo | Assets Golden",
-    "meta_description": "Propiedades de lujo off-market en España y el mundo. Asesoramiento experto y discreto en compraventa internacional, presente en 12 países.",
+    "meta_title": "Propiedades Exclusivas en España y el Mundo | Assets Golden",
+    "meta_description": "Propiedades exclusivas off-market en España y el mundo. Asesoramiento experto y discreto en compraventa internacional, presente en 12 países.",
     "featured_eyebrow": "Selección exclusiva",
     "featured_title": "Propiedades destacadas",
     "cta_view_all_featured": "Ver todas las destacadas",
@@ -88,7 +88,7 @@
     "trust1_title": "Discreción total",
     "trust1_desc": "Red offmarket exclusiva. Sus datos y los de su propiedad permanecen completamente confidenciales en todo momento.",
     "trust2_title": "Red internacional",
-    "trust2_desc": "Compradores cualificados de 11 países. Conectamos su propiedad con el inversor correcto, sin importar su origen.",
+    "trust2_desc": "Compradores cualificados de 12 países. Conectamos su propiedad con el inversor correcto, sin importar su origen.",
     "trust3_title": "Expertos en cada destino",
     "trust3_desc": "Conocimiento profundo de cada mercado donde operamos: del Mediterráneo español a Indonesia, pasando por Latinoamérica y Medio Oriente.",
     "destinations_eyebrow": "Inversión global",
@@ -104,10 +104,10 @@
     "cta_valuation_location": "Barcelona · España · Red internacional"
   },
   "Properties": {
-    "meta_title": "Propiedades de Lujo",
-    "meta_description": "Explore nuestra selección de propiedades de lujo: pisos, áticos, villas y casas en los mejores destinos del mundo. Filtre por país, precio y tipología.",
+    "meta_title": "Propiedades Exclusivas",
+    "meta_description": "Explore nuestra selección de propiedades exclusivas: pisos, áticos, villas y casas en los mejores destinos del mundo. Filtre por país, precio y tipología.",
     "hero_eyebrow": "Selección exclusiva",
-    "hero_title": "Propiedades de lujo",
+    "hero_title": "Propiedades exclusivas",
     "count_singular": "{count} propiedad disponible",
     "count_plural": "{count} propiedades disponibles",
     "featured_badge": "⭐ Mostrando solo propiedades destacadas",
@@ -187,17 +187,17 @@
     "results_in_city": "en {city}",
     "results_in_country": "en {country}",
     "meta_title": "Propiedades en {country}",
-    "meta_description": "Propiedades de lujo en {country}: apartamentos, villas y áticos. Búsqueda personalizada y asesoramiento experto.",
+    "meta_description": "Propiedades exclusivas en {country}: apartamentos, villas y áticos. Búsqueda personalizada y asesoramiento experto.",
     "meta_title_city": "Propiedades en {city}, {country}",
-    "meta_description_city": "Apartamentos, villas y áticos de lujo en {city}, {country}. Selección exclusiva de propiedades premium con asesoramiento personalizado."
+    "meta_description_city": "Apartamentos, villas y áticos exclusivos en {city}, {country}. Selección exclusiva de propiedades premium con asesoramiento personalizado."
   },
   "Spain": {
     "meta_title": "Propiedades en España",
-    "meta_description": "Explore la selección de propiedades de lujo en España: villas en la costa, áticos en Barcelona y apartamentos en los destinos más exclusivos del país.",
+    "meta_description": "Explore la selección de propiedades exclusivas en España: villas en la costa, áticos en Barcelona y apartamentos en los destinos más exclusivos del país.",
     "meta_title_zone_city": "Propiedades en {city}, {zone}",
-    "meta_description_zone_city": "Apartamentos, villas y áticos de lujo en {city}, {zone}. Selección exclusiva y asesoramiento experto para compradores nacionales e internacionales.",
+    "meta_description_zone_city": "Apartamentos, villas y áticos exclusivos en {city}, {zone}. Selección exclusiva y asesoramiento experto para compradores nacionales e internacionales.",
     "meta_title_zone": "Propiedades en {zone}",
-    "meta_description_zone": "Las mejores propiedades de lujo en {zone}: villas, apartamentos y áticos en ubicaciones privilegiadas. Asesoramiento personalizado en cada búsqueda.",
+    "meta_description_zone": "Las mejores propiedades exclusivas en {zone}: villas, apartamentos y áticos en ubicaciones privilegiadas. Asesoramiento personalizado en cada búsqueda.",
     "back": "Volver a Destinos",
     "investment_label": "Destino de inversión",
     "properties_singular": "propiedad disponible",
@@ -215,7 +215,7 @@
   },
   "Contact": {
     "meta_title": "Contacto",
-    "meta_description": "Contacte con nuestros expertos en inmobiliaria de lujo. Consultas confidenciales sobre compra, venta o inversión. Respondemos en menos de 24 horas.",
+    "meta_description": "Contacte con nuestros expertos en propiedades exclusivas. Consultas confidenciales sobre compra, venta o inversión. Respondemos en menos de 24 horas.",
     "hero_eyebrow": "Estamos aquí para ayudarle",
     "hero_title": "Contacte con nosotros",
     "hero_subtitle": "Nuestro equipo de especialistas le atenderá en menos de 24 horas.",

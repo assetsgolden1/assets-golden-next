@@ -8,7 +8,7 @@ import { getLinkedin } from '@/lib/constants/linkedinMap'
 export const metadata: Metadata = {
   title: 'Red Internacional de Partners',
   description:
-    'Red global de colaboradores y agencias inmobiliarias independientes en 11 países. Profesionales de primer nivel para operaciones de lujo internacional.',
+    'Red global de colaboradores y agencias inmobiliarias independientes en 12 países. Profesionales de primer nivel para operaciones exclusivas a nivel internacional.',
   alternates: {
     canonical: '/partners',
   },

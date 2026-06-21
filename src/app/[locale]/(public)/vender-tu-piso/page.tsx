@@ -6,7 +6,7 @@ import { buttonVariants } from '@/components/ui/button'
 export const metadata: Metadata = {
   title: 'Vender Tu Piso en Barcelona — Tasación Gratuita',
   description:
-    'Vende tu piso o propiedad de lujo en Barcelona con la máxima discreción y al mejor precio. Tasación gratuita y sin compromiso en menos de 24 horas.',
+    'Vende tu piso o propiedad exclusiva en Barcelona con la máxima discreción y al mejor precio. Tasación gratuita y sin compromiso en menos de 24 horas.',
   alternates: {
     canonical: '/vender-tu-piso',
   },

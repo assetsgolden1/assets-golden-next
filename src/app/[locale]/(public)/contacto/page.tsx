@@ -25,8 +25,8 @@ export default async function ContactoPage() {
     '@id': 'https://assetsgolden.com/#organization',
     name: 'Assets Golden',
     description: locale === 'en'
-      ? 'International luxury real estate consultancy'
-      : 'Consultoría inmobiliaria internacional especializada en propiedades de lujo',
+      ? 'International exclusive real estate consultancy'
+      : 'Consultoría inmobiliaria internacional especializada en propiedades exclusivas',
     url: 'https://assetsgolden.com',
     telephone: '+34611853001',
     email: 'hola@assetsgolden.com',

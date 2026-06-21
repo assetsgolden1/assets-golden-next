@@ -7,7 +7,7 @@ import { getBlogPosts } from '@/lib/supabase/queries'
 export const metadata: Metadata = {
   title: 'Blog Inmobiliario',
   description:
-    'Artículos y análisis sobre el mercado inmobiliario de lujo en Barcelona y destinos internacionales. Tendencias, consejos e inversión.',
+    'Artículos y análisis sobre el mercado inmobiliario exclusivo en Barcelona y destinos internacionales. Tendencias, consejos e inversión.',
   alternates: {
     canonical: '/blog',
   },

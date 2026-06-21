@@ -53,7 +53,7 @@ function buildSchema(locale: string) {
         })),
         hasOfferCatalog: {
           '@type': 'OfferCatalog',
-          name: 'Propiedades de lujo en venta',
+          name: 'Propiedades exclusivas en venta',
           numberOfItems: 2364,
         },
         sameAs: [
@@ -67,7 +67,7 @@ function buildSchema(locale: string) {
         '@id': 'https://assetsgolden.com/#website',
         url: 'https://assetsgolden.com',
         name: 'Assets Golden',
-        description: 'Inmobiliaria de Lujo Internacional',
+        description: 'Inmobiliaria Internacional de Propiedades Exclusivas',
         publisher: { '@id': 'https://assetsgolden.com/#organization' },
         inLanguage: 'es-ES',
         potentialAction: {
