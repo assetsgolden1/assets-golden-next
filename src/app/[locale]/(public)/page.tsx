@@ -6,7 +6,7 @@ import HomeSidebar from '@/components/HomeSidebar'
 import HeroImageCarousel from '@/components/HeroImageCarousel'
 import HomePropertiesCarousel from '@/components/HomePropertiesCarousel'
 import HomeTeamSection from '@/components/HomeTeamSection'
-import DestinationCard3D from '@/components/DestinationCard3D'
+import DestinationsCarousel from '@/components/home/DestinationsCarousel'
 import { Link } from '@/i18n/navigation'
 import { getTranslations, getLocale } from 'next-intl/server'
 import {
@@ -38,28 +38,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const revalidate = 3600
 
-const VALID_COUNTRIES = [
-  'españa', 'spain',
-  'méxico', 'mexico',
-  'emiratos', 'eau', 'dubai', 'united arab',
-  'argentina',
-  'estados unidos', 'eeuu', 'usa', 'united states',
-  'costa rica',
-  'reino unido', 'uk', 'united kingdom',
-  'ecuador',
-  'grecia', 'greece',
-  'indonesia',
-  'paraguay',
-]
-
-function isValidCountry(name: string): boolean {
-  const lower = name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
-  return VALID_COUNTRIES.some((kw) => {
-    const kwNorm = kw.normalize('NFD').replace(/[̀-ͯ]/g, '')
-    return lower.includes(kwNorm)
-  })
-}
-
 export default async function HomePage() {
   const t = await getTranslations('Home')
   const locale = await getLocale()
@@ -81,7 +59,7 @@ export default async function HomePage() {
   }
 
   const filteredDestinations = destinations
-    .filter((d) => isValidCountry(d.country_name))
+    .slice()
     .sort((a, b) => {
       const aIsSpain = a.country_name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes('espana')
       const bIsSpain = b.country_name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes('espana')
@@ -89,6 +67,11 @@ export default async function HomePage() {
       if (bIsSpain) return 1
       return countFor(b.country_name) - countFor(a.country_name)
     })
+
+  const destinationsWithCount = filteredDestinations.map((d) => ({
+    dest: d,
+    count: countFor(d.country_name),
+  }))
 
   return (
     <>
@@ -167,11 +150,7 @@ export default async function HomePage() {
               <div className="divider-gold mx-auto mt-4" />
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {filteredDestinations.map((dest) => (
-                <DestinationCard3D key={dest.id} dest={dest} count={countFor(dest.country_name)} locale={locale} />
-              ))}
-            </div>
+            <DestinationsCarousel items={destinationsWithCount} locale={locale} />
 
             <div className="mt-10 text-center">
               <Link href="/destinos" className={buttonVariants({ variant: 'goldOutline', size: 'lg' })}>
