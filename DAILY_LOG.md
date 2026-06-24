@@ -67,6 +67,36 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+## 2026-06-24 — Cambios de Atilio + rebranding + 3 posts de blog
+
+### Cambios pedidos por Atilio (cerrados y verificados en prod)
+1. Destinos del home dinámicos + carrusel — commit 67561b4
+   - Eliminada whitelist VALID_COUNTRIES/isValidCountry que ocultaba países (Rep. Dominicana no aparecía).
+   - Nuevo componente src/components/home/DestinationsCarousel.tsx (scroll-snap horizontal, flechas, reutiliza DestinationCard3D).
+   - Verificado: 12 países visibles incl. Rep. Dominicana.
+2. Foto 1 y 2 repetidas en galería — commit a7d6622
+   - Dedupe Array.from(new Set([image_url, ...gallery_urls].filter(Boolean))) en
+     src/app/[locale]/(public)/propiedades/[slug]/page.tsx y src/components/portal/PortalPropertyDetail.tsx.
+3. Rebranding "lujo/luxury" -> "exclusivas/exclusividad" (4 capas)
+   - Código marca/UI: commit df727dc (messages es/en, JSON-LD, metadata, componentes; descriptor "Inmobiliaria Internacional de Propiedades Exclusivas" / "International Exclusive Real Estate"; "11 países" -> "12").
+   - Editoriales: commit 5d622bb (destinoEditorial.tsx + destinos/espana/page.tsx, con concordancia).
+   - DB destinos: 3 country_destinations (Costa Rica, Emiratos, Ecuador) actualizados por MCP.
+   - DB blog: 13 posts limpiados por MCP (preservando "flujo"). Verificado 0 "lujo/luxury" real.
+
+### Blog: 3 posts nuevos (pedido de Atilio, estilo "tips"), bilingües, published=true
+Cargados por Supabase MCP (filas separadas por idioma; columnas _en son legacy, vacías):
+- A: como-trabajar-con-consultor-inmobiliario-propiedad-exclusiva / work-with-real-estate-consultant-exclusive-property (cat guías/guides, read_time 8, banner AG-01425 Tiana)
+- B: comprar-propiedad-extranjero-sin-estar-presente / buy-property-abroad-without-being-there (read_time 8, banner AG-04298 Platja d'Aro)
+- C: checklist-segunda-residencia-mediterraneo / checklist-mediterranean-second-home (read_time 9, banner AG-04296 Sant Just)
+Los 3 verificados en prod: 200, hero, FAQPage + BlogPosting + Breadcrumb OK, enlaces dorados funcionando.
+
+### Pendientes para próxima sesión
+- Blog: corregir post ES comprar-piso-espana-siendo-extranjero-2026 (Golden Visa/NLV); Fase C EN (7 posts por expandir).
+- Viejos: cuenta admin de Joan; PDF portal end-to-end; confirmación Atilio crear propiedades; criterios /inversiones; NOSOTROS truncado; bug created_time meta_leads_synced.
+- SEO/infra: verificar GSC + reenviar sitemap; thumbnails/egress; banner cookies + gateo GA4/Pixel (GDPR).
+
+---
+
 ### 2026-06-19 — [FASE-SEO-B1 + B2 + B2.1] Reposicionamiento internacional home + traducción de títulos/alt de propiedad en EN
 
 **Contexto:** Bloque "B" del SEO: (B1) reescribir title/description de la home hacia un posicionamiento internacional (off-market, 12 países) en vez del foco "Barcelona"; (B2) traducir en runtime los títulos de propiedad en la vista EN (en la DB están en español, patrón "{Tipo} en {Ciudad}", auto-generados por el sync) sin tocar la DB ni el ES; (B2.1) extender esa traducción también al `alt` de las imágenes.
