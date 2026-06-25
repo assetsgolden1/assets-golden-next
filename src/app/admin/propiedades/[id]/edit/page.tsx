@@ -20,6 +20,7 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable'
 import { SortableImage } from '@/components/admin/SortableImage'
+import { compressImage } from '@/lib/utils/compressImage'
 
 const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF']
 
@@ -188,8 +189,9 @@ export default function EditPropertyPage({
 
     const newImageUrls: string[] = []
     for (const file of newImages) {
+      const compressed = await compressImage(file)
       const fd = new FormData()
-      fd.append('file', file)
+      fd.append('file', compressed)
       const res = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
       if (!res.ok) {
         const text = await res.text()

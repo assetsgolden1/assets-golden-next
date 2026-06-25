@@ -20,6 +20,7 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable'
 import { SortableImage } from '@/components/admin/SortableImage'
+import { compressImage } from '@/lib/utils/compressImage'
 
 const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF']
 
@@ -122,8 +123,9 @@ export default function NuevaPropiedadPage() {
       // Subir fotos secuencialmente
       const uploadedUrls: string[] = []
       for (const { file } of galleryItems) {
+        const compressed = await compressImage(file)
         const fd = new FormData()
-        fd.append('file', file)
+        fd.append('file', compressed)
         const uploadRes = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
         const uploadData = await uploadRes.json()
         if (!uploadRes.ok) {
