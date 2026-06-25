@@ -67,6 +67,15 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+## 2026-06-24 (cont.) — Fix upload imágenes (compresión en cliente)
+
+- Atilio no podía crear una propiedad: error "File too large (max 5MB)" al subir foto.
+- Causa: validación de 5MB en el endpoint src/app/api/admin/upload-image/route.ts (bucket property-images), sin compresión previa.
+- Solución (commit 0a12406, verificado READY en prod): helper src/lib/utils/compressImage.ts (browser-image-compression, maxSizeMB 4.5, maxWidthOrHeight 2560, quality 0.8, preserva nombre, passthrough si no es imagen o si falla). Integrado en el loop de subida de nueva-propiedad/page.tsx y propiedades/[id]/edit/page.tsx. La validación de 5MB queda como red de seguridad posterior.
+- Pendiente menor: aplicar el mismo helper a destinos/[slug]/edit/page.tsx y TeamManager.tsx (los usa Ivan, no Atilio; baja prioridad).
+
+---
+
 ## 2026-06-24 — Cambios de Atilio + rebranding + 3 posts de blog
 
 ### Cambios pedidos por Atilio (cerrados y verificados en prod)
