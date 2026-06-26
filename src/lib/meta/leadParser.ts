@@ -64,17 +64,32 @@ function mapValue(raw: string, map: Record<string, string>): string {
   return map[key] ?? raw
 }
 
-function extractVariant(adName?: string): string {
+// Mapa ad_id → variante (fuente de verdad). Ad set Marbella-NewBuild 6999816973276.
+const AD_VARIANT_MAP: Record<string, string> = {
+  '52521226792880': 'Carrusel D',
+  '6999816973076': 'Carrusel A',
+  '6999835546076': 'Carrusel B',
+  '6999838792676': 'Carrusel C',
+  '52539896471280': 'Video E1',
+  '52539953330480': 'Video E2',
+}
+
+function variantFromName(adName?: string): string {
   if (!adName) return ''
-  const match = adName.match(/[Cc]arousel[-_]([A-Za-z])/i)
-  if (match) return `Carrusel ${match[1].toUpperCase()}`
-  // fallback: letter at end of name segment e.g. "...EN-v1-A"
-  const fallback = adName.match(/[-_]([A-Za-z])(?:[-_]|$)/)
-  return fallback ? `Carrusel ${fallback[1].toUpperCase()}` : ''
+  const carousel = adName.match(/[Cc]arousel[-_\s]*([A-Za-z])/i)
+  if (carousel) return `Carrusel ${carousel[1].toUpperCase()}`
+  const video = adName.match(/[Vv]ideo[-_\s]*([A-Za-z]\d*)/i)
+  if (video) return `Video ${video[1].toUpperCase()}`
+  return ''
+}
+
+function extractVariant(adId?: string, adName?: string): string {
+  if (adId && AD_VARIANT_MAP[adId]) return AD_VARIANT_MAP[adId] // 1º por ad_id
+  return variantFromName(adName) || 'Desconocido' // 2º por ad_name, si no → Desconocido
 }
 
 export function parseMetaLead(raw: MetaLeadRaw): ParsedMetaLead {
-  const { id, field_data, created_time, ad_name } = raw
+  const { id, field_data, created_time, ad_id, ad_name } = raw
 
   const fecha = new Date(created_time).toLocaleString('es-ES', {
     timeZone: 'Europe/Madrid',
@@ -139,6 +154,6 @@ export function parseMetaLead(raw: MetaLeadRaw): ParsedMetaLead {
     presupuesto: mapValue(rawBudget, BUDGET_MAP),
     timeline: mapValue(rawTimeline, TIMELINE_MAP),
     purpose: mapValue(rawPurpose, PURPOSE_MAP),
-    variante: extractVariant(ad_name),
+    variante: extractVariant(ad_id, ad_name),
   }
 }

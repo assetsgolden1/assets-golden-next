@@ -67,6 +67,35 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-26 — [VARIANTE-FIX] Detección robusta del anuncio de origen (ad_id + fallback ad_name + "Desconocido")
+
+**Contexto:** Un lead nuevo (jeyjey / jeyjeybewo@gmail.com, 26/06) entró con `variante=NULL` en `meta_leads`. Diagnóstico: el sync derivaba la variante SOLO del `ad_name` por regex (`leadParser.ts` `extractVariant`), asumiendo que todo anuncio era un "Carrusel". El lead vino del ad **"Video E1 - AG-04146 con sonido"** (ad_id `52539896471280`), que no matcheaba ni la regex de carrusel ni el fallback → devolvía `''` → se persistía NULL. Confirmado vía Graph API que Meta SÍ mandaba `ad_id`/`ad_name`; el bug era del parser.
+
+**Ads del ad set `6999816973276` (relevados por Graph API):** Carrusel A `6999816973076` (ACTIVE), B `6999835546076` (PAUSED), C `6999838792676` (PAUSED), D `52521226792880` (ACTIVE), **Video E1 `52539896471280` (ACTIVE)**, **Video E2 `52539953330480` (ACTIVE)**. Los 2 videos ya están activos (Video E1 ya generó un lead).
+
+**Trabajo hecho (`src/lib/meta/leadParser.ts`):**
+- Nuevo `AD_VARIANT_MAP` (ad_id → variante) con los 6 ads del ad set: Carrusel A-D + Video E1/E2.
+- `extractVariant(adId, adName)`: 1º resuelve por `ad_id` (robusto); 2º fallback `variantFromName` por regex sobre `ad_name` (reconoce `Carousel X` y `Video EX`); 3º si nada matchea → **`"Desconocido"`** en vez de `''`/NULL (distingue falta de dato de bug).
+- `parseMetaLead` ahora destructura y pasa `ad_id`. Sin cambios de DB ni de endpoints. `npx tsc --noEmit` → 0 errores.
+
+**Backfill del lead de jeyjey (one-off, no quedó en el repo):**
+- Supabase (MCP): `UPDATE meta_leads SET variante='Video E1' WHERE meta_lead_id='1017239414462726'` → OK (1 fila).
+- Google Sheet (pestaña LEADS, col I, fila 28): celda de Variante seteada a `"Video E1"` vía script temporal `scripts/backfillJeyjeyVariant.mjs` (creado, ejecutado y borrado — no commiteado).
+
+**Archivos tocados:**
+- MODIFIED: `src/lib/meta/leadParser.ts`, `DAILY_LOG.md` (esta entrada).
+- DB (vía MCP) + Sheet: backfill puntual de jeyjey (sin migración).
+
+**Commits:** `fix(leads): detectar variante por ad_id con fallback a ad_name + "Desconocido"` (push a `main`).
+
+**Avisos / cosas a revisar:**
+- Si Atilio crea ads nuevos en el ad set, agregar su `ad_id` al `AD_VARIANT_MAP` para mapeo exacto; mientras tanto el fallback por nombre cubre `Carousel X` / `Video EX`, y cualquier otro caso cae en `"Desconocido"`.
+- A partir de ahora ningún lead nuevo debería quedar con variante NULL (peor caso = `"Desconocido"`).
+
+**Próximo paso sugerido:** Monitorear que los próximos leads de Video E1/E2 lleguen con su variante correcta. Retomar bloqueantes go-live (refactor pipeline de leads / páginas legales GDPR / DNS de Atilio).
+
+---
+
 ## 2026-06-24 (cont.) — Fix upload imágenes (compresión en cliente)
 
 - Atilio no podía crear una propiedad: error "File too large (max 5MB)" al subir foto.
