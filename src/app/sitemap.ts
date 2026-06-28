@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { getAllPropertySlugs, createStaticClient } from '@/lib/supabase/queries'
+import { getAllPropertySlugs, getAllDestinationSlugs, createStaticClient } from '@/lib/supabase/queries'
 
 const BASE_URL = 'https://assetsgolden.com'
 
@@ -45,8 +45,9 @@ const STATIC_PAGES: MetadataRoute.Sitemap = [
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createStaticClient()
 
-  const [propertySlugs, blogRows] = await Promise.all([
+  const [propertySlugs, destinationSlugs, blogRows] = await Promise.all([
     getAllPropertySlugs(),
+    getAllDestinationSlugs(),
     supabase
       .from('blog_posts')
       .select('slug, published_at')
@@ -59,6 +60,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     sitemapEntry(`/propiedades/${slug}`, 'weekly', 0.8),
   )
 
+  // /destinos/[país] — incluye espana (página dedicada) y dedupe
+  const destinationUrls: MetadataRoute.Sitemap = [
+    ...new Set(['espana', ...destinationSlugs]),
+  ].map((slug) => sitemapEntry(`/destinos/${slug}`, 'monthly', 0.7))
+
   const blogUrls: MetadataRoute.Sitemap = blogRows.map((post) =>
     sitemapEntry(
       `/blog/${post.slug}`,
@@ -68,5 +74,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ),
   )
 
-  return [...STATIC_PAGES, ...propertyUrls, ...blogUrls]
+  return [...STATIC_PAGES, ...destinationUrls, ...propertyUrls, ...blogUrls]
 }

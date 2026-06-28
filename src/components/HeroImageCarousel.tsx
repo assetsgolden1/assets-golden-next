@@ -17,7 +17,21 @@ const images = [
   { src: heroModern,    alt: 'Propiedad moderna de diseño' },
 ]
 
-export default function HeroImageCarousel() {
+interface HeroImageCarouselProps {
+  tagline?: string
+  title: string
+  subtitle: string
+  ctaValuation: string
+  ctaProperties: string
+}
+
+export default function HeroImageCarousel({
+  tagline,
+  title,
+  subtitle,
+  ctaValuation,
+  ctaProperties,
+}: HeroImageCarouselProps) {
   const [current, setCurrent] = useState(0)
 
   useEffect(() => {
@@ -74,6 +88,18 @@ export default function HeroImageCarousel() {
         paddingLeft: '2rem', paddingRight: '2rem',
         maxWidth: '680px',
       }}>
+        {tagline && (
+          <p style={{
+            color: 'rgba(255,255,255,0.65)',
+            fontSize: 'clamp(0.7rem, 1.2vw, 0.85rem)',
+            marginBottom: '12px',
+            textTransform: 'uppercase', letterSpacing: '0.18em',
+            fontWeight: 600,
+          }}>
+            {tagline}
+          </p>
+        )}
+
         <h1 style={{
           fontFamily: '"Playfair Display", Georgia, serif',
           fontSize: 'clamp(1.8rem, 4vw, 3.2rem)',
@@ -81,7 +107,7 @@ export default function HeroImageCarousel() {
           lineHeight: 1.1, marginBottom: '20px',
           textTransform: 'uppercase', letterSpacing: '0.04em',
         }}>
-          International Real Estate Consulting
+          {title}
         </h1>
 
         <p style={{
@@ -92,7 +118,7 @@ export default function HeroImageCarousel() {
           textTransform: 'uppercase', letterSpacing: '0.1em',
           fontWeight: 500,
         }}>
-          Compraventa de activos inmobiliarios<br />en cualquier parte del mundo
+          {subtitle}
         </p>
 
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
@@ -102,7 +128,7 @@ export default function HeroImageCarousel() {
             fontWeight: 700, fontSize: '0.95rem',
             textDecoration: 'none', display: 'inline-block',
           }}>
-            Solicitar tasación gratuita
+            {ctaValuation}
           </a>
           <a href="/propiedades" style={{
             background: 'transparent', color: '#ffffff',
@@ -111,7 +137,7 @@ export default function HeroImageCarousel() {
             textDecoration: 'none', display: 'inline-block',
             border: '1.5px solid rgba(255,255,255,0.5)',
           }}>
-            Ver propiedades
+            {ctaProperties}
           </a>
         </div>
       </div>

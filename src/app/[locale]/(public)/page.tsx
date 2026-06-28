@@ -82,7 +82,13 @@ export default async function HomePage() {
       >
         <HomeSidebar destinations={destinations} propertyCounts={propertyCounts} partners={partners ?? []} locale={locale} />
         <div style={{ flex: 1, position: 'relative', overflow: 'hidden', minHeight: 0 }}>
-          <HeroImageCarousel />
+          <HeroImageCarousel
+            tagline={t('hero_tagline')}
+            title={t('hero_title')}
+            subtitle={t('hero_subtitle')}
+            ctaValuation={t('hero_cta_valuation')}
+            ctaProperties={t('hero_cta_properties')}
+          />
         </div>
       </section>
 
