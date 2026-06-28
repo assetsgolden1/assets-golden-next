@@ -67,6 +67,33 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-28 — [SYNC-DUAL-FORM] El sync lee DOS formularios de leads (multi-form)
+
+**Contexto:** Se creó un formulario de leads nuevo en Meta — `2055038041784255` ("Marbella-HigherIntent-EN-v1") — además del viejo `1495878108643736` ("Marbella-NewBuild-EN-v1"). El sync leía un solo form (env `META_LEADS_FORM_ID` con fallback hardcodeado al viejo), así que los leads del form nuevo nunca caían en el Sheet/CRM.
+
+**Diagnóstico (confirmado antes de tocar nada):**
+- Hoy ambos endpoints (`sync-meta/route.ts`, `sync-meta/manual/route.ts`) resolvían un único `formId` y llamaban `fetchLeadsFromMeta(formId, token)` → 1 form por corrida.
+- Todo el flujo posterior es **agnóstico al form** una vez que el lead entra a `meta_leads`: dedupe (`meta_lead_id` único global), append al Sheet, `upsertMetaLead`, welcome inline y la secuencia de nurture (`sequence/route.ts` filtra solo `seq_paused=false`, sin `form_id`). La `variante` sale del `ad_id` (`leadParser`), independiente del form. ⇒ un lead del form nuevo recibe welcome + secuencia igual que uno del viejo.
+
+**Trabajo hecho:**
+- NEW `src/lib/meta/formIds.ts` → `getFormIds()`: cascada `META_LEADS_FORM_IDS` (CSV) → `META_LEADS_FORM_ID` (single) → hardcoded viejo. Parseo con `trim` y filtrado de vacíos (tolera `"id1, id2"` y comas colgadas).
+- `src/lib/meta/syncTracker.ts`: `getSyncedLeadIds`/`getSyncedEmails` ahora reciben `string[]` y dedupan como **unión** de todos los forms vía `.in('form_id', ...)`.
+- `sync-meta/route.ts` + `sync-meta/manual/route.ts`: iteran sobre `getFormIds()`, traen leads de cada form **etiquetando su `formId` de origen**, dedup unión (DB + email global del Sheet + dedup intra-batch por `seenIds`/email). `recordSyncedLeads` guarda el **`form_id` REAL** de cada lead (no el hardcodeado). `createSyncRun` loguea la lista `"id1,id2"`.
+- **Regla de oro respetada:** append-only, dedupe ANTES de escribir, nunca borrar/sobreescribir. `npx tsc --noEmit` → 0 errores.
+
+**Env var (Vercel, proyecto `i-botts-projects/assets-golden-next`):**
+- `META_LEADS_FORM_IDS = 1495878108643736,2055038041784255` agregada en **Production, Preview y Development** (verificado con `vercel env ls`). Se mantiene `META_LEADS_FORM_ID` (Production) como fallback.
+
+**Archivos tocados:**
+- CREATED: `src/lib/meta/formIds.ts`
+- MODIFIED: `src/lib/meta/syncTracker.ts`, `src/app/api/leads/sync-meta/route.ts`, `src/app/api/leads/sync-meta/manual/route.ts`, `DAILY_LOG.md`
+
+**Commits:** `feat(leads): sync lee múltiples form_ids de Meta (META_LEADS_FORM_IDS, dedupe unión)` (push a `main`).
+
+**Próximo paso sugerido:** Tras el primer cron, verificar en `meta_sync_runs` que `form_id` aparezca como `"id1,id2"` y que lleguen leads del form nuevo (`2055038041784255`) al Sheet/CRM con welcome + secuencia. Si Atilio crea más forms, sumar el ID a `META_LEADS_FORM_IDS`.
+
+---
+
 ### 2026-06-26 — [VARIANTE-FIX] Detección robusta del anuncio de origen (ad_id + fallback ad_name + "Desconocido")
 
 **Contexto:** Un lead nuevo (jeyjey / jeyjeybewo@gmail.com, 26/06) entró con `variante=NULL` en `meta_leads`. Diagnóstico: el sync derivaba la variante SOLO del `ad_name` por regex (`leadParser.ts` `extractVariant`), asumiendo que todo anuncio era un "Carrusel". El lead vino del ad **"Video E1 - AG-04146 con sonido"** (ad_id `52539896471280`), que no matcheaba ni la regex de carrusel ni el fallback → devolvía `''` → se persistía NULL. Confirmado vía Graph API que Meta SÍ mandaba `ad_id`/`ad_name`; el bug era del parser.

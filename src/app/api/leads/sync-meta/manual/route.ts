@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchLeadsFromMeta } from '@/lib/meta/leadsApi'
+import { fetchLeadsFromMeta, type MetaLeadRaw } from '@/lib/meta/leadsApi'
 import { parseMetaLead } from '@/lib/meta/leadParser'
+import { getFormIds } from '@/lib/meta/formIds'
 import { getSyncedLeadIds, getSyncedEmails, recordSyncedLeads, upsertMetaLead } from '@/lib/meta/syncTracker'
 import { createSyncRun, updateSyncRun } from '@/lib/meta/syncLog'
 import { appendLeadToMetaSheet, readMetaSheetEmails } from '@/lib/googleSheets'
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const formId = process.env.META_LEADS_FORM_ID ?? '1495878108643736'
+  const formIds = getFormIds()
   const sheetId = process.env.META_LEADS_SHEET_ID ?? '1Q_PRvDe45XxRoB43JZGWVJyJli8Cqf0G2Ry8vJcvZcA'
   const token = process.env.META_LEADS_SYNC_TOKEN
 
@@ -30,34 +31,43 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'META_LEADS_SYNC_TOKEN no configurado' }, { status: 500 })
   }
 
-  const runId = await createSyncRun(formId)
+  const runId = await createSyncRun(formIds.join(','))
 
   try {
     const [syncedIds, syncedEmailsDb, sheetEmails] = await Promise.all([
-      getSyncedLeadIds(formId),
-      getSyncedEmails(formId),
+      getSyncedLeadIds(formIds),
+      getSyncedEmails(formIds),
       readMetaSheetEmails(sheetId),
     ])
     const knownEmails = new Set([...syncedEmailsDb, ...sheetEmails])
 
-    const rawLeads = await fetchLeadsFromMeta(formId, token)
-    console.log(`[sync-meta/manual] ${rawLeads.length} lead(s) obtenidos de Meta`)
+    // Obtener leads de cada form, etiquetando su origen
+    const rawLeads: Array<{ raw: MetaLeadRaw; formId: string }> = []
+    for (const formId of formIds) {
+      const leads = await fetchLeadsFromMeta(formId, token)
+      console.log(`[sync-meta/manual] ${leads.length} lead(s) obtenidos de Meta (form ${formId})`)
+      for (const raw of leads) rawLeads.push({ raw, formId })
+    }
 
     let duplicated = 0
-    const batch: ReturnType<typeof parseMetaLead>[] = []
+    const batch: Array<{ parsed: ReturnType<typeof parseMetaLead>; formId: string }> = []
+    const seenIds = new Set<string>()
 
-    for (const raw of rawLeads) {
-      if (syncedIds.has(raw.id)) { duplicated++; continue }
+    for (const { raw, formId } of rawLeads) {
+      if (seenIds.has(raw.id) || syncedIds.has(raw.id)) { duplicated++; continue }
       const parsed = parseMetaLead(raw)
-      if (parsed.email && knownEmails.has(parsed.email.toLowerCase())) { duplicated++; continue }
-      batch.push(parsed)
+      const emailKey = parsed.email?.toLowerCase()
+      if (emailKey && knownEmails.has(emailKey)) { duplicated++; continue }
+      seenIds.add(raw.id)
+      if (emailKey) knownEmails.add(emailKey)
+      batch.push({ parsed, formId })
     }
 
     console.log(`[sync-meta/manual] ${duplicated} duplicado(s), ${batch.length} nuevo(s) a cargar`)
 
     const synced: Array<{ meta_lead_id: string; email: string; created_time: string; form_id: string }> = []
 
-    for (const parsed of batch) {
+    for (const { parsed, formId } of batch) {
       const prioridad = categorizeLead({
         email: parsed.email,
         telefono: parsed.telefono,
@@ -99,7 +109,7 @@ export async function POST(req: NextRequest) {
         meta_lead_id: parsed.meta_lead_id,
         email: parsed.email,
         created_time: new Date().toISOString(),
-        form_id: formId,
+        form_id: formId, // form_id REAL del lead, no el hardcodeado
       })
 
       await sendWelcomeEmail(parsed.email, parsed.nombre)

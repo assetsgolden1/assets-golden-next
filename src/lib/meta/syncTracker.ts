@@ -1,11 +1,13 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import type { ParsedMetaLead } from './leadParser'
 
-export async function getSyncedLeadIds(formId: string): Promise<Set<string>> {
+// Dedupe multi-form: unión de meta_lead_ids ya cargados de TODOS los forms.
+// meta_lead_id es único global, así que la unión es correcta sin riesgo de colisión.
+export async function getSyncedLeadIds(formIds: string[]): Promise<Set<string>> {
   const { data, error } = await supabaseAdmin
     .from('meta_leads_synced')
     .select('meta_lead_id')
-    .eq('form_id', formId)
+    .in('form_id', formIds)
 
   if (error) {
     console.error('[syncTracker] Error leyendo meta_lead_ids:', error.message)
@@ -15,11 +17,12 @@ export async function getSyncedLeadIds(formId: string): Promise<Set<string>> {
   return new Set(data?.map(r => r.meta_lead_id) ?? [])
 }
 
-export async function getSyncedEmails(formId: string): Promise<Set<string>> {
+// Dedupe multi-form: unión de emails ya cargados de TODOS los forms.
+export async function getSyncedEmails(formIds: string[]): Promise<Set<string>> {
   const { data, error } = await supabaseAdmin
     .from('meta_leads_synced')
     .select('email')
-    .eq('form_id', formId)
+    .in('form_id', formIds)
     .not('email', 'is', null)
 
   if (error) {
