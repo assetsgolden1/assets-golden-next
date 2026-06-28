@@ -9,40 +9,14 @@ Este proyecto mantiene su contexto en 3 archivos. Su uso NO es opcional:
 ## Al ARRANCAR cualquier sesión:
 - Leer ESTADO.md y PENDIENTES.md ANTES de actuar. Con eso tenés el contexto vigente y el backlog.
 - DAILY_LOG.md solo si necesitás reconstruir cómo se llegó a algo.
+- Reportar al usuario en tu primera respuesta:
+  - Cuántos pendientes activos hay y en qué categorías (de PENDIENTES.md).
+  - Cuál fue el último trabajo hecho (entrada más reciente de DAILY_LOG.md).
+  - Cuál es el "próximo paso sugerido" anotado.
+  - Si detectás conflicto entre lo que pide el usuario y los pendientes activos, mencionalo.
 
 ## Al CERRAR cualquier sesión en la que se hizo un cambio:
-1. **DAILY_LOG.md** → agregar una entrada nueva arriba (fecha + qué se hizo + commits).
-2. **PENDIENTES.md** → tachar lo resuelto (mover a "Hecho reciente" o borrar) y agregar lo nuevo que haya surgido.
-3. **ESTADO.md** → actualizar números/estado si cambiaron (catálogo, deploys, features).
-Mantener estos 3 archivos al día es parte de "terminar la tarea". Una tarea sin sus .md actualizados NO está cerrada.
-
----
-
-# Assets Golden Next — Instrucciones para Claude Code
-
-## 🔄 DAILY_LOG.md — Lectura obligatoria al inicio y cierre
-
-Este proyecto usa una bitácora operativa en `DAILY_LOG.md`.
-Tu trabajo como agente DEBE empezar y terminar interactuando con
-ese archivo.
-
-### Al INICIAR cada sesión
-
-1. Leer DAILY_LOG.md completo
-2. Reportar al usuario en tu primera respuesta:
-   - Cuántos pendientes activos hay y en qué categorías
-   - Cuál fue el último trabajo hecho (sección "Historial de sesiones")
-   - Cuál es el "próximo paso sugerido" anotado
-   - Si detectás conflicto entre lo que pide el usuario y los
-     pendientes activos, mencionalo
-
-### Al CERRAR cada sesión (cuando el usuario indique fin o pidás "haz
-el cierre" / "actualiza el log")
-
-1. Marcar con `[x]` los items terminados en "Pendientes activos"
-2. Si descubriste pendientes nuevos durante la sesión, agregarlos
-   a la sección que corresponda
-3. Agregar una entrada NUEVA arriba en "Historial de sesiones" con:
+1. **DAILY_LOG.md** → agregar una entrada NUEVA arriba (append-only) con:
    - Fecha (formato YYYY-MM-DD)
    - Título descriptivo de la sesión
    - Contexto: qué pidió el usuario
@@ -50,27 +24,25 @@ el cierre" / "actualiza el log")
    - Archivos tocados: CREATED/MODIFIED/DELETED
    - Commits: hashes y mensajes (si los hubo)
    - Próximo paso sugerido: qué hacer la próxima sesión
-4. NO borres entradas viejas del historial — es append-only
-5. NO modifiques entradas pasadas — solo agregar arriba
+   - NO borres ni modifiques entradas viejas — solo se agrega arriba.
+2. **PENDIENTES.md** → tachar/quitar lo resuelto (mover a "Hecho reciente" o borrar) y agregar lo nuevo que haya surgido.
+3. **ESTADO.md** → actualizar números/estado si cambiaron (catálogo, deploys, features).
 
-### Reglas de honestidad
+Mantener estos 3 archivos al día es parte de "terminar la tarea". Una tarea sin sus .md actualizados NO está cerrada.
 
-- NO marques `[x]` un item si no lo terminaste de verdad
-- Si un item quedó parcial, dejalo `[ ]` y anotá el progreso parcial
-  en el historial de la sesión
-- Si surgió un blocker que impide completar un item, marcalo en el
-  item con sufijo `(BLOQUEADO: razón)` y mencionalo en el historial
-- Si un commit no llegó a hacerse (porque el usuario no dio OK),
-  anotalo como "(pendiente de OK del usuario)"
+## Reglas de honestidad
+- NO marques como hecho un item si no lo terminaste de verdad.
+- Si un item quedó parcial, dejalo pendiente y anotá el progreso parcial en la entrada del DAILY_LOG.
+- Si surgió un blocker que impide completar un item, marcalo en PENDIENTES.md con sufijo `(BLOQUEADO: razón)` y mencionalo en el historial.
+- Si un commit no llegó a hacerse (porque el usuario no dio OK), anotalo como "(pendiente de OK del usuario)".
 
-### Cuándo NO actualizar el log
-
-- Sesiones puramente de diagnóstico/lectura sin modificar código →
-  no requiere entrada en historial
-- Tareas triviales de < 5 minutos sin cambios persistentes → no
-  requiere entrada
-- Si el usuario explícitamente dice "no actualices el log" → respetar
+## Cuándo NO actualizar la bitácora
+- Sesiones puramente de diagnóstico/lectura sin modificar código → no requiere entrada en DAILY_LOG.
+- Tareas triviales de < 5 minutos sin cambios persistentes → no requiere entrada.
+- Si el usuario explícitamente dice "no actualices el log" → respetar.
 
 ---
+
+# Assets Golden Next — Instrucciones para Claude Code
 
 @AGENTS.md
