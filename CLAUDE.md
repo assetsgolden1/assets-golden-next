@@ -1,3 +1,23 @@
+# ⚠️ PROTOCOLO DE SESIÓN — LEER PRIMERO (obligatorio para cualquier agente IA)
+
+Este proyecto mantiene su contexto en 3 archivos. Su uso NO es opcional:
+
+1. **ESTADO.md** — Foto del estado ACTUAL del proyecto. Leelo al ARRANCAR para tener contexto inmediato. Es la verdad vigente (no el historial).
+2. **PENDIENTES.md** — Backlog vivo de tareas. Leelo al ARRANCAR para saber qué falta. Es la fuente de qué hacer a continuación.
+3. **DAILY_LOG.md** — Historial cronológico. Solo se le AGREGA; nunca se reescribe lo viejo.
+
+## Al ARRANCAR cualquier sesión:
+- Leer ESTADO.md y PENDIENTES.md ANTES de actuar. Con eso tenés el contexto vigente y el backlog.
+- DAILY_LOG.md solo si necesitás reconstruir cómo se llegó a algo.
+
+## Al CERRAR cualquier sesión en la que se hizo un cambio:
+1. **DAILY_LOG.md** → agregar una entrada nueva arriba (fecha + qué se hizo + commits).
+2. **PENDIENTES.md** → tachar lo resuelto (mover a "Hecho reciente" o borrar) y agregar lo nuevo que haya surgido.
+3. **ESTADO.md** → actualizar números/estado si cambiaron (catálogo, deploys, features).
+Mantener estos 3 archivos al día es parte de "terminar la tarea". Una tarea sin sus .md actualizados NO está cerrada.
+
+---
+
 # Assets Golden Next — Instrucciones para Claude Code
 
 ## 🔄 DAILY_LOG.md — Lectura obligatoria al inicio y cierre
