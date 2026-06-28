@@ -5,23 +5,17 @@
 > - Al cerrar una sesión: tachar/quitar lo resuelto y agregar lo nuevo que surja.
 > - El detalle de CÓMO se hizo cada cosa va en DAILY_LOG.md, no acá.
 > - El estado actual del proyecto (números, stack) va en ESTADO.md, no acá.
-> Última actualización: 26/06/2026
+> Última actualización: 29/06/2026
 
 Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
 
 ## 0. Lo más urgente
 1. [Ivan·S] Activar/confirmar Search Console + reenviar sitemap + pedir recrawl. Hoy Google muestra el title viejo ("lujo") porque no recrawleó; además desbloquea medición.
-2. [CC·S] Limpiar llms.txt (lujo→exclusivas + quitar "Partner de Nest Seekers"). Es lo que leen ChatGPT/Claude/Perplexity.
-3. [CC·S] H1 del home en español (hoy "International Real Estate Consulting").
-4. [CC+Atilio·M] Banner de cookies + gatear GA4/Meta Pixel (GDPR) antes de escalar ads.
-5. [CC·S] /destinos/* al sitemap.
+2. [CC+Atilio·M] Banner de cookies + gatear GA4/Meta Pixel (GDPR) antes de escalar ads.
 
 ## 1. SEO / Posicionamiento
 - [Ivan·S] GSC: verificar propiedad activa, reenviar sitemap, recrawl. (El meta-tag presente ≠ verificada).
-- [CC·S] Limpiar llms.txt. Verificado en vivo 26/06: dice "Inmobiliaria de Lujo Internacional", "propiedades de lujo" y "Partner oficial de Nest Seekers International". Fósil de marca vieja.
-- [CC·S] H1 home ES con keyword; dejar tagline EN como subtítulo; en /en mantener H1 inglés.
-- [CC·S] /destinos/espana y /destinos/[país] al sitemap.ts.
 - [Claude+CC·M] Verificar si el listado /blog es client-side; si lo es, pasarlo a SSR (enlazado interno).
 - [CC·M] Home sin caché (no-store → ISR revalidate).
 - [CC·M] Títulos de ficha enriquecidos: {tipología} en {ciudad}, {provincia} · {hab} hab · desde {precio}.
@@ -62,6 +56,8 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 ## 7. Higiene / deuda técnica baja
 - ~20 props Cataluña/Madrid mal marcadas habihub (el sync ya las protege; rastrear origen antes de reetiquetar).
 - ~750 slugs habihub desincronizados (latente).
+- [CC·S] HeroImageCarousel: los 2 CTAs usan `<a href>` (no `<Link>` de @/i18n/navigation) → no son locale-aware (en /en apuntan a la ruta ES) y disparan lint `no-html-link-for-pages`. Pre-existente; baja prioridad.
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 29/06: combo SEO (46e0174) — H1 del home ES localizado vía next-intl (ES: "Inmobiliaria internacional de propiedades exclusivas", /en mantiene "International Real Estate Consulting" como H1 y queda de tagline en ES); llms.txt limpio (lujo→exclusivas, sin "Partner de Nest Seekers"); `/destinos/[país]` (incl. espana) sumados a sitemap.ts.
 - 24/06: carrusel destinos (67561b4), dedupe fotos galería (a7d6622), rebranding lujo→exclusivas en marca/editoriales/DB (df727dc, 5d622bb), 3 posts nuevos de blog bilingües publicados, fix compresión de imágenes en upload (0a12406).

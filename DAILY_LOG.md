@@ -67,6 +67,25 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-29 — [SEO-COMBO] H1 home ES + limpieza llms.txt + destinos al sitemap
+
+**Contexto:** El usuario pidió avanzar con los pendientes. Se eligió el combo SEO de 3 toques de PENDIENTES (#0.2/#0.3/#0.5): no dependen de terceros y mejoran lo que leen Google/ChatGPT/Claude hoy.
+
+**Trabajo hecho:**
+- **llms.txt** rebrandeado: "Inmobiliaria de Lujo Internacional" → "Inmobiliaria Internacional de Propiedades Exclusivas"; "propiedades de lujo" → "exclusivas" (4 ocurrencias: H1, /propiedades, /destinos/espana, especialidades); eliminada la frase "Partner oficial de Nest Seekers International" (marca vieja).
+- **H1 del home localizado** vía next-intl. `HeroImageCarousel` pasó de copy hardcodeado (H1 inglés para ambos idiomas) a recibir props (`tagline`, `title`, `subtitle`, `ctaValuation`, `ctaProperties`). Claves nuevas en namespace `Home` de `messages/es.json` y `en.json`. ES: H1 = "Inmobiliaria internacional de propiedades exclusivas" + tagline "International Real Estate Consulting" como eyebrow. EN: H1 = "International Real Estate Consulting" (tagline vacío → no se renderiza). CTAs y subtítulo también traducidos.
+- **sitemap.ts**: se agregó `getAllDestinationSlugs()` al `Promise.all` y un bloque `destinationUrls` que emite `/destinos/[país]` (con `espana` forzado + dedupe vía Set), insertado antes de propertyUrls.
+
+**Archivos tocados (MODIFIED):** public/llms.txt · src/components/HeroImageCarousel.tsx · src/app/[locale]/(public)/page.tsx · src/app/sitemap.ts · messages/es.json · messages/en.json · PENDIENTES.md · ESTADO.md · DAILY_LOG.md
+
+**Verificación:** `tsc --noEmit` → EXIT 0. Lint en los 3 archivos fuente: 12 errores `no-html-link-for-pages`, TODOS pre-existentes (los `<a>` de los CTAs del hero; `git diff` confirma que no agregué ningún `<a>`). Next 16.2.6 no corre ESLint en `next build`, por eso producción ya los tolera. NO se corrió `next build` completo (requiere env/red de Supabase) — apoyado en typecheck + que el cambio de sitemap espeja el patrón existente de propertySlugs.
+
+**Commits:** `46e0174` (seo: H1 home ES localizado, limpieza llms.txt y destinos al sitemap) + commit de los .md de cierre.
+
+**Próximo paso sugerido:** Validar en prod /es y /en que el H1 cambie por idioma y que `/sitemap.xml` liste los `/destinos/*`. Iván: reenviar sitemap en GSC + recrawl. Luego seguir con el barrido de coherencia de marca (residuos "lujo"/"Nest Seekers" en otros estáticos/metadata) y el banner de cookies GDPR. Follow-up menor anotado: pasar los CTAs del hero a `<Link>` locale-aware.
+
+---
+
 ### 2026-06-28 — [SYNC-DUAL-FORM] El sync lee DOS formularios de leads (multi-form)
 
 **Contexto:** Se creó un formulario de leads nuevo en Meta — `2055038041784255` ("Marbella-HigherIntent-EN-v1") — además del viejo `1495878108643736` ("Marbella-NewBuild-EN-v1"). El sync leía un solo form (env `META_LEADS_FORM_ID` con fallback hardcodeado al viejo), así que los leads del form nuevo nunca caían en el Sheet/CRM.

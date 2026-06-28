@@ -4,7 +4,7 @@
 > - Esta es la foto del estado VIGENTE. Leerla al arrancar para tener contexto.
 > - Se SOBRESCRIBE cuando algo cambia (no se acumula como un diario).
 > - El historial va en DAILY_LOG.md; el backlog en PENDIENTES.md.
-> Última actualización: 26/06/2026
+> Última actualización: 29/06/2026
 
 ## Qué es
 Web inmobiliaria internacional bilingüe (ES/EN), Next.js 15 App Router SSR sobre Vercel + Supabase Pro. Cliente: Atilio Montironi (+ socio Joan). Proveedor: IBott (Ivan). Marca: "Inmobiliaria Internacional de Propiedades Exclusivas".
@@ -29,9 +29,10 @@ Next.js 15 / React 19 / TypeScript · Tailwind v4 (config en @theme de globals.c
 - Admin: Atilio + socio Joan (mismo nivel). Agentes: 3 activos, acceso solo a /portal.
 - Portal de agentes con PDF white-label.
 
-## SEO — estado real (26/06)
+## SEO — estado real (29/06)
 - Bases técnicas: muy buenas (auditoría CC 83/100; técnico 92, schema 95).
-- Posicionamiento real: incipiente. Google indexa parcialmente (esencialmente la home), muestra todavía contenido viejo ("lujo"), no rankea por su categoría. GSC verificación/recrawl PENDIENTE. Horizonte 6–12 meses.
+- Posicionamiento real: incipiente. Google indexa parcialmente (esencialmente la home) y aún cachea el title viejo ("lujo") hasta recrawl. GSC verificación/recrawl PENDIENTE. Horizonte 6–12 meses.
+- Coherencia de marca: llms.txt ya rebrandeado (exclusivas, sin Nest Seekers) y H1 del home ES con keyword. El sitemap incluye `/destinos/[país]`. Falta el barrido de estáticos/metadata por residuos "lujo".
 
 ## Reglas críticas (no romper)
 - Leads: solo APPEND, nunca borrar/sobrescribir.
