@@ -35,6 +35,8 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [Atilio+CC·S] Criterios de /inversiones (definición de Atilio) + verificar filtro.
 - [Claude·S] Verificar sección NOSOTROS no truncada (line-clamp).
 - [CC·S] Bug created_time en meta_leads_synced (guarda synced_at, no timestamp de Meta).
+- [CC·S] upload-image: mensaje específico al usuario cuando pega el rate-limit (429) subiendo muchas fotos seguidas (hoy esa foto se omite con aviso genérico).
+- [Ivan+CC·M] Revisar imágenes huérfanas en storage de intentos de carga fallidos previos (fotos subidas antes de que abortara la creación).
 
 ## 4. Infraestructura / Seguridad / Datos
 - [Ivan·S] Dropear properties_backup_20260429 cuando el catálogo esté validado.
@@ -56,6 +58,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [CC·S] HeroImageCarousel: los 2 CTAs usan `<a href>` (no `<Link>` de @/i18n/navigation) → no son locale-aware (en /en apuntan a la ruta ES) y disparan lint `no-html-link-for-pages`. Pre-existente; baja prioridad.
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 29/06: bugfix carga propiedades (8753646) — una foto vacía (0 bytes, típico foto de iCloud no descargada) abortaba TODA la propiedad ("No file provided"). Ahora los forms de crear/editar omiten la foto mala y guardan el resto, con aviso. Diagnóstico confirmado por DB (la propiedad fallida nunca se escribía).
 - 29/06: GDPR cookies (ee3a38f) — GA4 ahora se carga SOLO tras consentimiento "analytics" (antes cargaba siempre); eliminado el banner de cookies legacy duplicado (CookieBanner.tsx). El Pixel ya estaba gateado.
 - 29/06: GSC (sin commit, vía navegador, cuenta assetsgolden1@gmail.com de Atilio) — descubierto que la propiedad estaba bajo la cuenta de Atilio y el sitemap NUNCA se había enviado. Enviado `sitemap.xml` (verificado HTTP 200 / XML válido) + solicitada re-indexación de la home.
 - 29/06: Supabase leaked-password protection ACTIVADO (vía navegador; estaba dentro del provider Email, no en sección suelta). Advisor ya no lo marca.

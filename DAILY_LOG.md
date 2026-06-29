@@ -67,6 +67,28 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-29 — [BUGFIX] Carga de propiedades: una foto vacía abortaba toda la propiedad
+
+**Contexto:** Atilio reportó que al cargar propiedades, tras crear 4-5 una fallaba con error "No file provided". Captura compartida confirma el error en el form de nueva propiedad.
+
+**Diagnóstico (con datos de DB vía Supabase MCP):**
+- El error "No file provided" sale de `api/admin/upload-image/route.ts:37` cuando una foto llega con `size === 0`.
+- El form de creación subía fotos una por una y, ante el primer fallo, hacía `return` ANTES de crear la propiedad → la propiedad fallida **no quedaba en la DB** (por eso "no se podía cargar"). Mismo bug en el form de edición (abortaba el guardado).
+- Causa de la foto en 0 bytes: archivo vacío del lado del navegador — típicamente una **foto de iCloud no descargada** (placeholder 0 bytes) o un archivo corrupto. No es problema de servidor ni Supabase.
+- Confirmado en DB: las creaciones manuales (`external_source='manual'`) que sí entraron están todas OK con sus fotos; la fallida simplemente no existe (nunca se escribió).
+
+**Trabajo hecho (commit `8753646`):**
+- `nueva-propiedad/page.tsx` y `propiedades/[id]/edit/page.tsx`: el loop de subida ahora **omite** la foto vacía/corrupta/rechazada (guard `size===0` + try/catch + chequeo de `data.url`) en vez de abortar. La propiedad se crea/guarda con las fotos buenas.
+- Aviso amarillo no-bloqueante: "Se omitieron N foto(s)… se creó con las restantes", con redirect demorado (6s) para que se lea.
+
+**Archivos tocados:** MODIFIED src/app/admin/nueva-propiedad/page.tsx · src/app/admin/propiedades/[id]/edit/page.tsx · PENDIENTES.md · DAILY_LOG.md
+
+**Verificación:** `tsc --noEmit` EXIT 0. Lint: errores pre-existentes (set-state-in-effect L108 y `<a>` L629 en el edit), ninguno introducido por este cambio.
+
+**Próximo paso sugerido:** Avisar a Atilio que reintente la propiedad que falló (ahora no se va a abortar; las fotos malas se saltean con aviso). Opcional: revisar imágenes huérfanas en storage de intentos fallidos previos; y evaluar un mensaje específico para el rate-limit de uploads (429) si sube muchísimas fotos seguidas.
+
+---
+
 ### 2026-06-29 — [OPS+GDPR] Supabase leaked-password, GSC sitemap/recrawl y gateo GDPR de GA4
 
 **Contexto:** Continuación de la misma jornada. El usuario pidió completar pendientes operativos (Supabase, GSC) y cerrar el tema de cookies. Tareas hechas vía navegador (extensión Claude-in-Chrome) + un commit de código.
