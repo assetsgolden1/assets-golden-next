@@ -116,7 +116,7 @@ export async function GET(req: NextRequest) {
       synced.push({
         meta_lead_id: parsed.meta_lead_id,
         email: parsed.email,
-        created_time: new Date().toISOString(),
+        created_time: parsed.created_time, // timestamp REAL del lead en Meta (no el del sync)
         form_id: formId, // form_id REAL del lead, no el hardcodeado
       })
 
