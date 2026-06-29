@@ -304,7 +304,9 @@ export async function getPropertyBySlug(slug: string) {
 }
 
 export async function getFeaturedProperties() {
-  const supabase = await createClient()
+  // Cliente estático (sin cookies): datos públicos. Permite que las páginas que
+  // la consumen (home, etc.) cacheen con ISR en vez de renderizar dinámico.
+  const supabase = createStaticClient()
   const { data, error } = await supabase
     .from('properties')
     .select('*')
@@ -398,7 +400,8 @@ export async function getRelatedPartners(currentId: string, country: string | nu
 }
 
 export async function getTeamMembers() {
-  const supabase = await createClient()
+  // Cliente estático (sin cookies): equipo público → permite ISR.
+  const supabase = createStaticClient()
   const { data, error } = await supabase
     .from('team_members')
     .select('*')
@@ -481,7 +484,8 @@ export async function getDestinationBySlug(slug: string) {
 }
 
 export async function getDestinations() {
-  const supabase = await createClient()
+  // Cliente estático (sin cookies): destinos públicos → permite ISR.
+  const supabase = createStaticClient()
   const { data, error } = await supabase
     .from('country_destinations')
     .select('*')
