@@ -67,6 +67,24 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-29 — [BUGFIX] meta_leads_synced.created_time = timestamp real de Meta
+
+**Contexto:** Ivan pidió arreglar el bug anotado: `meta_leads_synced.created_time` guardaba la hora del sync en vez de la del lead.
+
+**Diagnóstico:** En `sync-meta/route.ts:119` y `sync-meta/manual/route.ts:111`, el objeto que va a `recordSyncedLeads` ponía `created_time: new Date().toISOString()` (hora del sync). El valor correcto, `parsed.created_time` (timestamp real del lead en Meta, que el parser ya extrae), estaba disponible en el loop. Nota: la tabla `meta_leads` (base de la secuencia de nurture) SÍ guardaba el valor correcto vía `upsertMetaLead`, así que la secuencia (umbrales por días desde created_time) NUNCA estuvo afectada — el bug era solo en la tabla de tracking/dedup `meta_leads_synced` (informativo/reporting; el dedup usa meta_lead_id + email, no created_time).
+
+**Trabajo hecho (commit `aad0990`):**
+- Cambiado `created_time: new Date().toISOString()` → `created_time: parsed.created_time` en los 2 routes de sync.
+- **Backfill histórico (vía MCP):** UPDATE de 12 filas de `meta_leads_synced` tomando el `created_time` correcto de `meta_leads` (join por meta_lead_id, solo donde diferían). Las otras 10 filas son leads viejos sin registro en `meta_leads` → su timestamp real se perdió, quedan como estaban.
+
+**Archivos tocados:** MODIFIED src/app/api/leads/sync-meta/route.ts · src/app/api/leads/sync-meta/manual/route.ts · PENDIENTES.md · DAILY_LOG.md — DB: UPDATE 12 filas meta_leads_synced.
+
+**Verificación:** `tsc --noEmit` EXIT 0. Backfill confirmado (12 filas). `parsed.created_time` es string no-null (FIELDS de Meta lo incluye siempre).
+
+**Próximo paso sugerido:** Quick-wins agotados. Prioridad cercana: carga Miami/Cervera. Grande: ISR home (con build), /blog a SSR. Contenido (Claude.ai): posts EN restantes.
+
+---
+
 ### 2026-06-29 — [QUICK-WINS] Extender optimización de imágenes + rate-limit 429 + NOSOTROS
 
 **Contexto:** Ivan pidió avanzar con los quick-wins de alto valor. (Miami/Cervera marcado como prioridad CERCANA, no ya.)
