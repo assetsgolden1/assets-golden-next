@@ -24,12 +24,10 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 
 ## 3. Web / Técnico
 - [Ivan+Claude·M] PDF del portal end-to-end con agente real en prod (nunca validado). Riesgo: Chromium clavado v143.0.4.
-- [CC·S] Helper compressImage a destinos/[slug]/edit y TeamManager (baja prioridad).
 - [Atilio+CC·S] Criterios de /inversiones (definición de Atilio) + verificar filtro.
-- [Ivan+CC·M] Revisar imágenes huérfanas en storage de intentos de carga fallidos previos (fotos subidas antes de que abortara la creación).
+- [Ivan·decide] Imágenes huérfanas en `property-images`: ANALIZADO 29/06 → **177 archivos = 437 MB** sin referencia en la DB (mayoría junio, del bug de uploads fallidos). El resto de buckets, insignificante. Listo para borrar con OK de Ivan (no borrado aún).
 
 ## 4. Infraestructura / Seguridad / Datos
-- [Ivan+CC·M] Limpiar bucket de imágenes huérfanas (post-upgrade).
 - (Aceptados, sin acción: buckets con listing, get_property_filters, pg_trgm, leads_public_insert.)
 
 ## 5. GDPR / Legal
@@ -39,11 +37,11 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [Ivan+Claude·M] **PRIORIDAD CERCANA (Ivan, 29/06): hacer pronto, no ya.** Carga Cervera/Miami EEUU (cerverabrokerportal.com): directa vs manual.
 
 ## 7. Higiene / deuda técnica baja
-- ~20 props Cataluña/Madrid mal marcadas habihub (el sync ya las protege; rastrear origen antes de reetiquetar).
+- ~21 props Cataluña/Madrid/Tarragona con `external_source='habihub'` mal puesto. IDENTIFICADO 29/06: son listados REALES (Sitges, Barcelona, villas, locales) con fotos en NUESTRO Supabase, `external_id` null/UUID (no numérico) → fuera del scope del sync (protegidas). Origen: import masivo del 26/12/2025 + scraper. Es solo el label mal puesto (cosmético). Ivan quiere saber qué son antes de re-etiquetar — ya respondido; pendiente su decisión de re-etiquetar a 'manual'/null (no urgente, no rompe nada).
 - ~750 slugs habihub desincronizados (latente).
-- [CC·S] HeroImageCarousel: los 2 CTAs usan `<a href>` (no `<Link>` de @/i18n/navigation) → no son locale-aware (en /en apuntan a la ruta ES) y disparan lint `no-html-link-for-pages`. Pre-existente; baja prioridad.
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 29/06: quick-wins finales (8950e88) — (1) CTAs del hero a `<Link>` locale-aware (antes `<a>`, no locale-aware + lint); (2) `compressImage` en TeamManager y destinos/[slug]/edit (consistencia con crear/editar propiedad). + ANÁLISIS (sin tocar): 177 imágenes huérfanas (437 MB) en property-images, listo para borrar con OK; ~21 props "mal marcadas habihub" identificadas (listados reales BCN/Cataluña/Madrid, label external_source mal, fuera del scope del sync).
 - 29/06: ISR completo (577f662) — migradas getPropertyBySlug/getBlogPosts/getBlogPostsByCategory/getBlogPostBySlug al cliente estático + setRequestLocale en destinos. Resultado (build): 11→21 rutas estáticas. GANANCIA GRANDE: `propiedades/[slug]` (~2.600 fichas) ahora SSG, + todo el blog (listado/posts/5 categorías), consejos, noticias, destinos listado. Las 8 ƒ restantes usan searchParams (inherentemente dinámicas). admin/portal intactos.
 - 29/06: rediseño tarjetas de destino (435ab3b) — el texto pasó de centrado-ilegible (sobre la parte clara de la foto) a anclado abajo sobre gradiente fuerte: conteo en dorado (eyebrow) + país en Playfair + tagline muteada + "Ver destino →" en hover. Verificado en prod. Auto-creación de tarjetas de país corroborada (create-property crea country_destinations con la foto de la propiedad — OK).
 - 29/06: H1 home ES (a3a714d) — cambiado de "Inmobiliaria internacional de propiedades exclusivas" (largo) a "Propiedades exclusivas, sin fronteras" (elección de Iván). /en sin cambios.

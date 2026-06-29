@@ -67,6 +67,26 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-29 — [QUICK-WINS-2] Hero CTAs a Link + compressImage + análisis huérfanas/mal-marcadas
+
+**Contexto:** Ivan pidió hacer todos los quick-wins de CC. Las props "mal marcadas": NO borrar, primero identificar.
+
+**Trabajo hecho (commit `8950e88`):**
+- **CTAs del hero a `<Link>` locale-aware:** los 2 botones de HeroImageCarousel usaban `<a href>` → ahora `<Link>` de `@/i18n/navigation` (en /en respetan el prefijo de locale + limpia el lint `no-html-link-for-pages`).
+- **`compressImage` en TeamManager y `destinos/[slug]/edit`:** comprimían/subían el archivo crudo → ahora pasan por `compressImage` antes del upload (consistente con crear/editar propiedad).
+
+**Análisis (read-only, NADA borrado/modificado):**
+- **Imágenes huérfanas:** en `property-images` hay **177 archivos = 437 MB** sin referencia en la DB (de 1.122 / 3,2 GB). Distribución: jun 133 (376 MB, del bug de uploads fallidos), may 34, abr 10. Resto de buckets insignificante (destination 35, agent-logos 4, hero 5, team 1). Comparé objetos de `storage.objects` vs URLs en `properties.image_url`+`gallery_urls` (extrayendo el path tras `/property-images/`; los URLs en DB son `/object/public/` sin query, así que el transform de render no genera falsos huérfanos). LISTO para borrar con OK de Ivan.
+- **~21 props "mal marcadas habihub" (Cataluña/Madrid/Tarragona):** son listados REALES (Sitges, Barcelona, villas, locales) con fotos en NUESTRO Supabase (no medianewbuild) y `external_id` null/UUID (no numérico). El sync scope = habihub + external_id NUMÉRICO → quedan fuera → protegidas. Origen: import masivo del 26/12/2025 + scraper. Solo el label `external_source` está mal (cosmético). Pendiente: decisión de Ivan de re-etiquetar (no urgente).
+
+**Archivos tocados:** MODIFIED src/components/HeroImageCarousel.tsx · src/components/admin/TeamManager.tsx · src/app/admin/destinos/[slug]/edit/page.tsx · PENDIENTES.md · DAILY_LOG.md.
+
+**Verificación:** `tsc --noEmit` EXIT 0. Lint del hero ya sin `no-html-link-for-pages`; el resto de lint son pre-existentes (img de TeamManager, `<a>` admin en destinos/edit).
+
+**Próximo paso sugerido:** CC-only agotado salvo decisiones de Ivan (borrar 437 MB huérfanos, re-etiquetar las 21). Prioridad cercana: Miami/Cervera.
+
+---
+
 ### 2026-06-29 — [ISR-2] Fichas de propiedad (~2.600 SSG) + blog + destinos estáticas
 
 **Contexto:** Ivan pidió "ISR completo" — extender lo de la entrada ISR-1 al resto de páginas.
