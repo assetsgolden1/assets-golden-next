@@ -7,6 +7,7 @@ import { getTranslations } from "next-intl/server";
 import { translatePropertyType, translatePropertyTitle } from "@/lib/propertyTypes";
 import { formatPrice } from "@/lib/utils/format";
 import { toSentenceCase } from "@/lib/utils/normalizeText";
+import { optimizedImage } from "@/lib/utils/optimizedImage";
 
 interface PropertyCardProps {
   id: string;
@@ -57,7 +58,7 @@ export default async function PropertyCard({
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {image_url ? (
           <Image
-            src={image_url}
+            src={optimizedImage(image_url, { width: 640, quality: 65 })}
             alt={translatePropertyTitle(title, locale)}
             fill
             unoptimized
