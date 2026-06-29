@@ -16,8 +16,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 
 ## 1. SEO / Posicionamiento
 - [Claude+CC·M] Verificar si el listado /blog es client-side; si lo es, pasarlo a SSR (enlazado interno).
-- [CC·M] Home sin caché (no-store → ISR revalidate).
-- [Claude·S] Verificar areaServed JSON-LD en EN (estaba en español y sin Rep. Dominicana; auditoría dice 12 países: confirmar).
+- [CC·M] Home/ISR: el verdadero bloqueo del caché es next-intl SIN `setRequestLocale` (v4.13) + el `getLocale()` del root layout → fuerzan render dinámico app-wide. Prereq ya hecho (lecturas públicas con cliente estático, 5ea94ce). Falta: setRequestLocale en root/[locale] layout + páginas, manejar el getLocale() del root, y VERIFICAR con `next build` qué rutas quedan estáticas. Riesgo i18n medio — hacer con build.
 - [Atilio+Ivan·L] Autoridad/backlinks: menciones, prensa, portales, partners. Lo que falta vs competidores.
 
 ## 2. Blog / Contenido
@@ -51,6 +50,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [CC·S] HeroImageCarousel: los 2 CTAs usan `<a href>` (no `<Link>` de @/i18n/navigation) → no son locale-aware (en /en apuntan a la ruta ES) y disparan lint `no-html-link-for-pages`. Pre-existente; baja prioridad.
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 29/06: schema EN (b22341b) — WebSite JSON-LD: inLanguage/description/catálogo ahora locale-aware (antes EN declaraba es-ES). + verificado que areaServed ya tenía los 12 países traducidos a EN (pendiente que estaba resuelto). + prereq ISR (5ea94ce): featured/team/destinos con cliente estático sin cookies.
 - 29/06: FAQ destinos (b546701) — FAQPage (schema + sección visible) en destino por país y en España, data-driven (conteo, descripción editorial, datos de mercado), bilingüe. El conteo solo se incluye en la vista sin filtros (schema estable). Cierra el pendiente de FAQPage (servicios + destinos completos).
 - 29/06: FAQ servicios (dee4743) — sección de FAQ visible (6 preguntas) + schema FAQPage JSON-LD en /servicios. Respuestas basadas solo en datos reales de la página. Falta replicar en destinos.
 - 29/06: dropeada la tabla de respaldo `properties_backup_20260429` (1.757 filas, snapshot 29/04) con OK de Ivan. Catálogo vivo intacto (2.696). También limpia el advisor RLS que la marcaba.

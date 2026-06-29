@@ -67,6 +67,23 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-29 — [SEO] areaServed verificado + schema EN locale-aware + prereq ISR
+
+**Contexto:** Continuación SEO. Atacar areaServed JSON-LD EN y Home-sin-caché.
+
+**Trabajo hecho:**
+- **areaServed JSON-LD (pendiente):** VERIFICADO ya resuelto. `GlobalSchemaOrg` tiene los 12 países (incl. República Dominicana) y usa `translateCountry(country, locale)`; confirmado en `translateGeography.ts` que los 12 están en COUNTRY_MAP con su nombre EN → en /en salen en inglés. Sin cambios.
+- **Bug de calidad EN en el mismo schema (commit `b22341b`):** el bloque `WebSite` declaraba `inLanguage: 'es-ES'`, `description` en ES y el nombre del catálogo en ES **también en /en**. Ahora son locale-aware (en-GB / EN cuando locale==='en').
+- **Home sin caché → ISR (commit `5ea94ce`, PARCIAL):** investigado a fondo. La home ya tiene `revalidate=3600`, pero `getFeaturedProperties`/`getTeamMembers`/`getDestinations` usaban `createClient()` (con cookies) → fuerzan dinámico. Cambiadas a `createStaticClient()` (datos públicos; todos sus callers son páginas públicas con revalidate). **PERO el bloqueo real es next-intl:** sin `setRequestLocale` (v4.13) y con el `getLocale()` del root layout, las páginas `[locale]` se renderizan dinámicas igual. Eso es un refactor i18n app-wide que requiere verificación con `next build` — NO se hizo en esta sesión para no shippear a ciegas. El cambio Supabase queda como prerrequisito correcto.
+
+**Archivos tocados:** MODIFIED src/components/seo/GlobalSchemaOrg.tsx · src/lib/supabase/queries.ts · PENDIENTES.md · DAILY_LOG.md
+
+**Verificación:** `tsc --noEmit` EXIT 0. Lint: errores `any` pre-existentes en queries.ts (L118/L150), no introducidos por este cambio.
+
+**Próximo paso sugerido:** Para cerrar ISR: agregar `setRequestLocale(locale)` en layouts/páginas, resolver el `getLocale()` del root layout, y correr `next build` para confirmar qué rutas pasan a estáticas/ISR. Es la tarea correcta para hacer CON build a mano.
+
+---
+
 ### 2026-06-29 — [SEO] FAQPage en destinos (por país + España)
 
 **Contexto:** Continuación de SEO. Cerrar el pendiente de FAQPage (faltaban destinos).
