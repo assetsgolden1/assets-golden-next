@@ -113,9 +113,47 @@ const ADDITIONAL = [
   },
 ]
 
+const FAQS = [
+  {
+    q: '¿Qué tipo de propiedades comercializa Assets Golden?',
+    a: 'Trabajamos pisos y apartamentos, locales comerciales, edificios, solares y terrenos, hoteles y establecimientos, y fincas rústicas. Cada operación incluye due diligence legal completo.',
+  },
+  {
+    q: '¿En qué países opera Assets Golden?',
+    a: 'Estamos presentes en 12 países a través de nuestra red de partners: España, México, Indonesia (Bali), Emiratos Árabes Unidos (Dubái), Argentina, Estados Unidos, Costa Rica, Reino Unido, Ecuador, Grecia y Paraguay. Abrimos nuevos mercados de forma permanente.',
+  },
+  {
+    q: '¿Trabajan con compradores e inversores extranjeros?',
+    a: 'Sí. Ofrecemos asesoramiento internacional integral —aspectos fiscales, legales y prácticos— para invertir en España y otros mercados europeos y americanos. Atendemos en español e inglés.',
+  },
+  {
+    q: '¿Qué es una propiedad off-market y por qué importa?',
+    a: 'Son propiedades que no se publican en los portales habituales. A través de nuestra red exclusiva accedemos a estos activos de forma discreta, a menudo antes de que lleguen al mercado abierto.',
+  },
+  {
+    q: '¿Ofrecen due diligence y acompañamiento legal?',
+    a: 'Sí. Realizamos un due diligence completo en cada operación y acompañamos en la negociación, la financiación y la gestión postventa.',
+  },
+  {
+    q: '¿Cómo solicito una consulta?',
+    a: 'Puede contarnos su proyecto desde la página de contacto y le asignaremos el especialista adecuado. La consulta inicial es gratuita y sin compromiso.',
+  },
+]
+
 export default function ServiciosPage() {
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQS.map(({ q, a }) => ({
+      '@type': 'Question',
+      name: q,
+      acceptedAnswer: { '@type': 'Answer', text: a },
+    })),
+  }
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* Hero */}
       <section className="gradient-navy py-20">
         <div className="container-luxury text-center">
@@ -191,6 +229,27 @@ export default function ServiciosPage() {
             <Link href="/partners" className={buttonVariants({ variant: 'goldOutline', size: 'sm' })}>
               Conocer a nuestros partners
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="section-padding bg-background">
+        <div className="container-luxury max-w-3xl">
+          <div className="mb-10 text-center">
+            <p className="text-xs tracking-[0.25em] text-gold uppercase mb-3">Preguntas frecuentes</p>
+            <h2 className="font-display text-3xl font-semibold">Sobre nuestros servicios</h2>
+          </div>
+          <div className="space-y-3">
+            {FAQS.map(({ q, a }) => (
+              <details key={q} className="group rounded-xl border border-border bg-card px-5 py-4">
+                <summary className="flex cursor-pointer items-center justify-between gap-4 font-medium text-foreground list-none">
+                  {q}
+                  <span className="text-gold text-xl leading-none transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{a}</p>
+              </details>
+            ))}
           </div>
         </div>
       </section>
