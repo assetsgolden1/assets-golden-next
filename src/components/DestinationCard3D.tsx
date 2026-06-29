@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { ArrowRight } from 'lucide-react'
 import type { CountryDestination } from '@/types'
 import { translateCountry } from '@/lib/utils/translateGeography'
 import { optimizedImage } from '@/lib/utils/optimizedImage'
@@ -71,19 +72,28 @@ export default function DestinationCard3D({ dest, count, locale }: Props) {
         }}
       />
 
-      <div className="overlay-dark" />
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-        <span className="font-display text-lg font-semibold text-white group-hover:text-gold transition-colors">
-          {translateCountry(dest.country_name, locale)}
-        </span>
+      {/* Gradiente: fuerte abajo (donde va el texto) → legibilidad garantizada */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+
+      {/* Contenido anclado abajo, alineado a la izquierda */}
+      <div className="absolute inset-x-0 bottom-0 flex flex-col items-start p-4">
         {count > 0 && (
-          <span className="mt-1 text-xs text-white/60">
+          <span className="mb-1 text-[11px] font-medium uppercase tracking-[0.12em] text-gold">
             {count} {count === 1 ? 'propiedad' : 'propiedades'}
           </span>
         )}
+        <h3 className="font-display text-xl font-semibold leading-tight text-white">
+          {translateCountry(dest.country_name, locale)}
+        </h3>
         {dest.tagline && (
-          <span className="mt-1 text-xs text-white/70 line-clamp-2">{dest.tagline}</span>
+          <span className="mt-1 text-xs leading-snug text-white/75 line-clamp-2">
+            {dest.tagline}
+          </span>
         )}
+        <span className="mt-2 inline-flex translate-y-1 items-center gap-1 text-xs font-medium text-gold opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          {locale === 'en' ? 'View destination' : 'Ver destino'}
+          <ArrowRight className="h-3.5 w-3.5" />
+        </span>
       </div>
     </Link>
   )
