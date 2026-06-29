@@ -67,6 +67,22 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-29 — [DATA-CLEANUP] Re-etiquetado 51 props mal-marcadas + borrado 177 huérfanas (437 MB)
+
+**Contexto:** Ivan dio OK para borrar huérfanas y pidió re-etiquetar las mal-marcadas para que el cron de sync no las toque.
+
+**Trabajo hecho (vía MCP SQL + script one-off; SIN commit de código):**
+- **Re-etiquetado (UPDATE):** verificado el scope real del sync en `sync-habihub/route.ts:542-546` → oculta solo `external_source='habihub'` + `external_id` NUMÉRICO (`/^\d+$/`) + `featured!=true` (nunca borra, solo `hidden_by_sync=true`, reversible). Las mal-marcadas tienen id null/UUID → ya estaban fuera, pero re-etiquetadas a `'manual'` para sacarlas del universo del sync del todo (el sync carga solo `external_source='habihub'`). Universo: de las habihub, 2.589 son feed real (id numérico + foto medianewbuild, NO tocadas); **51** tenían id null/UUID + foto de NUESTRO Supabase → re-etiquetadas a 'manual' (las ~21 BCN/Madrid del pendiente + ~30 más). 3 con id UUID pero foto del feed se DEJARON (ambiguas, riesgo de duplicado si el sync re-asigna id por slug/fingerprint).
+- **Borrado de huérfanas:** script temporal `scripts/_deleteOrphans.ts` (ya borrado) que re-deriva orphans (objetos de property-images no referenciados por `properties.image_url`+`gallery_urls`, guard >1h) con sanity-check (aborta si >300) y borra vía Storage API (`storage.remove`, NO SQL — el SQL no borra el archivo físico). Dry-run primero (orphans=177, coincide con el análisis), luego `--apply`. Resultado verificado: bucket 1.122→**945 objetos**, 3.222→**2.785 MB** (437 MB liberados).
+
+**Archivos tocados:** PENDIENTES.md · DAILY_LOG.md (el script temporal se creó y borró, no quedó en el repo). DB: UPDATE 51 properties.external_source; Storage: -177 objetos.
+
+**Verificación:** scope del sync leído del código; UPDATE returning=51; dry-run=177 == análisis; conteo post-borrado confirmado (945 / 2.785 MB).
+
+**Próximo paso sugerido:** CC-only realmente agotado. Quedan decisiones/cargas de Ivan/Atilio (Miami, GSC monitor, criterios /inversiones) y contenido (Claude.ai).
+
+---
+
 ### 2026-06-29 — [QUICK-WINS-2] Hero CTAs a Link + compressImage + análisis huérfanas/mal-marcadas
 
 **Contexto:** Ivan pidió hacer todos los quick-wins de CC. Las props "mal marcadas": NO borrar, primero identificar.
