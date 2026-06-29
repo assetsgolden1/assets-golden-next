@@ -67,6 +67,24 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-29 — [ISR-2] Fichas de propiedad (~2.600 SSG) + blog + destinos estáticas
+
+**Contexto:** Ivan pidió "ISR completo" — extender lo de la entrada ISR-1 al resto de páginas.
+
+**Trabajo hecho (commit `577f662`):**
+- **Migradas 4 queries al cliente estático** (`createStaticClient`, sin cookies): `getPropertyBySlug`, `getBlogPosts`, `getBlogPostsByCategory`, `getBlogPostBySlug`. Verificado antes que TODOS sus callers son páginas `(public)` (no admin/auth) → seguro (lecturas públicas: published/visible).
+- **`destinos/page.tsx`:** usaba `getLocale()` (fuerza dinámico aunque el layout tenga setRequestLocale) → cambiado a `params` + `setRequestLocale`. (Las páginas que leen locale de `params` quedan estáticas con el setRequestLocale del layout; las que usan `getLocale()` necesitan setRequestLocale propio.)
+- **Resultado (3 builds):** de **11 → 21 rutas `[locale]` estáticas/ISR**. La grande: **`propiedades/[slug]` → SSG (~2.600 fichas prerenderizadas/cacheadas)**. También: blog (listado + posts + 5 categorías), consejos, noticias, destinos listado. Revalidate 1h.
+- **Las 8 que siguen ƒ** son correctas: usan `searchParams` (filtros/paginación) → inherentemente dinámicas (propiedades listado, destinos/[slug], destinos/espana, inversiones, promociones, propiedades/[slug]/[ciudad]).
+
+**Archivos tocados:** MODIFIED src/lib/supabase/queries.ts · src/app/[locale]/(public)/destinos/page.tsx · PENDIENTES.md · DAILY_LOG.md.
+
+**Verificación:** `tsc --noEmit` EXIT 0. Build final EXIT 0, sin errores, route table confirmando 21 estáticas. admin/portal/api intactos (ƒ).
+
+**Próximo paso sugerido:** ISR dado por cerrado (lo cacheable ya está). Validar en prod que una ficha (`propiedades/[slug]`) sirva con X-Vercel-Cache HIT. Prioridad cercana: Miami/Cervera.
+
+---
+
 ### 2026-06-29 — [ISR] Home + 10 páginas públicas ahora estáticas/ISR (verificado con build)
 
 **Contexto:** Ivan pidió avanzar con lo más grande: ISR de la home y /blog a SSR.

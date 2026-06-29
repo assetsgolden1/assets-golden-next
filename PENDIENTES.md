@@ -14,8 +14,8 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 1. [Ivan·S] Monitorear en GSC (cuenta assetsgolden1@gmail.com) que el sitemap pase de "No se ha podido obtener" a "Correcto" y que el title nuevo reemplace al viejo en resultados (días).
 
 ## 1. SEO / Posicionamiento
-- [CC·M] Extender ISR a las páginas que quedaron dinámicas (propiedades, blog, destinos, inversiones, promociones): migrar sus queries (`getProperties`, `getBlogPosts`, `getDestinationBySlug`, `getPropertiesForSpain/Destination`) al cliente estático (sin cookies) + `setRequestLocale` en esas páginas. Verificar con `next build`. (Home + 10 públicas YA son ISR — 81744dd.)
 - [Atilio+Ivan·L] Autoridad/backlinks: menciones, prensa, portales, partners. Lo que falta vs competidores.
+- (ISR cerrado 29/06: 21 rutas públicas estáticas/ISR. Las 8 que siguen ƒ — propiedades listado, destinos/[slug], destinos/espana, inversiones, promociones, propiedades/[slug]/[ciudad] — usan `searchParams` (filtros) → inherentemente dinámicas, no cacheables. Es correcto, no es pendiente.)
 
 ## 2. Blog / Contenido
 - [Claude·L] Fase C blog EN: 7 posts restantes a 1.500–2.000 palabras (van 3 de 10).
@@ -44,6 +44,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [CC·S] HeroImageCarousel: los 2 CTAs usan `<a href>` (no `<Link>` de @/i18n/navigation) → no son locale-aware (en /en apuntan a la ruta ES) y disparan lint `no-html-link-for-pages`. Pre-existente; baja prioridad.
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 29/06: ISR completo (577f662) — migradas getPropertyBySlug/getBlogPosts/getBlogPostsByCategory/getBlogPostBySlug al cliente estático + setRequestLocale en destinos. Resultado (build): 11→21 rutas estáticas. GANANCIA GRANDE: `propiedades/[slug]` (~2.600 fichas) ahora SSG, + todo el blog (listado/posts/5 categorías), consejos, noticias, destinos listado. Las 8 ƒ restantes usan searchParams (inherentemente dinámicas). admin/portal intactos.
 - 29/06: rediseño tarjetas de destino (435ab3b) — el texto pasó de centrado-ilegible (sobre la parte clara de la foto) a anclado abajo sobre gradiente fuerte: conteo en dorado (eyebrow) + país en Playfair + tagline muteada + "Ver destino →" en hover. Verificado en prod. Auto-creación de tarjetas de país corroborada (create-property crea country_destinations con la foto de la propiedad — OK).
 - 29/06: H1 home ES (a3a714d) — cambiado de "Inmobiliaria internacional de propiedades exclusivas" (largo) a "Propiedades exclusivas, sin fronteras" (elección de Iván). /en sin cambios.
 - 29/06: ISR home (81744dd) — la home + 10 páginas públicas (servicios, sobre-nosotros, equipo, partners, vender-tu-piso, colabora, 3 legales) pasaron de ƒ dinámicas a ● estáticas/ISR (revalidate 1h). VERIFICADO con `next build` (antes: 0 estáticas; ahora 11). Causa raíz era next-intl sin setRequestLocale + getLocale() del root. Fix: root lang estático "es" + HtmlLangSync (corrige lang en /en) + setRequestLocale en [locale] layout, (public) layout y home. Las 18 que siguen ƒ usan queries con cookies (propiedades/blog/destinos) — follow-up. /blog ya era SSR (verificado). GDPR legal cerrado (Atilio validó).
