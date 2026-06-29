@@ -11,11 +11,10 @@ Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
 
 ## 0. Lo más urgente
-1. [Ivan·S] Activar/confirmar Search Console + reenviar sitemap + pedir recrawl. Hoy Google muestra el title viejo ("lujo") porque no recrawleó; además desbloquea medición.
-2. [CC+Atilio·M] Banner de cookies + gatear GA4/Meta Pixel (GDPR) antes de escalar ads.
+1. [Atilio·M] Validar/redactar los textos legales de cookies y privacidad. El banner técnico y el gateo GA4/Pixel YA están (29/06); falta solo la revisión legal de los textos para cerrar GDPR antes de escalar ads.
+2. [Ivan·S] Monitorear en GSC (cuenta assetsgolden1@gmail.com) que el sitemap pase de "No se ha podido obtener" a "Correcto" y que el title nuevo reemplace al viejo en resultados (días).
 
 ## 1. SEO / Posicionamiento
-- [Ivan·S] GSC: verificar propiedad activa, reenviar sitemap, recrawl. (El meta-tag presente ≠ verificada).
 - [Claude+CC·M] Verificar si el listado /blog es client-side; si lo es, pasarlo a SSR (enlazado interno).
 - [CC·M] Home sin caché (no-store → ISR revalidate).
 - [CC·M] Títulos de ficha enriquecidos: {tipología} en {ciudad}, {provincia} · {hab} hab · desde {precio}.
@@ -38,14 +37,12 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [CC·S] Bug created_time en meta_leads_synced (guarda synced_at, no timestamp de Meta).
 
 ## 4. Infraestructura / Seguridad / Datos
-- [Ivan·S] Toggle leaked-password protection en Supabase Auth. Confirmado 26/06: sigue DISABLED. 1 clic.
 - [Ivan·S] Dropear properties_backup_20260429 cuando el catálogo esté validado.
 - [Ivan+CC·M] Limpiar bucket de imágenes huérfanas (post-upgrade).
 - (Aceptados, sin acción: buckets con listing, get_property_filters, pg_trgm, leads_public_insert.)
 
 ## 5. GDPR / Legal
-- [CC+Atilio·M] Banner de cookies + gateo de GA4/Meta Pixel.
-- [Atilio·M] Textos legales: privacidad, aviso legal, T&C.
+- [Atilio·M] Textos legales: privacidad, aviso legal, T&C. (El banner de cookies + gateo GA4/Pixel ya están hechos — falta solo validar/redactar los textos.)
 - [Atilio+Ivan] Contrato formal IBott–Atilio sin firmar.
 
 ## 6. Operación / Cliente
@@ -59,5 +56,8 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [CC·S] HeroImageCarousel: los 2 CTAs usan `<a href>` (no `<Link>` de @/i18n/navigation) → no son locale-aware (en /en apuntan a la ruta ES) y disparan lint `no-html-link-for-pages`. Pre-existente; baja prioridad.
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 29/06: GDPR cookies (ee3a38f) — GA4 ahora se carga SOLO tras consentimiento "analytics" (antes cargaba siempre); eliminado el banner de cookies legacy duplicado (CookieBanner.tsx). El Pixel ya estaba gateado.
+- 29/06: GSC (sin commit, vía navegador, cuenta assetsgolden1@gmail.com de Atilio) — descubierto que la propiedad estaba bajo la cuenta de Atilio y el sitemap NUNCA se había enviado. Enviado `sitemap.xml` (verificado HTTP 200 / XML válido) + solicitada re-indexación de la home.
+- 29/06: Supabase leaked-password protection ACTIVADO (vía navegador; estaba dentro del provider Email, no en sección suelta). Advisor ya no lo marca.
 - 29/06: combo SEO (46e0174) — H1 del home ES localizado vía next-intl (ES: "Inmobiliaria internacional de propiedades exclusivas", /en mantiene "International Real Estate Consulting" como H1 y queda de tagline en ES); llms.txt limpio (lujo→exclusivas, sin "Partner de Nest Seekers"); `/destinos/[país]` (incl. espana) sumados a sitemap.ts.
 - 24/06: carrusel destinos (67561b4), dedupe fotos galería (a7d6622), rebranding lujo→exclusivas en marca/editoriales/DB (df727dc, 5d622bb), 3 posts nuevos de blog bilingües publicados, fix compresión de imágenes en upload (0a12406).

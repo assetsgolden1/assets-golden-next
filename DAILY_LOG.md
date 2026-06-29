@@ -67,6 +67,27 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-29 — [OPS+GDPR] Supabase leaked-password, GSC sitemap/recrawl y gateo GDPR de GA4
+
+**Contexto:** Continuación de la misma jornada. El usuario pidió completar pendientes operativos (Supabase, GSC) y cerrar el tema de cookies. Tareas hechas vía navegador (extensión Claude-in-Chrome) + un commit de código.
+
+**Trabajo hecho:**
+- **Supabase — leaked-password protection ACTIVADO.** Estaba DISABLED. No aparecía en una sección suelta: vive dentro de Authentication → Sign In / Providers → provider **Email** → toggle "Prevent use of leaked passwords". Activado + Save. Confirmado por MCP: el advisor `auth_leaked_password_protection` ya no aparece.
+- **GSC — sitemap + re-indexación.** Diagnóstico clave: la propiedad NO estaba bajo ivalberini@gmail.com (de ahí el error "esta URL no pertenece a la propiedad"); está verificada bajo **assetsgolden1@gmail.com (Atilio)** como URL-prefix `https://assetsgolden.com/`. El sitemap NUNCA se había enviado (lista en 0). Se envió `sitemap.xml` ("Se ha enviado correctamente"; verificado aparte: HTTP 200, application/xml, 1.1 MB, hreflang OK) y se solicitó re-indexación de la home ("Se ha solicitado la indexación — cola prioritaria"). El estado "No se ha podido obtener" es solo el inicial hasta que Google lo lea.
+- **GDPR cookies (commit `ee3a38f`).** Dos arreglos:
+  1. **GA4 ahora consent-gated.** Antes `<GoogleAnalytics>` se inyectaba siempre en RootLayout (gtag.js cargaba sin consentimiento). Se quitó el estático y se agregó `initGA4()` en `CookieConsentInit` que carga gtag.js SOLO tras aceptar la categoría "analytics" (onConsent/onChange) — misma técnica que el Pixel. SPA page_view queda cubierto por GA4 Enhanced Measurement.
+  2. **Banner duplicado eliminado.** El layout público montaba un banner legacy (`CookieBanner.tsx`, localStorage, no gateaba nada) además del real. Se quitó del layout y se borró el componente.
+
+**Archivos tocados:** MODIFIED src/app/layout.tsx · src/app/[locale]/(public)/layout.tsx · src/components/cookies/CookieConsentInit.tsx · PENDIENTES.md · ESTADO.md · DAILY_LOG.md — DELETED src/components/CookieBanner.tsx
+
+**Verificación:** `tsc --noEmit` EXIT 0; eslint de los 3 archivos fuente EXIT 0. Sitemap curl HTTP 200/XML válido. Supabase advisor confirmado por MCP.
+
+**Commits:** `ee3a38f` (fix GDPR cookies) + commit de cierre de los .md. Supabase y GSC fueron acciones en dashboards externos (sin commit).
+
+**Próximo paso sugerido:** Atilio debe validar/redactar los textos legales de cookies/privacidad (es lo único que falta para cerrar GDPR). Ivan: monitorear en GSC que el sitemap pase a "Correcto" y que el title nuevo reemplace al viejo (días). Follow-up de código pendiente: CTAs del hero a `<Link>` locale-aware.
+
+---
+
 ### 2026-06-29 — [SEO-COMBO] H1 home ES + limpieza llms.txt + destinos al sitemap
 
 **Contexto:** El usuario pidió avanzar con los pendientes. Se eligió el combo SEO de 3 toques de PENDIENTES (#0.2/#0.3/#0.5): no dependen de terceros y mejoran lo que leen Google/ChatGPT/Claude hoy.

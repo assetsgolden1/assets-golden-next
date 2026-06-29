@@ -31,8 +31,15 @@ Next.js 15 / React 19 / TypeScript · Tailwind v4 (config en @theme de globals.c
 
 ## SEO — estado real (29/06)
 - Bases técnicas: muy buenas (auditoría CC 83/100; técnico 92, schema 95).
-- Posicionamiento real: incipiente. Google indexa parcialmente (esencialmente la home) y aún cachea el title viejo ("lujo") hasta recrawl. GSC verificación/recrawl PENDIENTE. Horizonte 6–12 meses.
+- Posicionamiento real: incipiente. Google indexa parcialmente (esencialmente la home) y aún cachea el title viejo ("lujo") hasta que procese el recrawl. Horizonte 6–12 meses.
+- **GSC**: la propiedad (URL-prefix `https://assetsgolden.com/`) está verificada bajo la cuenta **assetsgolden1@gmail.com (Atilio)**, NO bajo ivalberini. El 29/06 se envió el sitemap por primera vez y se solicitó re-indexación de la home. Sitemap sano (HTTP 200, XML válido).
 - Coherencia de marca: llms.txt ya rebrandeado (exclusivas, sin Nest Seekers) y H1 del home ES con keyword. El sitemap incluye `/destinos/[país]`. Falta el barrido de estáticos/metadata por residuos "lujo".
+
+## Privacidad / GDPR
+- Banner de cookies real = vanilla-cookieconsent v3 (Aceptar/Rechazar/Personalizar, ES, 3 categorías), montado en RootLayout vía `CookieConsentInit`.
+- GA4 y Meta Pixel se cargan SOLO tras consentimiento (analytics / marketing respectivamente). Banner legacy duplicado eliminado (29/06).
+- Falta: validación legal de los textos (cookies/privacidad) por Atilio.
+- Supabase Auth: leaked-password protection ACTIVADO (29/06).
 
 ## Reglas críticas (no romper)
 - Leads: solo APPEND, nunca borrar/sobrescribir.
