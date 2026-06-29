@@ -289,7 +289,7 @@ export default async function DestinoPage({ params, searchParams }: Props) {
                         price={p.price} currency={p.currency}
                         area_sqm={p.area_sqm} bedrooms={p.bedrooms}
                         bathrooms={p.bathrooms} property_type={p.property_type}
-                        image_url={p.image_url} featured={p.featured}
+                        image_url={p.image_url} images={p.gallery_urls} featured={p.featured}
                       />
                     ))}
                   </div>

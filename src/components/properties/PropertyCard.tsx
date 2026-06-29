@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { MapPin, Maximize, Building2, BedDouble, Bath } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getLocale } from "next-intl/server";
@@ -7,7 +6,7 @@ import { getTranslations } from "next-intl/server";
 import { translatePropertyType, translatePropertyTitle } from "@/lib/propertyTypes";
 import { formatPrice } from "@/lib/utils/format";
 import { toSentenceCase } from "@/lib/utils/normalizeText";
-import { optimizedImage } from "@/lib/utils/optimizedImage";
+import PropertyCardCarousel from "@/components/properties/PropertyCardCarousel";
 
 interface PropertyCardProps {
   id: string;
@@ -21,6 +20,7 @@ interface PropertyCardProps {
   bathrooms: number | null;
   property_type: string | null;
   image_url: string | null;
+  images?: string[] | null;
   featured?: boolean;
   sold?: boolean | null;
   className?: string;
@@ -38,6 +38,7 @@ export default async function PropertyCard({
   bathrooms,
   property_type,
   image_url,
+  images,
   featured,
   sold,
   className,
@@ -46,9 +47,15 @@ export default async function PropertyCard({
   const locale = await getLocale();
   const t = await getTranslations("Properties");
 
+  // Galería para el mini-carrusel: image_url primero, luego el resto, deduplicado.
+  const gallery = Array.from(
+    new Set([...(image_url ? [image_url] : []), ...(images ?? [])].filter(Boolean))
+  ) as string[];
+  const detailHref = `/propiedades/${slug}`;
+  const alt = translatePropertyTitle(title, locale);
+
   return (
-    <Link
-      href={`/propiedades/${slug}`}
+    <div
       className={cn(
         "group block card-premium rounded-xl overflow-hidden",
         className
@@ -56,33 +63,29 @@ export default async function PropertyCard({
     >
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-        {image_url ? (
-          <Image
-            src={optimizedImage(image_url, { width: 640, quality: 65 })}
-            alt={translatePropertyTitle(title, locale)}
-            fill
-            unoptimized
-            className={`object-cover transition-transform duration-700 group-hover:scale-110 ${sold ? 'opacity-60' : ''}`}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
+        {gallery.length > 0 ? (
+          <PropertyCardCarousel images={gallery} alt={alt} sold={sold} />
         ) : (
           <div className="flex h-full items-center justify-center">
             <Building2 className="h-12 w-12 text-muted-foreground" />
           </div>
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent opacity-40" />
+        {/* Link que cubre la imagen para navegar (las flechas del carrusel van por encima, z-20) */}
+        <Link href={detailHref} aria-label={alt} className="absolute inset-0 z-10" />
+
+        <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-primary/40 via-transparent to-transparent opacity-40" />
 
         {/* Featured badge */}
         {featured && !sold && (
-          <span className="absolute top-4 right-4 rounded-full bg-primary/80 px-2.5 py-1 text-xs font-medium text-gold border border-gold/30">
+          <span className="absolute top-4 right-4 z-20 rounded-full bg-primary/80 px-2.5 py-1 text-xs font-medium text-gold border border-gold/30">
             {t("featured_label")}
           </span>
         )}
 
         {/* SOLD band */}
         {sold && (
-          <div className="absolute top-0 right-0 z-10 overflow-hidden" style={{ width: 90, height: 90 }}>
+          <div className="absolute top-0 right-0 z-20 overflow-hidden" style={{ width: 90, height: 90 }}>
             <div style={{
               position: 'absolute',
               top: 20,
@@ -105,7 +108,7 @@ export default async function PropertyCard({
       </div>
 
       {/* Content */}
-      <div className="p-3 sm:p-5">
+      <Link href={detailHref} className="block p-3 sm:p-5">
         {/* Property type */}
         {property_type && (
           <p className="text-xs sm:text-sm text-gold font-medium mb-0.5">
@@ -150,7 +153,7 @@ export default async function PropertyCard({
             </span>
           )}
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 }

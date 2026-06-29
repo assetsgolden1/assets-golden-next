@@ -69,6 +69,7 @@ export function SpainPropertiesGrid({
                 bathrooms={p.bathrooms}
                 property_type={p.property_type}
                 image_url={p.image_url}
+                images={p.gallery_urls}
                 featured={p.featured}
               />
             ))}

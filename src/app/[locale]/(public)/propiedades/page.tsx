@@ -157,6 +157,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
                         bathrooms={property.bathrooms}
                         property_type={property.property_type}
                         image_url={property.image_url}
+                        images={property.gallery_urls}
                         featured={property.featured}
                         sold={property.sold}
                       />
