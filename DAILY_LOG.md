@@ -67,6 +67,29 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-29 — [ISR] Home + 10 páginas públicas ahora estáticas/ISR (verificado con build)
+
+**Contexto:** Ivan pidió avanzar con lo más grande: ISR de la home y /blog a SSR.
+
+**Trabajo hecho:**
+- **/blog SSR:** VERIFICADO ya era server-side (`export default async function BlogPage`, fetch server, revalidate=3600). El pendiente estaba mal planteado; el tema real era el caché (mismo bloqueo que el home).
+- **ISR (commit `81744dd`):** Diagnóstico con `next build` baseline → TODO `[locale]` era ƒ dinámico (0 estáticas, ni siquiera fichas con generateStaticParams). Causa raíz: next-intl v4 sin `setRequestLocale` + el `getLocale()` del root layout forzaban render dinámico app-wide. Estructura clave: el root `app/layout.tsx` renderiza `<html>` para TODO (incl. admin/portal, que no tienen html propio), así que NO se podía mover el html.
+  - **Fix aplicado (verificado por iteración de builds):**
+    1. Root `layout.tsx`: `<html lang="es">` ESTÁTICO (sin getLocale). admin/portal/api son ES → correcto. GlobalSchemaOrg movido fuera del root.
+    2. Nuevo `HtmlLangSync` (client): corrige `document.documentElement.lang` al locale real en /en (a11y; los hreflang ya eran correctos por página).
+    3. `[locale]/layout.tsx`: `setRequestLocale(locale)` + GlobalSchemaOrg (ahora per-locale) + HtmlLangSync.
+    4. `[locale]/(public)/layout.tsx`: `setRequestLocale` (Header/Footer son async con getTranslations → era el ancestro compartido que faltaba; ESTE fue el que destrabó el home).
+    5. Home page: params + `setRequestLocale` en componente y generateMetadata.
+  - **Resultado (build):** 0 → **11 rutas `[locale]` estáticas/ISR**: home, servicios, sobre-nosotros, equipo (1d), partners (1h), partners/[id], vender-tu-piso, colabora, aviso-legal, politica-de-cookies, politica-de-privacidad. Revalidate 1h (1d equipo). Las 18 que siguen ƒ usan queries con cookies (propiedades, blog, destinos, inversiones, promociones, forms) — follow-up: migrar esas queries al cliente estático. admin/portal/api siguen ƒ (correcto).
+
+**Archivos tocados:** MODIFIED src/app/layout.tsx · src/app/[locale]/layout.tsx · src/app/[locale]/(public)/layout.tsx · src/app/[locale]/(public)/page.tsx · PENDIENTES.md · DAILY_LOG.md — NEW src/components/HtmlLangSync.tsx.
+
+**Verificación:** `tsc --noEmit` EXIT 0. **3 builds completos** (baseline + 2 iteraciones) — el último: EXIT 0, sin errores, route table confirmando 11 estáticas. admin/portal intactos.
+
+**Próximo paso sugerido:** Extender ISR migrando getProperties/getBlogPosts/getDestinationBySlug/getPropertiesForSpain al cliente estático + setRequestLocale en esas páginas (verificar con build). Validar en prod que /es y /en de la home rendericen bien y el lang sea correcto.
+
+---
+
 ### 2026-06-29 — [BUGFIX] meta_leads_synced.created_time = timestamp real de Meta
 
 **Contexto:** Ivan pidió arreglar el bug anotado: `meta_leads_synced.created_time` guardaba la hora del sync en vez de la del lead.

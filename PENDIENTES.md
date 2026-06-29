@@ -11,12 +11,10 @@ Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
 
 ## 0. Lo más urgente
-1. [Atilio·M] Validar/redactar los textos legales de cookies y privacidad. El banner técnico y el gateo GA4/Pixel YA están (29/06); falta solo la revisión legal de los textos para cerrar GDPR antes de escalar ads.
-2. [Ivan·S] Monitorear en GSC (cuenta assetsgolden1@gmail.com) que el sitemap pase de "No se ha podido obtener" a "Correcto" y que el title nuevo reemplace al viejo en resultados (días).
+1. [Ivan·S] Monitorear en GSC (cuenta assetsgolden1@gmail.com) que el sitemap pase de "No se ha podido obtener" a "Correcto" y que el title nuevo reemplace al viejo en resultados (días).
 
 ## 1. SEO / Posicionamiento
-- [Claude+CC·M] Verificar si el listado /blog es client-side; si lo es, pasarlo a SSR (enlazado interno).
-- [CC·M] Home/ISR: el verdadero bloqueo del caché es next-intl SIN `setRequestLocale` (v4.13) + el `getLocale()` del root layout → fuerzan render dinámico app-wide. Prereq ya hecho (lecturas públicas con cliente estático, 5ea94ce). Falta: setRequestLocale en root/[locale] layout + páginas, manejar el getLocale() del root, y VERIFICAR con `next build` qué rutas quedan estáticas. Riesgo i18n medio — hacer con build.
+- [CC·M] Extender ISR a las páginas que quedaron dinámicas (propiedades, blog, destinos, inversiones, promociones): migrar sus queries (`getProperties`, `getBlogPosts`, `getDestinationBySlug`, `getPropertiesForSpain/Destination`) al cliente estático (sin cookies) + `setRequestLocale` en esas páginas. Verificar con `next build`. (Home + 10 públicas YA son ISR — 81744dd.)
 - [Atilio+Ivan·L] Autoridad/backlinks: menciones, prensa, portales, partners. Lo que falta vs competidores.
 
 ## 2. Blog / Contenido
@@ -35,7 +33,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - (Aceptados, sin acción: buckets con listing, get_property_filters, pg_trgm, leads_public_insert.)
 
 ## 5. GDPR / Legal
-- [Atilio·M] Textos legales: privacidad, aviso legal, T&C. (El banner de cookies + gateo GA4/Pixel ya están hechos — falta solo validar/redactar los textos.)
+- (Cerrado 29/06: Atilio validó los textos legales de cookies/privacidad; banner + gateo GA4/Pixel ya estaban. GDPR técnico + legal OK para escalar ads.)
 
 ## 6. Operación / Cliente
 - [Ivan+Claude·M] **PRIORIDAD CERCANA (Ivan, 29/06): hacer pronto, no ya.** Carga Cervera/Miami EEUU (cerverabrokerportal.com): directa vs manual.
@@ -46,6 +44,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [CC·S] HeroImageCarousel: los 2 CTAs usan `<a href>` (no `<Link>` de @/i18n/navigation) → no son locale-aware (en /en apuntan a la ruta ES) y disparan lint `no-html-link-for-pages`. Pre-existente; baja prioridad.
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 29/06: ISR home (81744dd) — la home + 10 páginas públicas (servicios, sobre-nosotros, equipo, partners, vender-tu-piso, colabora, 3 legales) pasaron de ƒ dinámicas a ● estáticas/ISR (revalidate 1h). VERIFICADO con `next build` (antes: 0 estáticas; ahora 11). Causa raíz era next-intl sin setRequestLocale + getLocale() del root. Fix: root lang estático "es" + HtmlLangSync (corrige lang en /en) + setRequestLocale en [locale] layout, (public) layout y home. Las 18 que siguen ƒ usan queries con cookies (propiedades/blog/destinos) — follow-up. /blog ya era SSR (verificado). GDPR legal cerrado (Atilio validó).
 - 29/06: fix created_time (aad0990) — `meta_leads_synced.created_time` guardaba `new Date()` (hora del sync) en vez de `parsed.created_time` (hora real del lead en Meta). Corregido en los 2 routes de sync + backfill de 12 filas históricas desde `meta_leads` (que ya tenía el dato bien). 10 filas viejas sin match en meta_leads quedan como están (timestamp perdido). La secuencia de nurture NO estaba afectada (usa meta_leads.created_time, que estaba bien).
 - 29/06: quick-wins (d795a80, 4bf4b1e) — (1) extendido `optimizedImage` a 17 archivos más (destinos, blog, equipo, home, related, portal, fundadores de NOSOTROS): 21 `<Image>` + 1 `<img>` ahora WebP/resize. (2) Subida de fotos: reintento automático en 429 (Retry-After, cap 6s) + mensaje específico de rate-limit en crear y editar. (3) NOSOTROS line-clamp VERIFICADO: el único clamp es la bio de fundadores, recorte intencional de tarjeta, no bug.
 - 29/06: mini-carrusel en tarjetas (efe016e) — cada card de propiedad ahora tiene flechas sobre la imagen para pasar fotos sin entrar a la ficha (estilo Idealista). Carga solo la foto que se mira (egress acotado). Puntitos si ≤6 fotos, contador "i/N" si más. Card restructurado a overlay-link (HTML válido, sin botón dentro de `<a>`). Aplicado en listado, destinos, inversiones, promociones y España-grid.
