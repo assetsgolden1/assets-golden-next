@@ -128,6 +128,7 @@ export default function NuevaPropiedadPage() {
       // iCloud no descargada) tiraba abajo toda la propiedad.
       const uploadedUrls: string[] = []
       const skipped: string[] = []
+      let rateLimited = false
       for (const { file } of galleryItems) {
         const label = file?.name || 'foto sin nombre'
         // Guard cliente: archivos vacíos → omitir sin intentar subir
@@ -143,9 +144,18 @@ export default function NuevaPropiedadPage() {
           }
           const fd = new FormData()
           fd.append('file', compressed)
-          const uploadRes = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
+          let uploadRes = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
+          // Rate limit (429): esperar el Retry-After (cap 6s) y reintentar una vez
+          if (uploadRes.status === 429) {
+            const wait = Math.min(Number(uploadRes.headers.get('Retry-After')) || 3, 6)
+            await new Promise((r) => setTimeout(r, wait * 1000))
+            const fdRetry = new FormData()
+            fdRetry.append('file', compressed)
+            uploadRes = await fetch('/api/admin/upload-image', { method: 'POST', body: fdRetry })
+          }
           const uploadData = await uploadRes.json().catch(() => ({}))
           if (!uploadRes.ok || !uploadData.url) {
+            if (uploadRes.status === 429) rateLimited = true
             skipped.push(label)
             continue
           }
@@ -160,9 +170,14 @@ export default function NuevaPropiedadPage() {
           ? skipped.join(', ')
           : `${skipped.slice(0, 5).join(', ')} y ${skipped.length - 5} más`
         setWarnMsg(
-          `Se omitieron ${skipped.length} foto(s) vacías o que no se pudieron procesar (${lista}). ` +
+          (rateLimited
+            ? 'Se subieron muchas fotos muy rápido y el servidor limitó la subida temporalmente. '
+            : '') +
+          `Se omitieron ${skipped.length} foto(s) (${lista}). ` +
           `La propiedad se creó con las ${uploadedUrls.length} fotos restantes. ` +
-          `Podés volver a subir las que faltan editando la propiedad.`
+          (rateLimited
+            ? 'Esperá un minuto y volvé a subir las que faltan editando la propiedad.'
+            : 'Podés volver a subir las que faltan editando la propiedad.')
         )
       }
 

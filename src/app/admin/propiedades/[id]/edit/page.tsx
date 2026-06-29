@@ -194,6 +194,7 @@ export default function EditPropertyPage({
     // (p.ej. foto de iCloud no descargada) tiraba abajo todos los cambios.
     const newImageUrls: string[] = []
     const skipped: string[] = []
+    let rateLimited = false
     for (const file of newImages) {
       const label = file?.name || 'foto sin nombre'
       if (!file || file.size === 0) {
@@ -208,9 +209,18 @@ export default function EditPropertyPage({
         }
         const fd = new FormData()
         fd.append('file', compressed)
-        const res = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
+        let res = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
+        // Rate limit (429): esperar el Retry-After (cap 6s) y reintentar una vez
+        if (res.status === 429) {
+          const wait = Math.min(Number(res.headers.get('Retry-After')) || 3, 6)
+          await new Promise((r) => setTimeout(r, wait * 1000))
+          const fdRetry = new FormData()
+          fdRetry.append('file', compressed)
+          res = await fetch('/api/admin/upload-image', { method: 'POST', body: fdRetry })
+        }
         const data = await res.json().catch(() => ({}))
         if (!res.ok || data.error || !data.url) {
+          if (res.status === 429) rateLimited = true
           skipped.push(label)
           continue
         }
@@ -225,8 +235,13 @@ export default function EditPropertyPage({
         ? skipped.join(', ')
         : `${skipped.slice(0, 5).join(', ')} y ${skipped.length - 5} más`
       setWarn(
-        `Se omitieron ${skipped.length} foto(s) nueva(s) vacías o que no se pudieron procesar (${lista}). ` +
-        `Se guardó con el resto. Podés volver a subir las que faltan.`
+        (rateLimited
+          ? 'Se subieron muchas fotos muy rápido y el servidor limitó la subida temporalmente. '
+          : '') +
+        `Se omitieron ${skipped.length} foto(s) nueva(s) (${lista}). Se guardó con el resto. ` +
+        (rateLimited
+          ? 'Esperá un minuto y volvé a subir las que faltan.'
+          : 'Podés volver a subir las que faltan.')
       )
     }
 
