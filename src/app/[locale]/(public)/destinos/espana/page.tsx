@@ -17,6 +17,7 @@ import {
 } from '@/lib/constants/spainZones'
 import { SpainFilters } from '@/components/SpainFilters'
 import { SpainPropertiesGrid } from '@/components/SpainPropertiesGrid'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 export const revalidate = 3600
 
@@ -161,7 +162,7 @@ export default async function EspanaPage({ searchParams }: Props) {
       {/* Hero */}
       <section className="relative h-80 md:h-[420px] overflow-hidden">
         {destination?.hero_image_url ? (
-          <Image src={destination.hero_image_url} alt={t('breadcrumb_spain')} fill unoptimized className="object-cover" priority sizes="100vw" />
+          <Image src={optimizedImage(destination.hero_image_url, { width: 1280, quality: 70 })} alt={t('breadcrumb_spain')} fill unoptimized className="object-cover" priority sizes="100vw" />
         ) : (
           <div className="absolute inset-0 gradient-navy" />
         )}

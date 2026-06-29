@@ -9,6 +9,7 @@ import { translatePropertyType, translatePropertyTitle } from '@/lib/propertyTyp
 import { getCityImage } from '@/lib/constants/cityImages'
 import { normalizeLocation } from '@/lib/utils/normalizeLocation'
 import { getSpainZone } from '@/lib/constants/spainZones'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -129,7 +130,7 @@ function LocationCard({ displayName, imageKey, count, index, onClick, cityImages
       className="group relative aspect-[3/4] rounded-xl overflow-hidden text-left"
     >
       <Image
-        src={imageSrc}
+        src={optimizedImage(imageSrc, { width: 640, quality: 70 })}
         alt={displayName}
         fill
         unoptimized
@@ -171,7 +172,7 @@ function PropertyMiniCard({ property }: { property: Property }) {
       <div className="relative aspect-[4/3] bg-muted overflow-hidden">
         {property.image_url ? (
           <Image
-            src={property.image_url}
+            src={optimizedImage(property.image_url, { width: 640, quality: 70 })}
             alt={property.title}
             fill
             unoptimized

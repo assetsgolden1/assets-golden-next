@@ -21,6 +21,7 @@ import { PaginationBar } from '@/components/PaginationBar'
 import PropertyCard from '@/components/properties/PropertyCard'
 import { getDestinoEditorial } from '@/lib/editorial/destinoEditorial'
 import { translateCountry, translateProvince } from '@/lib/utils/translateGeography'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -203,7 +204,7 @@ export default async function DestinoPage({ params, searchParams }: Props) {
       {/* Hero */}
       <section className="relative h-80 md:h-[420px] overflow-hidden">
         {(destination.hero_image_url ?? destination.card_image_url) ? (
-          <Image src={(destination.hero_image_url ?? destination.card_image_url)!} alt={countryLabel} fill unoptimized className="object-cover" priority sizes="100vw" />
+          <Image src={optimizedImage((destination.hero_image_url ?? destination.card_image_url)!, { width: 1280, quality: 70 })} alt={countryLabel} fill unoptimized className="object-cover" priority sizes="100vw" />
         ) : (
           <div className="absolute inset-0 gradient-navy" />
         )}

@@ -6,6 +6,7 @@ import { getTranslations, getLocale } from 'next-intl/server'
 import { buttonVariants } from '@/components/ui/button'
 import { getDestinations, getPropertyCountsByCountry } from '@/lib/supabase/queries'
 import { translateCountry } from '@/lib/utils/translateGeography'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('Destinations')
@@ -62,7 +63,7 @@ export default async function DestinosPage() {
                     <div className="relative h-52 overflow-hidden bg-muted">
                       {(dest.card_image_url ?? dest.hero_image_url) ? (
                         <Image
-                          src={(dest.card_image_url ?? dest.hero_image_url)!}
+                          src={optimizedImage((dest.card_image_url ?? dest.hero_image_url)!, { width: 640, quality: 70 })}
                           alt={translateCountry(dest.country_name, locale)}
                           fill unoptimized
                           className="object-cover transition-transform duration-700 group-hover:scale-105"

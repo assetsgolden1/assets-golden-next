@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import type { BlogPost } from '@/types'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 const CATEGORY_LABELS: Record<string, string> = {
   consejos: 'Consejos',
@@ -84,7 +85,7 @@ export default function BlogCategoryGrid({ posts, category }: Props) {
                   <div className="relative aspect-video bg-muted overflow-hidden">
                     {post.cover_image ? (
                       <Image
-                        src={post.cover_image}
+                        src={optimizedImage(post.cover_image, { width: 800, quality: 70 })}
                         alt={post.title}
                         fill
                         unoptimized

@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { RelatedProperty } from '@/lib/blogProperties'
 import { translatePropertyTitle } from '@/lib/propertyTypes'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 interface Props {
   properties: RelatedProperty[]
@@ -48,7 +49,7 @@ export function RelatedProperties({ properties, language = 'es' }: Props) {
           >
             <div className="relative h-48 w-full bg-muted overflow-hidden">
               <Image
-                src={prop.image_url!}
+                src={optimizedImage(prop.image_url!, { width: 640, quality: 70 })}
                 alt={translatePropertyTitle(prop.title, language)}
                 fill
                 unoptimized

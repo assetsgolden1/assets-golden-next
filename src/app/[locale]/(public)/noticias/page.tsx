@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Calendar, TrendingUp, Building2, MapPin } from 'lucide-react'
 import { getBlogPostsByCategory } from '@/lib/supabase/queries'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 export const metadata: Metadata = {
   title: 'Noticias del Mercado Inmobiliario',
@@ -102,7 +103,7 @@ export default async function NoticiasPage({ params }: Props) {
                   {post.cover_image && (
                     <div className="relative h-36 md:h-28 md:w-44 shrink-0 overflow-hidden rounded-lg">
                       <Image
-                        src={post.cover_image}
+                        src={optimizedImage(post.cover_image, { width: 800, quality: 70 })}
                         alt={post.title}
                         fill
                         unoptimized

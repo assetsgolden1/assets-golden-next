@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { CheckCircle } from 'lucide-react'
 import { getBlogPostsByCategory } from '@/lib/supabase/queries'
 import { buttonVariants } from '@/components/ui/button'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 export const metadata: Metadata = {
   title: 'Consejos Inmobiliarios',
@@ -112,7 +113,7 @@ export default async function ConsejosPage({ params }: Props) {
                   {post.cover_image && (
                     <div className="relative h-44 overflow-hidden">
                       <Image
-                        src={post.cover_image}
+                        src={optimizedImage(post.cover_image, { width: 800, quality: 70 })}
                         alt={post.title}
                         fill
                         unoptimized

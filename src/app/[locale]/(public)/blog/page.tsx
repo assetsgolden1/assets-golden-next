@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Coffee } from 'lucide-react'
 import { getBlogPosts } from '@/lib/supabase/queries'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 export const metadata: Metadata = {
   title: 'Blog Inmobiliario',
@@ -87,7 +88,7 @@ export default async function BlogPage({ params }: Props) {
                     <div className="relative h-64 lg:min-h-[400px] bg-muted overflow-hidden">
                       {featured.cover_image ? (
                         <Image
-                          src={featured.cover_image}
+                          src={optimizedImage(featured.cover_image, { width: 800, quality: 70 })}
                           alt={featured.title}
                           fill
                           unoptimized
@@ -143,7 +144,7 @@ export default async function BlogPage({ params }: Props) {
                       <div className="relative aspect-video bg-muted overflow-hidden">
                         {post.cover_image ? (
                           <Image
-                            src={post.cover_image}
+                            src={optimizedImage(post.cover_image, { width: 800, quality: 70 })}
                             alt={post.title}
                             fill
                             unoptimized

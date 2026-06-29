@@ -10,6 +10,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { getRelatedProperties } from '@/lib/blogProperties'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { addInternalLinks } from '@/lib/utils/blogInternalLinks'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 interface Props {
   params: Promise<{ slug: string; locale: string }>
@@ -239,7 +240,7 @@ export default async function BlogPostPage({ params }: Props) {
         <>
         <section className="relative h-[420px] md:h-[520px] overflow-hidden">
           <Image
-            src={post.banner_image_url}
+            src={optimizedImage(post.banner_image_url, { width: 1280, quality: 70 })}
             alt={post.title}
             fill
             unoptimized
@@ -303,7 +304,7 @@ export default async function BlogPostPage({ params }: Props) {
           {post.cover_image && (
             <div className="relative aspect-video max-h-[60vh] overflow-hidden bg-muted">
               <Image
-                src={post.cover_image}
+                src={optimizedImage(post.cover_image, { width: 1280, quality: 70 })}
                 alt={post.title}
                 fill
                 unoptimized

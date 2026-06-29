@@ -3,6 +3,7 @@ import { useState, useRef } from 'react'
 import Image from 'next/image'
 import { User, Upload, Save } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 import type { Agent } from '@/types/agent'
 
 interface Props {
@@ -86,7 +87,7 @@ export function ProfileForm({ initialData, userId }: Props) {
           <div className="w-20 h-20 rounded-xl border-2 border-border overflow-hidden bg-muted flex items-center justify-center shrink-0">
             {logoUrl ? (
               <Image
-                src={logoUrl}
+                src={optimizedImage(logoUrl, { width: 400, quality: 70 })}
                 alt="Logo agencia"
                 width={80}
                 height={80}

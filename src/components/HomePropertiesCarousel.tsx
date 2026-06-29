@@ -10,6 +10,7 @@ import type { Property } from '@/types'
 import { translateCountry, translateProvince } from '@/lib/utils/translateGeography'
 import { translatePropertyTitle } from '@/lib/propertyTypes'
 import { toSentenceCase } from '@/lib/utils/normalizeText'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 const typeLabels: Record<string, string> = {
   villa: 'Villa',
@@ -62,7 +63,7 @@ export default function HomePropertiesCarousel({ properties, locale }: Props) {
                 <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                   {property.image_url ? (
                     <Image
-                      src={property.image_url}
+                      src={optimizedImage(property.image_url, { width: 640, quality: 70 })}
                       alt={translatePropertyTitle(property.title, locale)}
                       fill
                       unoptimized

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Globe, Users, Award, Target } from 'lucide-react'
 import { getTeamMembers } from '@/lib/supabase/queries'
 import { buttonVariants } from '@/components/ui/button'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 export const metadata: Metadata = {
   title: 'Sobre Nosotros',
@@ -173,7 +174,7 @@ export default async function SobreNosotrosPage() {
                   {m.photo_url && (
                     <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full border-2 border-gold/20">
                       <img
-                        src={m.photo_url}
+                        src={optimizedImage(m.photo_url, { width: 200, quality: 70 })}
                         alt={m.name}
                         className="h-full w-full object-cover"
                       />

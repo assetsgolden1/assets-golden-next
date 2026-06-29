@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { getTeamMembers } from '@/lib/supabase/queries'
 import { getLinkedin } from '@/lib/constants/linkedinMap'
 import { getLocalPhoto } from '@/lib/constants/photoMap'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 export const metadata: Metadata = {
   title: 'Equipo',
@@ -99,7 +100,7 @@ function TeamGroup({
             <div className="relative mb-5 aspect-[3/4] overflow-hidden rounded-xl bg-muted">
               {(member.photo_url || getLocalPhoto(member.name)) ? (
                 <Image
-                  src={member.photo_url || getLocalPhoto(member.name)!}
+                  src={optimizedImage(member.photo_url || getLocalPhoto(member.name)!, { width: 400, quality: 70 })}
                   alt={member.name}
                   fill
                   unoptimized

@@ -9,6 +9,7 @@ import type { TeamMember } from '@/types'
 import { buttonVariants } from '@/components/ui/button'
 import { getLinkedin } from '@/lib/constants/linkedinMap'
 import { getLocalPhoto } from '@/lib/constants/photoMap'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 function LinkedinIcon({ className }: { className?: string }) {
   return (
@@ -41,7 +42,7 @@ function MemberCard({ member, onClick }: { member: TeamMember; onClick: () => vo
       <div className="card-premium rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
         <div className="relative h-[320px] overflow-hidden bg-muted flex-shrink-0">
           {getMemberPhoto(member) ? (
-            <Image src={getMemberPhoto(member)!} alt={member.name} fill unoptimized className="object-cover object-top transition-transform duration-700 group-hover:scale-105" sizes="260px" />
+            <Image src={optimizedImage(getMemberPhoto(member)!, { width: 400, quality: 70 })} alt={member.name} fill unoptimized className="object-cover object-top transition-transform duration-700 group-hover:scale-105" sizes="260px" />
           ) : (
             <div className="flex h-full items-center justify-center gradient-navy">
               <span className="font-display text-4xl text-gold">{member.name.charAt(0)}</span>
@@ -85,7 +86,7 @@ function BioModal({ member, onClose }: { member: TeamMember; onClose: () => void
           <div className="shrink-0 mx-auto sm:mx-0">
             <div className="relative w-40 h-52 sm:w-48 sm:h-64 overflow-hidden rounded-xl bg-muted">
               {getMemberPhoto(member) ? (
-                <Image src={getMemberPhoto(member)!} alt={member.name} fill unoptimized className="object-cover object-top" sizes="192px" />
+                <Image src={optimizedImage(getMemberPhoto(member)!, { width: 400, quality: 70 })} alt={member.name} fill unoptimized className="object-cover object-top" sizes="192px" />
               ) : (
                 <div className="flex h-full items-center justify-center gradient-navy">
                   <span className="font-display text-4xl text-gold">{member.name.charAt(0)}</span>

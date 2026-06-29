@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { CountryDestination } from '@/types'
 import { translateCountry } from '@/lib/utils/translateGeography'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 interface Props {
   dest: CountryDestination
@@ -50,7 +51,7 @@ export default function DestinationCard3D({ dest, count, locale }: Props) {
     >
       {(dest.card_image_url ?? dest.hero_image_url) ? (
         <Image
-          src={dest.card_image_url ?? dest.hero_image_url!}
+          src={optimizedImage(dest.card_image_url ?? dest.hero_image_url!, { width: 640, quality: 70 })}
           alt={translateCountry(dest.country_name, locale)}
           fill
           unoptimized

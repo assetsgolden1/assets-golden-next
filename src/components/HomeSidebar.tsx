@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import type { CountryDestination, TeamMember } from '@/types'
 import { translateCountry } from '@/lib/utils/translateGeography'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 import CollaborateDialog from '@/components/CollaborateDialog'
 import DemandDialog from '@/components/DemandDialog'
 import AssetFormDialog from '@/components/AssetFormDialog'
@@ -151,7 +152,7 @@ export default function HomeSidebar({ destinations, propertyCounts, partners, lo
                   {partners.map((partner, index) => (
                     <div key={partner.id} className={`absolute inset-0 flex flex-col items-center transition-opacity duration-700 ${index === currentPartnerIndex ? 'opacity-100' : 'opacity-0'}`}>
                       {partner.photo_url ? (
-                        <Image src={partner.photo_url} alt={partner.name} width={96} height={96} unoptimized className="w-24 h-24 rounded-xl object-cover object-top border-2 border-gold/30 group-hover:border-gold/60 transition-colors" />
+                        <Image src={optimizedImage(partner.photo_url, { width: 400, quality: 70 })} alt={partner.name} width={96} height={96} unoptimized className="w-24 h-24 rounded-xl object-cover object-top border-2 border-gold/30 group-hover:border-gold/60 transition-colors" />
                       ) : (
                         <div className="w-24 h-24 rounded-xl bg-primary-foreground/10 border-2 border-gold/30 flex items-center justify-center">
                           <span className="font-display text-2xl text-gold">{partner.name.charAt(0)}</span>

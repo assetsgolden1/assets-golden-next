@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { translatePropertyType, translatePropertyTitle } from '@/lib/propertyTypes'
 import { toSentenceCase } from '@/lib/utils/normalizeText'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 import type { Property } from '@/types'
 
 const UUID_REGEX =
@@ -78,7 +79,7 @@ function PortalPropertyCard({ p }: { p: Property }) {
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {p.image_url ? (
           <Image
-            src={p.image_url}
+            src={optimizedImage(p.image_url, { width: 640, quality: 70 })}
             alt={p.title}
             fill
             unoptimized
