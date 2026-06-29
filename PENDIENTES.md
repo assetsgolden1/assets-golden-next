@@ -26,12 +26,9 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 
 ## 3. Web / Técnico
 - [Ivan+Claude·M] PDF del portal end-to-end con agente real en prod (nunca validado). Riesgo: Chromium clavado v143.0.4.
-- [CC·S] Aplicar el helper `optimizedImage` también a heros de destino, blog e imágenes de equipo (ya está en cards + galería de ficha; el helper existe, solo falta extenderlo).
 - [CC·S] Helper compressImage a destinos/[slug]/edit y TeamManager (baja prioridad).
 - [Atilio+CC·S] Criterios de /inversiones (definición de Atilio) + verificar filtro.
-- [Claude·S] Verificar sección NOSOTROS no truncada (line-clamp).
 - [CC·S] Bug created_time en meta_leads_synced (guarda synced_at, no timestamp de Meta).
-- [CC·S] upload-image: mensaje específico al usuario cuando pega el rate-limit (429) subiendo muchas fotos seguidas (hoy esa foto se omite con aviso genérico).
 - [Ivan+CC·M] Revisar imágenes huérfanas en storage de intentos de carga fallidos previos (fotos subidas antes de que abortara la creación).
 
 ## 4. Infraestructura / Seguridad / Datos
@@ -42,7 +39,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [Atilio·M] Textos legales: privacidad, aviso legal, T&C. (El banner de cookies + gateo GA4/Pixel ya están hechos — falta solo validar/redactar los textos.)
 
 ## 6. Operación / Cliente
-- [Ivan+Claude·M] Carga Cervera/Miami EEUU (cerverabrokerportal.com): directa vs manual.
+- [Ivan+Claude·M] **PRIORIDAD CERCANA (Ivan, 29/06): hacer pronto, no ya.** Carga Cervera/Miami EEUU (cerverabrokerportal.com): directa vs manual.
 
 ## 7. Higiene / deuda técnica baja
 - ~20 props Cataluña/Madrid mal marcadas habihub (el sync ya las protege; rastrear origen antes de reetiquetar).
@@ -50,6 +47,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [CC·S] HeroImageCarousel: los 2 CTAs usan `<a href>` (no `<Link>` de @/i18n/navigation) → no son locale-aware (en /en apuntan a la ruta ES) y disparan lint `no-html-link-for-pages`. Pre-existente; baja prioridad.
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 29/06: quick-wins (d795a80, 4bf4b1e) — (1) extendido `optimizedImage` a 17 archivos más (destinos, blog, equipo, home, related, portal, fundadores de NOSOTROS): 21 `<Image>` + 1 `<img>` ahora WebP/resize. (2) Subida de fotos: reintento automático en 429 (Retry-After, cap 6s) + mensaje específico de rate-limit en crear y editar. (3) NOSOTROS line-clamp VERIFICADO: el único clamp es la bio de fundadores, recorte intencional de tarjeta, no bug.
 - 29/06: mini-carrusel en tarjetas (efe016e) — cada card de propiedad ahora tiene flechas sobre la imagen para pasar fotos sin entrar a la ficha (estilo Idealista). Carga solo la foto que se mira (egress acotado). Puntitos si ≤6 fotos, contador "i/N" si más. Card restructurado a overlay-link (HTML válido, sin botón dentro de `<a>`). Aplicado en listado, destinos, inversiones, promociones y España-grid.
 - 29/06: imágenes (605878c) — TODAS las imágenes de propiedad pasaron de `unoptimized` (PNG/JPG full-size) a **Supabase Image Transformation** (WebP por contexto): card 446KB→42KB, thumb→15KB (~−90% egress, verificado en vivo). + galería de ficha rehecha: mosaico hero estilo Idealista (1 grande + 4 + "Ver las N fotos"), aspect ratio 16:9 desktop / 4:3 mobile (antes 21:9 recortaba interiores), lightbox optimizado. Helper nuevo `lib/utils/optimizedImage.ts` (solo Supabase; externos como medianewbuild quedan igual).
 - 29/06: schema EN (b22341b) — WebSite JSON-LD: inLanguage/description/catálogo ahora locale-aware (antes EN declaraba es-ES). + verificado que areaServed ya tenía los 12 países traducidos a EN (pendiente que estaba resuelto). + prereq ISR (5ea94ce): featured/team/destinos con cliente estático sin cookies.

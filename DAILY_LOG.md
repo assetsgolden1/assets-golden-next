@@ -67,6 +67,23 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-29 — [QUICK-WINS] Extender optimización de imágenes + rate-limit 429 + NOSOTROS
+
+**Contexto:** Ivan pidió avanzar con los quick-wins de alto valor. (Miami/Cervera marcado como prioridad CERCANA, no ya.)
+
+**Trabajo hecho:**
+- **Extender `optimizedImage` (commit `d795a80`):** sweep (vía subagente, verificado por mí: `tsc` EXIT 0 + spot-check del diff) a 17 archivos más — destinos ([slug]/espana/listado/DestinationCard3D), blog (page/[slug]/BlogCategoryGrid/noticias/consejos), equipo (HomeTeamSection/equipo), home (HomePropertiesCarousel/HomeSidebar), RelatedProperties, LocationBrowser, portal (ProfileForm/PortalPropertiesGrid). 21 `<Image>` envueltos con widths por contexto (hero 1280, card 640, foto/avatar 400, blog 800), `unoptimized` intacto. Además la foto de fundadores en sobre-nosotros (era `<img>` plano) → width 200. Ahora prácticamente todas las imágenes del sitio salen WebP/resize desde Supabase.
+- **Rate-limit 429 (commit `4bf4b1e`):** en los forms de crear y editar propiedad, ante un 429 se espera el `Retry-After` (cap 6s) y se reintenta la subida una vez; si igual falla, se marca `rateLimited` y el aviso amarillo dice específicamente "se subieron muchas fotos muy rápido… esperá un minuto" en vez del genérico.
+- **NOSOTROS line-clamp:** VERIFICADO. El único `line-clamp` en sobre-nosotros es la bio de los fundadores (tarjetas w-64, clamp-3) — recorte intencional de diseño, no un truncado roto. Sin cambios.
+
+**Archivos tocados:** 18 (sweep imágenes, incl. sobre-nosotros) + nueva-propiedad/page.tsx + propiedades/[id]/edit/page.tsx + PENDIENTES.md + DAILY_LOG.md.
+
+**Verificación:** `tsc --noEmit` EXIT 0 (todo junto). Lint: errores `<a>`/`any`/`set-state-in-effect` PRE-EXISTENTES (edit form L644, espana editorial, PortalPropertiesGrid effect), ninguno introducido. Subagente reportó tsc 0; reconfirmado por mí.
+
+**Próximo paso sugerido:** Quedan quick-wins menores: bug `created_time` en meta_leads_synced. Prioridad cercana: carga Miami/Cervera. Más grande: ISR de la home (con build).
+
+---
+
 ### 2026-06-29 — [UX] Mini-carrusel en las tarjetas de propiedad
 
 **Contexto:** Ivan pidió que en la sección Propiedades cada tarjeta permita pasar fotos con flechitas sobre la imagen, sin entrar a la ficha (estilo Idealista/Airbnb).
