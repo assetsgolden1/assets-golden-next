@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
-import GlobalSchemaOrg from "@/components/seo/GlobalSchemaOrg";
 import MetaPixelPageViewTracker from "@/components/analytics/MetaPixel";
 import CookieConsentInit from "@/components/cookies/CookieConsentInit";
-import { getLocale } from 'next-intl/server'
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -80,20 +78,16 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // getLocale() reads the locale set by next-intl middleware.
-  // Falls back to 'es' for routes outside the middleware matcher (admin, api, portal).
-  let locale = 'es'
-  try {
-    locale = await getLocale()
-  } catch {}
-
+  // lang estático = 'es' (default). NO usamos getLocale() acá porque leería el
+  // request y forzaría render dinámico en TODAS las rutas. El locale real (y el
+  // <html lang> correcto en /en) lo maneja el layout [locale] vía setRequestLocale
+  // + HtmlLangSync. admin/portal/api son ES → lang="es" correcto.
   return (
     <html
-      lang={locale}
+      lang="es"
       className={`${playfair.variable} ${dmSans.variable} h-full antialiased`}
     >
       <head>
-        <GlobalSchemaOrg locale={locale} />
         <link rel="preconnect" href="https://mromkwpqrxpxbbxhdofs.supabase.co" />
         <link rel="preconnect" href="https://wloneprkibfjioxwypaw.supabase.co" />
         <link rel="preconnect" href="https://medianewbuild.com" />

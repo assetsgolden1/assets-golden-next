@@ -8,7 +8,7 @@ import HomePropertiesCarousel from '@/components/HomePropertiesCarousel'
 import HomeTeamSection from '@/components/HomeTeamSection'
 import DestinationsCarousel from '@/components/home/DestinationsCarousel'
 import { Link } from '@/i18n/navigation'
-import { getTranslations, getLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import {
   getFeaturedProperties,
   getTeamMembers,
@@ -17,9 +17,12 @@ import {
   getPartners,
 } from '@/lib/supabase/queries'
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> }
+): Promise<Metadata> {
+  const { locale } = await params
+  setRequestLocale(locale)
   const t = await getTranslations('Home')
-  const locale = await getLocale()
   return {
     title: { absolute: t('meta_title') },
     description: t('meta_description'),
@@ -38,9 +41,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const revalidate = 3600
 
-export default async function HomePage() {
+export default async function HomePage(
+  { params }: { params: Promise<{ locale: string }> }
+) {
+  const { locale } = await params
+  setRequestLocale(locale)
   const t = await getTranslations('Home')
-  const locale = await getLocale()
 
   const [{ data: featured }, { data: team }, { data: destinations }, propertyCounts, { data: partners }] =
     await Promise.all([
