@@ -53,7 +53,7 @@ function buildSchema(locale: string) {
         })),
         hasOfferCatalog: {
           '@type': 'OfferCatalog',
-          name: 'Propiedades exclusivas en venta',
+          name: locale === 'en' ? 'Exclusive properties for sale' : 'Propiedades exclusivas en venta',
           numberOfItems: 2364,
         },
         sameAs: [
@@ -67,9 +67,11 @@ function buildSchema(locale: string) {
         '@id': 'https://assetsgolden.com/#website',
         url: 'https://assetsgolden.com',
         name: 'Assets Golden',
-        description: 'Inmobiliaria Internacional de Propiedades Exclusivas',
+        description: locale === 'en'
+          ? 'International real estate consultancy for exclusive properties'
+          : 'Inmobiliaria Internacional de Propiedades Exclusivas',
         publisher: { '@id': 'https://assetsgolden.com/#organization' },
-        inLanguage: 'es-ES',
+        inLanguage: locale === 'en' ? 'en-GB' : 'es-ES',
         potentialAction: {
           '@type': 'SearchAction',
           target: 'https://assetsgolden.com/propiedades?q={search_term_string}',
