@@ -67,6 +67,24 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-29 — [UX] Mini-carrusel en las tarjetas de propiedad
+
+**Contexto:** Ivan pidió que en la sección Propiedades cada tarjeta permita pasar fotos con flechitas sobre la imagen, sin entrar a la ficha (estilo Idealista/Airbnb).
+
+**Trabajo hecho (commit `efe016e`):**
+- **Nuevo `PropertyCardCarousel.tsx` (client):** renderiza SOLO la imagen actual (la `src` cambia al navegar) → el browser solo descarga las fotos que el usuario mira, sin precargar la galería entera (egress acotado, coherente con la optimización previa). Flechas con `stopPropagation`+`preventDefault`. Indicador: puntitos si ≤6 fotos, contador "i/N" si más. Flechas aparecen en hover (y focus-visible para teclado).
+- **`PropertyCard` restructurado:** dejó de ser un único `<Link>` envolvente (que haría HTML inválido con botones adentro). Ahora es un `<div class="group">` con: área de imagen (carrusel + Link overlay z-10 para navegar + flechas z-20 + badges z-20) y el contenido como su propio `<Link>`. Toda la tarjeta sigue clickeable; solo las flechas no navegan.
+- Galería del card = `image_url` + `gallery_urls` deduplicado. Imágenes vía `optimizedImage` (WebP, width 640).
+- Prop nuevo `images?: string[]` (opcional, con fallback a single image). Pasado en los 5 call sites: listado, destinos/[slug], inversiones, promociones, SpainPropertiesGrid.
+
+**Archivos tocados:** NEW src/components/properties/PropertyCardCarousel.tsx — MODIFIED PropertyCard.tsx · SpainPropertiesGrid.tsx · propiedades/page.tsx · destinos/[slug]/page.tsx · inversiones/page.tsx · promociones/page.tsx · PENDIENTES.md · DAILY_LOG.md
+
+**Verificación:** `tsc --noEmit` EXIT 0; eslint EXIT 0. Pendiente: verificación visual en prod (flechas en hover + cambio de foto sin navegar).
+
+**Próximo paso sugerido:** Verificar visual en /propiedades. (El HomePropertiesCarousel del home usa otro componente, no PropertyCard — si se quiere el carrusel ahí también, es aparte.)
+
+---
+
 ### 2026-06-29 — [IMAGENES] Optimización (Supabase transform) + galería mosaico + aspect ratio
 
 **Contexto:** Ivan pidió optimizar imágenes (egress) y mejorar la UX/IU de "ver propiedades". Análisis previo con datos en vivo → eligió el paquete A1+B1+B2.
