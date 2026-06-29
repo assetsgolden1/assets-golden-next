@@ -294,7 +294,8 @@ export async function getPropertyTypesForDestination(countryName: string): Promi
 }
 
 export async function getPropertyBySlug(slug: string) {
-  const supabase = await createClient()
+  // Cliente estático (sin cookies): ficha pública → permite SSG/ISR del detalle.
+  const supabase = createStaticClient()
   const { data, error } = await supabase
     .from('properties')
     .select('*')
@@ -413,7 +414,8 @@ export async function getTeamMembers() {
 // ─── Blog ──────────────────────────────────────────────────────
 
 export async function getBlogPosts(limit = 12, locale?: string) {
-  const supabase = await createClient()
+  // Cliente estático (sin cookies): blog público → permite ISR.
+  const supabase = createStaticClient()
   let query = supabase
     .from('blog_posts')
     .select('*')
@@ -426,7 +428,8 @@ export async function getBlogPosts(limit = 12, locale?: string) {
 }
 
 export async function getBlogPostsByCategory(category: string, locale?: string, limit = 20) {
-  const supabase = await createClient()
+  // Cliente estático (sin cookies): blog público → permite ISR.
+  const supabase = createStaticClient()
   let query = supabase
     .from('blog_posts')
     .select('*')
@@ -440,7 +443,8 @@ export async function getBlogPostsByCategory(category: string, locale?: string, 
 }
 
 export async function getBlogPostBySlug(slug: string) {
-  const supabase = await createClient()
+  // Cliente estático (sin cookies): post público → permite SSG/ISR.
+  const supabase = createStaticClient()
   const { data, error } = await supabase
     .from('blog_posts')
     .select('*')

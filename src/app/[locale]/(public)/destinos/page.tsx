@@ -2,15 +2,18 @@ import type { Metadata } from 'next'
 import { buildAlternates } from '@/lib/utils/seoAlternates'
 import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
-import { getTranslations, getLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { buttonVariants } from '@/components/ui/button'
 import { getDestinations, getPropertyCountsByCountry } from '@/lib/supabase/queries'
 import { translateCountry } from '@/lib/utils/translateGeography'
 import { optimizedImage } from '@/lib/utils/optimizedImage'
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> }
+): Promise<Metadata> {
+  const { locale } = await params
+  setRequestLocale(locale)
   const t = await getTranslations('Destinations')
-  const locale = await getLocale()
   return {
     title: t('meta_title'),
     description: t('meta_description'),
@@ -21,9 +24,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const revalidate = 3600
 
-export default async function DestinosPage() {
+export default async function DestinosPage(
+  { params }: { params: Promise<{ locale: string }> }
+) {
+  const { locale } = await params
+  setRequestLocale(locale)
   const t = await getTranslations('Destinations')
-  const locale = await getLocale()
   const [{ data: destinations }, propertyCounts] = await Promise.all([
     getDestinations(),
     getPropertyCountsByCountry(),
