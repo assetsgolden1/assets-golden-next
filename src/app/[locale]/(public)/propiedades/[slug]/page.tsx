@@ -43,8 +43,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const localizedTitle = translatePropertyTitle(data.title, locale)
 
+  // Título SEO enriquecido para el <title>: añade provincia (si no está ya en
+  // el título), nº de habitaciones y precio "desde". Mejora el long-tail y el
+  // CTR en las ~2.600 fichas. OG/Twitter usan el título limpio (mejor para social).
+  const provinceLabel = data.province
+    ? (locale === 'en' ? translateProvince(data.province, locale) : data.province)
+    : null
+  const seoBase = provinceLabel && !localizedTitle.toLowerCase().includes(provinceLabel.toLowerCase())
+    ? `${localizedTitle}, ${provinceLabel}`
+    : localizedTitle
+  const seoSegments = [seoBase]
+  if (data.bedrooms != null && data.bedrooms > 0) {
+    const bedLabel = locale === 'en' ? (data.bedrooms === 1 ? 'bed' : 'beds') : 'hab'
+    seoSegments.push(`${data.bedrooms} ${bedLabel}`)
+  }
+  if (data.price != null && data.price > 0) {
+    seoSegments.push(`${locale === 'en' ? 'from' : 'desde'} ${formatPrice(data.price, data.currency, locale)}`)
+  }
+  const seoTitle = seoSegments.join(' · ')
+
   return {
-    title: localizedTitle,
+    title: seoTitle,
     description,
     alternates: buildAlternates(`/propiedades/${slug}`, locale),
     openGraph: {
@@ -104,6 +123,7 @@ export default async function PropertyDetailPage({ params }: Props) {
       },
     }),
     ...(property.bedrooms != null && { numberOfRooms: property.bedrooms }),
+    ...(property.bathrooms != null && { numberOfBathroomsTotal: property.bathrooms }),
     ...(property.area_sqm != null && { floorSize: { '@type': 'QuantitativeValue', value: property.area_sqm, unitCode: 'MTK' } }),
     seller: { '@id': 'https://assetsgolden.com/#organization' },
   }
