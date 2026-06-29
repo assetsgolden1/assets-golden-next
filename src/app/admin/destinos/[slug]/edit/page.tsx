@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from 'react'
 import { ArrowLeft, Upload, Info } from 'lucide-react'
+import { compressImage } from '@/lib/utils/compressImage'
 
 // Slugs con bloque editorial extenso gestionado desde el código (no editable desde el panel).
 // Keys de EDITORIAL_MAP en src/lib/editorial/destinoEditorial.tsx + 'espana'.
@@ -49,8 +50,9 @@ function ImageUploader({
       return
     }
     setUploading(true)
+    const compressed = await compressImage(file)
     const fd = new FormData()
-    fd.append('file', file)
+    fd.append('file', compressed)
     fd.append('bucket', 'destination-images')
     const res = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
     const data = await res.json()

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { Link } from '@/i18n/navigation'
 
 import heroVilla from '@/assets/hero-villa.jpg'
 import heroBeach from '@/assets/hero-beach-villa.jpg'
@@ -122,15 +123,15 @@ export default function HeroImageCarousel({
         </p>
 
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-          <a href="/vender-tu-piso" style={{
+          <Link href="/vender-tu-piso" style={{
             background: '#D4AF37', color: '#131D2E',
             padding: '15px 32px', borderRadius: '4px',
             fontWeight: 700, fontSize: '0.95rem',
             textDecoration: 'none', display: 'inline-block',
           }}>
             {ctaValuation}
-          </a>
-          <a href="/propiedades" style={{
+          </Link>
+          <Link href="/propiedades" style={{
             background: 'transparent', color: '#ffffff',
             padding: '15px 32px', borderRadius: '4px',
             fontWeight: 600, fontSize: '0.95rem',
@@ -138,7 +139,7 @@ export default function HeroImageCarousel({
             border: '1.5px solid rgba(255,255,255,0.5)',
           }}>
             {ctaProperties}
-          </a>
+          </Link>
         </div>
       </div>
 

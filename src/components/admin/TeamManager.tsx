@@ -3,6 +3,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Edit2, Trash2, X, Upload } from 'lucide-react'
 import { createTeamMember, updateTeamMember, deleteTeamMember } from '@/app/admin/actions'
+import { compressImage } from '@/lib/utils/compressImage'
 function TeamPhotoUploader({
   value,
   onChange,
@@ -20,8 +21,9 @@ function TeamPhotoUploader({
       return
     }
     setUploading(true)
+    const compressed = await compressImage(file)
     const fd = new FormData()
-    fd.append('file', file)
+    fd.append('file', compressed)
     fd.append('bucket', 'team-photos')
     const res = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
     const data = await res.json()
