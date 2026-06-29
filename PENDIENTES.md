@@ -26,7 +26,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 
 ## 3. Web / Técnico
 - [Ivan+Claude·M] PDF del portal end-to-end con agente real en prod (nunca validado). Riesgo: Chromium clavado v143.0.4.
-- [CC·M] Optimizar imágenes (egress): thumbnails/AVIF-WebP responsivos vs PNG pesados.
+- [CC·S] Aplicar el helper `optimizedImage` también a heros de destino, blog e imágenes de equipo (ya está en cards + galería de ficha; el helper existe, solo falta extenderlo).
 - [CC·S] Helper compressImage a destinos/[slug]/edit y TeamManager (baja prioridad).
 - [Atilio+CC·S] Criterios de /inversiones (definición de Atilio) + verificar filtro.
 - [Claude·S] Verificar sección NOSOTROS no truncada (line-clamp).
@@ -50,6 +50,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [CC·S] HeroImageCarousel: los 2 CTAs usan `<a href>` (no `<Link>` de @/i18n/navigation) → no son locale-aware (en /en apuntan a la ruta ES) y disparan lint `no-html-link-for-pages`. Pre-existente; baja prioridad.
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 29/06: imágenes (605878c) — TODAS las imágenes de propiedad pasaron de `unoptimized` (PNG/JPG full-size) a **Supabase Image Transformation** (WebP por contexto): card 446KB→42KB, thumb→15KB (~−90% egress, verificado en vivo). + galería de ficha rehecha: mosaico hero estilo Idealista (1 grande + 4 + "Ver las N fotos"), aspect ratio 16:9 desktop / 4:3 mobile (antes 21:9 recortaba interiores), lightbox optimizado. Helper nuevo `lib/utils/optimizedImage.ts` (solo Supabase; externos como medianewbuild quedan igual).
 - 29/06: schema EN (b22341b) — WebSite JSON-LD: inLanguage/description/catálogo ahora locale-aware (antes EN declaraba es-ES). + verificado que areaServed ya tenía los 12 países traducidos a EN (pendiente que estaba resuelto). + prereq ISR (5ea94ce): featured/team/destinos con cliente estático sin cookies.
 - 29/06: FAQ destinos (b546701) — FAQPage (schema + sección visible) en destino por país y en España, data-driven (conteo, descripción editorial, datos de mercado), bilingüe. El conteo solo se incluye en la vista sin filtros (schema estable). Cierra el pendiente de FAQPage (servicios + destinos completos).
 - 29/06: FAQ servicios (dee4743) — sección de FAQ visible (6 preguntas) + schema FAQPage JSON-LD en /servicios. Respuestas basadas solo en datos reales de la página. Falta replicar en destinos.

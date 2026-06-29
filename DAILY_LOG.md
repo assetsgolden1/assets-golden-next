@@ -67,6 +67,27 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-29 — [IMAGENES] Optimización (Supabase transform) + galería mosaico + aspect ratio
+
+**Contexto:** Ivan pidió optimizar imágenes (egress) y mejorar la UX/IU de "ver propiedades". Análisis previo con datos en vivo → eligió el paquete A1+B1+B2.
+
+**Diagnóstico:** TODO usaba `unoptimized` (se servía el original full-size). Medido: imagen Supabase 446KB; vía `/storage/v1/render/image/public/...?width=400&quality=70` con Accept webp → **42KB** (−90%); thumb 160px → **15KB**. Supabase Image Transformation YA activo en el plan Pro.
+
+**Trabajo hecho (commit `605878c`):**
+- **A1 — Helper `lib/utils/optimizedImage.ts`:** reescribe URLs de Supabase Storage al endpoint de transformación con width/quality (WebP automático por Accept header). URLs no-Supabase (medianewbuild externo, Unsplash) se devuelven sin tocar. Idempotente, a prueba de errores.
+- Aplicado en **PropertyCard** (width 640) y en toda la **galería de ficha** (mosaico 1280/640, mobile 900, lightbox 2000). Se mantiene `unoptimized` en `<Image>` → next/image sirve la URL ya-transformada de Supabase (sin costo de optimización de Vercel).
+- **B1 — Galería mosaico hero** (estilo Idealista/Zillow): desktop = grilla 4×2 con 1 imagen grande + hasta 4 chicas (spans adaptativos según cantidad: 1/2/3/4/≥5) + overlay "+N" + botón "Ver las N fotos". Mobile = swipe Embla. Ambos abren el lightbox.
+- **B2 — Aspect ratio:** desktop 16:9 (mosaico) y mobile 4:3 (antes 21:9 recortaba interiores). Lightbox 6xl.
+- De paso: corregido un bug del listener de Embla (estaba registrado dentro de un `useState` en vez de `useEffect`) y el manejo de teclado del lightbox pasado a listener global.
+
+**Archivos tocados:** NEW src/lib/utils/optimizedImage.ts — MODIFIED src/components/PropertyGalleryClient.tsx · src/components/properties/PropertyCard.tsx · PENDIENTES.md · DAILY_LOG.md
+
+**Verificación:** `tsc --noEmit` EXIT 0; eslint de los 3 archivos EXIT 0. Pendiente: validar visualmente el mosaico en prod cuando termine el deploy (BUILDING al momento del commit).
+
+**Próximo paso sugerido:** Verificar visual del mosaico/lightbox en una ficha con muchas fotos. Extender `optimizedImage` a heros de destino, blog e imágenes de equipo (helper ya existe).
+
+---
+
 ### 2026-06-29 — [SEO] areaServed verificado + schema EN locale-aware + prereq ISR
 
 **Contexto:** Continuación SEO. Atacar areaServed JSON-LD EN y Home-sin-caché.
