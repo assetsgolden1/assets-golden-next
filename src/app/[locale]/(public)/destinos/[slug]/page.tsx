@@ -131,8 +131,65 @@ export default async function DestinoPage({ params, searchParams }: Props) {
   const descIntro = descParagraphs[0] ?? null
   const descRest = descParagraphs.slice(1)
 
+  // FAQ (schema + sección visible). Solo preguntas con datos reales del destino;
+  // nada inventado. Bilingüe vía locale. La sección solo se muestra con ≥2 preguntas.
+  const en = locale === 'en'
+  const noFilters = !ciudad && !tipo && precioMin == null && precioMax == null && habitaciones == null
+  const faqs: { q: string; a: string }[] = []
+  // El conteo varía con los filtros → solo en la vista canónica (sin filtros).
+  if (noFilters) {
+    faqs.push({
+      q: en ? `How many properties does Assets Golden have in ${countryLabel}?`
+            : `¿Cuántas propiedades tiene Assets Golden en ${countryLabel}?`,
+      a: en ? `We currently list ${formatNumber(totalCount, locale)} properties in ${countryLabel} through our network, with the catalogue updated continuously.`
+            : `Actualmente ofrecemos ${formatNumber(totalCount, locale)} propiedades en ${countryLabel} a través de nuestra red, con el catálogo actualizándose de forma permanente.`,
+    })
+  }
+  if (descIntro) {
+    faqs.push({
+      q: en ? `Why invest in ${countryLabel}?` : `¿Por qué invertir en ${countryLabel}?`,
+      a: descIntro,
+    })
+  }
+  if (marketInfo?.avgPrice) {
+    faqs.push({
+      q: en ? `What is the average property price in ${countryLabel}?`
+            : `¿Cuál es el precio medio de la vivienda en ${countryLabel}?`,
+      a: en ? `The indicative average price is ${marketInfo.avgPrice}.`
+            : `El precio medio orientativo es ${marketInfo.avgPrice}.`,
+    })
+  }
+  if (marketInfo?.rentalYield) {
+    faqs.push({
+      q: en ? `What rental yield can you expect in ${countryLabel}?`
+            : `¿Qué rentabilidad por alquiler ofrece ${countryLabel}?`,
+      a: en ? `Gross rental yield is around ${marketInfo.rentalYield}.`
+            : `La rentabilidad bruta por alquiler ronda ${marketInfo.rentalYield}.`,
+    })
+  }
+  if (marketInfo?.priceGrowth) {
+    faqs.push({
+      q: en ? `How have property prices evolved in ${countryLabel}?`
+            : `¿Cómo evolucionan los precios en ${countryLabel}?`,
+      a: en ? `Recent price growth is around ${marketInfo.priceGrowth}.`
+            : `La revalorización reciente ronda ${marketInfo.priceGrowth}.`,
+    })
+  }
+  const faqJsonLd = faqs.length >= 2 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(({ q, a }) => ({
+      '@type': 'Question',
+      name: q,
+      acceptedAnswer: { '@type': 'Answer', text: a },
+    })),
+  } : null
+
   return (
     <>
+      {faqJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      )}
       <Breadcrumb
         variant="secondary"
         items={[
@@ -335,6 +392,31 @@ export default async function DestinoPage({ params, searchParams }: Props) {
             {descRest.map((p, i) => (
               <p key={i} className="text-muted-foreground leading-relaxed text-base">{p}</p>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* FAQ */}
+      {faqs.length >= 2 && (
+        <section className="py-12 bg-background">
+          <div className="container-luxury max-w-3xl">
+            <div className="mb-8 text-center">
+              <h2 className="font-display text-2xl font-semibold">
+                {en ? 'Frequently asked questions' : 'Preguntas frecuentes'}
+              </h2>
+              <div className="divider-gold mx-auto mt-4" />
+            </div>
+            <div className="space-y-3">
+              {faqs.map(({ q, a }) => (
+                <details key={q} className="group rounded-xl border border-border bg-card px-5 py-4">
+                  <summary className="flex cursor-pointer items-center justify-between gap-4 font-medium text-foreground list-none">
+                    {q}
+                    <span className="text-gold text-xl leading-none transition-transform group-open:rotate-45">+</span>
+                  </summary>
+                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{a}</p>
+                </details>
+              ))}
+            </div>
           </div>
         </section>
       )}

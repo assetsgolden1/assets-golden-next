@@ -86,8 +86,67 @@ export default async function EspanaPage({ searchParams }: Props) {
   const tagline = locale === 'en' ? (destination?.tagline_en ?? destination?.tagline) : destination?.tagline
   const currentFilters = { zona, ciudad, tipo, precioMin, precioMax, habitaciones, orden }
 
+  // FAQ (schema + sección visible). Datos reales del destino; nada inventado.
+  // El conteo solo en la vista canónica (sin filtros) para un schema estable.
+  const en = locale === 'en'
+  const spainLabel = t('breadcrumb_spain')
+  const noFilters = !zona && !ciudad && !tipo && precioMin == null && precioMax == null && habitaciones == null
+  const spainDesc = (en ? (destination?.description_en ?? destination?.description) : destination?.description) ?? ''
+  const spainDescIntro = spainDesc.split(/\n\n+/).filter(Boolean)[0] ?? null
+  const faqs: { q: string; a: string }[] = []
+  if (noFilters) {
+    faqs.push({
+      q: en ? `How many properties does Assets Golden have in ${spainLabel}?`
+            : `¿Cuántas propiedades tiene Assets Golden en ${spainLabel}?`,
+      a: en ? `We currently list ${formatNumber(totalCount, locale)} properties across ${spainLabel} through our network, with the catalogue updated continuously.`
+            : `Actualmente ofrecemos ${formatNumber(totalCount, locale)} propiedades en ${spainLabel} a través de nuestra red, con el catálogo actualizándose de forma permanente.`,
+    })
+  }
+  if (spainDescIntro) {
+    faqs.push({
+      q: en ? `Why invest in ${spainLabel}?` : `¿Por qué invertir en ${spainLabel}?`,
+      a: spainDescIntro,
+    })
+  }
+  if (marketInfo?.avgPrice) {
+    faqs.push({
+      q: en ? `What is the average property price in ${spainLabel}?`
+            : `¿Cuál es el precio medio de la vivienda en ${spainLabel}?`,
+      a: en ? `The indicative average price is ${marketInfo.avgPrice}.`
+            : `El precio medio orientativo es ${marketInfo.avgPrice}.`,
+    })
+  }
+  if (marketInfo?.rentalYield) {
+    faqs.push({
+      q: en ? `What rental yield can you expect in ${spainLabel}?`
+            : `¿Qué rentabilidad por alquiler ofrece ${spainLabel}?`,
+      a: en ? `Gross rental yield is around ${marketInfo.rentalYield}.`
+            : `La rentabilidad bruta por alquiler ronda ${marketInfo.rentalYield}.`,
+    })
+  }
+  if (marketInfo?.priceGrowth) {
+    faqs.push({
+      q: en ? `How have property prices evolved in ${spainLabel}?`
+            : `¿Cómo evolucionan los precios en ${spainLabel}?`,
+      a: en ? `Recent price growth is around ${marketInfo.priceGrowth}.`
+            : `La revalorización reciente ronda ${marketInfo.priceGrowth}.`,
+    })
+  }
+  const faqJsonLd = faqs.length >= 2 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(({ q, a }) => ({
+      '@type': 'Question',
+      name: q,
+      acceptedAnswer: { '@type': 'Answer', text: a },
+    })),
+  } : null
+
   return (
     <>
+      {faqJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      )}
       <Breadcrumb
         variant="secondary"
         items={[
@@ -307,6 +366,31 @@ export default async function EspanaPage({ searchParams }: Props) {
                 </>
               )}
             </article>
+          </div>
+        </section>
+      )}
+
+      {/* FAQ */}
+      {faqs.length >= 2 && (
+        <section className="py-12 bg-background">
+          <div className="container-luxury max-w-3xl">
+            <div className="mb-8 text-center">
+              <h2 className="font-display text-2xl font-semibold">
+                {en ? 'Frequently asked questions' : 'Preguntas frecuentes'}
+              </h2>
+              <div className="divider-gold mx-auto mt-4" />
+            </div>
+            <div className="space-y-3">
+              {faqs.map(({ q, a }) => (
+                <details key={q} className="group rounded-xl border border-border bg-card px-5 py-4">
+                  <summary className="flex cursor-pointer items-center justify-between gap-4 font-medium text-foreground list-none">
+                    {q}
+                    <span className="text-gold text-xl leading-none transition-transform group-open:rotate-45">+</span>
+                  </summary>
+                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{a}</p>
+                </details>
+              ))}
+            </div>
           </div>
         </section>
       )}
