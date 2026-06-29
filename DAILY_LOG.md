@@ -79,9 +79,9 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 **Archivos tocados:** NEW src/components/properties/PropertyCardCarousel.tsx — MODIFIED PropertyCard.tsx · SpainPropertiesGrid.tsx · propiedades/page.tsx · destinos/[slug]/page.tsx · inversiones/page.tsx · promociones/page.tsx · PENDIENTES.md · DAILY_LOG.md
 
-**Verificación:** `tsc --noEmit` EXIT 0; eslint EXIT 0. Pendiente: verificación visual en prod (flechas en hover + cambio de foto sin navegar).
+**Verificación:** `tsc --noEmit` EXIT 0; eslint EXIT 0. VERIFICADO VISUAL en prod (29/06): flechas aparecen en hover, contador "1/30" en tarjetas con muchas fotos, clic en flecha avanza la foto (1/30→3/30) SIN navegar a la ficha. Imágenes WebP optimizadas. 2475/2479 propiedades visibles tienen galería múltiple → el carrusel aplica a casi todas.
 
-**Próximo paso sugerido:** Verificar visual en /propiedades. (El HomePropertiesCarousel del home usa otro componente, no PropertyCard — si se quiere el carrusel ahí también, es aparte.)
+**Próximo paso sugerido:** (El HomePropertiesCarousel del home usa otro componente, no PropertyCard — si se quiere el carrusel ahí también, es aparte.)
 
 ---
 
