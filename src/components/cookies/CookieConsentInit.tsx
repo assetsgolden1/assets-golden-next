@@ -16,6 +16,33 @@ import * as CookieConsent from 'vanilla-cookieconsent'
 import 'vanilla-cookieconsent/dist/cookieconsent.css'
 
 const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID
+const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-5E27WGKEDF'
+
+/**
+ * Dynamically injects and initializes Google Analytics 4 (gtag.js).
+ * Safe to call multiple times — exits early if the init script already exists.
+ * Loaded ONLY after the user grants the "analytics" consent category.
+ * SPA page_view is covered by GA4 Enhanced Measurement (history events).
+ */
+function initGA4(gaId: string): void {
+  if (typeof window === 'undefined') return
+  if (document.getElementById('ga4-init')) return // idempotent guard
+
+  const loader = document.createElement('script')
+  loader.async = true
+  loader.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`
+  document.head.appendChild(loader)
+
+  const inline = document.createElement('script')
+  inline.id = 'ga4-init'
+  inline.textContent = [
+    'window.dataLayer = window.dataLayer || [];',
+    'function gtag(){dataLayer.push(arguments);}',
+    "gtag('js', new Date());",
+    `gtag('config', '${gaId}');`,
+  ].join('')
+  document.head.appendChild(inline)
+}
 
 /**
  * Dynamically injects and initializes the Meta Pixel SDK.
@@ -82,12 +109,22 @@ export default function CookieConsentInit() {
       // ── Callbacks ─────────────────────────────────────────────────
       onConsent: ({ cookie }) => {
         // Fires every page load when consent cookie exists.
+        if (GA_ID && cookie.categories.includes('analytics')) {
+          initGA4(GA_ID)
+        }
         if (PIXEL_ID && cookie.categories.includes('marketing')) {
           initMetaPixel(PIXEL_ID)
         }
       },
       onChange: ({ cookie, changedCategories }) => {
         // Fires when preferences change after initial consent.
+        if (
+          GA_ID &&
+          changedCategories.includes('analytics') &&
+          cookie.categories.includes('analytics')
+        ) {
+          initGA4(GA_ID)
+        }
         if (
           PIXEL_ID &&
           changedCategories.includes('marketing') &&
