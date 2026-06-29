@@ -67,6 +67,22 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-29 — [SEO+DATA] FAQPage en /servicios + dropeo del backup viejo
+
+**Contexto:** Ivan pidió seguir con FAQ y dio OK para dropear el backup.
+
+**Trabajo hecho:**
+- **FAQPage en /servicios (commit `dee4743`):** sección de FAQ visible (6 preguntas: tipos de propiedad, países, inversores extranjeros, off-market, due diligence, cómo consultar) con accordion nativo `<details>`, + schema `FAQPage` JSON-LD que coincide con el contenido visible (requisito de Google). Respuestas redactadas SOLO con datos ya presentes en la página (nada inventado: nada de comisiones, plazos ni garantías). La página es hardcodeada en ES (no usa next-intl), así que el FAQ va en ES. Falta replicar en destinos.
+- **Dropeo de `properties_backup_20260429`:** verificado antes (backup 1.757 filas, snapshot del 29/04; live 2.696, más grande y sano) → `DROP TABLE`. Post-drop el catálogo vivo sigue en 2.696. Esto también elimina el advisor de RLS-sin-policy que marcaba esa tabla. Acción destructiva con OK explícito de Ivan.
+
+**Archivos tocados:** MODIFIED src/app/[locale]/(public)/servicios/page.tsx · PENDIENTES.md · DAILY_LOG.md — DB: DROP TABLE properties_backup_20260429.
+
+**Verificación:** `tsc --noEmit` EXIT 0; eslint EXIT 0. Drop confirmado por count post-operación.
+
+**Próximo paso sugerido:** FAQPage en destinos (per-país, con datos del propio destino para no inventar). Otros SEO: Home sin caché (no-store→ISR), verificar areaServed JSON-LD en EN. Validar en prod el rich-result de FAQ con la herramienta de resultados enriquecidos de Google.
+
+---
+
 ### 2026-06-29 — [SEO] Barrido de marca (limpio) + títulos de ficha enriquecidos
 
 **Contexto:** Ivan pidió avanzar con SEO. También confirmó resoluciones de su lado.

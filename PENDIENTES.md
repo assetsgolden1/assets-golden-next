@@ -17,7 +17,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 ## 1. SEO / Posicionamiento
 - [Claude+CC·M] Verificar si el listado /blog es client-side; si lo es, pasarlo a SSR (enlazado interno).
 - [CC·M] Home sin caché (no-store → ISR revalidate).
-- [CC·M] Ampliar schema: FAQPage en servicios/destinos. (numberOfRooms/numberOfBathroomsTotal en fichas ya hecho 29/06.)
+- [CC·M] Ampliar schema: FAQPage en destinos. (Servicios ya hecho 29/06; numberOfRooms/numberOfBathroomsTotal en fichas ya hecho 29/06.)
 - [Claude·S] Verificar areaServed JSON-LD en EN (estaba en español y sin Rep. Dominicana; auditoría dice 12 países: confirmar).
 - [Atilio+Ivan·L] Autoridad/backlinks: menciones, prensa, portales, partners. Lo que falta vs competidores.
 
@@ -37,7 +37,6 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [Ivan+CC·M] Revisar imágenes huérfanas en storage de intentos de carga fallidos previos (fotos subidas antes de que abortara la creación).
 
 ## 4. Infraestructura / Seguridad / Datos
-- [Ivan·S] Dropear properties_backup_20260429 cuando el catálogo esté validado.
 - [Ivan+CC·M] Limpiar bucket de imágenes huérfanas (post-upgrade).
 - (Aceptados, sin acción: buckets con listing, get_property_filters, pg_trgm, leads_public_insert.)
 
@@ -53,6 +52,8 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [CC·S] HeroImageCarousel: los 2 CTAs usan `<a href>` (no `<Link>` de @/i18n/navigation) → no son locale-aware (en /en apuntan a la ruta ES) y disparan lint `no-html-link-for-pages`. Pre-existente; baja prioridad.
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 29/06: FAQ servicios (dee4743) — sección de FAQ visible (6 preguntas) + schema FAQPage JSON-LD en /servicios. Respuestas basadas solo en datos reales de la página. Falta replicar en destinos.
+- 29/06: dropeada la tabla de respaldo `properties_backup_20260429` (1.757 filas, snapshot 29/04) con OK de Ivan. Catálogo vivo intacto (2.696). También limpia el advisor RLS que la marcaba.
 - 29/06: SEO fichas (1597773) — títulos enriquecidos en las ~2.600 fichas ("{tipo} en {ciudad}, {provincia} · {hab} hab · desde {precio}") + numberOfBathroomsTotal en el JSON-LD. OG/Twitter quedan con título limpio.
 - 29/06: barrido de coherencia de marca → VERIFICADO LIMPIO (0 residuos "lujo"/"Nest Seekers" en código user-facing, i18n, public/, blog DB y destinos DB; solo quedan clases CSS y el campo DB nestseekers_url, no visibles). No requirió cambios.
 - 29/06: resueltos por Ivan/Atilio — Joan ya es admin con usuario; contrato IBott–Atilio firmado; Atilio avisado para recargar la propiedad de Torrevieja.
