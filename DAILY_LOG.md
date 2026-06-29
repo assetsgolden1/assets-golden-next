@@ -67,6 +67,25 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-29 — [SEO] Barrido de marca (limpio) + títulos de ficha enriquecidos
+
+**Contexto:** Ivan pidió avanzar con SEO. También confirmó resoluciones de su lado.
+
+**Trabajo hecho:**
+- **Barrido de coherencia de marca (pendiente SEO):** búsqueda exhaustiva de residuos "lujo"/"Nest Seekers" en código (`src`), i18n (`messages/`), `public/`, y DB (blog_posts y country_destinations vía MCP). **Resultado: 0 residuos user-facing.** Lo único que queda son clases CSS (`container-luxury`, `tracking-luxury`) y el campo de DB `nestseekers_url` (interno, ya marcado como no-tocar sin migración). El rebrand de mayo + el llms.txt de hoy lo cubrieron todo. No requirió cambios — pendiente cerrado como verificado.
+- **Títulos de ficha enriquecidos (commit `1597773`):** en `propiedades/[slug]/page.tsx`, el `<title>` SEO pasó del título crudo a "{tipo} en {ciudad}, {provincia} · {N} hab · desde {precio}" (ES) / "… · N beds · from {price}" (EN). Provincia solo si no está ya en el título; precio vía formatPrice. OG/Twitter siguen con el título limpio (mejor para social). Afecta a las ~2.600 fichas. De paso, agregado `numberOfBathroomsTotal` al JSON-LD RealEstateListing.
+
+**Resoluciones reportadas por Ivan/Atilio (pendientes cerrados, sin commit):**
+- Joan ya es admin con su usuario. · Contrato IBott–Atilio firmado. · Atilio avisado para recargar la propiedad de Torrevieja que falló.
+
+**Archivos tocados:** MODIFIED src/app/[locale]/(public)/propiedades/[slug]/page.tsx · PENDIENTES.md · DAILY_LOG.md
+
+**Verificación:** `tsc --noEmit` EXIT 0; eslint del archivo EXIT 0. Título validado con datos reales (ej. "Apartamento en Torrox, Málaga · 2 hab · desde 335.000 €").
+
+**Próximo paso sugerido:** Seguir SEO con FAQPage en servicios/destinos, o Home sin caché (no-store→ISR), o verificar areaServed JSON-LD en EN. Pendiente del backup `properties_backup_20260429`: dropear cuando Ivan dé OK (destructivo).
+
+---
+
 ### 2026-06-29 — [BUGFIX] Carga de propiedades: una foto vacía abortaba toda la propiedad
 
 **Contexto:** Atilio reportó que al cargar propiedades, tras crear 4-5 una fallaba con error "No file provided". Captura compartida confirma el error en el form de nueva propiedad.
