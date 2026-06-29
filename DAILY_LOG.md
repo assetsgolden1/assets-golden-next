@@ -67,6 +67,23 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-29 — [SEO] FAQPage en destinos (por país + España)
+
+**Contexto:** Continuación de SEO. Cerrar el pendiente de FAQPage (faltaban destinos).
+
+**Trabajo hecho (commit `b546701`):**
+- **`destinos/[slug]/page.tsx`** (11 países no-España) y **`destinos/espana/page.tsx`**: agregada sección de FAQ visible (accordion `<details>`) + schema `FAQPage` JSON-LD, **data-driven** y **bilingüe** (locale).
+- Preguntas generadas solo con datos reales del destino: nº de propiedades (`totalCount`/`formatNumber`), "por qué invertir" (primer párrafo de la descripción editorial del destino), y precio medio / rentabilidad / revalorización (de `market_info`, solo si existen). Nada inventado.
+- **Schema estable:** la pregunta del conteo (que varía con los filtros ciudad/tipo/precio) se incluye SOLO en la vista canónica sin filtros (`noFilters`). Las demás preguntas son filter-independent. La sección se renderiza solo con ≥2 preguntas.
+
+**Archivos tocados:** MODIFIED src/app/[locale]/(public)/destinos/[slug]/page.tsx · src/app/[locale]/(public)/destinos/espana/page.tsx · PENDIENTES.md · DAILY_LOG.md
+
+**Verificación:** `tsc --noEmit` EXIT 0. Lint: 4 errores `any` en espana/page.tsx PRE-EXISTENTES (código editorial/mercado, confirmado por git diff que no agregué ninguno).
+
+**Próximo paso sugerido:** Validar los rich results de FAQ en prod (servicios + un destino) con la herramienta de Google. Seguir SEO con Home sin caché (no-store→ISR) o areaServed JSON-LD en EN. Deuda baja anotada: limpiar los `any` pre-existentes de espana/page.tsx si se hace una pasada de lint.
+
+---
+
 ### 2026-06-29 — [SEO+DATA] FAQPage en /servicios + dropeo del backup viejo
 
 **Contexto:** Ivan pidió seguir con FAQ y dio OK para dropear el backup.
