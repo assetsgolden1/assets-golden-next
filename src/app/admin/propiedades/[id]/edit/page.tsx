@@ -76,6 +76,7 @@ export default function EditPropertyPage({
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [warn, setWarn] = useState('')
   const [availableCities, setAvailableCities] = useState<string[]>([])
   const [useCustomCity, setUseCustomCity] = useState(false)
   const initialLoadDone = useRef(false)
@@ -186,27 +187,47 @@ export default function EditPropertyPage({
     }
     setSaving(true)
     setError('')
+    setWarn('')
 
+    // Una foto que falle (vacía, corrupta o rechazada) NO aborta el guardado:
+    // se omite y se guardan las buenas. Antes un solo archivo de 0 bytes
+    // (p.ej. foto de iCloud no descargada) tiraba abajo todos los cambios.
     const newImageUrls: string[] = []
+    const skipped: string[] = []
     for (const file of newImages) {
-      const compressed = await compressImage(file)
-      const fd = new FormData()
-      fd.append('file', compressed)
-      const res = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
-      if (!res.ok) {
-        const text = await res.text()
-        console.error('Upload failed:', text)
-        setError('Error subiendo imagen')
-        setSaving(false)
-        return
+      const label = file?.name || 'foto sin nombre'
+      if (!file || file.size === 0) {
+        skipped.push(label)
+        continue
       }
-      const data = await res.json()
-      if (data.error) {
-        setError(data.error)
-        setSaving(false)
-        return
+      try {
+        const compressed = await compressImage(file)
+        if (compressed.size === 0) {
+          skipped.push(label)
+          continue
+        }
+        const fd = new FormData()
+        fd.append('file', compressed)
+        const res = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok || data.error || !data.url) {
+          skipped.push(label)
+          continue
+        }
+        newImageUrls.push(data.url)
+      } catch {
+        skipped.push(label)
       }
-      if (data.url) newImageUrls.push(data.url)
+    }
+
+    if (skipped.length > 0) {
+      const lista = skipped.length <= 5
+        ? skipped.join(', ')
+        : `${skipped.slice(0, 5).join(', ')} y ${skipped.length - 5} más`
+      setWarn(
+        `Se omitieron ${skipped.length} foto(s) nueva(s) vacías o que no se pudieron procesar (${lista}). ` +
+        `Se guardó con el resto. Podés volver a subir las que faltan.`
+      )
     }
 
     const allImages = [...existingImages, ...newImageUrls]
@@ -229,6 +250,12 @@ export default function EditPropertyPage({
       return
     }
 
+    // Si se omitieron fotos, dar tiempo a leer el aviso antes de redirigir.
+    if (skipped.length > 0) {
+      setSaving(false)
+      setTimeout(() => { window.location.href = '/admin/propiedades' }, 6000)
+      return
+    }
     window.location.href = '/admin/propiedades'
   }
 
@@ -582,6 +609,12 @@ export default function EditPropertyPage({
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
             {error}
+          </div>
+        )}
+
+        {warn && (
+          <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl px-4 py-3 text-sm">
+            ⚠ {warn}
           </div>
         )}
 

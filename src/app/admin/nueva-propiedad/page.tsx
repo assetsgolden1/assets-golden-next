@@ -39,6 +39,7 @@ export default function NuevaPropiedadPage() {
   const formRef = useRef<HTMLFormElement>(null)
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const [warnMsg, setWarnMsg] = useState('')
   const [galleryItems, setGalleryItems] = useState<{ file: File; preview: string }[]>([])
   const [isDev, setIsDev] = useState(false)
   const [isFeatured, setIsFeatured] = useState(false)
@@ -115,25 +116,54 @@ export default function NuevaPropiedadPage() {
     }
     setStatus('loading')
     setErrorMsg('')
+    setWarnMsg('')
 
     try {
       const form = e.currentTarget
       const rawData = new FormData(form)
 
-      // Subir fotos secuencialmente
+      // Subir fotos secuencialmente. Una foto que falle (vacía, corrupta o
+      // rechazada) NO aborta la carga: se omite y la propiedad se crea igual
+      // con las fotos buenas. Antes un solo archivo de 0 bytes (p.ej. foto de
+      // iCloud no descargada) tiraba abajo toda la propiedad.
       const uploadedUrls: string[] = []
+      const skipped: string[] = []
       for (const { file } of galleryItems) {
-        const compressed = await compressImage(file)
-        const fd = new FormData()
-        fd.append('file', compressed)
-        const uploadRes = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
-        const uploadData = await uploadRes.json()
-        if (!uploadRes.ok) {
-          setErrorMsg(uploadData.error ?? 'Error subiendo imagen')
-          setStatus('error')
-          return
+        const label = file?.name || 'foto sin nombre'
+        // Guard cliente: archivos vacíos → omitir sin intentar subir
+        if (!file || file.size === 0) {
+          skipped.push(label)
+          continue
         }
-        if (uploadData.url) uploadedUrls.push(uploadData.url)
+        try {
+          const compressed = await compressImage(file)
+          if (compressed.size === 0) {
+            skipped.push(label)
+            continue
+          }
+          const fd = new FormData()
+          fd.append('file', compressed)
+          const uploadRes = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
+          const uploadData = await uploadRes.json().catch(() => ({}))
+          if (!uploadRes.ok || !uploadData.url) {
+            skipped.push(label)
+            continue
+          }
+          uploadedUrls.push(uploadData.url)
+        } catch {
+          skipped.push(label)
+        }
+      }
+
+      if (skipped.length > 0) {
+        const lista = skipped.length <= 5
+          ? skipped.join(', ')
+          : `${skipped.slice(0, 5).join(', ')} y ${skipped.length - 5} más`
+        setWarnMsg(
+          `Se omitieron ${skipped.length} foto(s) vacías o que no se pudieron procesar (${lista}). ` +
+          `La propiedad se creó con las ${uploadedUrls.length} fotos restantes. ` +
+          `Podés volver a subir las que faltan editando la propiedad.`
+        )
       }
 
       const res = await fetch('/api/admin/create-property', {
@@ -166,7 +196,8 @@ export default function NuevaPropiedadPage() {
         setStatus('error')
       } else {
         setStatus('success')
-        setTimeout(() => router.push('/admin/propiedades'), 1500)
+        // Si se omitieron fotos, dar tiempo a leer el aviso antes de redirigir.
+        setTimeout(() => router.push('/admin/propiedades'), skipped.length > 0 ? 6000 : 1500)
       }
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Error inesperado')
@@ -184,6 +215,12 @@ export default function NuevaPropiedadPage() {
       {status === 'success' && (
         <div className="mb-4 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm font-medium">
           ✓ Propiedad creada correctamente. Redirigiendo...
+        </div>
+      )}
+
+      {warnMsg && (status === 'success' || status === 'loading') && (
+        <div className="mb-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl px-4 py-3 text-sm font-medium">
+          ⚠ {warnMsg}
         </div>
       )}
 
