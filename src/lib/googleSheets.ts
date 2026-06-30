@@ -82,6 +82,42 @@ export async function readMetaSheetEmails(spreadsheetId: string): Promise<Set<st
   }
 }
 
+// Lee la pestaña CRM (la que mantiene Atilio). Email=col C, Estado=col O.
+// SOLO LECTURA. Devuelve filas crudas {email, estado}; la normalización/decisión
+// de pausa vive en lib/leads/crmPause.ts. Lanza si no hay credenciales o si la
+// API falla, para que el caller pueda ABORTAR la corrida (no enviar a ciegas).
+export interface CrmStatusRow {
+  email: string
+  estado: string
+}
+
+export async function readCrmStatuses(spreadsheetId: string): Promise<CrmStatusRow[]> {
+  const credentialsJson = process.env.GOOGLE_SHEETS_CREDENTIALS_JSON
+  if (!credentialsJson) {
+    throw new Error('[Sheets-CRM] GOOGLE_SHEETS_CREDENTIALS_JSON no configurado')
+  }
+  if (!spreadsheetId) {
+    throw new Error('[Sheets-CRM] spreadsheetId no configurado')
+  }
+
+  const sheets = buildSheetsClient(credentialsJson)
+
+  // Rango C:O → C[0]=Email ... O[12]=Estado dentro de cada fila del rango.
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: "'CRM'!C:O",
+  })
+
+  const rows = res.data.values ?? []
+  // rows[0] es el header (Email / ... / Estado) — lo saltamos.
+  return rows
+    .slice(1)
+    .map((r): CrmStatusRow => ({
+      email: (r[0] as string | undefined) ?? '',
+      estado: (r[12] as string | undefined) ?? '',
+    }))
+}
+
 export async function appendLeadToSheets(lead: {
   name: string
   email: string

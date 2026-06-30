@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { SEQUENCE_TEMPLATES, type SequenceLead } from '@/lib/email/sequenceTemplates'
 import { sendSequenceEmail } from '@/lib/email/sendSequenceEmail'
+import { pauseLeadsFromCrm } from '@/lib/leads/crmPause'
 
 // Cron de la secuencia de nurture (LEADS-SEQ-P03).
 // GET protegido con el mismo secret que el sync de leads (META_LEADS_CRON_SECRET).
@@ -48,6 +49,19 @@ export async function GET(req: NextRequest) {
   }
 
   const now = Date.now()
+
+  // ── 0. Sincronizar pausas desde el CRM ANTES de elegir destinatarios ────
+  // Lee el Estado del CRM y pausa (seq_paused=true) a los leads avanzados/terminales.
+  // Si NO se pudo leer el CRM, ABORTAMOS la corrida: preferimos un día de atraso
+  // (el cron corre mañana) antes que mandarle a un Ganado/Descartado a ciegas.
+  const crmPause = await pauseLeadsFromCrm()
+  if (crmPause.aborted) {
+    console.error('[sequence] Corrida ABORTADA: no se pudo verificar pausas del CRM:', crmPause.error)
+    return NextResponse.json(
+      { ok: false, aborted: true, sent: 0, error: crmPause.error, crmPause },
+      { status: 503 },
+    )
+  }
 
   const { data, error } = await supabaseAdmin
     .from('meta_leads')
@@ -129,6 +143,7 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     ok: true,
+    crmPause,
     scanned,
     sent,
     sentByEmail,

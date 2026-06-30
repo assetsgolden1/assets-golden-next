@@ -67,6 +67,26 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-06-30 — [CRM-SYNC-PAUSE] El estado del CRM pausa la secuencia (Fase 1)
+
+**Contexto:** Ivan pidió conectar el Estado que Atilio marca en el CRM (pestaña 'CRM' del Sheet `META_LEADS_SHEET_ID`) con la pausa de la secuencia de nurture. Antes estaban desconectados: el cron mandaba correos sin mirar el CRM. Reglas duras: SOLO pausa (nunca reactiva), solo LEE el Sheet, solo toca `meta_leads.seq_paused`, match por email normalizado, idempotente. Manejo de error: ABORTAR el envío de la corrida si no se puede leer el CRM (no mandar a ciegas a un Ganado/Descartado), pero logueando y devolviéndolo en el JSON.
+
+**Diagnóstico (en vivo, solo lectura):**
+- La secuencia corre en `GET /api/leads/sequence` y filtra destinatarios con `.eq('seq_paused', false)`. Cron `meta-leads-sequence.yml` 09:00 UTC (ACTIVO desde 2026-06-16, commit `e5be41a`; el comentario "NO ACTIVADO" del YAML es viejo).
+- Sheet "LEADS META" (`1Q_PRvDe45...`) tiene 3 pestañas: LEADS, DEMANDAS, **CRM**. En CRM: **Email = col C**, **Estado = col O** (21 cols A:U). ~29 leads con email (capacidad de grilla 1517 → sin riesgo de rate limit; agregamos 1 lectura por corrida).
+- Estados reales hoy: Contactado ×16, Descartado ×5, vacío ×4, En conversación ×3.
+
+**Trabajo hecho (commit de código):**
+- `src/lib/googleSheets.ts` (MODIFIED): nueva `readCrmStatuses(spreadsheetId)` → un solo `values.get` de `'CRM'!C:O`, devuelve `{email, estado}[]` saltando header. Solo lectura; lanza si falla (para que el caller aborte).
+- `src/lib/leads/crmPause.ts` (CREATED): `pauseLeadsFromCrm()`. Normaliza estados (trim+lower+sin acentos vía `\p{Diacritic}`) contra set PAUSE (en conversacion, propuesta enviada, propuesta, visita, negociacion, ganado, perdido, descartado). Match por email lower+trim contra `meta_leads` con `seq_paused=false`. `UPDATE seq_paused=true` solo sobre esos id (NUNCA false, NUNCA escribe el Sheet, idempotente). Devuelve `{ok, aborted, error?, crmRowsRead, pauseCandidates, newlyPaused, pausedEmails[]}`.
+- `src/app/api/leads/sequence/route.ts` (MODIFIED): llama `pauseLeadsFromCrm()` al inicio del GET, ANTES del filtro de destinatarios. Si `aborted` → corta con HTTP 503 + `{ok:false, aborted:true, crmPause}` (no envía). Si ok → suma `crmPause` al JSON de respuesta.
+
+**Verificación:** `tsc --noEmit` limpio. Corrida de prueba del paso de pausa (local, sin enviar correos, contra CRM+DB reales): `{ok:true, aborted:false, crmRowsRead:29, pauseCandidates:8, newlyPaused:0, pausedEmails:[]}` — los 8 candidatos (5 Descartado + 3 En conversación) ya estaban `seq_paused=true` (8/8 match por email OK, idempotencia OK). Prueba reversible del write path: forcé 1 a `false` → `newlyPaused:1, pausedEmails:[fabiener@gmail.com]` → volvió a `true`. Estado neto sin cambios.
+
+**Próximo paso sugerido:** En la próxima corrida del cron (09:00 UTC) verificar el bloque `crmPause` en la respuesta/logs de Vercel. Si Atilio empieza a usar Propuesta/Visita/Negociación/Ganado/Perdido, ya están soportados. Reactivación sigue siendo manual (por diseño).
+
+---
+
 ### 2026-06-29 — [DATA-CLEANUP] Re-etiquetado 51 props mal-marcadas + borrado 177 huérfanas (437 MB)
 
 **Contexto:** Ivan dio OK para borrar huérfanas y pidió re-etiquetar las mal-marcadas para que el cron de sync no las toque.
