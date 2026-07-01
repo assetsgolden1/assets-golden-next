@@ -67,6 +67,30 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-07-01 — [IMAGENES] AG-00811: 10 fotos rotas arregladas (fuente >25 MB → transform 400)
+
+**Contexto:** Iván reportó que AG-00811 ("NATULIA LUJO FRENTE AL MAR EN TULUM", Tulum/México, manual) tenía fotos que no se ven en la web.
+
+**Diagnóstico (causa raíz):**
+- 10 de 22 imágenes eran PNG **sin comprimir de 28–52 MB**. Supabase Image Transformation rechaza toda fuente **> ~25 MB** con `HTTP 400 "source image file is too large to process"`.
+- El sitio sirve TODO vía `optimizedImage()` → endpoint `/render/image/` → esas 10 daban 400 → imágenes rotas (incluida la `image_url` principal → card del listado también rota). Las 12 restantes (<4 MB) transformaban OK.
+- Las imágenes viven en un **proyecto Supabase secundario** (`wloneprkibfjioxwypaw`), no el principal. El entorno local solo tiene la key del principal.
+
+**Fix (opción re-host, sin key del secundario):**
+- Script (sharp): descargó las 10, recomprimió a JPEG máx 2560px q82 (**44 MB → ~1 MB** c/u, respetando EXIF), subió al bucket `property-images` del **proyecto principal** (Pro, con transforms) bajo prefijo `ag00811/`.
+- Verificó 200 (raw+transform) en las 10 nuevas ANTES de tocar BD.
+- UPDATE de `image_url` + `gallery_urls` reemplazando SOLO esas 10 URLs, preservando orden; las 12 buenas intactas.
+- Verificación final: **22/22 transforman 200, 0 rotas**.
+- Reversible: no se borraron los archivos originales del proyecto secundario.
+
+**Archivos tocados:** ninguno de código (fix de datos vía script + MCP execute_sql, sin commit). Scripts temporales borrados.
+
+**Nota de propagación:** la ficha es ISR (revalidate 1h) → en prod se ve cuando revalide la caché o en el próximo deploy. El dato ya está bien en BD+storage.
+
+**Próximo paso sugerido (MAÑANA):** escanear las **57 propiedades restantes** con imágenes en el proyecto secundario (`wloneprkibfjioxwypaw`) para listar cuáles tienen el mismo defecto (fuentes >25 MB) y arreglarlas en lote con el mismo método. (El script de escaneo falló por usar `.or(...ilike)` sobre columna jsonb `gallery_urls` — hay que castear `gallery_urls::text` o filtrar en JS; ajustar antes de correr.)
+
+---
+
 ### 2026-07-01 — [LEADS-PARSER] Soporte de 2 formularios de Meta + tokens de valor actuales
 
 **Contexto:** Ivan reportó que un lead nuevo (Stephanie Lyskov, `monacsteph@hotmail.com`, 01/07) se cargó al Sheet SIN tipo/presupuesto/timeline/purpose. Confirmó que creó un form nuevo a propósito y pidió que el parser tome los dos forms.
