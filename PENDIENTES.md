@@ -5,7 +5,7 @@
 > - Al cerrar una sesión: tachar/quitar lo resuelto y agregar lo nuevo que surja.
 > - El detalle de CÓMO se hizo cada cosa va en DAILY_LOG.md, no acá.
 > - El estado actual del proyecto (números, stack) va en ESTADO.md, no acá.
-> Última actualización: 29/06/2026
+> Última actualización: 01/07/2026
 
 Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
@@ -39,17 +39,16 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 
 ## 7. Higiene / deuda técnica baja
 
-### 7a. Deuda de lint pre-existente (CC-doable; NO rompe el build — Next 16 no corre ESLint en build)
-- [CC·S] **`<a href>` → `<Link>` de next/link** en nav de admin. Lugares: `admin/propiedades/[id]/edit/page.tsx` (~L644, link a `/admin/propiedades/`), `admin/destinos/[slug]/edit/page.tsx` (L324, link a `/admin/destinos/`). Acción: importar `Link` de `next/link` y reemplazar `<a href>`/`</a>`. Cuidado: BAJO — es nav interna de admin (no i18n, así que `next/link` normal, NO el de `@/i18n/navigation`). Verificar con `npx eslint` que se limpian esos errores.
-- [CC·S] **`<img>` → `next/Image`** en `components/admin/TeamManager.tsx` (2 lugares: L~43 preview del uploader, L~212 lista de miembros). Acción: reemplazar por `<Image>` con `width`/`height` o `fill`+contenedor relativo, y `unoptimized` + `optimizedImage(url)` (mismo patrón del resto). Cuidado: BAJO-MEDIO — son fotos de equipo en el panel admin; verificar que no se rompa el layout (el uploader es cuadrado, la lista es avatar). No urgente (admin, no user-facing).
-- [CC·M] **`set-state-in-effect` (regla React 19)** en `admin/propiedades/[id]/edit/page.tsx` (L~108, `setAvailableCities([])` dentro de un useEffect) y `components/portal/PortalPropertiesGrid.tsx` (L342, `setCities([])` en un effect). Acción: mover el setState fuera del cuerpo del effect (derivar el estado, o usar el patrón que recomienda React: calcular en render / event handler). Cuidado: MEDIO — es un mini-refactor, NO un one-liner; hay que TESTEAR que la carga de ciudades/filtros siga funcionando igual (crear/editar propiedad, filtros del portal). No romper el flujo de "cambia país → recarga ciudades".
-- [CC·S/M] **`any` casts** en `[locale]/(public)/destinos/espana/page.tsx` (L~260-303, bloques `t(key as any)` del editorial inglés) y `lib/supabase/queries.ts` (L118, L150). Acción: tipar correctamente. Cuidado: el de España es un workaround de tipado de next-intl (claves dinámicas) — puede requerir un helper de tipos o `keyof`; si se complica, dejarlo. Los de queries.ts: leer qué son primero (probablemente casts de resultados de Supabase) y tipar con la interfaz correcta.
+### 7a. Deuda de lint pre-existente — ✅ CERRADA (01/07)
+(Los 4 items resueltos: `<a>`→`<Link>`, `<img>`→`<Image>`, `set-state-in-effect`, `any` casts. Baseline 26 err/3 warn → eslint 0/0, tsc exit 0. Detalle en DAILY_LOG 01/07.)
+- [Ivan·S] **Pendiente de testeo manual:** el refactor de `set-state-in-effect` cambió el fetch de ciudades a async con guard de cancelación → probar "cambiar país → recarga ciudades" en crear/editar propiedad (admin) y en los filtros del portal.
 
 ### 7b. Datos / higiene latente
-- [CC investiga · Ivan decide] **~750 slugs habihub desincronizados**. Acción CC: analizar (SQL) cuántos son, qué patrón tienen (slug DB vs slug que generaría el feed), y si están indexados en Google → informe. Cuidado: cambiar un slug **rompe la URL indexada** → NO tocar sin plan de redirects 301. El fix es decisión de Ivan tras el informe.
+- [Ivan decide] **990 slugs habihub legacy** (no ~750). Informe entregado 01/07 → `docs/slugs-habihub-desincronizados.md`. Resumen: 908 live/en sitemap, esquema legacy (tipo en inglés + location duplicada) vs. convención actual `slugify(título)-external_id`. NO rompe el sync (matchea por external_id). Fix collision-free pero **necesita redirects 301**. 3 opciones en el doc; decisión de Ivan.
 - (3 props con external_id UUID pero foto de medianewbuild quedaron como 'habihub' — ambiguas, podrían ser del feed; NO re-etiquetadas para no arriesgar duplicados. CC puede revisarlas caso por caso si se quiere; bajo valor.)
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 01/07: deuda de lint 7a CERRADA (Link/Image/set-state/any → eslint 0/0, tsc OK) + informe de los 990 slugs habihub legacy (`docs/slugs-habihub-desincronizados.md`, sin tocar slugs). Queda: Ivan testea flujo ciudades/filtros + decide fix de slugs.
 - 29/06: limpieza de datos (vía MCP/script, sin commit) — (1) **51 props re-etiquetadas** `external_source` habihub→manual (las que tenían id null/UUID + foto nuestra de Supabase; las ~21 BCN/Madrid + ~30 más): ahora fuera del scope del cron de sync para siempre. Las 3 con foto del feed se dejaron (ambiguas). (2) **177 imágenes huérfanas borradas** de property-images (437 MB liberados: 3.222→2.785 MB) vía script con dry-run + sanity-check + Storage API. Verificado el bucket post-borrado.
 - 29/06: quick-wins finales (8950e88) — (1) CTAs del hero a `<Link>` locale-aware (antes `<a>`, no locale-aware + lint); (2) `compressImage` en TeamManager y destinos/[slug]/edit (consistencia con crear/editar propiedad). + ANÁLISIS (sin tocar): 177 imágenes huérfanas (437 MB) en property-images, listo para borrar con OK; ~21 props "mal marcadas habihub" identificadas (listados reales BCN/Cataluña/Madrid, label external_source mal, fuera del scope del sync).
 - 29/06: ISR completo (577f662) — migradas getPropertyBySlug/getBlogPosts/getBlogPostsByCategory/getBlogPostBySlug al cliente estático + setRequestLocale en destinos. Resultado (build): 11→21 rutas estáticas. GANANCIA GRANDE: `propiedades/[slug]` (~2.600 fichas) ahora SSG, + todo el blog (listado/posts/5 categorías), consejos, noticias, destinos listado. Las 8 ƒ restantes usan searchParams (inherentemente dinámicas). admin/portal intactos.

@@ -5,6 +5,10 @@ import { supabaseAdmin } from './admin'
 import { getCitiesInZone, getProvincesInZone, ZONE_SLUGS } from '@/lib/constants/spainZones'
 import { normalizeLocation } from '@/lib/utils/normalizeLocation'
 
+// Query builder de Supabase para la tabla properties (derivado del cliente,
+// evita `any` en los helpers que encadenan filtros).
+type PropertiesQuery = ReturnType<ReturnType<typeof supabaseAdmin.from>['select']>
+
 // Client without cookies — only for generateStaticParams (build time)
 export function createStaticClient() {
   return createSupabaseClient(
@@ -115,7 +119,7 @@ export async function getPropertiesForSpain(filters: GetSpainPropertiesFilters =
   const offset = filters.offset ?? 0
 
   // Helper: aplica todos los filtros NO-zona y los modificadores comunes
-  const applyCommonFilters = (q: any) => {
+  const applyCommonFilters = (q: PropertiesQuery) => {
     let qq = q
       .or('country.ilike.%España%,country.ilike.%Spain%,country.ilike.%espana%')
       .not('hidden', 'eq', true)
@@ -147,7 +151,7 @@ export async function getPropertiesForSpain(filters: GetSpainPropertiesFilters =
   const provinces = getProvincesInZone(filters.zona)
 
   // Build N queries
-  const queries: Promise<any>[] = []
+  const queries: PropertiesQuery[] = []
 
   // 1 query por province (.in es seguro con array nativo)
   if (provinces.length > 0) {

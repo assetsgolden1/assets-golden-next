@@ -67,6 +67,29 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-07-01 — [LINT+DATA] Limpieza de deuda de lint (7a) + informe slugs habihub (7b)
+
+**Contexto:** Iván pidió avanzar con todos los pendientes CC-doable del backlog.
+
+**Trabajo hecho:**
+- **Deuda de lint pre-existente (PENDIENTES 7a) — resuelta:** baseline 26 errores + 3 warnings → `npx eslint` 0/0, `npx tsc --noEmit` exit 0.
+  - `<a href>` → `<Link>` de `next/link` en nav de admin (propiedades edit L644, destinos edit L201+L324).
+  - `<img>` → `next/Image` con `optimizedImage(url)` + `unoptimized` en TeamManager (uploader 64px + lista 48px) y, de yapa, el uploader de destinos edit (128×80) que quedaba con warning.
+  - `set-state-in-effect` (regla React 19): extraído el fetch de ciudades a función async con guard de cancelación en `admin/propiedades/[id]/edit` y `components/portal/PortalPropertiesGrid`. Saca el setState síncrono del cuerpo del effect + mata race de respuestas stale. **Requiere testeo manual** del flujo "cambiar país → recarga ciudades".
+  - `any` casts: en `destinos/espana/page.tsx` (4× `as any` → `as Parameters<typeof t>[0]`, tipo real de clave i18n) y `lib/supabase/queries.ts` (2× → tipo `PropertiesQuery` derivado del cliente Supabase).
+- **Informe slugs habihub (PENDIENTES 7b) — entregado** (`docs/slugs-habihub-desincronizados.md`, investigación SQL read-only, NO se tocó ningún slug):
+  - Son **990** (no ~750): de 2.589 habihub con external_id numérico, 990 tienen slug que no termina en su `external_id`. **908 están live/en sitemap** → indexables.
+  - Patrón real: esquema legacy entero (tipo en inglés + location duplicada + secuencia corta, `villa-en-marbella-marbella-26`) vs. convención actual `slugify(título-es)-external_id`. Reparto en varios lotes de importación (405 el 15/01, 254 el 11/03, etc.).
+  - **No rompe nada hoy** (el sync matchea por external_id, no por slug). Es SEO/consistencia. Fix collision-free (external_id 100% único) pero **necesita redirects 301**. Decisión de Iván (3 opciones en el doc).
+
+**Archivos tocados:**
+- MODIFIED: `src/app/[locale]/(public)/destinos/espana/page.tsx`, `src/app/admin/destinos/[slug]/edit/page.tsx`, `src/app/admin/propiedades/[id]/edit/page.tsx`, `src/components/admin/TeamManager.tsx`, `src/components/portal/PortalPropertiesGrid.tsx`, `src/lib/supabase/queries.ts`
+- CREATED: `docs/slugs-habihub-desincronizados.md`
+
+**Próximo paso sugerido:** (1) Iván testea el flujo de ciudades/filtros (único cambio con riesgo de comportamiento). (2) Iván decide qué hacer con los 990 slugs legacy (opción del informe).
+
+---
+
 ### 2026-06-30 — [CRM-SYNC-PAUSE] El estado del CRM pausa la secuencia (Fase 1)
 
 **Contexto:** Ivan pidió conectar el Estado que Atilio marca en el CRM (pestaña 'CRM' del Sheet `META_LEADS_SHEET_ID`) con la pausa de la secuencia de nurture. Antes estaban desconectados: el cron mandaba correos sin mirar el CRM. Reglas duras: SOLO pausa (nunca reactiva), solo LEE el Sheet, solo toca `meta_leads.seq_paused`, match por email normalizado, idempotente. Manejo de error: ABORTAR el envío de la corrida si no se puede leer el CRM (no mandar a ciegas a un Ganado/Descartado), pero logueando y devolviéndolo en el JSON.

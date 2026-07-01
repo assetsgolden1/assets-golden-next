@@ -21,6 +21,7 @@ import {
 } from '@dnd-kit/sortable'
 import { SortableImage } from '@/components/admin/SortableImage'
 import { compressImage } from '@/lib/utils/compressImage'
+import Link from 'next/link'
 
 const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF']
 
@@ -105,13 +106,20 @@ export default function EditPropertyPage({
   // Cargar ciudades cuando cambia el país (no en la carga inicial para no resetear)
   useEffect(() => {
     if (!initialLoadDone.current) return
-    if (!form.country) { setAvailableCities([]); return }
-    fetch(`/api/admin/get-cities?country=${encodeURIComponent(form.country)}`)
-      .then((r) => r.json())
-      .then((d) => {
-        setAvailableCities(d.cities ?? [])
-        setUseCustomCity(false)
-      })
+    let cancelled = false
+    async function loadCities() {
+      if (!form.country) {
+        setAvailableCities([])
+        return
+      }
+      const r = await fetch(`/api/admin/get-cities?country=${encodeURIComponent(form.country)}`)
+      const d = await r.json()
+      if (cancelled) return
+      setAvailableCities(d.cities ?? [])
+      setUseCustomCity(false)
+    }
+    loadCities()
+    return () => { cancelled = true }
   }, [form.country])
 
   useEffect(() => {
@@ -641,12 +649,12 @@ export default function EditPropertyPage({
           >
             {saving ? 'Guardando...' : 'Guardar cambios'}
           </button>
-          <a
+          <Link
             href="/admin/propiedades"
             className="px-6 py-2.5 bg-gray-100 text-gray-600 rounded-lg text-sm hover:bg-gray-200 transition-colors"
           >
             Cancelar
-          </a>
+          </Link>
         </div>
       </form>
     </div>

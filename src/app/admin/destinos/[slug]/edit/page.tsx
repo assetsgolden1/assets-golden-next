@@ -1,8 +1,11 @@
 'use client'
 
 import { use, useEffect, useState } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowLeft, Upload, Info } from 'lucide-react'
 import { compressImage } from '@/lib/utils/compressImage'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 // Slugs con bloque editorial extenso gestionado desde el código (no editable desde el panel).
 // Keys de EDITORIAL_MAP en src/lib/editorial/destinoEditorial.tsx + 'espana'.
@@ -71,9 +74,12 @@ function ImageUploader({
       <label className="block text-xs font-medium text-gray-600 mb-2">{label}</label>
       <div className="flex items-start gap-4">
         {value ? (
-          <img
-            src={value}
+          <Image
+            src={optimizedImage(value, { width: 256, quality: 70 })}
             alt={label}
+            width={128}
+            height={80}
+            unoptimized
             className="w-32 h-20 object-cover rounded-lg border border-gray-200 flex-shrink-0"
           />
         ) : (
@@ -198,12 +204,12 @@ export default function EditDestinoPage({
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
-      <a
+      <Link
         href="/admin/destinos"
         className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 mb-5 transition-colors"
       >
         <ArrowLeft size={14} /> Volver a destinos
-      </a>
+      </Link>
 
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Editar destino — {countryName}</h1>
@@ -321,12 +327,12 @@ export default function EditDestinoPage({
           >
             {saving ? 'Guardando...' : 'Guardar cambios'}
           </button>
-          <a
+          <Link
             href="/admin/destinos"
             className="px-6 py-2.5 bg-gray-100 text-gray-600 rounded-lg text-sm hover:bg-gray-200 transition-colors"
           >
             Cancelar
-          </a>
+          </Link>
         </div>
       </form>
     </div>

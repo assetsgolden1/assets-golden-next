@@ -258,10 +258,10 @@ export default async function EspanaPage({ searchParams }: Props) {
                       <div key={zone.titleKey}>
                         <h3 className="font-display text-xl font-semibold mb-3">
                           <Link href={zone.href} className="hover:text-gold transition-colors">
-                            {t(zone.titleKey as any)}
+                            {t(zone.titleKey as Parameters<typeof t>[0])}
                           </Link>
                         </h3>
-                        <p className="text-muted-foreground leading-relaxed">{t(zone.bodyKey as any)}</p>
+                        <p className="text-muted-foreground leading-relaxed">{t(zone.bodyKey as Parameters<typeof t>[0])}</p>
                       </div>
                     ))}
                   </div>
@@ -300,8 +300,8 @@ export default async function EspanaPage({ searchParams }: Props) {
                       { dt: 'editorial_why_community_title', dd: 'editorial_why_community_body' },
                     ].map((item) => (
                       <div key={item.dt}>
-                        <dt className="font-semibold text-foreground">{t(item.dt as any)}</dt>
-                        <dd className="text-muted-foreground leading-relaxed mt-1">{t(item.dd as any)}</dd>
+                        <dt className="font-semibold text-foreground">{t(item.dt as Parameters<typeof t>[0])}</dt>
+                        <dd className="text-muted-foreground leading-relaxed mt-1">{t(item.dd as Parameters<typeof t>[0])}</dd>
                       </div>
                     ))}
                   </dl>

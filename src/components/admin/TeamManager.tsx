@@ -1,9 +1,11 @@
 'use client'
 import { useState, useTransition } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Plus, Edit2, Trash2, X, Upload } from 'lucide-react'
 import { createTeamMember, updateTeamMember, deleteTeamMember } from '@/app/admin/actions'
 import { compressImage } from '@/lib/utils/compressImage'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 function TeamPhotoUploader({
   value,
   onChange,
@@ -40,9 +42,12 @@ function TeamPhotoUploader({
   return (
     <div className="flex items-center gap-4">
       {value ? (
-        <img
-          src={value}
+        <Image
+          src={optimizedImage(value, { width: 128, quality: 70 })}
           alt="Foto"
+          width={64}
+          height={64}
+          unoptimized
           className="w-16 h-16 rounded-full object-cover border border-gray-200 flex-shrink-0"
         />
       ) : (
@@ -209,9 +214,12 @@ export function TeamManager({ initialMembers }: { initialMembers: TeamMember[] }
                     className={`flex items-center gap-4 px-5 py-4 ${idx > 0 ? 'border-t border-gray-50' : ''} ${!member.active ? 'opacity-50' : ''}`}
                   >
                     {member.photo_url ? (
-                      <img
-                        src={member.photo_url}
+                      <Image
+                        src={optimizedImage(member.photo_url, { width: 128, quality: 70 })}
                         alt={member.name}
+                        width={48}
+                        height={48}
+                        unoptimized
                         className="w-12 h-12 rounded-full object-cover flex-shrink-0"
                       />
                     ) : (

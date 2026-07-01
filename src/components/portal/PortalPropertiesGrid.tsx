@@ -338,13 +338,19 @@ export function PortalPropertiesGrid() {
 
   // Load cities when country changes
   useEffect(() => {
-    if (!filters.country) {
-      setCities([])
-      return
+    let cancelled = false
+    async function loadCities() {
+      if (!filters.country) {
+        setCities([])
+        return
+      }
+      const r = await fetch(`/api/portal/filters-metadata?country=${encodeURIComponent(filters.country)}`)
+      const data = await r.json()
+      if (cancelled) return
+      setCities(data.cities ?? [])
     }
-    fetch(`/api/portal/filters-metadata?country=${encodeURIComponent(filters.country)}`)
-      .then(r => r.json())
-      .then(data => setCities(data.cities ?? []))
+    loadCities()
+    return () => { cancelled = true }
   }, [filters.country])
 
   // Fetch results con AbortController para cancelar requests stale
