@@ -20,6 +20,7 @@ Next.js 15 / React 19 / TypeScript · Tailwind v4 (config en @theme de globals.c
 
 ## Catálogo (al 29/06/2026)
 - ~2.696 propiedades · 12 países (creció vía sync HabiHub desde el 26/06).
+- Tope esperado (Ivan, 29/06): NO crecerá mucho más — a lo sumo ~500 más (~3.200 máx). Por eso el prerender SSG de las fichas en el build es aceptable; NO hace falta limitar `generateStaticParams`.
 - Distribución: España 2.572, Indonesia 35, México 9, EEUU 7, EAU 5, Argentina 3, y 1 c/u en Rep. Dominicana, Ecuador, Costa Rica, Reino Unido, Grecia, Paraguay.
 - Sync HabiHub operativo: oculta no borra (hidden_by_sync), scope external_source='habihub' + external_id numérico + featured!=true. Dry-run obligatorio antes de sync real.
 

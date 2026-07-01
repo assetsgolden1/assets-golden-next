@@ -23,7 +23,9 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [Claude+Ivan·L] Plan editorial por clústeres: 4–6 art/mes, guías por zona/fiscalidad/proceso, con enlazado a fichas y destinos.
 
 ## 3. Web / Técnico
-- [Ivan+Claude·M] PDF del portal end-to-end con agente real en prod (nunca validado). Riesgo: Chromium clavado v143.0.4.
+- [Ivan+Claude·M] **PDF del portal end-to-end — NUNCA validado en prod (riesgo real).**
+  - Acción: loguearse como agente real en `/portal` en PRODUCCIÓN, abrir una propiedad, generar el PDF white-label vía `/api/portal/generate-pdf/[id]`, y verificar que renderiza OK (fotos, precio, layout, sin páginas rotas).
+  - Cuidados: (a) Chromium clavado en `@sparticuz/chromium-min@143.0.4` — si Vercel cambia el runtime de Node o el paquete se actualiza, puede romper el binario. (b) Probar SÍ O SÍ en prod, NO en local (el binario/entorno difiere). (c) `serverExternalPackages` en next.config mantiene puppeteer server-side — no romper esa config. (d) NO es CC-only: necesita una sesión de agente real logueado.
 - [Atilio+CC·S] Criterios de /inversiones (definición de Atilio) + verificar filtro.
 
 ## 4. Infraestructura / Seguridad / Datos
@@ -36,8 +38,16 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [Ivan+Claude·M] **PRIORIDAD CERCANA (Ivan, 29/06): hacer pronto, no ya.** Carga Cervera/Miami EEUU (cerverabrokerportal.com): directa vs manual.
 
 ## 7. Higiene / deuda técnica baja
-- ~750 slugs habihub desincronizados (latente).
-- (3 props con external_id UUID pero foto de medianewbuild quedaron como 'habihub' — ambiguas, podrían ser del feed; NO re-etiquetadas para no arriesgar duplicados. Bajo riesgo.)
+
+### 7a. Deuda de lint pre-existente (CC-doable; NO rompe el build — Next 16 no corre ESLint en build)
+- [CC·S] **`<a href>` → `<Link>` de next/link** en nav de admin. Lugares: `admin/propiedades/[id]/edit/page.tsx` (~L644, link a `/admin/propiedades/`), `admin/destinos/[slug]/edit/page.tsx` (L324, link a `/admin/destinos/`). Acción: importar `Link` de `next/link` y reemplazar `<a href>`/`</a>`. Cuidado: BAJO — es nav interna de admin (no i18n, así que `next/link` normal, NO el de `@/i18n/navigation`). Verificar con `npx eslint` que se limpian esos errores.
+- [CC·S] **`<img>` → `next/Image`** en `components/admin/TeamManager.tsx` (2 lugares: L~43 preview del uploader, L~212 lista de miembros). Acción: reemplazar por `<Image>` con `width`/`height` o `fill`+contenedor relativo, y `unoptimized` + `optimizedImage(url)` (mismo patrón del resto). Cuidado: BAJO-MEDIO — son fotos de equipo en el panel admin; verificar que no se rompa el layout (el uploader es cuadrado, la lista es avatar). No urgente (admin, no user-facing).
+- [CC·M] **`set-state-in-effect` (regla React 19)** en `admin/propiedades/[id]/edit/page.tsx` (L~108, `setAvailableCities([])` dentro de un useEffect) y `components/portal/PortalPropertiesGrid.tsx` (L342, `setCities([])` en un effect). Acción: mover el setState fuera del cuerpo del effect (derivar el estado, o usar el patrón que recomienda React: calcular en render / event handler). Cuidado: MEDIO — es un mini-refactor, NO un one-liner; hay que TESTEAR que la carga de ciudades/filtros siga funcionando igual (crear/editar propiedad, filtros del portal). No romper el flujo de "cambia país → recarga ciudades".
+- [CC·S/M] **`any` casts** en `[locale]/(public)/destinos/espana/page.tsx` (L~260-303, bloques `t(key as any)` del editorial inglés) y `lib/supabase/queries.ts` (L118, L150). Acción: tipar correctamente. Cuidado: el de España es un workaround de tipado de next-intl (claves dinámicas) — puede requerir un helper de tipos o `keyof`; si se complica, dejarlo. Los de queries.ts: leer qué son primero (probablemente casts de resultados de Supabase) y tipar con la interfaz correcta.
+
+### 7b. Datos / higiene latente
+- [CC investiga · Ivan decide] **~750 slugs habihub desincronizados**. Acción CC: analizar (SQL) cuántos son, qué patrón tienen (slug DB vs slug que generaría el feed), y si están indexados en Google → informe. Cuidado: cambiar un slug **rompe la URL indexada** → NO tocar sin plan de redirects 301. El fix es decisión de Ivan tras el informe.
+- (3 props con external_id UUID pero foto de medianewbuild quedaron como 'habihub' — ambiguas, podrían ser del feed; NO re-etiquetadas para no arriesgar duplicados. CC puede revisarlas caso por caso si se quiere; bajo valor.)
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
 - 29/06: limpieza de datos (vía MCP/script, sin commit) — (1) **51 props re-etiquetadas** `external_source` habihub→manual (las que tenían id null/UUID + foto nuestra de Supabase; las ~21 BCN/Madrid + ~30 más): ahora fuera del scope del cron de sync para siempre. Las 3 con foto del feed se dejaron (ambiguas). (2) **177 imágenes huérfanas borradas** de property-images (437 MB liberados: 3.222→2.785 MB) vía script con dry-run + sanity-check + Storage API. Verificado el bucket post-borrado.
