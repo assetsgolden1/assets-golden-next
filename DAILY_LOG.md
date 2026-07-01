@@ -67,6 +67,26 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-07-01 — [LEADS-PARSER] Soporte de 2 formularios de Meta + tokens de valor actuales
+
+**Contexto:** Ivan reportó que un lead nuevo (Stephanie Lyskov, `monacsteph@hotmail.com`, 01/07) se cargó al Sheet SIN tipo/presupuesto/timeline/purpose. Confirmó que creó un form nuevo a propósito y pidió que el parser tome los dos forms.
+
+**Diagnóstico (en vivo, Meta Graph API + Supabase):**
+- El lead nuevo vino de un form NUEVO `2055038041784255` (el histórico es `1495878108643736`). El parser matchea preguntas por nombre exacto y el form nuevo las nombra distinto: `what's_your_budget?`, `when_are_you_looking_to_buy?`, `purpose?` → no matcheaban → 4 campos NULL. (Tipo: el form nuevo NO pregunta tipo → NULL esperable.)
+- Problema de fondo: Meta cambió los VALORES de las opciones y los MAP del parser quedaron viejos. Tokens actuales sin mapear: presupuesto `€300k_–_€500k`/`€500k_–_€1m`/`€1m_–_€2m`/`€2m_–_€5m`/`€5m+` (22 leads), timeline `just_exploring_for_now` (×6), purpose `second_home_/_holiday_residence`/`investment_/_rental`/`relocation_/_primary_residence` (×19), tipo `open_to_any` (×2). El separador `–` es guion largo (U+2013), que el normalizador viejo (`[\s-]`) no limpiaba.
+
+**Trabajo hecho (commit de código + backfill de datos):**
+- `src/lib/meta/leadParser.ts` (MODIFIED): (1) alias de nombres de campo de AMBOS forms en `extractField` (budget/timeline/purpose). (2) `normalizeToken()` nuevo: minúsculas, sin `€`, separadores (espacios, `-–—`, `/`, `_`) colapsados a `_`. (3) MAPs actualizados (BUDGET/TIMELINE/PURPOSE/PROPERTY_TYPE) con tokens actuales + antiguos. `mapValue` usa el normalizador nuevo.
+- `scripts/reparseMetaLeads.ts` (CREATED): backfill one-off. Re-trae field_data de Meta, re-parsea con el parser corregido, UPDATE `meta_leads`, y en el Sheet (pestaña LEADS) RELLENA SOLO celdas VACÍAS de E:H (tipo/presup/timeline/purpose) — nunca sobrescribe (respeta append-only). Dry-run por defecto, `--apply` para aplicar.
+
+**Verificación:** `tsc --noEmit` limpio. Backfill aplicado: 23 leads re-parseados OK en `meta_leads` (todos con etiquetas legibles), 3 celdas rellenadas en el Sheet (fila 31 de Stephanie: F=`1M - 2M EUR`, G=`6 a 12 meses`, H=`Segunda residencia`; E vacío correcto). DB y Sheet verificados post-apply.
+
+**Pendiente / decisión abierta:** las filas históricas del Sheet con tokens crudos (`€500k_–_€1m`, etc.) NO se tocaron (el backfill solo rellena vacías, por la regla append-only). En `meta_leads` sí quedaron corregidas. Si Ivan quiere normalizar también esas celdas del Sheet, hace falta un pase que SOBRESCRIBA (requiere OK explícito). El nurture segmenta por `presupuesto_raw` (token crudo, no cambió) → segmentación intacta; ahora los nuevos leads del form 2055 ya traen presupuesto → entran con segmento correcto.
+
+**Próximo paso sugerido:** Monitorear el próximo lead del form nuevo para confirmar carga completa en vivo. Si Atilio/Ivan agregan más forms, sumar sus nombres de campo al parser.
+
+---
+
 ### 2026-07-01 — [LINT+DATA] Limpieza de deuda de lint (7a) + informe slugs habihub (7b)
 
 **Contexto:** Iván pidió avanzar con todos los pendientes CC-doable del backlog.
