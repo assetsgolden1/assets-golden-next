@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { buildAlternates } from '@/lib/utils/seoAlternates'
 import { Link } from '@/i18n/navigation'
-import { notFound, redirect } from 'next/navigation'
-import { permanentRedirect } from '@/i18n/navigation'
+import { notFound, redirect, permanentRedirect } from 'next/navigation'
+import { routing } from '@/i18n/routing'
 import { ArrowLeft, Maximize, BedDouble, Bath, MapPin, ExternalLink } from 'lucide-react'
 import Breadcrumb from '@/components/seo/Breadcrumb'
 import { buttonVariants } from '@/components/ui/button'
@@ -85,9 +85,15 @@ export default async function PropertyDetailPage({ params }: Props) {
 
   const { data: property } = await getPropertyBySlug(slug)
   if (!property) {
-    // Slug legacy ya indexado → 308 permanente al canónico (preserva locale).
+    // Slug legacy ya indexado → 308 permanente al canónico. Usamos el
+    // permanentRedirect de next/navigation (NO el de next-intl, que lee headers
+    // y rompe el render estático de la ficha). Prefijo de locale manual según
+    // localePrefix 'as-needed' (defaultLocale sin prefijo).
     const canonical = await getPropertyByLegacySlug(slug)
-    if (canonical?.slug) permanentRedirect({ href: `/propiedades/${canonical.slug}`, locale })
+    if (canonical?.slug) {
+      const prefix = locale === routing.defaultLocale ? '' : `/${locale}`
+      permanentRedirect(`${prefix}/propiedades/${canonical.slug}`)
+    }
     notFound()
   }
 
