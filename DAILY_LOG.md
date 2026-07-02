@@ -67,6 +67,32 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-07-03 — [SEO-SLUGS] Rename de 990 slugs habihub legacy + redirect 308 (opción 2 del informe)
+
+**Contexto:** Iván eligió la opción 2 del informe de slugs (`docs/slugs-habihub-desincronizados.md`): normalizar los slugs legacy + redirects, listo para deploy.
+
+**Datos (aplicado en prod vía script + MCP, sin commit):**
+- Detectados 990 slugs legacy (habihub, external_id numérico, slug que NO termina en `-{external_id}`). Esquema viejo: tipo en inglés + location duplicada (`villa-en-marbella-marbella-15`).
+- Dry-run con el `slugify` EXACTO del sync + chequeo de colisiones. 1 "colisión" resultó falsa (el slug ocupado era de otra fila legacy que también se renombra). Como `external_id` es único, ningún slug nuevo colisiona con uno estable.
+- **Rename en 2 fases** (todos a `mig-tmp-{extid}` y después al final) para evitar violaciones transitorias del índice único. Resultado: **990/990 renombrados** a `slugify(title)-external_id`, `legacy_slug` = slug viejo.
+- Migración: `ALTER TABLE properties ADD COLUMN legacy_slug text` + índice parcial (`add_legacy_slug_for_slug_redirects`).
+- Verificado: 0 legacy restantes, 0 slugs `mig-tmp-`, 0 duplicados, 990 con legacy_slug, 0 legacy==slug.
+- El sync NO reescribe slug en ningún UPDATE (L463 "NO tocamos el slug existente") y matchea por external_id → el rename es estable.
+
+**Código (commit `e5f18bc`):**
+- `i18n/navigation.ts`: exporta `permanentRedirect` (locale-aware, 308).
+- `lib/supabase/queries.ts`: `getPropertyByLegacySlug(slug)` → slug canónico.
+- ficha `[slug]/page.tsx`: si no matchea por slug, busca `legacy_slug` → `permanentRedirect` 308 al canónico (preserva locale). eslint 0, tsc 0.
+- Sitemap ya emite los slugs nuevos (sale de `getAllPropertySlugs`); generateStaticParams usa canónicos, los legacy caen a dinámico → 308.
+
+**Archivos tocados:** MODIFIED `src/i18n/navigation.ts`, `src/lib/supabase/queries.ts`, `src/app/[locale]/(public)/propiedades/[slug]/page.tsx`. Migración DB. Scripts temporales borrados.
+
+**⚠️ RIESGO/SECUENCIA — leer:** el rename de DATOS ya está vivo en prod, pero el CÓDIGO del redirect está sin deployar. **Hasta el deploy, las URLs viejas indexadas darán 404 cuando revalide el ISR (~1h).** Deployar cuanto antes (push a origin/main → Vercel; commit `e5f18bc` + docs). Los commits locales están SIN pushear.
+
+**Próximo paso sugerido:** (1) **Deployar ya** y verificar que una `legacy_slug` vieja hace 308 al canónico en prod. (2) Opcional: manejar redirect también en la sub-ruta `/propiedades/[slug]/[ciudad]` si esas URLs importan.
+
+---
+
 ### 2026-07-03 — [IMAGENES-BATCH] 204 fotos rotas arregladas en 37 propiedades (mismo defecto >25 MB)
 
 **Contexto:** Iván pidió avanzar con lo pendiente CC-doable → continuar el fix de imágenes del proyecto secundario (`wloneprkibfjioxwypaw`) iniciado con AG-00811 el 01/07.
