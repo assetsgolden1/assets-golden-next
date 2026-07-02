@@ -67,6 +67,26 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-07-03 — [IMAGENES-BATCH] 204 fotos rotas arregladas en 37 propiedades (mismo defecto >25 MB)
+
+**Contexto:** Iván pidió avanzar con lo pendiente CC-doable → continuar el fix de imágenes del proyecto secundario (`wloneprkibfjioxwypaw`) iniciado con AG-00811 el 01/07.
+
+**Escaneo (read-only):** de las **58 propiedades** con imágenes en el proyecto secundario, **37 tenían rotas** = **204 imágenes** (fuente >25 MB → Supabase Image Transformation 400). 8 tenían la `image_url` principal rota (card del listado): AG-00010, AG-00788, AG-00011, AG-00009, AG-00019, AG-00791, AG-00805, AG-00813. Bug del script de ayer resuelto (traer todo paginado + filtrar en JS, no `.or(ilike)` sobre jsonb).
+
+**Fix (autorizado explícitamente por Iván para el batch de producción):**
+- Script (sharp) con retry-on-429: por cada rota → descargó del secundario → recomprimió JPEG máx 2560px q82 → subió a `property-images` del **proyecto principal** bajo prefijo `migrated/<ref_code>/<basename>.jpg` → UPDATE de `image_url`/`gallery_urls` reemplazando SOLO las URLs rotas, preservando orden.
+- Resultado: **204/204 recuperadas y subidas, 37 propiedades con BD actualizada, 0 fallos, 0 archivos faltantes** (los "faltantes" del dry-run eran rate-limit 429, no 404).
+- **Re-escaneo de verificación: 0 rotas de 58 propiedades.**
+- Reversible: no se borró ningún original del secundario. Transformación determinista: `<secundario>/…/<archivo>` → `<principal>/…/property-images/migrated/<ref_code>/<basename>.jpg`.
+
+**Archivos tocados:** ninguno de código (fix de datos vía script + supabase-js, sin commit). Scripts temporales borrados.
+
+**Nota de propagación:** fichas ISR (revalidate 1h) → en prod se ven cuando revalide la caché o en el próximo deploy.
+
+**Próximo paso sugerido:** (opcional) prevención — el bucket `property-images` del proyecto principal no tiene `file_size_limit`; podría fijarse un límite (p.ej. 15 MB) para que futuras subidas manuales no repitan el defecto. Verificar también que el flujo de carga manual actual (admin) comprime siempre.
+
+---
+
 ### 2026-07-01 — [IMAGENES] AG-00811: 10 fotos rotas arregladas (fuente >25 MB → transform 400)
 
 **Contexto:** Iván reportó que AG-00811 ("NATULIA LUJO FRENTE AL MAR EN TULUM", Tulum/México, manual) tenía fotos que no se ven en la web.

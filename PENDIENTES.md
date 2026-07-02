@@ -5,7 +5,7 @@
 > - Al cerrar una sesión: tachar/quitar lo resuelto y agregar lo nuevo que surja.
 > - El detalle de CÓMO se hizo cada cosa va en DAILY_LOG.md, no acá.
 > - El estado actual del proyecto (números, stack) va en ESTADO.md, no acá.
-> Última actualización: 01/07/2026
+> Última actualización: 03/07/2026
 
 Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
@@ -27,7 +27,8 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
   - Acción: loguearse como agente real en `/portal` en PRODUCCIÓN, abrir una propiedad, generar el PDF white-label vía `/api/portal/generate-pdf/[id]`, y verificar que renderiza OK (fotos, precio, layout, sin páginas rotas).
   - Cuidados: (a) Chromium clavado en `@sparticuz/chromium-min@143.0.4` — si Vercel cambia el runtime de Node o el paquete se actualiza, puede romper el binario. (b) Probar SÍ O SÍ en prod, NO en local (el binario/entorno difiere). (c) `serverExternalPackages` en next.config mantiene puppeteer server-side — no romper esa config. (d) NO es CC-only: necesita una sesión de agente real logueado.
 - [Atilio+CC·S] Criterios de /inversiones (definición de Atilio) + verificar filtro.
-- [CC·M] **Imágenes rotas por fuente >25 MB en el proyecto secundario `wloneprkibfjioxwypaw`.** Causa: PNG sin comprimir (28–52 MB) → Supabase Image Transformation devuelve 400 → `optimizedImage()` sirve URL rota. AG-00811 YA arreglado (01/07, 10 imgs re-hosteadas al proyecto principal + BD actualizada; ver DAILY_LOG). Falta: **escanear las 57 propiedades restantes** con imágenes en ese host y arreglar en lote las que tengan el mismo defecto (descargar → sharp JPEG máx 2560px → subir a `property-images` del proyecto principal → UPDATE image_url/gallery_urls). Cuidado: (a) el script de escaneo falló con `.or(gallery_urls.ilike...)` sobre columna jsonb → castear `gallery_urls::text` o filtrar en JS; (b) reversible mientras no se borren los originales del secundario; (c) fichas son ISR (revalidate 1h) → forzar revalidación o esperar para ver el fix en prod.
+- (CERRADO 03/07: imágenes rotas por fuente >25 MB del proyecto secundario `wloneprkibfjioxwypaw`. Escaneadas las 58 props → 37 con rotas (204 imgs) → todas re-hosteadas comprimidas al proyecto principal + BD actualizada. Re-escaneo: 0 rotas. Ver DAILY_LOG 03/07.)
+- [CC·S opcional] **Prevención:** fijar `file_size_limit` al bucket `property-images` del proyecto principal (hoy sin límite) para que subidas manuales grandes no vuelvan a romper el transform. Verificar que el flujo admin comprime siempre.
 
 ## 4. Infraestructura / Seguridad / Datos
 - (Aceptados, sin acción: buckets con listing, get_property_filters, pg_trgm, leads_public_insert.)
@@ -49,6 +50,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - (3 props con external_id UUID pero foto de medianewbuild quedaron como 'habihub' — ambiguas, podrían ser del feed; NO re-etiquetadas para no arriesgar duplicados. CC puede revisarlas caso por caso si se quiere; bajo valor.)
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 03/07: imágenes rotas del proyecto secundario CERRADO — 37 props / 204 imgs (>25 MB → transform 400) re-hosteadas comprimidas al principal + BD actualizada. Re-escaneo: 0 rotas de 58 props.
 - 01/07: AG-00811 — 10 fotos rotas (fuente >25 MB → transform 400) arregladas: re-hosteadas comprimidas al proyecto principal + BD actualizada (22/22 OK). Falta escanear las otras 57 del proyecto secundario (ver sección 3).
 - 01/07: deuda de lint 7a CERRADA (Link/Image/set-state/any → eslint 0/0, tsc OK) + informe de los 990 slugs habihub legacy (`docs/slugs-habihub-desincronizados.md`, sin tocar slugs). Queda: Ivan testea flujo ciudades/filtros + decide fix de slugs.
 - 29/06: limpieza de datos (vía MCP/script, sin commit) — (1) **51 props re-etiquetadas** `external_source` habihub→manual (las que tenían id null/UUID + foto nuestra de Supabase; las ~21 BCN/Madrid + ~30 más): ahora fuera del scope del cron de sync para siempre. Las 3 con foto del feed se dejaron (ambiguas). (2) **177 imágenes huérfanas borradas** de property-images (437 MB liberados: 3.222→2.785 MB) vía script con dry-run + sanity-check + Storage API. Verificado el bucket post-borrado.
