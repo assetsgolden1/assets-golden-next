@@ -2,10 +2,11 @@ import type { Metadata } from 'next'
 import { buildAlternates } from '@/lib/utils/seoAlternates'
 import { Link } from '@/i18n/navigation'
 import { notFound, redirect } from 'next/navigation'
+import { permanentRedirect } from '@/i18n/navigation'
 import { ArrowLeft, Maximize, BedDouble, Bath, MapPin, ExternalLink } from 'lucide-react'
 import Breadcrumb from '@/components/seo/Breadcrumb'
 import { buttonVariants } from '@/components/ui/button'
-import { getPropertyBySlug, getAllPropertySlugs } from '@/lib/supabase/queries'
+import { getPropertyBySlug, getAllPropertySlugs, getPropertyByLegacySlug } from '@/lib/supabase/queries'
 import PropertyGalleryClient from '@/components/PropertyGalleryClient'
 import PropertyDescriptionExpand from '@/components/properties/PropertyDescriptionExpand'
 import { translatePropertyType, translatePropertyTitle } from '@/lib/propertyTypes'
@@ -83,7 +84,12 @@ export default async function PropertyDetailPage({ params }: Props) {
   if (slug in ZONE_SLUGS) redirect(`/destinos/espana?zona=${slug}`)
 
   const { data: property } = await getPropertyBySlug(slug)
-  if (!property) notFound()
+  if (!property) {
+    // Slug legacy ya indexado → 308 permanente al canónico (preserva locale).
+    const canonical = await getPropertyByLegacySlug(slug)
+    if (canonical?.slug) permanentRedirect({ href: `/propiedades/${canonical.slug}`, locale })
+    notFound()
+  }
 
   const gallery = Array.isArray(property.gallery_urls) ? property.gallery_urls : []
   // image_url suele ser idéntica a gallery_urls[0] → deduplicar por URL exacta

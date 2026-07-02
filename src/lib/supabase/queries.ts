@@ -308,6 +308,19 @@ export async function getPropertyBySlug(slug: string) {
   return { data: data as Property | null, error }
 }
 
+// Resuelve un slug legacy (histórico) al slug canónico actual. Se usa en la ficha
+// para emitir un redirect 301/308 cuando entra una URL vieja ya indexada, tras el
+// rename masivo de slugs habihub a la convención slugify(title)-external_id.
+export async function getPropertyByLegacySlug(slug: string) {
+  const supabase = createStaticClient()
+  const { data } = await supabase
+    .from('properties')
+    .select('slug')
+    .eq('legacy_slug', slug)
+    .maybeSingle()
+  return data as { slug: string | null } | null
+}
+
 export async function getFeaturedProperties() {
   // Cliente estático (sin cookies): datos públicos. Permite que las páginas que
   // la consumen (home, etc.) cacheen con ISR en vez de renderizar dinámico.
