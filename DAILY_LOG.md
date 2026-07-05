@@ -67,6 +67,30 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-07-06 — [PORTAL-PDF] Selector de fotos (hasta 10) + fix logo invisible + optimización de imágenes
+
+**Contexto:** Iván pidió trabajar sobre el portal de agentes. Requerimiento concreto: que el agente pueda ELEGIR hasta 10 fotos de la propiedad para incluir en el PDF. De paso, mejorar toda la función. Durante el test en prod apareció un bug: el PDF se descargaba SIN el logo de Assets Golden.
+
+**Trabajo hecho:**
+- **Selección de fotos (lo principal):** nuevo modal `PdfPhotoPickerModal`. Al pulsar "Descargar PDF" abre una grilla con todas las fotos de la propiedad; el agente marca hasta 10, el orden de selección = orden en el PDF (la 1ª es la portada), contador N/10, spinner y errores reales. Por defecto vienen las primeras 10 ya marcadas (decisión de Iván).
+- **Backend:** `generate-pdf/[id]` ahora acepta `POST { imageIndices }`. Los índices se validan contra la lista canónica de fotos de ESA propiedad (helper `lib/portal/propertyImages.ts`) → Puppeteer nunca carga URLs arbitrarias del cliente (anti-SSRF), tope 10. El `GET` viejo sigue como fallback (layout por defecto).
+- **Template PDF:** rediseño para hasta 10 fotos: portada grande + páginas de galería (grid 2 columnas, 6 por página, auto-paginado) + descripción al final.
+- **Fix logo (bug real de prod):** `public/logo.png` es blanco (diseñado para el header navy del sitio) y sobre el header BLANCO del PDF quedaba invisible. El header del PDF pasó a ser banda navy `#0a1f3d` (como el footer) → el logo blanco se ve. Los logos white-label de agente van dentro de un chip blanco por si son oscuros.
+- **Optimización:** las imágenes del PDF ahora pasan por el transform de Supabase (WebP/resize, hero 1400px / grid 900px). Sin esto, 10 fotos a resolución completa podían pesar 20-50 MB y colgar el timeout de 30s de Puppeteer.
+- **DB (sin código):** creado usuario agente de prueba `demo.agente@assetsgolden.com` (rol agent, activo) para validar en prod. NO se tocó ningún usuario existente de Atilio (siguen los 6). Gotcha: al seedear por SQL, GoTrue no lee `NULL` en los token fields (`confirmation_token`, `recovery_token`, `email_change_token_new`, `email_change`) y rompía el login → hubo que ponerlos en `''`.
+
+**Archivos:**
+- CREATED: `src/lib/portal/propertyImages.ts`, `src/components/portal/PdfPhotoPickerModal.tsx`
+- MODIFIED: `src/app/api/portal/generate-pdf/[id]/route.ts`, `src/lib/pdf/propertyPdfTemplate.ts`, `src/components/portal/PortalPropertyDetail.tsx`
+
+**Verificación:** `tsc --noEmit` 0 errores; eslint 0 en los archivos tocados. PDF renderizado localmente con puppeteer (4 páginas OK, logo visible sobre navy, galería paginada). Login del demo agent verificado contra el endpoint de auth de prod (devuelve access_token).
+
+**Commit:** (este mismo commit — ver git log).
+
+**Próximo paso sugerido:** con el deploy en prod, entrar a `/portal` con `demo.agente@assetsgolden.com`, abrir una propiedad, elegir fotos y descargar el PDF → validar fotos/orden/portada/logo/layout end-to-end. Eso CIERRA el pendiente histórico "PDF del portal end-to-end nunca validado en prod". Cuando no se necesite más, desactivar o borrar el demo agent (sin tocar los otros).
+
+---
+
 ### 2026-07-05 — [SEO-SLUGS-FIX] Deploy del redirect legacy + fix del 500 (causa real: setRequestLocale)
 
 **Contexto:** deploy de la opción 2 (redirect de slugs legacy). El rename de datos ya estaba en prod desde el 02/07; faltaba deployar el código del redirect. El primer deploy quedó con un 500 que tardó 3 iteraciones en resolverse.

@@ -4,7 +4,9 @@ import Link from 'next/link'
 import { ArrowLeft, MapPin, Maximize, BedDouble, Bath, FileDown, ChevronRight } from 'lucide-react'
 import PropertyGalleryClient from '@/components/PropertyGalleryClient'
 import PropertyDescriptionExpand from '@/components/properties/PropertyDescriptionExpand'
+import { PdfPhotoPickerModal } from '@/components/portal/PdfPhotoPickerModal'
 import { translatePropertyType, translatePropertyTitle } from '@/lib/propertyTypes'
+import { getPropertyImages } from '@/lib/portal/propertyImages'
 import { toSentenceCase } from '@/lib/utils/normalizeText'
 import type { Property } from '@/types'
 
@@ -22,38 +24,44 @@ function formatPrice(price: number | null, currency: string | null): string {
 }
 
 export function PortalPropertyDetail({ property }: Props) {
+  const [pickerOpen, setPickerOpen] = useState(false)
   const [downloading, setDownloading] = useState(false)
+  const [downloadError, setDownloadError] = useState('')
 
-  const gallery = Array.isArray(property.gallery_urls) ? property.gallery_urls : []
-  // image_url suele ser idéntica a gallery_urls[0] → deduplicar por URL exacta
-  // preservando el orden de aparición (solo render, la base no se toca).
-  const allImages = Array.from(
-    new Set([
-      ...(property.image_url ? [property.image_url] : []),
-      ...gallery,
-    ].filter(Boolean))
-  )
+  // Lista canónica de fotos, idéntica a la que valida el endpoint del PDF.
+  const allImages = getPropertyImages(property)
+  const downloadName = property.slug ?? property.id
 
-  async function handleDownload() {
+  // Sin fotos que elegir → descarga directa con el layout por defecto (GET).
+  async function handleDirectDownload() {
     setDownloading(true)
+    setDownloadError('')
     try {
       const res = await fetch(`/api/portal/generate-pdf/${property.id}`)
       if (!res.ok) {
         const json = await res.json().catch(() => ({}))
-        alert(json.error ?? 'Error generando el PDF')
+        setDownloadError(json.error ?? `No se pudo generar el PDF (error ${res.status}).`)
         return
       }
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `${property.slug ?? property.id}.pdf`
+      a.download = `${downloadName}.pdf`
       a.click()
       URL.revokeObjectURL(url)
     } catch {
-      alert('Error de red al generar el PDF')
+      setDownloadError('Error de red al generar el PDF.')
     } finally {
       setDownloading(false)
+    }
+  }
+
+  function handleDownloadClick() {
+    if (allImages.length > 0) {
+      setPickerOpen(true)
+    } else {
+      handleDirectDownload()
     }
   }
 
@@ -180,7 +188,7 @@ export function PortalPropertyDetail({ property }: Props) {
             <h3 className="font-display text-lg text-primary mb-4">Acciones</h3>
 
             <button
-              onClick={handleDownload}
+              onClick={handleDownloadClick}
               disabled={downloading}
               className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gold hover:bg-gold/90 text-primary font-semibold rounded-lg transition-colors disabled:opacity-50"
             >
@@ -188,8 +196,14 @@ export function PortalPropertyDetail({ property }: Props) {
               {downloading ? 'Generando PDF...' : 'Descargar PDF'}
             </button>
 
+            {downloadError && (
+              <p className="text-xs text-red-600 text-center mt-3">{downloadError}</p>
+            )}
+
             <p className="text-xs text-muted-foreground text-center mt-3">
-              Ficha completa en PDF para compartir con clientes
+              {allImages.length > 0
+                ? 'Elegí hasta 10 fotos para la ficha PDF'
+                : 'Ficha completa en PDF para compartir con clientes'}
             </p>
           </div>
 
@@ -216,6 +230,14 @@ export function PortalPropertyDetail({ property }: Props) {
           </div>
         </div>
       </div>
+
+      <PdfPhotoPickerModal
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        images={allImages}
+        propertyId={property.id}
+        downloadName={downloadName}
+      />
     </div>
   )
 }

@@ -4,7 +4,7 @@
 > - Esta es la foto del estado VIGENTE. Leerla al arrancar para tener contexto.
 > - Se SOBRESCRIBE cuando algo cambia (no se acumula como un diario).
 > - El historial va en DAILY_LOG.md; el backlog en PENDIENTES.md.
-> Última actualización: 29/06/2026
+> Última actualización: 06/07/2026
 
 ## Qué es
 Web inmobiliaria internacional bilingüe (ES/EN), Next.js 15 App Router SSR sobre Vercel + Supabase Pro. Cliente: Atilio Montironi (+ socio Joan). Proveedor: IBott (Ivan). Marca: "Inmobiliaria Internacional de Propiedades Exclusivas".
@@ -29,8 +29,8 @@ Next.js 15 / React 19 / TypeScript · Tailwind v4 (config en @theme de globals.c
 - Destinos: 12 activos (auto-creación al cargar país nuevo). Carrusel dinámico en home.
 
 ## Accesos / roles
-- Admin: Atilio + socio Joan (mismo nivel). Agentes: 3 activos, acceso solo a /portal.
-- Portal de agentes con PDF white-label.
+- Admin: Atilio + socio Joan (mismo nivel). Agentes: 4 reales activos + 1 de prueba (`demo.agente@assetsgolden.com`, creado 06/07 para validar el PDF; borrar cuando no se use). Acceso solo a /portal.
+- Portal de agentes con PDF white-label. Desde 06/07: el agente elige hasta 10 fotos (orden = portada) al descargar; header del PDF navy (logo visible); imágenes vía transform Supabase. Pendiente validación humana E2E en prod.
 
 ## SEO — estado real (29/06)
 - Bases técnicas: muy buenas (auditoría CC 83/100; técnico 92, schema 95).

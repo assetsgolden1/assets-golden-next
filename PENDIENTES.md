@@ -5,7 +5,7 @@
 > - Al cerrar una sesión: tachar/quitar lo resuelto y agregar lo nuevo que surja.
 > - El detalle de CÓMO se hizo cada cosa va en DAILY_LOG.md, no acá.
 > - El estado actual del proyecto (números, stack) va en ESTADO.md, no acá.
-> Última actualización: 05/07/2026
+> Última actualización: 06/07/2026
 
 Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
@@ -23,9 +23,10 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [Claude+Ivan·L] Plan editorial por clústeres: 4–6 art/mes, guías por zona/fiscalidad/proceso, con enlazado a fichas y destinos.
 
 ## 3. Web / Técnico
-- [Ivan+Claude·M] **PDF del portal end-to-end — NUNCA validado en prod (riesgo real).**
-  - Acción: loguearse como agente real en `/portal` en PRODUCCIÓN, abrir una propiedad, generar el PDF white-label vía `/api/portal/generate-pdf/[id]`, y verificar que renderiza OK (fotos, precio, layout, sin páginas rotas).
-  - Cuidados: (a) Chromium clavado en `@sparticuz/chromium-min@143.0.4` — si Vercel cambia el runtime de Node o el paquete se actualiza, puede romper el binario. (b) Probar SÍ O SÍ en prod, NO en local (el binario/entorno difiere). (c) `serverExternalPackages` en next.config mantiene puppeteer server-side — no romper esa config. (d) NO es CC-only: necesita una sesión de agente real logueado.
+- [Ivan·S] **VALIDAR PDF del portal end-to-end en prod (ahora con selector de fotos).** El 06/07 se deployó el selector de fotos (hasta 10) + fix del logo. Falta la validación humana en prod.
+  - Acción: entrar a `/portal` en PRODUCCIÓN con `demo.agente@assetsgolden.com` (agente de prueba creado el 06/07), abrir una propiedad, **elegir fotos (hasta 10)** y descargar el PDF. Verificar: portada correcta, orden de fotos = orden de selección, galería paginada OK, **logo visible** (header navy), precio/specs/agente/footer OK, sin páginas rotas.
+  - Cuidados: (a) Chromium clavado en `@sparticuz/chromium-min@143.0.4` — si Vercel cambia el runtime de Node o el paquete se actualiza, puede romper el binario. (b) Probar SÍ O SÍ en prod, NO en local (el binario/entorno difiere). (c) `serverExternalPackages` en next.config mantiene puppeteer server-side — no romper esa config.
+  - Al terminar: desactivar/borrar el demo agent si no se necesita más (sin tocar los otros 6 usuarios).
 - [Atilio+CC·S] Criterios de /inversiones (definición de Atilio) + verificar filtro.
 - (CERRADO 03/07: imágenes rotas por fuente >25 MB del proyecto secundario `wloneprkibfjioxwypaw`. Escaneadas las 58 props → 37 con rotas (204 imgs) → todas re-hosteadas comprimidas al proyecto principal + BD actualizada. Re-escaneo: 0 rotas. Ver DAILY_LOG 03/07.)
 - [CC·S opcional] **Prevención:** fijar `file_size_limit` al bucket `property-images` del proyecto principal (hoy sin límite) para que subidas manuales grandes no vuelvan a romper el transform. Verificar que el flujo admin comprime siempre.
@@ -51,6 +52,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - (3 props con external_id UUID pero foto de medianewbuild quedaron como 'habihub' — ambiguas, podrían ser del feed; NO re-etiquetadas para no arriesgar duplicados. CC puede revisarlas caso por caso si se quiere; bajo valor.)
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 06/07: **Portal PDF — selector de fotos (hasta 10) + fix logo invisible + optimización de imágenes.** El agente ahora elige qué fotos y en qué orden (1ª = portada) vía modal; backend valida índices contra las fotos reales (anti-SSRF). Header del PDF pasó a navy para que el logo blanco de AG se vea (bug de prod). Imágenes del PDF vía transform Supabase (WebP/resize). Creado demo agent `demo.agente@assetsgolden.com` para validar. Falta la validación humana en prod (ver sección 3).
 - 05/07: slugs 7b CERRADO Y DEPLOYADO (opción 2) — 990 renombrados + redirect 308. Deploy tomó 3 iteraciones (fix real: `setRequestLocale` en la ficha). Verificado en prod: legacy → 308 → canónico → 200.
 - 03/07: imágenes rotas del proyecto secundario CERRADO — 37 props / 204 imgs (>25 MB → transform 400) re-hosteadas comprimidas al principal + BD actualizada. Re-escaneo: 0 rotas de 58 props.
 - 01/07: AG-00811 — 10 fotos rotas (fuente >25 MB → transform 400) arregladas: re-hosteadas comprimidas al proyecto principal + BD actualizada (22/22 OK). Falta escanear las otras 57 del proyecto secundario (ver sección 3).

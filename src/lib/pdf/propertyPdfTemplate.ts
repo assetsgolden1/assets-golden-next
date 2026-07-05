@@ -2,6 +2,7 @@ import type { Property } from '@/types'
 import type { Agent } from '@/types/agent'
 import { translatePropertyType } from '@/lib/propertyTypes'
 import { toSentenceCase } from '@/lib/utils/normalizeText'
+import { optimizedImage } from '@/lib/utils/optimizedImage'
 
 function formatPrice(price: number | null, currency: string | null): string {
   if (!price) return 'Precio a consultar'
@@ -44,19 +45,26 @@ const SHARED_CSS = `
   }
   .page:last-child { page-break-after: auto; }
 
-  /* Header */
+  /* Header — banda navy (como el footer) para que el logo blanco de la marca
+     se vea; el logo claro de AG sobre blanco quedaba invisible. */
   .header {
-    padding: 12mm 18mm 8mm;
+    padding: 9mm 18mm;
+    background: #0a1f3d;
     border-bottom: 2.5px solid #c9a86b;
     display: flex;
-    align-items: flex-end;
-    gap: 10mm;
+    align-items: center;
+    gap: 8mm;
   }
-  .header-logo { max-height: 16mm; max-width: 60mm; object-fit: contain; }
+  .header-logo { max-height: 15mm; max-width: 58mm; object-fit: contain; }
+  /* Chip blanco para logos de agente (white-label), que pueden ser oscuros. */
+  .header-logo-chip {
+    background: #fff; border-radius: 2mm; padding: 2mm 3mm;
+    display: inline-flex; align-items: center;
+  }
   .header-agency {
-    font-size: 9pt; color: #888;
+    font-size: 9pt; color: #c9a86b;
     letter-spacing: 1.5px; text-transform: uppercase;
-    line-height: 1; padding-bottom: 1mm;
+    line-height: 1;
   }
 
   /* Photos */
@@ -81,6 +89,19 @@ const SHARED_CSS = `
     object-fit: cover; border-radius: 2mm; display: block;
   }
   .photos-grid-placeholder { flex: 1; }
+
+  /* Gallery pages (fotos elegidas por el agente, más allá de la portada) */
+  .gallery-section { padding: 8mm 18mm; flex: 1; }
+  .gallery-section h2 {
+    font-size: 14pt; font-weight: 700; color: #0a1f3d;
+    margin-bottom: 5mm; padding-bottom: 3mm;
+    border-bottom: 1.5px solid #c9a86b;
+  }
+  .gallery-grid { display: flex; flex-wrap: wrap; gap: 5mm; }
+  .gallery-grid img {
+    width: calc(50% - 2.5mm); height: 70mm;
+    object-fit: cover; border-radius: 2mm; display: block;
+  }
 
   /* Info */
   .info { padding: 5mm 18mm 4mm; flex: 1; }
@@ -141,6 +162,11 @@ export function generatePropertyPdfHtml(
   property: Property,
   agent: Agent | null,
   siteOrigin: string,
+  /**
+   * Fotos elegidas por el agente, ya ordenadas (la 1ª es la portada). Si viene
+   * vacío o no se pasa, se usa el comportamiento por defecto: portada + 2 fotos.
+   */
+  selectedPhotos?: string[],
 ): string {
   const refCode = property.ref_code ?? (property.external_id ?? property.id.slice(0, 8)).toUpperCase()
   const propType = translatePropertyType(property.property_type)
@@ -155,16 +181,33 @@ export function generatePropertyPdfHtml(
   const agentEmail  = esc(agent?.email       ?? '')
   const agentAgency = esc(agent?.agency_name ?? '')
 
-  // Galería: foto principal + máximo 2 fotos secundarias distintas
-  const mainImage = property.image_url ?? ''
-  const gallery = (property.gallery_urls ?? []) as string[]
-  const secondaryImages = gallery
-    .filter(url => url && url !== mainImage)
-    .slice(0, 2)
+  // Fotos del PDF. Si el agente eligió, respetamos su selección y orden
+  // (la 1ª es la portada). Si no, usamos el default histórico: principal + 2.
+  const chosen = (selectedPhotos ?? []).filter(Boolean)
+  let mainImage: string
+  let secondaryImages: string[]
+  let extraImages: string[]
+  if (chosen.length > 0) {
+    mainImage = chosen[0]
+    secondaryImages = []          // el resto va a las páginas de galería
+    extraImages = chosen.slice(1)
+  } else {
+    const gallery = (property.gallery_urls ?? []) as string[]
+    mainImage = property.image_url ?? ''
+    secondaryImages = gallery.filter(url => url && url !== mainImage).slice(0, 2)
+    extraImages = []
+  }
+
+  // Logo de AG (blanco) va directo sobre el navy; el logo propio del agente
+  // (white-label, posiblemente oscuro) va dentro de un chip blanco.
+  const usingCustomLogo = !!agent?.logo_url
+  const logoEl = usingCustomLogo
+    ? `<span class="header-logo-chip"><img class="header-logo" src="${esc(logoUrl)}" alt="${logoAlt}" /></span>`
+    : `<img class="header-logo" src="${esc(logoUrl)}" alt="${logoAlt}" />`
 
   const header = `
     <div class="header">
-      <img class="header-logo" src="${esc(logoUrl)}" alt="${logoAlt}" />
+      ${logoEl}
       ${agentAgency ? `<span class="header-agency">${agentAgency}</span>` : ''}
     </div>`
 
@@ -191,13 +234,13 @@ export function generatePropertyPdfHtml(
 
     <div class="photo-main">
       ${mainImage
-        ? `<img src="${esc(mainImage)}" alt="${esc(title)}" />`
+        ? `<img src="${esc(optimizedImage(mainImage, { width: 1400, quality: 75 }))}" alt="${esc(title)}" />`
         : `<div class="no-photo">ASSETS GOLDEN</div>`}
     </div>
 
     ${secondaryImages.length > 0 ? `
     <div class="photos-grid">
-      ${secondaryImages.map(url => `<img src="${esc(url)}" alt="" />`).join('')}
+      ${secondaryImages.map(url => `<img src="${esc(optimizedImage(url, { width: 900, quality: 72 }))}" alt="" />`).join('')}
       ${secondaryImages.length === 1 ? '<div class="photos-grid-placeholder"></div>' : ''}
     </div>` : ''}
 
@@ -219,7 +262,28 @@ export function generatePropertyPdfHtml(
     ${footerBlock}
   </div>`
 
-  // Página 2: descripción completa (solo si existe)
+  // Páginas de galería: las fotos elegidas (menos la portada) en grid de 2
+  // columnas, 6 por página. Solo aplica cuando el agente seleccionó fotos.
+  const GALLERY_PER_PAGE = 6
+  const galleryPages: string[] = []
+  for (let i = 0; i < extraImages.length; i += GALLERY_PER_PAGE) {
+    const chunk = extraImages.slice(i, i + GALLERY_PER_PAGE)
+    galleryPages.push(`
+    <div class="page">
+      ${header}
+      <div class="gallery-section">
+        ${i === 0 ? '<h2>Galer&iacute;a</h2>' : ''}
+        <div class="gallery-grid">
+          ${chunk.map(url => `<img src="${esc(optimizedImage(url, { width: 900, quality: 72 }))}" alt="" />`).join('')}
+        </div>
+      </div>
+      ${agentBlock}
+      ${footerBlock}
+    </div>`)
+  }
+  const galleryHtml = galleryPages.join('')
+
+  // Página final: descripción completa (solo si existe)
   const page2 = description ? `
   <div class="page">
     ${header}
@@ -241,6 +305,7 @@ export function generatePropertyPdfHtml(
 </head>
 <body>
 ${page1}
+${galleryHtml}
 ${page2}
 </body>
 </html>`

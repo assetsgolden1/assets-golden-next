@@ -4,6 +4,7 @@ import chromium from '@sparticuz/chromium-min'
 import { createClient } from '@/lib/supabase/server'
 import { getUserRole } from '@/lib/auth/getUserRole'
 import { generatePropertyPdfHtml } from '@/lib/pdf/propertyPdfTemplate'
+import { getPropertyImages, resolveSelectedPhotos } from '@/lib/portal/propertyImages'
 import type { Property } from '@/types'
 import type { Agent } from '@/types/agent'
 
@@ -35,9 +36,34 @@ async function getBrowser() {
   })
 }
 
+// GET: sin selección → PDF con el layout por defecto (portada + 2 fotos).
 export async function GET(
   request: NextRequest,
+  ctx: { params: Promise<{ id: string }> },
+) {
+  return renderPdf(request, ctx, undefined)
+}
+
+// POST: el agente manda `{ imageIndices: number[] }` (índices contra la lista
+// canónica de fotos de la propiedad) para elegir qué fotos y en qué orden salen.
+export async function POST(
+  request: NextRequest,
+  ctx: { params: Promise<{ id: string }> },
+) {
+  let imageIndices: unknown = undefined
+  try {
+    const body = await request.json()
+    imageIndices = body?.imageIndices
+  } catch {
+    // body vacío o inválido → tratamos como sin selección
+  }
+  return renderPdf(request, ctx, imageIndices)
+}
+
+async function renderPdf(
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
+  imageIndices: unknown,
 ) {
   const role = await getUserRole()
   if (role !== 'agent' && role !== 'admin') {
@@ -68,8 +94,13 @@ export async function GET(
     agent = data as Agent | null
   }
 
+  // Selección validada contra las fotos reales de ESTA propiedad: Puppeteer
+  // solo carga URLs que ya están en la BD (nunca URLs arbitrarias del cliente).
+  const images = getPropertyImages(property as Property)
+  const selectedPhotos = resolveSelectedPhotos(images, imageIndices)
+
   const siteOrigin = new URL(request.url).origin
-  const html = generatePropertyPdfHtml(property as Property, agent, siteOrigin)
+  const html = generatePropertyPdfHtml(property as Property, agent, siteOrigin, selectedPhotos)
 
   let browser
   try {
