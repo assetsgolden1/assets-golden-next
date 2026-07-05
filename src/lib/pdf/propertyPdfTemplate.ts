@@ -101,7 +101,7 @@ const SHARED_CSS = `
      (no a sangre / no ocupando toda la hoja). */
   .gallery-big { display: flex; flex-direction: column; gap: 6mm; }
   .gallery-big img {
-    width: 100%; height: 108mm;
+    width: 100%; height: 96mm;
     object-fit: cover; border-radius: 2mm; display: block;
   }
 
@@ -285,7 +285,6 @@ export function generatePropertyPdfHtml(
           ${chunk.map(url => `<img src="${esc(optimizedImage(url, { width: 1400, quality: 74 }))}" alt="" />`).join('')}
         </div>
       </div>
-      ${agentBlock}
       ${footerBlock}
     </div>`)
   }

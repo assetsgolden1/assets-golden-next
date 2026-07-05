@@ -67,6 +67,18 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-07-06 (cont. 2) — [PORTAL-PDF] Páginas en blanco en el PDF (desborde de las páginas de galería)
+
+**Contexto:** Iván descargó un PDF real (apartamento-en-torrox) y reportó páginas en blanco (8, 10, 12...).
+
+**Causa:** cada página de galería tenía header + 2 fotos de **108mm** + bloque de agente + footer, lo que superaba los 297mm de la A4 → el bloque de agente + footer se desbordaban a una 2ª página física (las "en blanco" mostraban ese bloque desbordado). Patrón: una página en blanco después de CADA página de galería.
+
+**Fix:** (1) quitado el bloque de agente de las páginas de galería (el contacto ya está en portada + descripción; el footer branded queda). (2) altura de las fotos de galería 108mm → **96mm**. **Verificado midiendo la altura real de cada `.page`** (render puppeteer): todas = 1123px (=297mm), 0 desbordes. 5 fotos → 5 páginas (portada, descripción, 3 de galería 2+2+1), sin blancos. Screenshot de la página de galería OK.
+
+**Archivo MODIFIED:** `src/lib/pdf/propertyPdfTemplate.ts`.
+
+---
+
 ### 2026-07-06 (cont.) — [PORTAL-PDF] Ajustes tras primer test en prod
 
 **Contexto:** tras deployar (commit `e87c0d0`, verificado READY en prod), Iván probó y pidió cambios de layout + reportó 2 cosas.
