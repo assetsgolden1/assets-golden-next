@@ -5,7 +5,7 @@
 > - Al cerrar una sesión: tachar/quitar lo resuelto y agregar lo nuevo que surja.
 > - El detalle de CÓMO se hizo cada cosa va en DAILY_LOG.md, no acá.
 > - El estado actual del proyecto (números, stack) va en ESTADO.md, no acá.
-> Última actualización: 03/07/2026
+> Última actualización: 05/07/2026
 
 Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
@@ -46,12 +46,12 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [Ivan·S] **Pendiente de testeo manual:** el refactor de `set-state-in-effect` cambió el fetch de ciudades a async con guard de cancelación → probar "cambiar país → recarga ciudades" en crear/editar propiedad (admin) y en los filtros del portal.
 
 ### 7b. Datos / higiene latente
-- (CERRADO 03/07 — opción 2 del informe: **990 slugs habihub legacy renombrados** a `slugify(título)-external_id` + columna `legacy_slug` + redirect 308 locale-aware en la ficha. Verificado: 0 legacy restantes, 0 duplicados. Ver DAILY_LOG 03/07.)
-  - ⚠️ **PENDIENTE DE DEPLOY (Ivan·S):** el rename de datos YA está en prod, pero el código del redirect (commit `e5f18bc`) está solo local. **Hasta que se deploye, las URLs viejas indexadas darán 404 a medida que revalide el ISR (~1h).** Deployar cuanto antes (push a origin/main → Vercel). Post-deploy: verificar que una `legacy_slug` vieja hace 308 al canónico.
+- (CERRADO Y DEPLOYADO 05/07 — opción 2 del informe: **990 slugs habihub legacy renombrados** a `slugify(título)-external_id` + columna `legacy_slug` + redirect 308 locale-aware en la ficha. Deploy tomó 3 iteraciones por un 500 en render on-demand — causa real: faltaba `setRequestLocale` en la ficha, no el redirect. **Verificado en prod: legacy ES/EN → 308 → canónico → 200.** Ver DAILY_LOG 05/07.)
+  - [opcional] Manejar el redirect también en `/propiedades/[slug]/[ciudad]` si esas URLs importan. Monitorear en GSC la migración de URLs viejas→nuevas.
 - (3 props con external_id UUID pero foto de medianewbuild quedaron como 'habihub' — ambiguas, podrían ser del feed; NO re-etiquetadas para no arriesgar duplicados. CC puede revisarlas caso por caso si se quiere; bajo valor.)
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
-- 03/07: slugs 7b CERRADO (opción 2) — 990 slugs legacy renombrados a la convención canónica + `legacy_slug` + redirect 308 en la ficha. ⚠️ FALTA DEPLOY (commit `e5f18bc`) para que las URLs viejas no den 404.
+- 05/07: slugs 7b CERRADO Y DEPLOYADO (opción 2) — 990 renombrados + redirect 308. Deploy tomó 3 iteraciones (fix real: `setRequestLocale` en la ficha). Verificado en prod: legacy → 308 → canónico → 200.
 - 03/07: imágenes rotas del proyecto secundario CERRADO — 37 props / 204 imgs (>25 MB → transform 400) re-hosteadas comprimidas al principal + BD actualizada. Re-escaneo: 0 rotas de 58 props.
 - 01/07: AG-00811 — 10 fotos rotas (fuente >25 MB → transform 400) arregladas: re-hosteadas comprimidas al proyecto principal + BD actualizada (22/22 OK). Falta escanear las otras 57 del proyecto secundario (ver sección 3).
 - 01/07: deuda de lint 7a CERRADA (Link/Image/set-state/any → eslint 0/0, tsc OK) + informe de los 990 slugs habihub legacy (`docs/slugs-habihub-desincronizados.md`, sin tocar slugs). Queda: Ivan testea flujo ciudades/filtros + decide fix de slugs.

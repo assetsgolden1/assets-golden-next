@@ -67,6 +67,27 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-07-05 — [SEO-SLUGS-FIX] Deploy del redirect legacy + fix del 500 (causa real: setRequestLocale)
+
+**Contexto:** deploy de la opción 2 (redirect de slugs legacy). El rename de datos ya estaba en prod desde el 02/07; faltaba deployar el código del redirect. El primer deploy quedó con un 500 que tardó 3 iteraciones en resolverse.
+
+**Qué pasó (3 deploys):**
+1. `98864db` — deploy inicial. Las URLs legacy daban **500** (`Page changed from static to dynamic at runtime, reason: headers`).
+2. `46adf1d` — 1er intento: cambié el `permanentRedirect` de next-intl (lee headers) por el de next/navigation + prefijo de locale manual. **NO alcanzó** (seguía 500).
+3. `7d17a48` — **fix real**: la ficha llamaba `getTranslations()`/`getLocale()` SIN `setRequestLocale`, lo que lee `headers()`. Los canónicos renombrados funcionaban por estar prerenderizados (en `generateStaticParams`); los slugs legacy YA NO están ahí → render on-demand → next-intl lee headers → 500 **antes** de llegar al redirect. Fix: `setRequestLocale(locale)` (locale del param) al inicio de `generateMetadata` y del page component. Mismo patrón que `destinos/page.tsx`.
+
+**Verificado en prod (05/07):** legacy ES y EN → **308 → canónico → 200**. Canónico directo → 200. El redirect respeta el locale.
+
+**Bug latente cubierto de yapa:** cualquier ficha nueva no prerenderizada (creada después del último build) habría dado 500 por lo mismo; ahora no.
+
+**Lección:** `tsc`/`eslint` NO capturan el error static-to-dynamic (solo aparece en runtime ISR on-demand). Para cambios en rutas ISR con params dinámicos, verificar el render on-demand (build+start local o deploy + curl de un slug no prerenderizado) antes de dar por cerrado.
+
+**Archivos:** MODIFIED `src/app/[locale]/(public)/propiedades/[slug]/page.tsx` (setRequestLocale + redirect legacy), `src/i18n/navigation.ts` (sin cambios netos finales). Commits `46adf1d`, `7d17a48` (pusheados a origin/main).
+
+**Próximo paso sugerido:** opcional, manejar el redirect también en `/propiedades/[slug]/[ciudad]`. Monitorear en GSC que las URLs viejas pasen a las nuevas.
+
+---
+
 ### 2026-07-03 — [SEO-SLUGS] Rename de 990 slugs habihub legacy + redirect 308 (opción 2 del informe)
 
 **Contexto:** Iván eligió la opción 2 del informe de slugs (`docs/slugs-habihub-desincronizados.md`): normalizar los slugs legacy + redirects, listo para deploy.
