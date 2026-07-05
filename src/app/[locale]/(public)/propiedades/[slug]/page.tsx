@@ -16,7 +16,7 @@ import { toSentenceCase } from '@/lib/utils/normalizeText'
 import PropertyContactModal from '@/components/PropertyContactModal'
 import { ZONE_SLUGS } from '@/lib/constants/spainZones'
 import ViewContentTracker from '@/components/analytics/ViewContentTracker'
-import { getTranslations, getLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 interface Props {
   params: Promise<{ slug: string; locale: string }>
@@ -31,10 +31,10 @@ export const dynamicParams = true
 export const revalidate = 3600
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params
+  const { slug, locale } = await params
+  setRequestLocale(locale)
   const { data } = await getPropertyBySlug(slug)
   const t = await getTranslations('PropertyDetail')
-  const locale = await getLocale()
 
   if (!data) return { title: t('not_found') }
 
@@ -77,9 +77,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function PropertyDetailPage({ params }: Props) {
-  const { slug } = await params
+  const { slug, locale } = await params
+  setRequestLocale(locale)
   const t = await getTranslations('PropertyDetail')
-  const locale = await getLocale()
 
   if (slug in ZONE_SLUGS) redirect(`/destinos/espana?zona=${slug}`)
 
