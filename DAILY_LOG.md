@@ -67,6 +67,24 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-07-06 (cont.) — [PORTAL-PDF] Ajustes tras primer test en prod
+
+**Contexto:** tras deployar (commit `e87c0d0`, verificado READY en prod), Iván probó y pidió cambios de layout + reportó 2 cosas.
+
+**Trabajo hecho:**
+- **Nuevo layout del PDF (pedido de Iván):** las fotos elegidas por el agente ya NO son la portada. Ahora: página 1 = portada + 2 fotos (default de siempre) + datos/precio; luego la descripción completa; y DESPUÉS las fotos que elige el agente, GRANDES (2 por página, ancho completo con márgenes — "que se vean grandes, no que ocupen toda la hoja"). Sección titulada "Más fotos".
+- **Fix preview del logo de agencia:** en `ProfileForm` el preview usaba `optimizedImage` (transform de Supabase) y se veía mal al subir; ahora usa la URL cruda (igual que el PDF, que se veía bien). Quitado el import sin uso.
+- **Modal:** ajustado el copy (ya no habla de "portada"; las fotos se agregan grandes al final) y quitado el badge "Portada".
+- **Diagnóstico "no se abre el modal / descarga directo":** NO es bug — el deploy está READY y el código del modal es correcto (`select *` trae `gallery_urls`). Era el bundle viejo del cliente cacheado en el navegador (el PDF con logo bien es server-side y sí se actualizó). Se resuelve con hard refresh / re-login.
+
+**Archivos MODIFIED:** `src/lib/pdf/propertyPdfTemplate.ts`, `src/components/portal/PdfPhotoPickerModal.tsx`, `src/components/portal/ProfileForm.tsx`.
+
+**Verificación:** tsc 0 / eslint 0; PDF re-renderizado (4 páginas: inicio 3 fotos + descripción + 2 páginas de fotos grandes). Deploy inicial `e87c0d0` verificado READY en assetsgolden.com.
+
+**Próximo paso:** deployar este ajuste y que Iván revalide con hard refresh.
+
+---
+
 ### 2026-07-06 — [PORTAL-PDF] Selector de fotos (hasta 10) + fix logo invisible + optimización de imágenes
 
 **Contexto:** Iván pidió trabajar sobre el portal de agentes. Requerimiento concreto: que el agente pueda ELEGIR hasta 10 fotos de la propiedad para incluir en el PDF. De paso, mejorar toda la función. Durante el test en prod apareció un bug: el PDF se descargaba SIN el logo de Assets Golden.

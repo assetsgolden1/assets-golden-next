@@ -97,9 +97,11 @@ const SHARED_CSS = `
     margin-bottom: 5mm; padding-bottom: 3mm;
     border-bottom: 1.5px solid #c9a86b;
   }
-  .gallery-grid { display: flex; flex-wrap: wrap; gap: 5mm; }
-  .gallery-grid img {
-    width: calc(50% - 2.5mm); height: 70mm;
+  /* Fotos elegidas por el agente: grandes, 2 por página, con márgenes
+     (no a sangre / no ocupando toda la hoja). */
+  .gallery-big { display: flex; flex-direction: column; gap: 6mm; }
+  .gallery-big img {
+    width: 100%; height: 108mm;
     object-fit: cover; border-radius: 2mm; display: block;
   }
 
@@ -181,22 +183,14 @@ export function generatePropertyPdfHtml(
   const agentEmail  = esc(agent?.email       ?? '')
   const agentAgency = esc(agent?.agency_name ?? '')
 
-  // Fotos del PDF. Si el agente eligió, respetamos su selección y orden
-  // (la 1ª es la portada). Si no, usamos el default histórico: principal + 2.
-  const chosen = (selectedPhotos ?? []).filter(Boolean)
-  let mainImage: string
-  let secondaryImages: string[]
-  let extraImages: string[]
-  if (chosen.length > 0) {
-    mainImage = chosen[0]
-    secondaryImages = []          // el resto va a las páginas de galería
-    extraImages = chosen.slice(1)
-  } else {
-    const gallery = (property.gallery_urls ?? []) as string[]
-    mainImage = property.image_url ?? ''
-    secondaryImages = gallery.filter(url => url && url !== mainImage).slice(0, 2)
-    extraImages = []
-  }
+  // Página 1: SIEMPRE la portada (image_url) + hasta 2 secundarias de la galería,
+  // como el layout histórico (independiente de lo que elija el agente).
+  const galleryDefault = (property.gallery_urls ?? []) as string[]
+  const mainImage = property.image_url ?? ''
+  const secondaryImages = galleryDefault.filter(url => url && url !== mainImage).slice(0, 2)
+
+  // Fotos elegidas por el agente → sección de fotos grandes DESPUÉS de la descripción.
+  const chosenPhotos = (selectedPhotos ?? []).filter(Boolean)
 
   // Logo de AG (blanco) va directo sobre el navy; el logo propio del agente
   // (white-label, posiblemente oscuro) va dentro de un chip blanco.
@@ -262,28 +256,7 @@ export function generatePropertyPdfHtml(
     ${footerBlock}
   </div>`
 
-  // Páginas de galería: las fotos elegidas (menos la portada) en grid de 2
-  // columnas, 6 por página. Solo aplica cuando el agente seleccionó fotos.
-  const GALLERY_PER_PAGE = 6
-  const galleryPages: string[] = []
-  for (let i = 0; i < extraImages.length; i += GALLERY_PER_PAGE) {
-    const chunk = extraImages.slice(i, i + GALLERY_PER_PAGE)
-    galleryPages.push(`
-    <div class="page">
-      ${header}
-      <div class="gallery-section">
-        ${i === 0 ? '<h2>Galer&iacute;a</h2>' : ''}
-        <div class="gallery-grid">
-          ${chunk.map(url => `<img src="${esc(optimizedImage(url, { width: 900, quality: 72 }))}" alt="" />`).join('')}
-        </div>
-      </div>
-      ${agentBlock}
-      ${footerBlock}
-    </div>`)
-  }
-  const galleryHtml = galleryPages.join('')
-
-  // Página final: descripción completa (solo si existe)
+  // Página 2: descripción completa (solo si existe)
   const page2 = description ? `
   <div class="page">
     ${header}
@@ -297,6 +270,27 @@ export function generatePropertyPdfHtml(
     ${footerBlock}
   </div>` : ''
 
+  // Páginas de galería: las fotos que eligió el agente, GRANDES, 2 por página,
+  // DESPUÉS de la descripción. Solo aplica si el agente seleccionó fotos.
+  const GALLERY_PER_PAGE = 2
+  const galleryPages: string[] = []
+  for (let i = 0; i < chosenPhotos.length; i += GALLERY_PER_PAGE) {
+    const chunk = chosenPhotos.slice(i, i + GALLERY_PER_PAGE)
+    galleryPages.push(`
+    <div class="page">
+      ${header}
+      <div class="gallery-section">
+        ${i === 0 ? '<h2>M&aacute;s fotos</h2>' : ''}
+        <div class="gallery-big">
+          ${chunk.map(url => `<img src="${esc(optimizedImage(url, { width: 1400, quality: 74 }))}" alt="" />`).join('')}
+        </div>
+      </div>
+      ${agentBlock}
+      ${footerBlock}
+    </div>`)
+  }
+  const galleryHtml = galleryPages.join('')
+
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -305,8 +299,8 @@ export function generatePropertyPdfHtml(
 </head>
 <body>
 ${page1}
-${galleryHtml}
 ${page2}
+${galleryHtml}
 </body>
 </html>`
 }

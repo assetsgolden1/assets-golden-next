@@ -93,7 +93,7 @@ export function PdfPhotoPickerModal({ open, onClose, images, propertyId, downloa
           <div>
             <h2 className="font-display text-xl text-primary">Elegí las fotos del PDF</h2>
             <p className="mt-0.5 text-sm text-muted-foreground">
-              Hasta {MAX_PDF_PHOTOS} fotos. La primera que elijas será la portada.
+              Hasta {MAX_PDF_PHOTOS} fotos, en el orden que las marques. Se agregan grandes al final del PDF, después de la descripción.
             </p>
           </div>
           <button
@@ -135,17 +135,10 @@ export function PdfPhotoPickerModal({ open, onClose, images, propertyId, downloa
                 {isSelected && (
                   <span className="absolute inset-0 bg-gold/10" />
                 )}
-                {/* Número de orden / portada */}
+                {/* Número de orden en el PDF */}
                 {isSelected && (
-                  <span className="absolute left-2 top-2 flex items-center gap-1">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gold text-xs font-bold text-primary shadow">
-                      {order + 1}
-                    </span>
-                    {order === 0 && (
-                      <span className="rounded bg-primary px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                        Portada
-                      </span>
-                    )}
+                  <span className="absolute left-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-gold text-xs font-bold text-primary shadow">
+                    {order + 1}
                   </span>
                 )}
               </button>
