@@ -117,7 +117,7 @@ export function PdfPhotoPickerModal({ open, onClose, images, propertyId, downloa
                 type="button"
                 onClick={() => toggle(i)}
                 disabled={disabled}
-                className={`group relative aspect-[4/3] overflow-hidden rounded-lg border-2 transition-all ${
+                className={`group relative block overflow-hidden rounded-lg border-2 transition-all ${
                   isSelected
                     ? 'border-gold ring-2 ring-gold/30'
                     : disabled
@@ -128,12 +128,12 @@ export function PdfPhotoPickerModal({ open, onClose, images, propertyId, downloa
                 <Image
                   src={url}
                   alt={`Foto ${i + 1}`}
-                  fill
-                  sizes="(max-width: 640px) 50vw, 200px"
-                  className="object-cover"
+                  width={300}
+                  height={200}
+                  style={{ height: '7rem', width: '100%', objectFit: 'cover', display: 'block' }}
                 />
                 {isSelected && (
-                  <span className="absolute inset-0 bg-gold/10" />
+                  <span className="pointer-events-none absolute inset-0 bg-gold/15" />
                 )}
                 {/* Número de orden en el PDF */}
                 {isSelected && (

@@ -76,6 +76,7 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 - **Fix preview del logo de agencia:** en `ProfileForm` el preview usaba `optimizedImage` (transform de Supabase) y se veía mal al subir; ahora usa la URL cruda (igual que el PDF, que se veía bien). Quitado el import sin uso.
 - **Modal:** ajustado el copy (ya no habla de "portada"; las fotos se agregan grandes al final) y quitado el badge "Portada".
 - **Diagnóstico "no se abre el modal / descarga directo":** NO es bug — el deploy está READY y el código del modal es correcto (`select *` trae `gallery_urls`). Era el bundle viejo del cliente cacheado en el navegador (el PDF con logo bien es server-side y sí se actualizó). Se resuelve con hard refresh / re-login.
+- **Fix grid del modal (miniaturas encimadas):** el `next/image` con `fill` + `aspect-[4/3]` no tomaba altura en este setup (Tailwind v4) → las fotos se apilaban. Reescrito a `width/height` explícitos + tamaño por estilo INLINE (`height:7rem;object-fit:cover`) para no depender de la generación de clases de Tailwind. Verificado con render puppeteer de un replica del grid (miniaturas uniformes, recortadas, sin encimar).
 
 **Archivos MODIFIED:** `src/lib/pdf/propertyPdfTemplate.ts`, `src/components/portal/PdfPhotoPickerModal.tsx`, `src/components/portal/ProfileForm.tsx`.
 
