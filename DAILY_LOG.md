@@ -76,7 +76,12 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 - **Fix preview del logo de agencia:** en `ProfileForm` el preview usaba `optimizedImage` (transform de Supabase) y se veía mal al subir; ahora usa la URL cruda (igual que el PDF, que se veía bien). Quitado el import sin uso.
 - **Modal:** ajustado el copy (ya no habla de "portada"; las fotos se agregan grandes al final) y quitado el badge "Portada".
 - **Diagnóstico "no se abre el modal / descarga directo":** NO es bug — el deploy está READY y el código del modal es correcto (`select *` trae `gallery_urls`). Era el bundle viejo del cliente cacheado en el navegador (el PDF con logo bien es server-side y sí se actualizó). Se resuelve con hard refresh / re-login.
-- **Fix grid del modal (miniaturas encimadas):** el `next/image` con `fill` + `aspect-[4/3]` no tomaba altura en este setup (Tailwind v4) → las fotos se apilaban. Reescrito a `width/height` explícitos + tamaño por estilo INLINE (`height:7rem;object-fit:cover`) para no depender de la generación de clases de Tailwind. Verificado con render puppeteer de un replica del grid (miniaturas uniformes, recortadas, sin encimar).
+- **Fix grid del modal (miniaturas encimadas) — 3 intentos hasta dar con la causa REAL:**
+  1. `next/image fill` + `aspect-[4/3]` → no tomaba altura. (no alcanzó)
+  2. `next/image` con width/height + estilo inline → tampoco. (no alcanzó)
+  3. **Causa real (verificada en la app corriendo):** el `<button>` que envuelve la miniatura, siendo grid item, NO se estiraba a la altura de su `<img>` hija (colapsaba a ~12px) y con `overflow-hidden` recortaba la foto a una tira. Fix: **altura explícita en el `<button>`** (`style height:7rem` + `w-full`) + `<img>` a `height:100%;object-fit:cover`. Cambiado a `<img>` plano (no next/image) para thumbnails dinámicas.
+  - **Verificado de verdad esta vez:** levanté `next dev` en el subdir, monté una página temporal `portal/zztest` que renderiza el modal real con 15 fotos de una propiedad real, y screenshoteé con puppeteer → grilla 3 col, miniaturas parejas recortadas, badges de orden 1-10. computed `button height` pasó de 11.86px → 112px. Página de test y launch.json borrados después.
+  - Aprendizaje: este Next modificado ("This is NOT the Next.js you know") trata next/image + sizing distinto; para UI hay que verificar en la app corriendo, no deducir.
 
 **Archivos MODIFIED:** `src/lib/pdf/propertyPdfTemplate.ts`, `src/components/portal/PdfPhotoPickerModal.tsx`, `src/components/portal/ProfileForm.tsx`.
 

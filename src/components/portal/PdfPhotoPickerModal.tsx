@@ -1,6 +1,5 @@
 'use client'
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
 import { X, FileDown, Loader2 } from 'lucide-react'
 import { MAX_PDF_PHOTOS } from '@/lib/portal/propertyImages'
 
@@ -117,7 +116,8 @@ export function PdfPhotoPickerModal({ open, onClose, images, propertyId, downloa
                 type="button"
                 onClick={() => toggle(i)}
                 disabled={disabled}
-                className={`group relative block overflow-hidden rounded-lg border-2 transition-all ${
+                style={{ height: '7rem' }}
+                className={`group relative block w-full overflow-hidden rounded-lg border-2 transition-all ${
                   isSelected
                     ? 'border-gold ring-2 ring-gold/30'
                     : disabled
@@ -125,12 +125,11 @@ export function PdfPhotoPickerModal({ open, onClose, images, propertyId, downloa
                       : 'border-transparent hover:border-gold/50'
                 }`}
               >
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element -- grilla dinámica de miniaturas; el <button> como grid item no se estira al alto del hijo en este setup */}
+                <img
                   src={url}
                   alt={`Foto ${i + 1}`}
-                  width={300}
-                  height={200}
-                  style={{ height: '7rem', width: '100%', objectFit: 'cover', display: 'block' }}
+                  style={{ height: '100%', width: '100%', objectFit: 'cover', display: 'block' }}
                 />
                 {isSelected && (
                   <span className="pointer-events-none absolute inset-0 bg-gold/15" />
