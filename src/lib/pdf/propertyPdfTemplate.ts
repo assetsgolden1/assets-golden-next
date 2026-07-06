@@ -21,14 +21,51 @@ function esc(s: string | null | undefined): string {
     .replace(/"/g, '&quot;')
 }
 
-// Convierte texto plano con saltos de línea en párrafos HTML
-function toParagraphs(text: string): string {
-  return text
-    .split(/\n\s*\n/)
-    .map(block => block.trim())
-    .filter(Boolean)
-    .map(block => `<p>${esc(block.replace(/\n/g, ' '))}</p>`)
-    .join('')
+/**
+ * Reparte los párrafos de la descripción en páginas A4 equilibradas. Estima la
+ * altura de cada párrafo (líneas × alto de línea) para que ninguna hoja se
+ * desborde (lo que generaba páginas en blanco / footers huérfanos) ni quede una
+ * última hoja casi vacía. Devuelve un array de páginas, cada una con sus párrafos.
+ */
+function splitDescriptionIntoPages(text: string): string[][] {
+  const paras = text.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean)
+  if (paras.length === 0) return []
+
+  const CHARS_PER_LINE = 90   // ancho útil ~174mm a 9.5pt justificado
+  const LINE_MM = 5.7         // alto de línea (line-height 1.7 × 9.5pt)
+  const PARA_MARGIN_MM = 3
+  const H2_MM = 14            // título "Descripción" (solo 1ª hoja)
+  const USABLE_MM = 208       // alto útil por hoja (297 − header − footer − padding)
+
+  const heights = paras.map(p => {
+    const len = p.replace(/\n/g, ' ').length
+    return Math.max(1, Math.ceil(len / CHARS_PER_LINE)) * LINE_MM + PARA_MARGIN_MM
+  })
+  const total = heights.reduce((a, b) => a + b, 0) + H2_MM
+  const numPages = Math.max(1, Math.ceil(total / USABLE_MM))
+  const targetPerPage = total / numPages
+
+  const pages: string[][] = [[]]
+  let curMm = H2_MM // la 1ª hoja lleva el título
+  for (let i = 0; i < paras.length; i++) {
+    const cur = pages[pages.length - 1]
+    if (cur.length > 0 && curMm + heights[i] > targetPerPage && pages.length < numPages) {
+      pages.push([])
+      curMm = 0
+    }
+    pages[pages.length - 1].push(paras[i])
+    curMm += heights[i]
+  }
+
+  // Evitar subtítulos huérfanos: un bloque corto en MAYÚSCULAS (p.ej. "EXTERIORES")
+  // no debe quedar al pie de una hoja separado de su párrafo → pasa a la siguiente.
+  const isHeading = (p: string) => p.length <= 25 && p === p.toUpperCase()
+  for (let i = 0; i < pages.length - 1; i++) {
+    while (pages[i].length > 1 && isHeading(pages[i][pages[i].length - 1])) {
+      pages[i + 1].unshift(pages[i].pop()!)
+    }
+  }
+  return pages
 }
 
 const SHARED_CSS = `
@@ -256,19 +293,20 @@ export function generatePropertyPdfHtml(
     ${footerBlock}
   </div>`
 
-  // Página 2: descripción completa (solo si existe)
-  const page2 = description ? `
+  // Descripción: paginada en tantas hojas como haga falta (equilibradas),
+  // cada una con header + footer. El bloque de agente ya va en la portada.
+  const descPages = description ? splitDescriptionIntoPages(description) : []
+  const descriptionHtml = descPages.map((paras, idx) => `
   <div class="page">
     ${header}
     <div class="desc-section">
-      <h2>Descripci&oacute;n</h2>
+      ${idx === 0 ? '<h2>Descripci&oacute;n</h2>' : ''}
       <div class="description">
-        ${toParagraphs(description)}
+        ${paras.map(p => `<p>${esc(p.replace(/\n/g, ' '))}</p>`).join('')}
       </div>
     </div>
-    ${agentBlock}
     ${footerBlock}
-  </div>` : ''
+  </div>`).join('')
 
   // Páginas de galería: las fotos que eligió el agente, GRANDES, 2 por página,
   // DESPUÉS de la descripción. Solo aplica si el agente seleccionó fotos.
@@ -298,7 +336,7 @@ export function generatePropertyPdfHtml(
 </head>
 <body>
 ${page1}
-${page2}
+${descriptionHtml}
 ${galleryHtml}
 </body>
 </html>`

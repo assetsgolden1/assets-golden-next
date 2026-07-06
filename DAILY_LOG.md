@@ -67,6 +67,20 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-07-06 (cont. 3) — [PORTAL-PDF] Descripción larga → hoja mal acomodada (paginación de la descripción)
+
+**Contexto:** Iván pasó 2 PDFs reales (adosado/apartamento en Estepona). Las fotos ya salían bien (fix cont.2), pero la DESCRIPCIÓN larga se desbordaba: la página 2 se partía y la 3 quedaba con 3 líneas + bloque de agente huérfano + media hoja en blanco.
+
+**Causa:** la descripción iba en UNA sola `.page` de altura fija; si el texto superaba una hoja, se partía feo y el footer/agente quedaban huérfanos.
+
+**Fix:** nueva función `splitDescriptionIntoPages()` que reparte los párrafos en N hojas EQUILIBRADAS (estima altura = líneas × alto de línea; N = ceil(total/útil); target = total/N), cada una con header + footer (el bloque de agente ya va en la portada). Regla anti-huérfanos: un subtítulo corto en MAYÚSCULAS (EXTERIORES, INTERIORES…) no queda al pie → pasa al inicio de la hoja siguiente con su párrafo. Eliminado `toParagraphs` (sin uso).
+
+**Verificado** con la descripción REAL de la BD (3746 chars, 9 bloques) vía render + medición de cada `.page`: 5 páginas (portada, descripción×2 equilibradas, galería×2), todas = 297mm, **0 desbordes**, sin subtítulos colgados. Screenshots OK.
+
+**Archivo MODIFIED:** `src/lib/pdf/propertyPdfTemplate.ts`.
+
+---
+
 ### 2026-07-06 (cont. 2) — [PORTAL-PDF] Páginas en blanco en el PDF (desborde de las páginas de galería)
 
 **Contexto:** Iván descargó un PDF real (apartamento-en-torrox) y reportó páginas en blanco (8, 10, 12...).
