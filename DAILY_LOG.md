@@ -67,6 +67,18 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-07-06 (cont. 4) — [MARCA] Instagram actualizado al handle correcto
+
+**Contexto:** Iván pasó el Instagram correcto (`assetsgolden.realestate`); estaba el viejo (`assetsgolden.consulting`).
+
+**Trabajo hecho:** cambiado el link de Instagram en los 2 únicos lugares del código donde estaba linkeado (grep en todo el repo): (1) ícono del footer `Footer.tsx`, (2) `sameAs` del schema SEO `GlobalSchemaOrg.tsx`. Ambos → `https://www.instagram.com/assetsgolden.realestate/`.
+
+**Archivos MODIFIED:** `src/components/Footer.tsx`, `src/components/seo/GlobalSchemaOrg.tsx`.
+
+**Nota:** los links del sitio son hardcodeados (no vienen de la BD). Si en el futuro se agregan redes en perfiles de equipo/partners guardados en BD, revisar ahí también.
+
+---
+
 ### 2026-07-06 (cont. 3) — [PORTAL-PDF] Descripción larga → hoja mal acomodada (paginación de la descripción)
 
 **Contexto:** Iván pasó 2 PDFs reales (adosado/apartamento en Estepona). Las fotos ya salían bien (fix cont.2), pero la DESCRIPCIÓN larga se desbordaba: la página 2 se partía y la 3 quedaba con 3 líneas + bloque de agente huérfano + media hoja en blanco.

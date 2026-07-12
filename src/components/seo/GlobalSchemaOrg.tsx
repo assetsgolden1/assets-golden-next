@@ -59,7 +59,7 @@ function buildSchema(locale: string) {
         sameAs: [
           'https://www.linkedin.com/company/assets-golden/',
           'https://www.fotocasa.es/es/inmobiliaria-assets-golden-international-real-estate-consulting/comprar/inmuebles/espana/todas-las-zonas/l?clientId=9202776098940&publisherId=2e46de12-5bb4-4fa3-b91d-2d768640e918',
-          'https://www.instagram.com/assetsgolden.consulting/',
+          'https://www.instagram.com/assetsgolden.realestate/',
         ],
       },
       {

@@ -76,7 +76,7 @@ export default async function Footer() {
                 </svg>
               </a>
               <a
-                href="https://www.instagram.com/assetsgolden.consulting/"
+                href="https://www.instagram.com/assetsgolden.realestate/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
