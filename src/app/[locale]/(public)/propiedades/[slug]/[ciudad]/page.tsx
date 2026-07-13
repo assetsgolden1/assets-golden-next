@@ -6,7 +6,7 @@ interface Props {
 }
 
 export const dynamicParams = true
-export const revalidate = 3600
+export const revalidate = 86400
 
 export default async function ZonaCiudadPage({ params }: Props) {
   const { slug, ciudad } = await params

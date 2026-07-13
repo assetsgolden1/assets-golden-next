@@ -67,6 +67,24 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-07-13 — [FIX-ISR-WRITES] Subidos los intervalos de revalidate para reducir ISR Writes de Vercel
+
+**Contexto:** Iván reportó 644K ISR Writes en Vercel contra un límite de 200K del plan. Todas las páginas públicas revalidaban cada 3600s (1h), demasiado agresivo para el volumen de páginas (~2.600 fichas SSG + blog + listados). Pedido exacto: subir SOLO la constante `revalidate` en 19 páginas, sin tocar `dynamicParams`, lógica ni API routes.
+
+**Trabajo hecho:**
+- **Fichas y contenido estable → `revalidate = 86400` (24h), 12 páginas:** `propiedades/[slug]`, `propiedades/[slug]/[ciudad]`, `blog/[slug]`, `blog` (listado), `blog/consejos`, `blog/inversiones`, `blog/mercado`, `blog/noticias`, `consejos`, `noticias`, `partners`, `partners/[id]`.
+- **Listados y home → `revalidate = 43200` (12h), 7 páginas:** `propiedades` (listado), `inversiones`, `promociones`, `destinos`, `destinos/espana`, `destinos/[slug]`, home (`page.tsx`).
+- **Sin tocar:** `equipo` (ya estaba en 86400) y `sobre-nosotros` (queda en 3600, por pedido explícito). API routes intactas. `dynamicParams` intactos.
+- Verificado con grep post-cambio: los 21 `export const revalidate` del app quedaron con los valores esperados.
+
+**Archivos MODIFIED:** los 19 `page.tsx` listados arriba (solo la línea de `revalidate`).
+
+**Verificación:** `npm run build` exit 0 (Next 16.2.6 / Turbopack, compilación + TypeScript OK, rutas generadas sin errores).
+
+**Próximo paso sugerido:** monitorear en el dashboard de Vercel que los ISR Writes bajen en los próximos días (con 24h/12h el techo teórico baja ~12–24× en esas rutas). Si el contenido de fichas/blog necesita refrescarse antes, considerar revalidación on-demand (`revalidatePath`/`revalidateTag`) desde el admin en vez de bajar los intervalos de nuevo.
+
+---
+
 ### 2026-07-06 (cont. 4) — [MARCA] Instagram actualizado al handle correcto
 
 **Contexto:** Iván pasó el Instagram correcto (`assetsgolden.realestate`); estaba el viejo (`assetsgolden.consulting`).

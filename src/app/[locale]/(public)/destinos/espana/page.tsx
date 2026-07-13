@@ -19,7 +19,7 @@ import { SpainFilters } from '@/components/SpainFilters'
 import { SpainPropertiesGrid } from '@/components/SpainPropertiesGrid'
 import { optimizedImage } from '@/lib/utils/optimizedImage'
 
-export const revalidate = 3600
+export const revalidate = 43200
 
 interface Props {
   searchParams: Promise<{

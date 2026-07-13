@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
 }
 
-export const revalidate = 3600
+export const revalidate = 86400
 
 // Consejos estáticos de respaldo (si no hay datos en BD)
 const STATIC_TIPS = [

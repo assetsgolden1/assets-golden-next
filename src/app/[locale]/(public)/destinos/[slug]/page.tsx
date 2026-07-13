@@ -37,7 +37,7 @@ export async function generateStaticParams() {
 }
 
 export const dynamicParams = true
-export const revalidate = 3600
+export const revalidate = 43200
 
 const ICON_MAP: Record<string, ElementType> = {
   Sun, TrendingUp, Building: Building2, Building2,

@@ -5,7 +5,7 @@
 > - Al cerrar una sesión: tachar/quitar lo resuelto y agregar lo nuevo que surja.
 > - El detalle de CÓMO se hizo cada cosa va en DAILY_LOG.md, no acá.
 > - El estado actual del proyecto (números, stack) va en ESTADO.md, no acá.
-> Última actualización: 06/07/2026
+> Última actualización: 13/07/2026
 
 Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
@@ -52,6 +52,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - (3 props con external_id UUID pero foto de medianewbuild quedaron como 'habihub' — ambiguas, podrían ser del feed; NO re-etiquetadas para no arriesgar duplicados. CC puede revisarlas caso por caso si se quiere; bajo valor.)
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 13/07: **Fix ISR Writes de Vercel** — subidos los intervalos de `revalidate` (estaban todos en 1h): fichas/blog/partners/consejos/noticias → 24h (12 páginas), listados/home/destinos → 12h (7 páginas). `equipo` (24h) y `sobre-nosotros` (1h) sin tocar. Motivo: 644K ISR Writes vs límite de 200K del plan. Sin cambios de lógica ni de `dynamicParams`. Ver DAILY_LOG 13/07.
 - 06/07: **Portal PDF — selector de fotos (hasta 10) + fix logo invisible + optimización de imágenes.** El agente ahora elige qué fotos y en qué orden (1ª = portada) vía modal; backend valida índices contra las fotos reales (anti-SSRF). Header del PDF pasó a navy para que el logo blanco de AG se vea (bug de prod). Imágenes del PDF vía transform Supabase (WebP/resize). Creado demo agent `demo.agente@assetsgolden.com` para validar. Falta la validación humana en prod (ver sección 3).
 - 05/07: slugs 7b CERRADO Y DEPLOYADO (opción 2) — 990 renombrados + redirect 308. Deploy tomó 3 iteraciones (fix real: `setRequestLocale` en la ficha). Verificado en prod: legacy → 308 → canónico → 200.
 - 03/07: imágenes rotas del proyecto secundario CERRADO — 37 props / 204 imgs (>25 MB → transform 400) re-hosteadas comprimidas al principal + BD actualizada. Re-escaneo: 0 rotas de 58 props.

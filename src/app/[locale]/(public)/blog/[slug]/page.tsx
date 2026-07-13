@@ -27,7 +27,7 @@ export async function generateStaticParams() {
 }
 
 export const dynamicParams = true
-export const revalidate = 3600
+export const revalidate = 86400
 
 const categoryLabels: Record<string, string> = {
   article: 'Artículo',
