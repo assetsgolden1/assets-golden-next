@@ -651,6 +651,12 @@ const GRAPHIC_FIELDS = ['renderings-link', 'non-cervera-db-link', 'floor-plans-l
 const DEFAULT_MAX_GB = 2
 /** Con esta cantidad de fotos la galería ya está enriquecida: no se vuelve a bajar. */
 const ENRICHED_AT = 8
+/**
+ * Tope de fotos por ficha. Las carpetas maestras traen TODO (planos, páginas de
+ * brochure, variantes): sin tope, 2200 Brickell quedó con 399 imágenes — inusable
+ * como galería y 123 MB de storage para una sola propiedad.
+ */
+const MAX_IMAGES = 40
 
 async function renders() {
   const limit = Number(process.argv.find((a) => a.startsWith('--limit='))?.split('=')[1] ?? 0)
@@ -683,11 +689,20 @@ async function renders() {
 
   // Idempotente: si ya tiene galería rica no se vuelve a bajar (--force para rehacer).
   const force = process.argv.includes('--force')
-  const enriched = (id: string) => {
+  // --trim: reprocesa SOLO las que quedaron por encima del tope de fotos, para
+  // recortarlas (y purgar las imágenes sobrantes del bucket).
+  const trim = process.argv.includes('--trim')
+  const gallerySize = (id: string) => {
     const g = byExt.get(id)?.gallery_urls
-    return Array.isArray(g) && g.length >= ENRICHED_AT
+    return Array.isArray(g) ? g.length : 0
   }
-  let queue = raw.filter((r) => byExt.has(`cv-${r.id}`) && folderOf(r) && (force || !enriched(`cv-${r.id}`)))
+  const enriched = (id: string) => gallerySize(id) >= ENRICHED_AT
+  let queue = raw.filter((r) => {
+    const id = `cv-${r.id}`
+    if (!byExt.has(id) || !folderOf(r)) return false
+    if (trim) return gallerySize(id) > MAX_IMAGES
+    return force || !enriched(id)
+  })
   if (limit > 0) queue = queue.slice(0, limit)
   console.log(`· ${queue.length} propiedades a enriquecer${force ? ' (--force)' : ''}${confirm ? '' : ' — DRY-RUN (--confirm para escribir)'}`)
   if (!confirm) { queue.forEach((r) => console.log(`  [dry] ${r.title}`)); return }
@@ -716,17 +731,52 @@ async function renders() {
       await pipeline(Readable.fromWeb(res.body as Parameters<typeof Readable.fromWeb>[0]), createWriteStream(zipPath))
       const zipMb = statSync(zipPath).size / 1048576
 
-      try { execFileSync('unzip', ['-o', '-j', '-qq', zipPath, '-d', tmp], { stdio: 'ignore' }) }
+      // Se conserva la estructura de carpetas (sin -j): el nombre del directorio es
+      // lo que permite quedarse con los renders y no con planos/brochure.
+      const outDir = path0.join(tmp, 'x')
+      try { execFileSync('unzip', ['-o', '-qq', zipPath, '-d', outDir], { stdio: 'ignore' }) }
       catch { /* unzip devuelve !=0 con warnings pero igual extrae */ }
 
-      const imgs = readdirSync(tmp).filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
-        .map((f) => path0.join(tmp, f))
+      const walk = (d: string): string[] => {
+        let acc: string[] = []
+        for (const e of readdirSync(d, { withFileTypes: true })) {
+          const p = path0.join(d, e.name)
+          if (e.isDirectory()) acc = acc.concat(walk(p))
+          else acc.push(p)
+        }
+        return acc
+      }
+      let all: string[] = []
+      try { all = walk(outDir) } catch { /* nada extraído */ }
+      const candidates = all
+        .filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
         .filter((f) => statSync(f).size > 40_000)          // descarta logos/iconos
         .sort()
-      if (!imgs.length) { console.error(`  ✗ ${r.title}: el ZIP (${zipMb.toFixed(0)} MB) no traía imágenes`); continue }
+      if (!candidates.length) { console.error(`  ✗ ${r.title}: el ZIP (${zipMb.toFixed(0)} MB) no traía imágenes`); continue }
+
+      // Preferencia: carpeta de renders > fotos > todo. Y tope duro de MAX_IMAGES.
+      // El subconjunto preferido se usa solo si es REPRESENTATIVO: en Vita at Grove
+      // Isle una sola imagen tenía "render" en la ruta y la galería cayó de 53 a 3.
+      const MIN_SUBSET = 5
+      const pick = (re: RegExp) => candidates.filter((f) => re.test(path0.relative(outDir, f)))
+      const preferred = pick(/render/i)
+      const secondary = pick(/photo|image|gallery|fotos/i)
+      const chosen = preferred.length >= MIN_SUBSET ? preferred
+        : secondary.length >= MIN_SUBSET ? secondary
+          : candidates
+      const imgs = chosen.slice(0, MAX_IMAGES)
+      const dropped = chosen.length - imgs.length
 
       const prop = byExt.get(`cv-${r.id}`)!
       const existing: string[] = Array.isArray(prop.gallery_urls) ? prop.gallery_urls : []
+
+      // Purga de renders previos de esta propiedad: si una corrida anterior subió más
+      // imágenes que la actual, sin esto quedarían huérfanas ocupando storage.
+      const prevList = await supa.storage.from('property-images').list(`cervera/${r.id}`, { limit: 1000 })
+      const stale = (prevList.data ?? []).filter((f) => /^r\d+\.jpg$/.test(f.name))
+        .map((f) => `cervera/${r.id}/${f.name}`)
+      if (stale.length) await supa.storage.from('property-images').remove(stale)
+
       const uploaded: string[] = []
       let mb = 0
       for (const [i, f] of imgs.entries()) {
@@ -745,12 +795,16 @@ async function renders() {
       if (!uploaded.length) { console.error(`  ✗ ${r.title}: no se pudo subir ninguna`); continue }
 
       // Los renders van primero (son mejores que el screenshot de la API), sin duplicar.
-      const gallery = [...new Set([...uploaded, ...existing])]
+      // De la galería previa SOLO se conservan las imágenes que NO son renders
+      // (`r00.jpg`…): esas ya fueron purgadas del bucket más arriba, así que
+      // arrastrarlas dejaría URLs rotas — y además reponerlas anulaba el tope.
+      const originals = existing.filter((u) => !/\/r\d+\.jpg$/.test(u))
+      const gallery = [...new Set([...uploaded, ...originals])].slice(0, MAX_IMAGES)
       const { error } = await supa.from('properties')
         .update({ image_url: gallery[0], gallery_urls: gallery, updated_at: new Date().toISOString() })
         .eq('id', prop.id)
       if (error) { console.error(`  ✗ ${r.title}: BD ${error.message}`); continue }
-      console.log(`  ✔ ${r.title}: ${uploaded.length} renders (ZIP ${zipMb.toFixed(0)} MB → ${mb.toFixed(1)} MB) · galería ${gallery.length}`)
+      console.log(`  ✔ ${r.title}: ${uploaded.length} renders (ZIP ${zipMb.toFixed(0)} MB → ${mb.toFixed(1)} MB) · galería ${gallery.length}${dropped ? ` · ${dropped} descartadas por tope` : ''}`)
     } catch (e) {
       console.error(`  ✗ ${r.title}: ${(e as Error).message}`)
     } finally {
