@@ -1,0 +1,500 @@
+/**
+ * Importador de proyectos de Cervera Broker Portal → catálogo de Assets Golden.
+ *
+ * Fuente: WP REST API pública (https://cerverabrokerportal.com/wp-json/wp/v2/projects).
+ * Son promociones de obra nueva (off-plan) en Florida → se cargan con is_development=true
+ * y precio "desde" (price_range_from).
+ *
+ * Modos:
+ *   extract  — baja API + direcciones (scrape puntual) + media. Cachea en outputs/.
+ *   report   — normaliza y emite informe dry-run. NO toca la BD.
+ *   load     — inserta en Supabase (requiere --confirm). Idempotente por external_id.
+ *
+ * Uso: npm run cervera -- extract | report | load [--limit N] [--confirm]
+ *
+ * Detalle del análisis y las trampas de la fuente: docs/plan-carga-cervera.md
+ */
+import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'node:fs'
+
+const API = 'https://cerverabrokerportal.com/wp-json/wp/v2'
+const OUT = 'outputs'
+const RAW = `${OUT}/cervera-raw.json`
+const ADDR_CACHE = `${OUT}/cervera-addresses.json`
+
+// robots.txt del sitio declara Crawl-delay: 10 → lo respetamos en el scrape de direcciones.
+const CRAWL_DELAY_MS = 10_000
+const UA = 'AssetsGoldenBot/1.0 (+https://assetsgolden.com)'
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+// ─── Tipos ────────────────────────────────────────────────────────────────
+interface WpProject {
+  id: number
+  slug: string
+  link: string
+  title: { rendered: string }
+  content?: { rendered: string }
+  excerpt?: { rendered: string }
+  featured_media?: number
+  meta?: Record<string, unknown>
+}
+
+export interface CerveraRaw {
+  id: number
+  slug: string
+  link: string
+  title: string
+  contentHtml: string
+  excerptHtml: string
+  excerptEs: string
+  mediaIds: number[]
+  images: string[]
+  address: { street: string; city: string; state: string; zip: string } | null
+  meta: Record<string, unknown>
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────
+function decodeEntities(s: string): string {
+  return s
+    .replace(/&#8217;|&#039;|&apos;/g, "'")
+    .replace(/&#8211;|&ndash;/g, '–')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n))
+    .trim()
+}
+
+const stripTags = (s: string) => decodeEntities(String(s ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' '))
+
+async function getJson<T>(url: string): Promise<T> {
+  const res = await fetch(url, { headers: { 'User-Agent': UA } })
+  if (!res.ok) throw new Error(`${res.status} ${url}`)
+  return res.json() as Promise<T>
+}
+
+/**
+ * La dirección NO está en la API (solo se renderiza en la ficha). La extraemos del
+ * HTML server-rendered: tras el encabezado "Site Address" vienen 3 campos JetEngine
+ * (calle / "Ciudad, ST" / zip).
+ */
+function parseAddress(html: string): CerveraRaw['address'] {
+  const i = html.indexOf('Site Address')
+  if (i === -1) return null
+  const chunk = html.slice(i, i + 3000).replace(/<script[\s\S]*?<\/script>/g, '')
+  const parts = chunk
+    .replace(/<[^>]+>/g, '|')
+    .split('|')
+    .map((s) => decodeEntities(s).replace(/\s+/g, ' ').trim())
+    .filter((s) => s && s !== 'Site Address')
+  const cityState = parts.find((p) => /^[A-Za-z .'\-]+,\s*[A-Z]{2}$/.test(p))
+  const zip = parts.find((p) => /^\d{5}(-\d{4})?$/.test(p))
+  const street = parts.find((p) => /^\d+\s+\S/.test(p))
+  if (!cityState && !street) return null
+  const [city, state] = (cityState ?? ', ').split(',').map((s) => s.trim())
+  return { street: street ?? '', city: city ?? '', state: state ?? '', zip: zip ?? '' }
+}
+
+// ─── F1 · EXTRACT ─────────────────────────────────────────────────────────
+async function extract() {
+  if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true })
+
+  console.log('· Bajando proyectos de la API…')
+  const projects: WpProject[] = []
+  for (let page = 1; page <= 2; page++) {
+    const batch = await getJson<WpProject[]>(`${API}/projects?per_page=100&page=${page}`)
+    projects.push(...batch)
+    if (batch.length < 100) break
+  }
+  console.log(`  ${projects.length} proyectos`)
+
+  // Media en lote (1 request por cada 100 ids) en vez de 1 por imagen.
+  const idsOf = (p: WpProject): number[] => {
+    const m = p.meta ?? {}
+    return [p.featured_media, m['project-image'], m['project-hero-image']]
+      .map(Number)
+      .filter((n) => Number.isFinite(n) && n > 0)
+  }
+  const allIds = [...new Set(projects.flatMap(idsOf))]
+  console.log(`· Resolviendo ${allIds.length} imágenes…`)
+  const mediaUrl = new Map<number, string>()
+  for (let i = 0; i < allIds.length; i += 100) {
+    const slice = allIds.slice(i, i + 100)
+    const media = await getJson<{ id: number; source_url: string; mime_type: string }[]>(
+      `${API}/media?include=${slice.join(',')}&per_page=100`,
+    )
+    for (const m of media) if (m.mime_type?.startsWith('image/')) mediaUrl.set(m.id, m.source_url)
+    await sleep(500)
+  }
+  console.log(`  ${mediaUrl.size} resueltas`)
+
+  // Direcciones: solo de los candidatos (con imagen o precio), cacheadas y con crawl-delay.
+  const cache: Record<string, CerveraRaw['address']> = existsSync(ADDR_CACHE)
+    ? JSON.parse(readFileSync(ADDR_CACHE, 'utf8'))
+    : {}
+  const isCandidate = (p: WpProject) =>
+    idsOf(p).length > 0 || Number(p.meta?.price_range_from) > 0
+  const pending = projects.filter((p) => isCandidate(p) && !(p.slug in cache))
+  console.log(`· Direcciones: ${pending.length} por bajar (crawl-delay ${CRAWL_DELAY_MS / 1000}s, ~${Math.ceil((pending.length * CRAWL_DELAY_MS) / 60000)} min)…`)
+
+  for (const [n, p] of pending.entries()) {
+    try {
+      const res = await fetch(p.link, { headers: { 'User-Agent': UA } })
+      cache[p.slug] = res.ok ? parseAddress(await res.text()) : null
+    } catch {
+      cache[p.slug] = null
+    }
+    writeFileSync(ADDR_CACHE, JSON.stringify(cache, null, 1))
+    if ((n + 1) % 10 === 0) console.log(`  ${n + 1}/${pending.length}`)
+    if (n < pending.length - 1) await sleep(CRAWL_DELAY_MS)
+  }
+
+  const raw: CerveraRaw[] = projects.map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    link: p.link,
+    title: decodeEntities(p.title?.rendered ?? ''),
+    contentHtml: p.content?.rendered ?? '',
+    excerptHtml: p.excerpt?.rendered ?? '',
+    excerptEs: String(p.meta?.excerpt_es ?? ''),
+    mediaIds: idsOf(p),
+    images: [...new Set(idsOf(p).map((id) => mediaUrl.get(id)).filter(Boolean) as string[])],
+    address: cache[p.slug] ?? null,
+    meta: (p.meta ?? {}) as Record<string, unknown>,
+  }))
+
+  writeFileSync(RAW, JSON.stringify(raw, null, 1))
+  console.log(`✔ ${RAW} (${raw.length} proyectos, ${raw.filter((r) => r.images.length).length} con imagen, ${raw.filter((r) => r.address?.city).length} con ciudad)`)
+}
+
+// ─── F2 · NORMALIZACIÓN ───────────────────────────────────────────────────
+const SQFT_TO_M2 = 10.7639
+// Precio por debajo de este umbral NO es un precio de venta: la fuente mete el
+// precio por pie cuadrado (PSF) en el mismo campo (ver docs/plan-carga-cervera.md).
+const MIN_PRICE_USD = 10_000
+
+const STATES: Record<string, string> = { FL: 'Florida', NY: 'Nueva York', TX: 'Texas', CA: 'California', NJ: 'Nueva Jersey' }
+
+export interface Normalized {
+  external_id: string
+  external_source: 'cervera'
+  title: string
+  slug: string
+  country: string
+  province: string | null
+  location: string | null
+  property_type: string
+  price: number | null
+  currency: string
+  area_sqm: number | null
+  bedrooms: number | null
+  bathrooms: number | null
+  description: string
+  description_en: string
+  image_url: string | null
+  gallery_urls: string[]
+  features: string[]
+  is_development: boolean
+  skip: string | null
+  warnings: string[]
+  sourceUrl: string
+}
+
+const slugify = (t: string) =>
+  t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 80)
+
+const num = (v: unknown): number => { const n = Number(String(v ?? '').replace(/[^0-9.]/g, '')); return Number.isFinite(n) ? n : 0 }
+
+/** Dormitorios/baños salen del desglose de tipologías (unit_size_ranges). */
+function bedsBaths(meta: Record<string, unknown>): { beds: number | null; baths: number | null } {
+  const u = meta.unit_size_ranges
+  if (!u || typeof u !== 'object') return { beds: null, baths: null }
+  const rows = Object.values(u as Record<string, Record<string, string>>)
+  const beds: number[] = []
+  const baths: number[] = []
+  for (const r of rows) {
+    if (String(r.is_studio) === 'true') beds.push(0)
+    const b = parseInt(r.unit_beds ?? '', 10)
+    if (Number.isFinite(b) && b > 0) beds.push(b)
+    const ba = parseFloat(String(r.unit_bth ?? '').replace(/[^0-9.]/g, ''))
+    if (Number.isFinite(ba) && ba > 0) baths.push(ba)
+  }
+  return {
+    beds: beds.length ? Math.min(...beds) : null,
+    baths: baths.length ? Math.round(Math.min(...baths)) : null,
+  }
+}
+
+/**
+ * F3 · Copy bilingüe derivado SOLO de datos duros de la fuente (developer, arquitecto,
+ * plantas, unidades, entrega, superficies). No inventa cifras ni afirmaciones.
+ */
+function buildDescription(r: CerveraRaw, n: Partial<Normalized>, lang: 'es' | 'en'): string {
+  const m = r.meta
+  const dev = String(m.developer ?? '').trim()
+  const arch = String(m.architect ?? '').trim()
+  const floors = num(m.floors)
+  const units = num(m.units)
+  const year = num(m.completion_year)
+  const q = String(m.completion_quarter ?? '').toUpperCase()
+  const sFrom = num(m.size_range_from), sTo = num(m.size_range_to)
+  const city = n.location ?? '', prov = n.province ?? ''
+  const es = lang === 'es'
+  const s: string[] = []
+
+  s.push(es
+    ? `${r.title} es una promoción de obra nueva${city ? ` en ${city}` : ''}${prov ? `, ${prov}` : ''} (Estados Unidos).`
+    : `${r.title} is a new development${city ? ` in ${city}` : ''}${prov ? `, ${prov}` : ''} (United States).`)
+
+  const team: string[] = []
+  if (dev) team.push(es ? `promovida por ${dev}` : `developed by ${dev}`)
+  if (arch) team.push(es ? `con arquitectura de ${arch}` : `with architecture by ${arch}`)
+  if (team.length) s.push((es ? 'Está ' : 'It is ') + team.join(es ? ' y ' : ' and ') + '.')
+
+  const bldg: string[] = []
+  if (floors) bldg.push(es ? `${floors} plantas` : `${floors} floors`)
+  if (units) bldg.push(es ? `${units} residencias` : `${units} residences`)
+  if (bldg.length) s.push((es ? 'El edificio cuenta con ' : 'The building has ') + bldg.join(es ? ' y ' : ' and ') + '.')
+
+  if (sFrom) {
+    const a = Math.round(sFrom / SQFT_TO_M2)
+    const b = sTo ? Math.round(sTo / SQFT_TO_M2) : 0
+    s.push(es
+      ? `Las viviendas parten de ${a} m²${b && b > a ? ` y llegan hasta ${b} m²` : ''}.`
+      : `Homes start at ${a} sqm${b && b > a ? ` and go up to ${b} sqm` : ''}.`)
+  }
+  if (year) s.push(es ? `Entrega prevista: ${q ? q + ' ' : ''}${year}.` : `Estimated delivery: ${q ? q + ' ' : ''}${year}.`)
+
+  const am = stripTags(String(m.amenities ?? ''))
+  if (am.length > 3) {
+    // Cortar en frontera de palabra: el campo es una lista corrida y un slice duro
+    // partía palabras a la mitad ("EV-ready parking P.").
+    const cut = am.length <= 240 ? am : am.slice(0, am.lastIndexOf(' ', 240)) + '…'
+    s.push((es ? 'Amenidades: ' : 'Amenities: ') + cut + (cut.endsWith('…') ? '' : '.'))
+  }
+
+  return s.join(' ')
+}
+
+function normalize(r: CerveraRaw): Normalized {
+  const m = r.meta
+  const warnings: string[] = []
+
+  const rawPrice = num(m.price_range_from)
+  let price: number | null = null
+  if (rawPrice >= MIN_PRICE_USD) price = Math.round(rawPrice)
+  else if (rawPrice > 0) warnings.push(`precio sospechoso (${rawPrice} = PSF, no total) → sin precio`)
+
+  const sqft = num(m.size_range_from)
+  const area_sqm = sqft ? Math.round(sqft / SQFT_TO_M2) : null
+  const { beds, baths } = bedsBaths(m)
+
+  const province = r.address?.state ? (STATES[r.address.state] ?? r.address.state) : null
+  const location = r.address?.city || null
+  if (!location) warnings.push('sin ciudad (no se pudo extraer la dirección)')
+
+  const n: Partial<Normalized> = { province, location }
+  const descEs = r.excerptEs.trim() || buildDescription(r, n, 'es')
+  const descEnSrc = stripTags(r.excerptHtml) || stripTags(r.contentHtml)
+  const descEn = descEnSrc.length > 60 ? descEnSrc : buildDescription(r, n, 'en')
+
+  const features = [
+    String(m.developer ?? '').trim() && `Promotora: ${m.developer}`,
+    String(m.architect ?? '').trim() && `Arquitectura: ${m.architect}`,
+    String(m['interior-designer'] ?? '').trim() && `Interiorismo: ${m['interior-designer']}`,
+    num(m.floors) && `${num(m.floors)} plantas`,
+    num(m.units) && `${num(m.units)} residencias`,
+    num(m.completion_year) && `Entrega ${num(m.completion_year)}`,
+    String(m.views ?? '').trim() && `Vistas: ${stripTags(String(m.views)).slice(0, 80)}`,
+  ].filter(Boolean) as string[]
+
+  let skip: string | null = null
+  if (!r.images.length && price === null) skip = 'sin imagen ni precio'
+  else if (!r.images.length) skip = 'sin imagen'
+  else if (price === null) skip = 'sin precio válido'
+
+  return {
+    external_id: String(r.id),
+    external_source: 'cervera',
+    title: r.title,
+    slug: `${slugify(r.title)}-${r.id}`,
+    country: 'Estados Unidos',
+    province,
+    location,
+    property_type: 'apartment',
+    price,
+    currency: 'USD',
+    area_sqm,
+    bedrooms: beds,
+    bathrooms: baths,
+    description: descEs,
+    description_en: descEn,
+    image_url: r.images[0] ?? null,
+    gallery_urls: r.images,
+    features,
+    is_development: true,
+    skip,
+    warnings,
+    sourceUrl: r.link,
+  }
+}
+
+// ─── F4 · INFORME (dry-run, no toca la BD) ────────────────────────────────
+async function report() {
+  const raw: CerveraRaw[] = JSON.parse(readFileSync(RAW, 'utf8'))
+  const all = raw.map(normalize)
+  const ok = all.filter((n) => !n.skip)
+  const out = all.filter((n) => n.skip)
+
+  // Dedupe contra el catálogo vivo
+  const { createClient } = await import('@supabase/supabase-js')
+  const supa = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
+  const { data: existing } = await supa.from('properties').select('ref_code,title,external_id,external_source').or('country.ilike.%Estados Unidos%,location.ilike.%miami%')
+
+  /**
+   * Dedupe por TOKENS DISTINTIVOS, no por prefijo: los títulos de la misma torre difieren
+   * mucho entre fuentes ("The Rider Residences" vs "THE RIDER MIAMI 1, 2 y 3 D"). Se ignoran
+   * palabras genéricas de producto/geografía y se cruza lo que queda ("rider", "domus").
+   */
+  const GENERIC = new Set(['the', 'la', 'el', 'los', 'las', 'de', 'del', 'en', 'y', 'and', 'by', 'at', 'on',
+    'residences', 'residence', 'condos', 'condo', 'hotel', 'tower', 'towers', 'apartamento', 'apartamentos',
+    'miami', 'beach', 'brickell', 'coral', 'gables', 'bay', 'harbor', 'islands', 'island', 'aventura',
+    'surfside', 'north', 'south', 'west', 'east', 'park', 'center', 'centre', 'club', 'house', 'new', 'york'])
+  const tokens = (s: string) => new Set(
+    slugify(s).split('-').filter((t) => t.length >= 4 && !GENERIC.has(t) && !/^\d+$/.test(t)))
+
+  const dupes: { nuevo: string; existente: string; motivo: string }[] = []
+  for (const n of ok) {
+    const tn = tokens(n.title)
+    const hit = (existing ?? []).find((e) => {
+      if (e.external_source === 'cervera' && e.external_id === n.external_id) return true
+      const te = tokens(e.title ?? '')
+      return [...tn].some((t) => te.has(t))
+    })
+    if (hit) dupes.push({
+      nuevo: n.title,
+      existente: `${hit.ref_code} — ${hit.title}`,
+      motivo: [...tokens(n.title)].filter((t) => tokens(hit.title ?? '').has(t)).join(', ') || 'mismo external_id',
+    })
+  }
+  const dupeTitles = new Set(dupes.map((d) => d.nuevo))
+
+  const by = (r: string) => out.filter((n) => n.skip === r).length
+  const L: string[] = []
+  L.push('# Informe dry-run — carga Cervera', '', `> Generado por \`npm run cervera -- report\`. **No se escribió nada en la BD.**`, '')
+  L.push('## Resumen', '', `| | |`, `|---|---|`)
+  L.push(`| Proyectos en la fuente | ${all.length} |`)
+  L.push(`| **Listos para cargar** | **${ok.length - dupes.length}** |`)
+  L.push(`| Duplicados detectados (no se cargan) | ${dupes.length} |`)
+  L.push(`| Excluidos por datos insuficientes | ${out.length} |`, '')
+  L.push('## Exclusiones', '', `| Motivo | N |`, `|---|---|`)
+  for (const r of ['sin imagen ni precio', 'sin imagen', 'sin precio válido']) L.push(`| ${r} | ${by(r)} |`)
+  L.push('')
+  if (dupes.length) {
+    L.push('## ⚠️ Posibles duplicados — NO se cargan', '',
+      'Detectados por token distintivo compartido. Revisar y decidir a mano (puede ser la misma torre cargada antes, o una fase distinta del mismo complejo).', '',
+      `| Cervera | Ya en el catálogo | Coincide en |`, `|---|---|---|`)
+    for (const d of dupes) L.push(`| ${d.nuevo} | ${d.existente} | \`${d.motivo}\` |`)
+    L.push('')
+  }
+  const psf = all.filter((n) => n.warnings.some((w) => w.includes('PSF')))
+  if (psf.length) {
+    L.push('## ⚠️ Precios PSF descartados (revisión manual)', '', `La fuente trae el precio por pie cuadrado en el campo de precio. Se cargan SIN precio o se excluyen.`, '', `| Proyecto | Valor en la fuente |`, `|---|---|`)
+    for (const n of psf) L.push(`| ${n.title} | ${n.warnings.find((w) => w.includes('PSF'))?.match(/\((\d+)/)?.[1] ?? '?'} |`)
+    L.push('')
+  }
+  const noCity = ok.filter((n) => !n.location && !dupeTitles.has(n.title))
+  if (noCity.length) {
+    L.push(`## Sin ciudad (${noCity.length}) — decisión tuya`, '',
+      'La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados Unidos) pero **sin ciudad**: no aparecerían en filtros por ciudad y la ficha queda más pobre. Opciones: cargarlas igual, o dejarlas para completar a mano.', '')
+    L.push(noCity.map((n) => `- ${n.title} — ${n.sourceUrl}`).join('\n'), '')
+  }
+  L.push('## Muestra de 5 fichas normalizadas', '')
+  for (const n of ok.filter((x) => !dupeTitles.has(x.title)).slice(0, 5)) {
+    L.push(`### ${n.title}`, '', '```', JSON.stringify({ ...n, description: n.description.slice(0, 220) + '…', description_en: n.description_en.slice(0, 120) + '…' }, null, 1), '```', '')
+  }
+  L.push('## Excluidos — detalle para carga manual', '', `| Proyecto | Motivo | Ficha |`, `|---|---|---|`)
+  for (const n of out) L.push(`| ${n.title} | ${n.skip} | ${n.sourceUrl} |`)
+
+  const path = 'docs/informe-carga-cervera.md'
+  writeFileSync(path, L.join('\n'))
+  // Se persiste la marca para que `load` NUNCA cargue un posible duplicado.
+  const marked = all.map((n) => (dupeTitles.has(n.title)
+    ? { ...n, skip: n.skip ?? 'posible duplicado', dupeOf: dupes.find((d) => d.nuevo === n.title)?.existente }
+    : n))
+  writeFileSync(`${OUT}/cervera-normalized.json`, JSON.stringify(marked, null, 1))
+  console.log(`✔ ${path}`)
+  console.log(`  listos: ${ok.length - dupes.length} · duplicados: ${dupes.length} · excluidos: ${out.length}`)
+}
+
+// ─── F5 · CARGA ───────────────────────────────────────────────────────────
+/**
+ * Inserta en Supabase. Idempotente: salta lo que ya existe por (external_source, external_id).
+ * Las imágenes se recomprimen y se suben a NUESTRO bucket — así no dependemos del hosting de
+ * Cervera y evitamos el problema de fuentes >25 MB que rompen el transform (ver DAILY_LOG 03/07).
+ */
+async function load() {
+  const limit = Number(process.argv.find((a) => a.startsWith('--limit='))?.split('=')[1] ?? 0)
+  const confirm = process.argv.includes('--confirm')
+
+  const all: Normalized[] = JSON.parse(readFileSync(`${OUT}/cervera-normalized.json`, 'utf8'))
+  const { createClient } = await import('@supabase/supabase-js')
+  const sharp = (await import('sharp')).default
+  const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supa = createClient(SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
+
+  const { data: already } = await supa.from('properties').select('external_id').eq('external_source', 'cervera')
+  const done = new Set((already ?? []).map((r) => r.external_id))
+
+  let queue = all.filter((n) => !n.skip && !done.has(n.external_id))
+  if (limit > 0) queue = queue.slice(0, limit)
+
+  console.log(`· ${queue.length} a cargar${limit ? ` (limit ${limit})` : ''}${confirm ? '' : ' — DRY-RUN, usá --confirm para escribir'}`)
+  if (!confirm) { queue.forEach((n) => console.log(`  [dry] ${n.title} — ${n.location ?? '?'} — ${n.price ? '$' + n.price.toLocaleString() : 's/precio'}`)); return }
+
+  let okCount = 0
+  for (const n of queue) {
+    try {
+      // Imágenes → bucket propio
+      const uploaded: string[] = []
+      for (const [i, url] of n.gallery_urls.entries()) {
+        try {
+          const res = await fetch(url, { headers: { 'User-Agent': UA } })
+          if (!res.ok) continue
+          const buf = Buffer.from(await res.arrayBuffer())
+          const jpg = await sharp(buf).rotate()
+            .resize({ width: 2560, height: 2560, fit: 'inside', withoutEnlargement: true })
+            .jpeg({ quality: 82, mozjpeg: true }).toBuffer()
+          const path = `cervera/${n.external_id}/${i}.jpg`
+          const up = await supa.storage.from('property-images')
+            .upload(path, jpg, { contentType: 'image/jpeg', upsert: true, cacheControl: '31536000' })
+          if (!up.error) uploaded.push(`${SUPABASE_URL}/storage/v1/object/public/property-images/${path}`)
+        } catch { /* imagen suelta que falla no aborta la propiedad */ }
+      }
+      if (!uploaded.length) { console.error(`  ✗ ${n.title}: ninguna imagen se pudo subir`); continue }
+
+      const { error } = await supa.from('properties').insert({
+        title: n.title, slug: n.slug,
+        country: n.country, province: n.province, location: n.location,
+        property_type: n.property_type, price: n.price, currency: n.currency,
+        area_sqm: n.area_sqm, bedrooms: n.bedrooms, bathrooms: n.bathrooms,
+        description: n.description, description_en: n.description_en,
+        image_url: uploaded[0], gallery_urls: uploaded,
+        features: n.features, is_development: n.is_development,
+        external_id: n.external_id, external_source: n.external_source,
+        status: 'active', hidden: false, featured: false,
+      })
+      if (error) { console.error(`  ✗ ${n.title}: ${error.message}`); continue }
+      okCount++
+      console.log(`  ✔ ${n.title} (${uploaded.length} img)`)
+    } catch (e) { console.error(`  ✗ ${n.title}: ${(e as Error).message}`) }
+  }
+  console.log(`\nCargadas: ${okCount}/${queue.length}`)
+}
+
+// ─── main ─────────────────────────────────────────────────────────────────
+const mode = process.argv[2] ?? 'report'
+const run = mode === 'extract' ? extract : mode === 'report' ? report : mode === 'load' ? load : null
+if (!run) { console.log('Usá: extract | report | load [--limit=N] [--confirm]'); process.exit(1) }
+run().catch((e) => { console.error('FALLÓ:', e.message); process.exit(1) })

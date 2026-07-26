@@ -1,0 +1,602 @@
+{
+ "mandarin-oriental-residences-west-palm-beach": {
+  "street": "5400 N Flagler Dr",
+  "city": "",
+  "state": "",
+  "zip": "33407"
+ },
+ "seventeen-gables": {
+  "street": "1715 Douglas Road",
+  "city": "Coral Gables",
+  "state": "FL",
+  "zip": "33134"
+ },
+ "aria-reserve-south": {
+  "street": "700 NE 24th Street",
+  "city": "",
+  "state": "",
+  "zip": "33137"
+ },
+ "edgehouse": {
+  "street": "1825 NE 4th Ave",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33132"
+ },
+ "missioni-baia": {
+  "street": "777 NE 26th Terrace, Miami",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33137"
+ },
+ "twenty-sixth-2nd-wynwood": {
+  "street": "201 NW 26th Street",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33127"
+ },
+ "the-well-bay-harbor-islands": {
+  "street": "1160 Kane Concourse Bay Harbor Islands",
+  "city": "Bay Harbor Islands",
+  "state": "FL",
+  "zip": ""
+ },
+ "seven-park": null,
+ "the-cloud-one-hotel-residences": null,
+ "poolhaus": {
+  "street": "1130 100th St, Bay Harbor Islands, FL 33154",
+  "city": "Bay Harbor Islands",
+  "state": "FL",
+  "zip": ""
+ },
+ "jean-georges-miami-tropic-residences": {
+  "street": "350 NE 1st Avenue",
+  "city": "Miami",
+  "state": "FL",
+  "zip": ""
+ },
+ "hollywood-moon": {
+  "street": "901 S Ocean Drive, Hollywood, FL",
+  "city": "",
+  "state": "",
+  "zip": ""
+ },
+ "midtown-park": {
+  "street": "300 NE 1st Ave",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33127"
+ },
+ "bay-harbor-towers": {
+  "street": "10143 E. Bay Harbor Drive Bay Harbor Islands",
+  "city": "",
+  "state": "",
+  "zip": ""
+ },
+ "ziggurat": {
+  "street": "3130 Grand Ave",
+  "city": "Miami",
+  "state": "FL",
+  "zip": ""
+ },
+ "atelier": {
+  "street": "1265 SW 22nd Street",
+  "city": "",
+  "state": "",
+  "zip": ""
+ },
+ "the-lincoln": {
+  "street": "2650 Lincoln Avenue",
+  "city": "Coral Gables",
+  "state": "FL",
+  "zip": ""
+ },
+ "opus-coconut-grove": {
+  "street": "3137 sw 27th ave",
+  "city": "Miami",
+  "state": "FL",
+  "zip": ""
+ },
+ "ponce-parc": {
+  "street": "3000 Ponce de Leon Blvd",
+  "city": "Coral Gables",
+  "state": "FL",
+  "zip": "33134"
+ },
+ "missoni-baia": null,
+ "1212-aventura": null,
+ "quadro-design-district": null,
+ "villa-miami": {
+  "street": "700 NE 29th St, Miami, FL 33137",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33137"
+ },
+ "casa-murano-las-olas": null,
+ "surfrow-surfside": {
+  "street": "8000 Collins Avenue Surfside",
+  "city": "Surfside",
+  "state": "FL",
+  "zip": ""
+ },
+ "twenty-nine-indian-creek": {
+  "street": "2901 Indian Creek Drive Miami Beach",
+  "city": "Miami Beach",
+  "state": "FL",
+  "zip": ""
+ },
+ "villa-17": {
+  "street": "1719 Jefferson Avenue",
+  "city": "Miami Beach",
+  "state": "FL",
+  "zip": "33139"
+ },
+ "the-perigon-miami-beach": {
+  "street": "5333 Collins Ave",
+  "city": "Miami Beach",
+  "state": "FL",
+  "zip": ""
+ },
+ "the-links-at-fisher-island": {
+  "street": "",
+  "city": "Miami Beach",
+  "state": "FL",
+  "zip": ""
+ },
+ "cora": {
+  "street": "4241 Aurora Street, Coral Gables Fl 33146",
+  "city": "Coral Gables",
+  "state": "FL",
+  "zip": "33146"
+ },
+ "faena": {
+  "street": "90 Southwest 3rd Street, Miami, FL 33130",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33130"
+ },
+ "aria-reserve": {
+  "street": "700 NE 24th Street",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33137"
+ },
+ "alhambra-parc": {
+  "street": "33 Alhambra Cir, Coral Gables, FL 33134",
+  "city": "Coral Gables",
+  "state": "FL",
+  "zip": "33134"
+ },
+ "alana-bay-harbor": {
+  "street": "9901 W Bay Harbor Drive",
+  "city": "Bay Harbor Islands",
+  "state": "FL",
+  "zip": ""
+ },
+ "9900-west": {
+  "street": "9900 West Bay Harbor Dr",
+  "city": "Bay Harbor Islands",
+  "state": "FL",
+  "zip": "33154"
+ },
+ "one-west-palm": {
+  "street": "550 North Quadrille Boulevard",
+  "city": "",
+  "state": "",
+  "zip": "33401"
+ },
+ "shorecrest": {
+  "street": "1901 N. Flagler Drive",
+  "city": "",
+  "state": "",
+  "zip": "33304"
+ },
+ "nautilus-220": {
+  "street": "220 Lake Shore Dirve",
+  "city": "",
+  "state": "",
+  "zip": "33403"
+ },
+ "the-ritz-carlton-residences-west-palm-beach": {
+  "street": "1717 N. Flagler Drive",
+  "city": "",
+  "state": "",
+  "zip": "33407"
+ },
+ "alba-palm-beach": {
+  "street": "4714 N Flagler Drive",
+  "city": "",
+  "state": "",
+  "zip": "33407"
+ },
+ "olara-residences": {
+  "street": "1919 N Flagler Drive",
+  "city": "",
+  "state": "",
+  "zip": "33407"
+ },
+ "la-mare": {
+  "street": "1031 E Bay Harbor Drive Bay Harbor Islands",
+  "city": "Bay Harbor Islands",
+  "state": "FL",
+  "zip": "33154"
+ },
+ "the-raleigh-rosewood-hotel-residences": {
+  "street": "1775 Collins Avenue Miami Beach, FL",
+  "city": "Miami Beach",
+  "state": "FL",
+  "zip": "33139"
+ },
+ "shoma-bay": {
+  "street": "1850 79th Street Causeway North Bay Village",
+  "city": "North Bay Village",
+  "state": "FL",
+  "zip": "33141"
+ },
+ "continuum-club-residences": {
+  "street": "1755 79th Street Causeway, North Bay Village, FL 33141, USA",
+  "city": "North Bay Village",
+  "state": "FL",
+  "zip": "33141"
+ },
+ "ella-miami-beach": {
+  "street": "6940 Abbot Avenue Miami beach",
+  "city": "Miami Beach",
+  "state": "FL",
+  "zip": "33141"
+ },
+ "una": {
+  "street": "175 SE 25th Road Miami Florida, 33129",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33129"
+ },
+ "andare-residences": {
+  "street": "521 E LAS OLAS BLVD. FORT LAUDERDALE, FLORIDA 33301",
+  "city": "",
+  "state": "",
+  "zip": "33301"
+ },
+ "sixth-rio": {
+  "street": "501 SE 6th Ave, Fort Lauderdale, FL 33301",
+  "city": "",
+  "state": "",
+  "zip": "33301"
+ },
+ "the-condominium-residences-at-pier-sixty-six": {
+  "street": "2301 SE 17th St. Fort Lauderdale Beach FL 33316",
+  "city": "",
+  "state": "",
+  "zip": "33316"
+ },
+ "selene-oceanfront-residences": {
+  "street": "3026 Alhambra St and 151 N Seabreeze Blvd, Fort Lauderdale, FL 33304",
+  "city": "",
+  "state": "",
+  "zip": "33304"
+ },
+ "river-district": {
+  "street": "1420 NW 14 STREET",
+  "city": "Miami",
+  "state": "FL",
+  "zip": ""
+ },
+ "viceroy": {
+  "street": "77 NE 5th St",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33131"
+ },
+ "2000-ocean": {
+  "street": "2000 S. Ocean Drive Hollywood",
+  "city": "",
+  "state": "",
+  "zip": ""
+ },
+ "rosewood-hillsboro": {
+  "street": "1180 Hillsboro Mile Hillsboro Beach",
+  "city": "",
+  "state": "",
+  "zip": "33062"
+ },
+ "mercedes-benz": {
+  "street": "191 SW 12th St",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33130"
+ },
+ "one-metropica": {
+  "street": "2000 Metropica Way Sunrise",
+  "city": "",
+  "state": "",
+  "zip": ""
+ },
+ "bentley-residences": {
+  "street": "18401 Collins Avenue Sunny Isles Beach",
+  "city": "Sunny Isles Beach",
+  "state": "FL",
+  "zip": "33160"
+ },
+ "one-park-tower-by-turnberry": {
+  "street": "2411 Laguna Circle North Miami",
+  "city": "North Miami",
+  "state": "FL",
+  "zip": "33181"
+ },
+ "district-14": {
+  "street": "1428 NW 14th Street Miami",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33130"
+ },
+ "smart-brickell-3": {
+  "street": "229 SW 9th Street Miami, Florida, 33130",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33130"
+ },
+ "casa-bella": {
+  "street": "1400 Biscayne Blvd Miami FL 33132",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33132"
+ },
+ "visions-at-brickell-station": {
+  "street": "1136 SW 3rd Ave",
+  "city": "Miami",
+  "state": "FL",
+  "zip": ""
+ },
+ "ora-by-casa-tua": {
+  "street": "1210 Brickell Ave",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33131"
+ },
+ "jem-residences": {
+  "street": "1016 NE 2nd Ave, Miami, FL 33132, USA",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33132"
+ },
+ "hub-miami": {
+  "street": "525 Nw. 2nd. Ave. Miami FL. 33136",
+  "city": "Miami",
+  "state": "FL",
+  "zip": ""
+ },
+ "flow-house-miami": {
+  "street": "697 N. Miami Ave",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33132"
+ },
+ "west-e11even": {
+  "street": "1050 N. Miami Avenue",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33136"
+ },
+ "the-elser-hotel-residences": {
+  "street": "398 NE 5th St",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33132"
+ },
+ "one-twenty-brickell": {
+  "street": "120 SW 8th Street",
+  "city": "Miami",
+  "state": "FL",
+  "zip": ""
+ },
+ "600-miami-world-center": {
+  "street": "600 NE 1st Ave, Miami, FL 33132, USA",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33132"
+ },
+ "888-brickell-by-dolce-gabbana": {
+  "street": "888 Brickell Ave",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33131"
+ },
+ "cipriani-residences-miami": {
+  "street": "1420 S Miami Ave Miami, FL 33130",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33130"
+ },
+ "2200-brickell": {
+  "street": "2200 Brickell Ave, Brickell",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33129"
+ },
+ "mandarin-oriental-residences": {
+  "street": "1 Island Drive Brickell Key",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33131"
+ },
+ "the-st-regis": {
+  "street": "1809 Brickell Ave Miami, FL 33129",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33129"
+ },
+ "okan-tower": {
+  "street": "555 N Miami Avenue",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33136"
+ },
+ "baccarat": {
+  "street": "99 SE 5th Street",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33131"
+ },
+ "waldorf-astoria-hotel-and-residences-miami": {
+  "street": "300 Biscayne Blvd Miami FL 33132",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33132"
+ },
+ "palma-miami-beach-residences": {
+  "street": "600 71st Street",
+  "city": "Miami Beach",
+  "state": "FL",
+  "zip": "33141"
+ },
+ "four-seasons-hotel-and-residences-coconut-grove": {
+  "street": "2699 SOUTH BAYSHORE DRIVE",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33133"
+ },
+ "elle-miami": {
+  "street": "",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33137"
+ },
+ "cove-miami": {
+  "street": "456 NE 29th Street",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33137"
+ },
+ "the-standard": {
+  "street": "3100 NE 1st Avenue",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33137"
+ },
+ "edition-residences": {
+  "street": "2121 N Bayshore Drive",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33137"
+ },
+ "diesel-wynwood": {
+  "street": "148 NW 28th St",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33127"
+ },
+ "rose-wynwood": {
+  "street": "3223 NW 5th Ave Miami, Fl",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33127"
+ },
+ "nomad-wynwood": {
+  "street": "2700 NW 2nd Ave",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33127"
+ },
+ "vida-residences": {
+  "street": "410 NE 35th Terrace",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33137"
+ },
+ "viceroy-residences-aventura": {
+  "street": "2999 NE 191st St",
+  "city": "Aventura",
+  "state": "FL",
+  "zip": "33180"
+ },
+ "14-roc-miami": {
+  "street": "125 NE 14TH St",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33132"
+ },
+ "arbor-residences-coconut-grove": {
+  "street": "3034 Oak Ave",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33133"
+ },
+ "gale-miami-hotel-residences": {
+  "street": "601 NE 1st Ave",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33132"
+ },
+ "cassia-residences-coral-gables": {
+  "street": "4011 Salcedo Street",
+  "city": "Coral Gables",
+  "state": "FL",
+  "zip": "33146"
+ },
+ "the-rider-residences": {
+  "street": "94 NE 29th St",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33137"
+ },
+ "domus-brickell-center": {
+  "street": "1034 SW 2nd Ave",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33130"
+ },
+ "vita-grove-isle": {
+  "street": "5 Grove Isle Dr",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33133"
+ },
+ "lofty-brickell": {
+  "street": "99 SW 7th St",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33130"
+ },
+ "domus-brickell-park": {
+  "street": "1611 SW 2nd Ave",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33129"
+ },
+ "the-avenue-coral-gables": {
+  "street": "351 San Lorenzo Ave",
+  "city": "Coral Gables",
+  "state": "FL",
+  "zip": "33146"
+ },
+ "aston-martin-residences": {
+  "street": "300 Biscayne Blvd",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33130"
+ },
+ "origin-residences-by-artefacto": {
+  "street": "9760 W Bay Harbor Dr",
+  "city": "Bay Harbor Islands",
+  "state": "FL",
+  "zip": "33154"
+ },
+ "72-park-miami-beach": {
+  "street": "580 72nd St",
+  "city": "Miami Beach",
+  "state": "FL",
+  "zip": "33141"
+ },
+ "natiivo-fort-lauderdale": {
+  "street": "200 West Broward Blvd.",
+  "city": "",
+  "state": "",
+  "zip": "33311"
+ },
+ "the-residences-at-1428-brickell": {
+  "street": "1428 Brickell Ave",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33131"
+ }
+}
