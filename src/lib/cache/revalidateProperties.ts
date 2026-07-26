@@ -11,8 +11,12 @@ const PUBLIC_PATHS = ['', '/propiedades', '/destinos', '/destinos/espana']
  * `/destinos` NO matchea esas entradas de caché: hay que hacerlo por locale
  * (además del path sin prefijo, que es el que sirve el defaultLocale).
  */
-export function revalidatePropertyPaths() {
-  for (const path of PUBLIC_PATHS) {
+export function revalidatePropertyPaths(slug?: string | null) {
+  const paths = [...PUBLIC_PATHS]
+  // La ficha propia también: sin esto, editar una propiedad refrescaba los listados
+  // pero su detalle seguía sirviendo la versión vieja hasta que expirara el ISR.
+  if (slug) paths.push(`/propiedades/${slug}`)
+  for (const path of paths) {
     revalidatePath(path === '' ? '/' : path)
     for (const locale of routing.locales) {
       revalidatePath(`/${locale}${path}`)

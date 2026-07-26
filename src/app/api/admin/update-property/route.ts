@@ -68,7 +68,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
+  // Se recupera el slug para revalidar también la ficha propia (no solo los listados).
+  const { data: row } = await supabaseAdmin
+    .from('properties').select('slug').eq('id', id).single()
+
   revalidatePath('/admin/propiedades')
-  revalidatePropertyPaths()
+  revalidatePropertyPaths(row?.slug)
   return NextResponse.json({ success: true })
 }

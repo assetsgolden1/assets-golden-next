@@ -15,6 +15,7 @@
  * Detalle del análisis y las trampas de la fuente: docs/plan-carga-cervera.md
  */
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'node:fs'
+import path0 from 'node:path'
 
 const API = 'https://cerverabrokerportal.com/wp-json/wp/v2'
 const OUT = 'outputs'
@@ -50,6 +51,8 @@ export interface CerveraRaw {
   mediaIds: number[]
   images: string[]
   address: { street: string; city: string; state: string; zip: string } | null
+  /** "2 to 4 Beds" — visible en la ficha pero NO expuesto por la API (campo JetEngine). */
+  bedroomsText: string
   meta: Record<string, unknown>
 }
 
@@ -111,6 +114,20 @@ function cityFromLine(line: string): { city: string; state: string } | null {
   const only = tail.replace(/\d{5}(-\d{4})?/g, '').replace(new RegExp(`\\b(${STATE_WORDS})\\b`, 'gi'), '').replace(/[,.]/g, ' ').trim()
   if (only && /^[A-Za-z][A-Za-z .'\-]{2,40}$/.test(only)) return { city: titleCase(only), state: '' }
   return null
+}
+
+/**
+ * "Bedrooms Range: 2 to 4 Beds" del bloque "Facts About". Lo pinta un campo dinámico
+ * de JetEngine que la REST API no expone, así que solo se puede leer de la ficha.
+ */
+function parseBedroomsRange(html: string): string {
+  const i = html.indexOf('Bedrooms Range')
+  if (i === -1) return ''
+  const parts = html.slice(i, i + 800).replace(/<[^>]+>/g, '|').split('|')
+    .map((s) => decodeEntities(s).replace(/\s+/g, ' ').trim())
+    .filter((s) => s && !/^Bedrooms Range:?$/i.test(s))
+  const v = parts[0] ?? ''
+  return /bed|studio|\d/i.test(v) ? v : ''
 }
 
 function parseAddress(html: string): CerveraRaw['address'] {
@@ -176,22 +193,29 @@ async function extract() {
   }
   console.log(`  ${mediaUrl.size} resueltas`)
 
-  // Direcciones: solo de los candidatos (con imagen o precio), cacheadas y con crawl-delay.
-  const cache: Record<string, CerveraRaw['address']> = existsSync(ADDR_CACHE)
+  // Datos de la ficha (dirección + rango de dormitorios): no están en la API.
+  // Cacheado y con crawl-delay; solo se piden los candidatos (con imagen o precio).
+  type Facts = { address: CerveraRaw['address']; bedroomsText: string }
+  const cache: Record<string, Facts> = existsSync(ADDR_CACHE)
     ? JSON.parse(readFileSync(ADDR_CACHE, 'utf8'))
     : {}
   const isCandidate = (p: WpProject) =>
     idsOf(p).length > 0 || Number(p.meta?.price_range_from) > 0
-  // Se refetchea también lo cacheado SIN ciudad: puede haber fallado el parser, no la fuente.
-  const pending = projects.filter((p) => isCandidate(p) && !cache[p.slug]?.city)
-  console.log(`· Direcciones: ${pending.length} por bajar (crawl-delay ${CRAWL_DELAY_MS / 1000}s, ~${Math.ceil((pending.length * CRAWL_DELAY_MS) / 60000)} min)…`)
+  // Refetch si falta la ciudad (pudo fallar el parser, no la fuente) o si el
+  // registro es del formato viejo (sin bedroomsText).
+  const needs = (s: string) => !cache[s] || !('bedroomsText' in cache[s]) || !cache[s].address?.city
+  const pending = projects.filter((p) => isCandidate(p) && needs(p.slug))
+  console.log(`· Fichas a leer: ${pending.length} (crawl-delay ${CRAWL_DELAY_MS / 1000}s, ~${Math.ceil((pending.length * CRAWL_DELAY_MS) / 60000)} min)…`)
 
   for (const [n, p] of pending.entries()) {
     try {
       const res = await fetch(p.link, { headers: { 'User-Agent': UA } })
-      cache[p.slug] = res.ok ? parseAddress(await res.text()) : null
+      if (res.ok) {
+        const html = await res.text()
+        cache[p.slug] = { address: parseAddress(html), bedroomsText: parseBedroomsRange(html) }
+      } else cache[p.slug] = { address: null, bedroomsText: '' }
     } catch {
-      cache[p.slug] = null
+      cache[p.slug] = { address: null, bedroomsText: '' }
     }
     writeFileSync(ADDR_CACHE, JSON.stringify(cache, null, 1))
     if ((n + 1) % 10 === 0) console.log(`  ${n + 1}/${pending.length}`)
@@ -208,12 +232,13 @@ async function extract() {
     excerptEs: String(p.meta?.excerpt_es ?? ''),
     mediaIds: idsOf(p),
     images: [...new Set(idsOf(p).map((id) => mediaUrl.get(id)).filter(Boolean) as string[])],
-    address: cache[p.slug] ?? null,
+    address: cache[p.slug]?.address ?? null,
+    bedroomsText: cache[p.slug]?.bedroomsText ?? '',
     meta: (p.meta ?? {}) as Record<string, unknown>,
   }))
 
   writeFileSync(RAW, JSON.stringify(raw, null, 1))
-  console.log(`✔ ${RAW} (${raw.length} proyectos, ${raw.filter((r) => r.images.length).length} con imagen, ${raw.filter((r) => r.address?.city).length} con ciudad)`)
+  console.log(`✔ ${RAW} (${raw.length} proyectos, ${raw.filter((r) => r.images.length).length} con imagen, ${raw.filter((r) => r.address?.city).length} con ciudad, ${raw.filter((r) => r.bedroomsText).length} con dormitorios)`)
 }
 
 // ─── F2 · NORMALIZACIÓN ───────────────────────────────────────────────────
@@ -337,7 +362,17 @@ function normalize(r: CerveraRaw): Normalized {
 
   const sqft = num(m.size_range_from)
   const area_sqm = sqft ? Math.round(sqft / SQFT_TO_M2) : null
-  const { beds, baths } = bedsBaths(m)
+  let { beds } = bedsBaths(m)
+  const { baths } = bedsBaths(m)
+  // Fallback: "2 to 4 Beds" / "Studio to 3 Beds" de la ficha (la API no lo expone).
+  if (beds === null && r.bedroomsText) {
+    const t = r.bedroomsText.toLowerCase()
+    if (/studio/.test(t.split(/to|–|-/)[0] ?? '')) beds = 0
+    else {
+      const first = t.match(/\d+/)
+      if (first) beds = parseInt(first[0], 10)
+    }
+  }
 
   const province = r.address?.state ? (STATES[r.address.state] ?? r.address.state) : null
   const location = r.address?.city || null
@@ -349,6 +384,7 @@ function normalize(r: CerveraRaw): Normalized {
   const descEn = descEnSrc.length > 60 ? descEnSrc : buildDescription(r, n, 'en')
 
   const features = [
+    r.bedroomsText && `Dormitorios: ${r.bedroomsText.replace(/\bto\b/i, 'a').replace(/\bbeds?\b/i, '').trim()}`,
     String(m.developer ?? '').trim() && `Promotora: ${m.developer}`,
     String(m.architect ?? '').trim() && `Arquitectura: ${m.architect}`,
     String(m['interior-designer'] ?? '').trim() && `Interiorismo: ${m['interior-designer']}`,
@@ -582,8 +618,105 @@ async function load() {
   console.log(`\nCargadas: ${okCount}/${queue.length}`)
 }
 
+// ─── F6 · RENDERS DE DROPBOX ──────────────────────────────────────────────
+/**
+ * Las carpetas de Dropbox del portal ("Unbranded Marketing Tools") traen los renders
+ * profesionales del proyecto — la API solo da 1-3 imágenes. Se bajan como ZIP (`&dl=1`),
+ * se extraen SOLO las imágenes, se recomprimen (~4 MB → ~480 KB, -89%) y se suben a
+ * nuestro bucket. El ZIP es temporal y se descarta: no se almacena el original.
+ *
+ * Requiere `unzip` en el PATH (viene con Git Bash en Windows).
+ */
+const GRAPHIC_FIELDS = ['renderings-link', 'non-cervera-db-link', 'floor-plans-link', 'brochure-link', 'fact-sheet-link']
+
+async function renders() {
+  const limit = Number(process.argv.find((a) => a.startsWith('--limit='))?.split('=')[1] ?? 0)
+  const confirm = process.argv.includes('--confirm')
+  const { execFileSync } = await import('node:child_process')
+  const os = await import('node:os')
+  const { rmSync, mkdtempSync, readdirSync, statSync } = await import('node:fs')
+
+  const raw: CerveraRaw[] = JSON.parse(readFileSync(RAW, 'utf8'))
+
+  const { createClient } = await import('@supabase/supabase-js')
+  const sharp = (await import('sharp')).default
+  const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supa = createClient(SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
+
+  // Solo propiedades YA cargadas (se les enriquece la galería).
+  const { data: loaded } = await supa.from('properties')
+    .select('id,external_id,title,gallery_urls').eq('external_source', 'cervera')
+  const byExt = new Map((loaded ?? []).map((p) => [p.external_id, p]))
+
+  const folderOf = (r: CerveraRaw): string | null => {
+    for (const f of GRAPHIC_FIELDS) {
+      const v = String(r.meta[f] ?? '').replace(/&amp;/g, '&').trim()
+      if (v.includes('dropbox.com')) return v
+    }
+    return null
+  }
+
+  let queue = raw.filter((r) => byExt.has(String(r.id)) && folderOf(r))
+  if (limit > 0) queue = queue.slice(0, limit)
+  console.log(`· ${queue.length} propiedades con carpeta Dropbox${confirm ? '' : ' — DRY-RUN (--confirm para escribir)'}`)
+  if (!confirm) { queue.forEach((r) => console.log(`  [dry] ${r.title}`)); return }
+
+  for (const r of queue) {
+    const tmp = mkdtempSync(path0.join(os.tmpdir(), 'cvz-'))
+    try {
+      const url = folderOf(r)!
+      const zipPath = path0.join(tmp, 'f.zip')
+      const res = await fetch(url.includes('dl=1') ? url : `${url}&dl=1`, { headers: { 'User-Agent': UA } })
+      if (!res.ok) { console.error(`  ✗ ${r.title}: descarga ${res.status}`); continue }
+      writeFileSync(zipPath, Buffer.from(await res.arrayBuffer()))
+      const zipMb = statSync(zipPath).size / 1048576
+
+      try { execFileSync('unzip', ['-o', '-j', '-qq', zipPath, '-d', tmp], { stdio: 'ignore' }) }
+      catch { /* unzip devuelve !=0 con warnings pero igual extrae */ }
+
+      const imgs = readdirSync(tmp).filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
+        .map((f) => path0.join(tmp, f))
+        .filter((f) => statSync(f).size > 40_000)          // descarta logos/iconos
+        .sort()
+      if (!imgs.length) { console.error(`  ✗ ${r.title}: el ZIP (${zipMb.toFixed(0)} MB) no traía imágenes`); continue }
+
+      const prop = byExt.get(String(r.id))!
+      const existing: string[] = Array.isArray(prop.gallery_urls) ? prop.gallery_urls : []
+      const uploaded: string[] = []
+      let mb = 0
+      for (const [i, f] of imgs.entries()) {
+        try {
+          const out = await sharp(readFileSync(f)).rotate()
+            .resize({ width: 2560, height: 2560, fit: 'inside', withoutEnlargement: true })
+            .jpeg({ quality: 82, mozjpeg: true }).toBuffer()
+          const key = `cervera/${r.id}/r${String(i).padStart(2, '0')}.jpg`
+          const up = await supa.storage.from('property-images')
+            .upload(key, out, { contentType: 'image/jpeg', upsert: true, cacheControl: '31536000' })
+          if (up.error) continue
+          uploaded.push(`${SUPABASE_URL}/storage/v1/object/public/property-images/${key}`)
+          mb += out.length / 1048576
+        } catch { /* una imagen mala no aborta el proyecto */ }
+      }
+      if (!uploaded.length) { console.error(`  ✗ ${r.title}: no se pudo subir ninguna`); continue }
+
+      // Los renders van primero (son mejores que el screenshot de la API), sin duplicar.
+      const gallery = [...new Set([...uploaded, ...existing])]
+      const { error } = await supa.from('properties')
+        .update({ image_url: gallery[0], gallery_urls: gallery, updated_at: new Date().toISOString() })
+        .eq('id', prop.id)
+      if (error) { console.error(`  ✗ ${r.title}: BD ${error.message}`); continue }
+      console.log(`  ✔ ${r.title}: ${uploaded.length} renders (ZIP ${zipMb.toFixed(0)} MB → ${mb.toFixed(1)} MB) · galería ${gallery.length}`)
+    } catch (e) {
+      console.error(`  ✗ ${r.title}: ${(e as Error).message}`)
+    } finally {
+      rmSync(tmp, { recursive: true, force: true })   // el ZIP no se conserva
+    }
+  }
+}
+
 // ─── main ─────────────────────────────────────────────────────────────────
 const mode = process.argv[2] ?? 'report'
-const run = mode === 'extract' ? extract : mode === 'report' ? report : mode === 'load' ? load : null
-if (!run) { console.log('Usá: extract | report | load [--limit=N] [--confirm]'); process.exit(1) }
+const run = mode === 'extract' ? extract : mode === 'report' ? report
+  : mode === 'load' ? load : mode === 'renders' ? renders : null
+if (!run) { console.log('Usá: extract | report | load [--limit=N] [--confirm] | renders [--limit=N] [--confirm]'); process.exit(1) }
 run().catch((e) => { console.error('FALLÓ:', e.message); process.exit(1) })

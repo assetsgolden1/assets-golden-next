@@ -1,118 +1,185 @@
 {
  "mandarin-oriental-residences-west-palm-beach": {
-  "street": "5400 N Flagler Dr",
-  "city": "",
-  "state": "FL",
-  "zip": "33407"
+  "address": {
+   "street": "5400 N Flagler Dr",
+   "city": "",
+   "state": "FL",
+   "zip": "33407"
+  },
+  "bedroomsText": "2 to 4 Beds"
  },
  "seventeen-gables": {
-  "street": "1715 Douglas Road",
-  "city": "Coral Gables",
-  "state": "FL",
-  "zip": "33134"
+  "address": {
+   "street": "1715 Douglas Road",
+   "city": "Coral Gables",
+   "state": "FL",
+   "zip": "33134"
+  },
+  "bedroomsText": "1 to 3 Beds"
  },
  "aria-reserve-south": {
-  "street": "700 NE 24th Street",
-  "city": "",
-  "state": "FL",
-  "zip": "33137"
+  "address": {
+   "street": "700 NE 24th Street",
+   "city": "",
+   "state": "FL",
+   "zip": "33137"
+  },
+  "bedroomsText": "1 to 3 Beds"
  },
  "edgehouse": {
-  "street": "1825 NE 4th Ave",
-  "city": "Miami",
-  "state": "FL",
-  "zip": "33132"
+  "address": {
+   "street": "1825 NE 4th Ave",
+   "city": "Miami",
+   "state": "FL",
+   "zip": "33132"
+  },
+  "bedroomsText": "Studios to 3 Beds"
  },
  "missioni-baia": {
-  "street": "777 NE 26th Terrace, Miami",
-  "city": "Miami",
-  "state": "FL",
-  "zip": "33137"
+  "address": null,
+  "bedroomsText": ""
  },
  "twenty-sixth-2nd-wynwood": {
-  "street": "201 NW 26th Street",
-  "city": "Miami",
-  "state": "FL",
-  "zip": "33127"
+  "address": {
+   "street": "201 NW 26th Street",
+   "city": "Miami",
+   "state": "FL",
+   "zip": "33127"
+  },
+  "bedroomsText": ""
  },
  "the-well-bay-harbor-islands": {
-  "street": "1160 Kane Concourse Bay Harbor Islands",
-  "city": "Bay Harbor Islands",
-  "state": "FL",
-  "zip": ""
+  "address": {
+   "street": "1160 Kane Concourse Bay Harbor Islands",
+   "city": "Bay Harbor Islands",
+   "state": "FL",
+   "zip": ""
+  },
+  "bedroomsText": "1 to 4 Beds"
  },
- "seven-park": null,
- "the-cloud-one-hotel-residences": null,
+ "seven-park": {
+  "address": null,
+  "bedroomsText": "Studios to 3 Beds"
+ },
+ "the-cloud-one-hotel-residences": {
+  "address": null,
+  "bedroomsText": ""
+ },
  "poolhaus": {
-  "street": "1130 100th St, Bay Harbor Islands, FL 33154",
-  "city": "Bay Harbor Islands",
-  "state": "FL",
-  "zip": ""
+  "address": {
+   "street": "1130 100th St, Bay Harbor Islands, FL 33154",
+   "city": "Bay Harbor Islands",
+   "state": "FL",
+   "zip": "33154"
+  },
+  "bedroomsText": "2 to 4 Beds"
  },
  "jean-georges-miami-tropic-residences": {
-  "street": "350 NE 1st Avenue",
-  "city": "Miami",
-  "state": "FL",
-  "zip": ""
+  "address": {
+   "street": "350 NE 1st Avenue",
+   "city": "Miami",
+   "state": "FL",
+   "zip": ""
+  },
+  "bedroomsText": ""
  },
  "hollywood-moon": {
-  "street": "901 S Ocean Drive, Hollywood, FL",
-  "city": "Hollywood",
-  "state": "FL",
-  "zip": ""
+  "address": {
+   "street": "901 S Ocean Drive, Hollywood, FL",
+   "city": "Hollywood",
+   "state": "FL",
+   "zip": ""
+  },
+  "bedroomsText": "1 to 3 Beds"
  },
  "midtown-park": {
-  "street": "300 NE 1st Ave",
-  "city": "Miami",
-  "state": "FL",
-  "zip": "33127"
+  "address": {
+   "street": "300 NE 1st Ave",
+   "city": "Miami",
+   "state": "FL",
+   "zip": "33127"
+  },
+  "bedroomsText": ""
  },
  "bay-harbor-towers": {
-  "street": "10143 E. Bay Harbor Drive Bay Harbor Islands",
-  "city": "Bay Harbor Islands",
-  "state": "FL",
-  "zip": "10143"
+  "address": {
+   "street": "10143 E. Bay Harbor Drive Bay Harbor Islands",
+   "city": "Bay Harbor Islands",
+   "state": "FL",
+   "zip": "10143"
+  },
+  "bedroomsText": "2 to 4 Beds"
  },
  "ziggurat": {
-  "street": "3130 Grand Ave",
-  "city": "Miami",
-  "state": "FL",
-  "zip": ""
+  "address": {
+   "street": "3130 Grand Ave",
+   "city": "Miami",
+   "state": "FL",
+   "zip": ""
+  },
+  "bedroomsText": ""
  },
  "atelier": {
-  "street": "1265 SW 22nd Street",
-  "city": "",
-  "state": "FL",
-  "zip": ""
+  "address": {
+   "street": "1265 SW 22nd Street",
+   "city": "",
+   "state": "FL",
+   "zip": ""
+  },
+  "bedroomsText": "Studios to 3 Beds"
  },
  "the-lincoln": {
-  "street": "2650 Lincoln Avenue",
-  "city": "Coral Gables",
-  "state": "FL",
-  "zip": ""
+  "address": {
+   "street": "2650 Lincoln Avenue",
+   "city": "Coral Gables",
+   "state": "FL",
+   "zip": ""
+  },
+  "bedroomsText": "1 to 4 Beds"
  },
  "opus-coconut-grove": {
-  "street": "3137 sw 27th ave",
-  "city": "Miami",
-  "state": "FL",
-  "zip": ""
+  "address": {
+   "street": "3137 sw 27th ave",
+   "city": "Miami",
+   "state": "FL",
+   "zip": ""
+  },
+  "bedroomsText": "3 to 4 Beds"
  },
  "ponce-parc": {
-  "street": "3000 Ponce de Leon Blvd",
-  "city": "Coral Gables",
-  "state": "FL",
-  "zip": "33134"
+  "address": {
+   "street": "3000 Ponce de Leon Blvd",
+   "city": "Coral Gables",
+   "state": "FL",
+   "zip": "33134"
+  },
+  "bedroomsText": "2 to 4 Beds"
  },
- "missoni-baia": null,
- "1212-aventura": null,
- "quadro-design-district": null,
+ "missoni-baia": {
+  "address": null,
+  "bedroomsText": ""
+ },
+ "1212-aventura": {
+  "address": null,
+  "bedroomsText": ""
+ },
+ "quadro-design-district": {
+  "address": null,
+  "bedroomsText": ""
+ },
  "villa-miami": {
-  "street": "700 NE 29th St, Miami, FL 33137",
-  "city": "Miami",
-  "state": "FL",
-  "zip": "33137"
+  "address": {
+   "street": "700 NE 29th St, Miami, FL 33137",
+   "city": "Miami",
+   "state": "FL",
+   "zip": "33137"
+  },
+  "bedroomsText": "3 to 5 Beds"
  },
- "casa-murano-las-olas": null,
+ "casa-murano-las-olas": {
+  "address": null,
+  "bedroomsText": ""
+ },
  "surfrow-surfside": {
   "street": "8000 Collins Avenue Surfside",
   "city": "Surfside",

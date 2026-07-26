@@ -112,6 +112,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  revalidatePropertyPaths()
+  revalidatePropertyPaths(slug)
   return NextResponse.json({ success: true, slug })
 }
