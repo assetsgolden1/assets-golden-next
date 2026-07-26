@@ -5,8 +5,8 @@
   "title": "Mandarin Oriental Residences, West Palm Beach",
   "slug": "mandarin-oriental-residences-west-palm-beach-4107",
   "country": "Estados Unidos",
-  "province": null,
-  "location": null,
+  "province": "Florida",
+  "location": "West Palm Beach",
   "property_type": "apartment",
   "price": 3500000,
   "currency": "USD",
@@ -27,9 +27,7 @@
   ],
   "is_development": true,
   "skip": null,
-  "warnings": [
-   "sin ciudad (no se pudo extraer la dirección)"
-  ],
+  "warnings": [],
   "sourceUrl": "https://cerverabrokerportal.com/projects/mandarin-oriental-residences-west-palm-beach/"
  },
  {
@@ -69,16 +67,16 @@
   "title": "Aria Reserve South",
   "slug": "aria-reserve-south-3752",
   "country": "Estados Unidos",
-  "province": null,
-  "location": null,
+  "province": "Florida",
+  "location": "Miami",
   "property_type": "apartment",
   "price": 300000,
   "currency": "USD",
   "area_sqm": 95,
   "bedrooms": null,
   "bathrooms": null,
-  "description": "Aria Reserve South es una promoción de obra nueva (Estados Unidos). Está promovida por melo_group y con arquitectura de arquitectonica. El edificio cuenta con 391 residencias. Las viviendas parten de 95 m² y llegan hasta 213 m². Entrega prevista: 2025.",
-  "description_en": "Aria Reserve South is a new development (United States). It is developed by melo_group and with architecture by arquitectonica. The building has 391 residences. Homes start at 95 sqm and go up to 213 sqm. Estimated delivery: 2025.",
+  "description": "Aria Reserve South es una promoción de obra nueva en Miami, Florida (Estados Unidos). Está promovida por melo_group y con arquitectura de arquitectonica. El edificio cuenta con 391 residencias. Las viviendas parten de 95 m² y llegan hasta 213 m². Entrega prevista: 2025.",
+  "description_en": "Aria Reserve South is a new development in Miami, Florida (United States). It is developed by melo_group and with architecture by arquitectonica. The building has 391 residences. Homes start at 95 sqm and go up to 213 sqm. Estimated delivery: 2025.",
   "image_url": null,
   "gallery_urls": [],
   "features": [
@@ -89,9 +87,7 @@
   ],
   "is_development": true,
   "skip": "sin imagen",
-  "warnings": [
-   "sin ciudad (no se pudo extraer la dirección)"
-  ],
+  "warnings": [],
   "sourceUrl": "https://cerverabrokerportal.com/projects/aria-reserve-south/"
  },
  {
@@ -339,15 +335,15 @@
   "title": "Hollywood Moon",
   "slug": "hollywood-moon-3500",
   "country": "Estados Unidos",
-  "province": null,
-  "location": null,
+  "province": "Florida",
+  "location": "Hollywood",
   "property_type": "apartment",
   "price": 1395000,
   "currency": "USD",
   "area_sqm": 109,
   "bedrooms": null,
   "bathrooms": null,
-  "description": "Hollywood Moon es una promoción de obra nueva (Estados Unidos). El edificio cuenta con 48 residencias. Las viviendas parten de 109 m² y llegan hasta 204 m². Entrega prevista: Q4 2027.",
+  "description": "Hollywood Moon es una promoción de obra nueva en Hollywood, Florida (Estados Unidos). El edificio cuenta con 48 residencias. Las viviendas parten de 109 m² y llegan hasta 204 m². Entrega prevista: Q4 2027.",
   "description_en": "Hollywood Beach: A Coveted Coastal Haven Tucked between Miami Beach and Fort Lauderdale, Hollywood Beach offers a slower, more soulful rhythm with an iconic Ocean Broadwalk, preserved dunes, and that nostalgic Art Deco charm.",
   "image_url": "https://cerverabrokerportal.com/wp-content/uploads/2025/07/PHOTO-2025-06-30-16-06-25.jpg",
   "gallery_urls": [
@@ -359,9 +355,7 @@
   ],
   "is_development": true,
   "skip": null,
-  "warnings": [
-   "sin ciudad (no se pudo extraer la dirección)"
-  ],
+  "warnings": [],
   "sourceUrl": "https://cerverabrokerportal.com/projects/hollywood-moon/"
  },
  {
@@ -466,15 +460,15 @@
   "title": "Bay Harbor Towers",
   "slug": "bay-harbor-towers-3488",
   "country": "Estados Unidos",
-  "province": null,
-  "location": null,
+  "province": "Florida",
+  "location": "Bay Harbor Islands",
   "property_type": "apartment",
   "price": 2600000,
   "currency": "USD",
   "area_sqm": 177,
   "bedrooms": null,
   "bathrooms": null,
-  "description": "Bay Harbor Towers es una promoción de obra nueva (Estados Unidos). Está promovida por pmg y con arquitectura de kobi_karp_architecture. El edificio cuenta con 8 plantas y 44 residencias. Las viviendas parten de 177 m² y llegan hasta 426 m². Entrega prevista: Q2 2026.",
+  "description": "Bay Harbor Towers es una promoción de obra nueva en Bay Harbor Islands, Florida (Estados Unidos). Está promovida por pmg y con arquitectura de kobi_karp_architecture. El edificio cuenta con 8 plantas y 44 residencias. Las viviendas parten de 177 m² y llegan hasta 426 m². Entrega prevista: Q2 2026.",
   "description_en": "Introducing Bay Harbor Towers, a boutique collection of forty-four private residences that elevate luxury island living to a new echelon. Nestled along the northern shoreline where the pristine Indian Creek waterfront meets the vast expanse of Biscayne Bay, this striking architectural gem is a beacon of opulence and exclusivity.",
   "image_url": "https://cerverabrokerportal.com/wp-content/uploads/2025/07/thumbnail_PastedGraphic-3.png",
   "gallery_urls": [
@@ -490,9 +484,7 @@
   ],
   "is_development": true,
   "skip": null,
-  "warnings": [
-   "sin ciudad (no se pudo extraer la dirección)"
-  ],
+  "warnings": [],
   "sourceUrl": "https://cerverabrokerportal.com/projects/bay-harbor-towers/"
  },
  {
@@ -533,7 +525,7 @@
   "title": "Atelier",
   "slug": "atelier-3462",
   "country": "Estados Unidos",
-  "province": null,
+  "province": "Florida",
   "location": null,
   "property_type": "apartment",
   "price": 400000,
@@ -541,8 +533,8 @@
   "area_sqm": 33,
   "bedrooms": null,
   "bathrooms": null,
-  "description": "Atelier es una promoción de obra nueva (Estados Unidos). El edificio cuenta con 10 plantas y 148 residencias. Las viviendas parten de 33 m² y llegan hasta 139 m². Entrega prevista: Q2 2027. Amenidades: 24/7 concierge Signature restaurant Serene Pool Brand-name fitness center Spa, steam, sauna & cold plunge Lounges & private meeting rooms.",
-  "description_en": "Atelier is a new development (United States). The building has 10 floors and 148 residences. Homes start at 33 sqm and go up to 139 sqm. Estimated delivery: Q2 2027. Amenities: 24/7 concierge Signature restaurant Serene Pool Brand-name fitness center Spa, steam, sauna & cold plunge Lounges & private meeting rooms.",
+  "description": "Atelier es una promoción de obra nueva, Florida (Estados Unidos). El edificio cuenta con 10 plantas y 148 residencias. Las viviendas parten de 33 m² y llegan hasta 139 m². Entrega prevista: Q2 2027. Amenidades: 24/7 concierge Signature restaurant Serene Pool Brand-name fitness center Spa, steam, sauna & cold plunge Lounges & private meeting rooms.",
+  "description_en": "Atelier is a new development, Florida (United States). The building has 10 floors and 148 residences. Homes start at 33 sqm and go up to 139 sqm. Estimated delivery: Q2 2027. Amenities: 24/7 concierge Signature restaurant Serene Pool Brand-name fitness center Spa, steam, sauna & cold plunge Lounges & private meeting rooms.",
   "image_url": null,
   "gallery_urls": [],
   "features": [
@@ -1271,7 +1263,7 @@
   "title": "One West Palm",
   "slug": "one-west-palm-3271",
   "country": "Estados Unidos",
-  "province": null,
+  "province": "Florida",
   "location": null,
   "property_type": "apartment",
   "price": null,
@@ -1279,8 +1271,8 @@
   "area_sqm": null,
   "bedrooms": null,
   "bathrooms": null,
-  "description": "One West Palm es una promoción de obra nueva (Estados Unidos). Está promovida por jeff_greene y con arquitectura de arquitectonica. El edificio cuenta con 30 plantas y 186 residencias. Entrega prevista: 2024.",
-  "description_en": "One West Palm is a new development (United States). It is developed by jeff_greene and with architecture by arquitectonica. The building has 30 floors and 186 residences. Estimated delivery: 2024.",
+  "description": "One West Palm es una promoción de obra nueva, Florida (Estados Unidos). Está promovida por jeff_greene y con arquitectura de arquitectonica. El edificio cuenta con 30 plantas y 186 residencias. Entrega prevista: 2024.",
+  "description_en": "One West Palm is a new development, Florida (United States). It is developed by jeff_greene and with architecture by arquitectonica. The building has 30 floors and 186 residences. Estimated delivery: 2024.",
   "image_url": "https://cerverabrokerportal.com/wp-content/uploads/2025/01/hero-viceroy-aventura.jpg",
   "gallery_urls": [
    "https://cerverabrokerportal.com/wp-content/uploads/2025/01/hero-viceroy-aventura.jpg"
@@ -1306,16 +1298,16 @@
   "title": "Shorecrest",
   "slug": "shorecrest-3270",
   "country": "Estados Unidos",
-  "province": null,
-  "location": null,
+  "province": "Florida",
+  "location": "Fort Lauderdale",
   "property_type": "apartment",
   "price": 1300000,
   "currency": "USD",
   "area_sqm": null,
   "bedrooms": null,
   "bathrooms": null,
-  "description": "Shorecrest es una promoción de obra nueva (Estados Unidos). Está promovida por related_group y con arquitectura de roger_ferris_partners. El edificio cuenta con 28 plantas y 144 residencias. Entrega prevista: 2027. Amenidades: Located on the Ground Level: • Motor Court • Lobby Lounge • 24 Hour Concierge • Valet and Parking Garage Entrance Located at the 8th Floor Club Level: • Private Dining Room • Catering Kitchen • Cocktail Lounge with Outdoor Terrace •…",
-  "description_en": "Shorecrest is a new development (United States). It is developed by related_group and with architecture by roger_ferris_partners. The building has 28 floors and 144 residences. Estimated delivery: 2027. Amenities: Located on the Ground Level: • Motor Court • Lobby Lounge • 24 Hour Concierge • Valet and Parking Garage Entrance Located at the 8th Floor Club Level: • Private Dining Room • Catering Kitchen • Cocktail Lounge with Outdoor Terrace •…",
+  "description": "Shorecrest es una promoción de obra nueva en Fort Lauderdale, Florida (Estados Unidos). Está promovida por related_group y con arquitectura de roger_ferris_partners. El edificio cuenta con 28 plantas y 144 residencias. Entrega prevista: 2027. Amenidades: Located on the Ground Level: • Motor Court • Lobby Lounge • 24 Hour Concierge • Valet and Parking Garage Entrance Located at the 8th Floor Club Level: • Private Dining Room • Catering Kitchen • Cocktail Lounge with Outdoor Terrace •…",
+  "description_en": "Shorecrest is a new development in Fort Lauderdale, Florida (United States). It is developed by related_group and with architecture by roger_ferris_partners. The building has 28 floors and 144 residences. Estimated delivery: 2027. Amenities: Located on the Ground Level: • Motor Court • Lobby Lounge • 24 Hour Concierge • Valet and Parking Garage Entrance Located at the 8th Floor Club Level: • Private Dining Room • Catering Kitchen • Cocktail Lounge with Outdoor Terrace •…",
   "image_url": null,
   "gallery_urls": [],
   "features": [
@@ -1328,9 +1320,7 @@
   ],
   "is_development": true,
   "skip": "sin imagen",
-  "warnings": [
-   "sin ciudad (no se pudo extraer la dirección)"
-  ],
+  "warnings": [],
   "sourceUrl": "https://cerverabrokerportal.com/projects/shorecrest/"
  },
  {
@@ -1339,7 +1329,7 @@
   "title": "Nautilus 220",
   "slug": "nautilus-220-3269",
   "country": "Estados Unidos",
-  "province": null,
+  "province": "Florida",
   "location": null,
   "property_type": "apartment",
   "price": null,
@@ -1347,8 +1337,8 @@
   "area_sqm": 102,
   "bedrooms": null,
   "bathrooms": null,
-  "description": "Nautilus 220 es una promoción de obra nueva (Estados Unidos). Está promovida por forest_development y con arquitectura de rn_architecture. El edificio cuenta con 24 plantas y 330 residencias. Las viviendas parten de 102 m² y llegan hasta 316 m². Entrega prevista: 2024.",
-  "description_en": "Nautilus 220 is a new development (United States). It is developed by forest_development and with architecture by rn_architecture. The building has 24 floors and 330 residences. Homes start at 102 sqm and go up to 316 sqm. Estimated delivery: 2024.",
+  "description": "Nautilus 220 es una promoción de obra nueva, Florida (Estados Unidos). Está promovida por forest_development y con arquitectura de rn_architecture. El edificio cuenta con 24 plantas y 330 residencias. Las viviendas parten de 102 m² y llegan hasta 316 m². Entrega prevista: 2024.",
+  "description_en": "Nautilus 220 is a new development, Florida (United States). It is developed by forest_development and with architecture by rn_architecture. The building has 24 floors and 330 residences. Homes start at 102 sqm and go up to 316 sqm. Estimated delivery: 2024.",
   "image_url": null,
   "gallery_urls": [],
   "features": [
@@ -1406,16 +1396,16 @@
   "title": "The Ritz-Carlton Residences, West Palm Beach",
   "slug": "the-ritz-carlton-residences-west-palm-beach-3221",
   "country": "Estados Unidos",
-  "province": null,
-  "location": null,
+  "province": "Florida",
+  "location": "West Palm Beach",
   "property_type": "apartment",
   "price": 5000000,
   "currency": "USD",
   "area_sqm": 258,
   "bedrooms": null,
   "bathrooms": null,
-  "description": "The Ritz-Carlton Residences, West Palm Beach es una promoción de obra nueva (Estados Unidos). Está promovida por related_group y con arquitectura de arquitectonica. El edificio cuenta con 7 plantas y 106 residencias. Las viviendas parten de 258 m² y llegan hasta 465 m². Entrega prevista: Q1 2026. Amenidades: • Private Marina with 29 boat slips • Concierge, pool, and cabana services • 100’ infinity edge heated swimming pool • Heated whirlpool spa • Six poolside cabanas with chaise lounges • Six poolside cabanas with private bathrooms, available…",
-  "description_en": "The Ritz-Carlton Residences, West Palm Beach is a new development (United States). It is developed by related_group and with architecture by arquitectonica. The building has 7 floors and 106 residences. Homes start at 258 sqm and go up to 465 sqm. Estimated delivery: Q1 2026. Amenities: • Private Marina with 29 boat slips • Concierge, pool, and cabana services • 100’ infinity edge heated swimming pool • Heated whirlpool spa • Six poolside cabanas with chaise lounges • Six poolside cabanas with private bathrooms, available…",
+  "description": "The Ritz-Carlton Residences, West Palm Beach es una promoción de obra nueva en West Palm Beach, Florida (Estados Unidos). Está promovida por related_group y con arquitectura de arquitectonica. El edificio cuenta con 7 plantas y 106 residencias. Las viviendas parten de 258 m² y llegan hasta 465 m². Entrega prevista: Q1 2026. Amenidades: • Private Marina with 29 boat slips • Concierge, pool, and cabana services • 100’ infinity edge heated swimming pool • Heated whirlpool spa • Six poolside cabanas with chaise lounges • Six poolside cabanas with private bathrooms, available…",
+  "description_en": "The Ritz-Carlton Residences, West Palm Beach is a new development in West Palm Beach, Florida (United States). It is developed by related_group and with architecture by arquitectonica. The building has 7 floors and 106 residences. Homes start at 258 sqm and go up to 465 sqm. Estimated delivery: Q1 2026. Amenities: • Private Marina with 29 boat slips • Concierge, pool, and cabana services • 100’ infinity edge heated swimming pool • Heated whirlpool spa • Six poolside cabanas with chaise lounges • Six poolside cabanas with private bathrooms, available…",
   "image_url": null,
   "gallery_urls": [],
   "features": [
@@ -1429,9 +1419,7 @@
   ],
   "is_development": true,
   "skip": "sin imagen",
-  "warnings": [
-   "sin ciudad (no se pudo extraer la dirección)"
-  ],
+  "warnings": [],
   "sourceUrl": "https://cerverabrokerportal.com/projects/the-ritz-carlton-residences-west-palm-beach/"
  },
  {
@@ -1440,16 +1428,16 @@
   "title": "Alba Palm Beach",
   "slug": "alba-palm-beach-3220",
   "country": "Estados Unidos",
-  "province": null,
-  "location": null,
+  "province": "Florida",
+  "location": "West Palm Beach",
   "property_type": "apartment",
   "price": 3500000,
   "currency": "USD",
   "area_sqm": 165,
   "bedrooms": 2,
   "bathrooms": null,
-  "description": "Alba Palm Beach es una promoción de obra nueva (Estados Unidos). Está promovida por kenneth_baboun,blue_road_group y con arquitectura de spina_orourke. El edificio cuenta con 22 plantas y 55 residencias. Las viviendas parten de 165 m² y llegan hasta 418 m². Entrega prevista: Q3 2026. Amenidades: • Private Marina with boat slips for residents only • 6th-floor dedicated to amenities • Sunrise pool overlooking the Intracoastal • Sunset pool for warm afternoon sun • Fitness center with cardio, resistance training, and studio space •…",
-  "description_en": "Alba Palm Beach is a new development (United States). It is developed by kenneth_baboun,blue_road_group and with architecture by spina_orourke. The building has 22 floors and 55 residences. Homes start at 165 sqm and go up to 418 sqm. Estimated delivery: Q3 2026. Amenities: • Private Marina with boat slips for residents only • 6th-floor dedicated to amenities • Sunrise pool overlooking the Intracoastal • Sunset pool for warm afternoon sun • Fitness center with cardio, resistance training, and studio space •…",
+  "description": "Alba Palm Beach es una promoción de obra nueva en West Palm Beach, Florida (Estados Unidos). Está promovida por kenneth_baboun,blue_road_group y con arquitectura de spina_orourke. El edificio cuenta con 22 plantas y 55 residencias. Las viviendas parten de 165 m² y llegan hasta 418 m². Entrega prevista: Q3 2026. Amenidades: • Private Marina with boat slips for residents only • 6th-floor dedicated to amenities • Sunrise pool overlooking the Intracoastal • Sunset pool for warm afternoon sun • Fitness center with cardio, resistance training, and studio space •…",
+  "description_en": "Alba Palm Beach is a new development in West Palm Beach, Florida (United States). It is developed by kenneth_baboun,blue_road_group and with architecture by spina_orourke. The building has 22 floors and 55 residences. Homes start at 165 sqm and go up to 418 sqm. Estimated delivery: Q3 2026. Amenities: • Private Marina with boat slips for residents only • 6th-floor dedicated to amenities • Sunrise pool overlooking the Intracoastal • Sunset pool for warm afternoon sun • Fitness center with cardio, resistance training, and studio space •…",
   "image_url": "https://cerverabrokerportal.com/wp-content/uploads/2025/06/alba-scaled.webp",
   "gallery_urls": [
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/alba-scaled.webp"
@@ -1464,9 +1452,7 @@
   ],
   "is_development": true,
   "skip": null,
-  "warnings": [
-   "sin ciudad (no se pudo extraer la dirección)"
-  ],
+  "warnings": [],
   "sourceUrl": "https://cerverabrokerportal.com/projects/alba-palm-beach/"
  },
  {
@@ -1475,16 +1461,16 @@
   "title": "Olara Residences",
   "slug": "olara-residences-3219",
   "country": "Estados Unidos",
-  "province": null,
-  "location": null,
+  "province": "Florida",
+  "location": "West Palm Beach",
   "property_type": "apartment",
   "price": 3380000,
   "currency": "USD",
   "area_sqm": 170,
   "bedrooms": 2,
   "bathrooms": null,
-  "description": "Olara Residences es una promoción de obra nueva (Estados Unidos). Está promovida por savanna y con arquitectura de arquitectonica. El edificio cuenta con 26 plantas y 275 residencias. Las viviendas parten de 170 m² y llegan hasta 601 m². Entrega prevista: 2026.",
-  "description_en": "Olara Residences is a new development (United States). It is developed by savanna and with architecture by arquitectonica. The building has 26 floors and 275 residences. Homes start at 170 sqm and go up to 601 sqm. Estimated delivery: 2026.",
+  "description": "Olara Residences es una promoción de obra nueva en West Palm Beach, Florida (Estados Unidos). Está promovida por savanna y con arquitectura de arquitectonica. El edificio cuenta con 26 plantas y 275 residencias. Las viviendas parten de 170 m² y llegan hasta 601 m². Entrega prevista: 2026.",
+  "description_en": "Olara Residences is a new development in West Palm Beach, Florida (United States). It is developed by savanna and with architecture by arquitectonica. The building has 26 floors and 275 residences. Homes start at 170 sqm and go up to 601 sqm. Estimated delivery: 2026.",
   "image_url": null,
   "gallery_urls": [],
   "features": [
@@ -1498,9 +1484,7 @@
   ],
   "is_development": true,
   "skip": "sin imagen",
-  "warnings": [
-   "sin ciudad (no se pudo extraer la dirección)"
-  ],
+  "warnings": [],
   "sourceUrl": "https://cerverabrokerportal.com/projects/olara-residences/"
  },
  {
@@ -1804,15 +1788,15 @@
   "title": "Andare Residences",
   "slug": "andare-residences-3208",
   "country": "Estados Unidos",
-  "province": null,
-  "location": null,
+  "province": "Florida",
+  "location": "Fort Lauderdale",
   "property_type": "apartment",
   "price": 2000000,
   "currency": "USD",
   "area_sqm": 191,
   "bedrooms": 2,
   "bathrooms": null,
-  "description": "Andare Residences es una promoción de obra nueva (Estados Unidos). Está promovida por related_group y con arquitectura de ohen_freeman_encinosa. El edificio cuenta con 45 plantas y 163 residencias. Las viviendas parten de 191 m² y llegan hasta 450 m². Entrega prevista: Q2 2027. Amenidades: Grand entrance with lobby Rooftop pool, hot tub, and bar State-of-the-art Fitness Center Spa Outdoor Kitchen Outdoor Lounge A loggia Fire Pits Library Co-working Space Kids room Game Room Club Room Card Room Catering Kitchen Parking Garage…",
+  "description": "Andare Residences es una promoción de obra nueva en Fort Lauderdale, Florida (Estados Unidos). Está promovida por related_group y con arquitectura de ohen_freeman_encinosa. El edificio cuenta con 45 plantas y 163 residencias. Las viviendas parten de 191 m² y llegan hasta 450 m². Entrega prevista: Q2 2027. Amenidades: Grand entrance with lobby Rooftop pool, hot tub, and bar State-of-the-art Fitness Center Spa Outdoor Kitchen Outdoor Lounge A loggia Fire Pits Library Co-working Space Kids room Game Room Club Room Card Room Catering Kitchen Parking Garage…",
   "description_en": "Introducing Andare Residences—a world of ease and refinement envisioned to enrich every day, with soaring layouts, imported Italian finishes, a stunning rooftop pool, holistic wellness spa, advanced fitness studio, and a full suite of services that elevate each element of home.",
   "image_url": "https://cerverabrokerportal.com/wp-content/uploads/2025/06/andare.webp",
   "gallery_urls": [
@@ -1829,9 +1813,7 @@
   ],
   "is_development": true,
   "skip": null,
-  "warnings": [
-   "sin ciudad (no se pudo extraer la dirección)"
-  ],
+  "warnings": [],
   "sourceUrl": "https://cerverabrokerportal.com/projects/andare-residences/"
  },
  {
@@ -1840,15 +1822,15 @@
   "title": "Sixth & Rio",
   "slug": "sixth-rio-3206",
   "country": "Estados Unidos",
-  "province": null,
-  "location": null,
+  "province": "Florida",
+  "location": "Fort Lauderdale",
   "property_type": "apartment",
   "price": 790000,
   "currency": "USD",
   "area_sqm": 109,
   "bedrooms": 2,
   "bathrooms": null,
-  "description": "Sixth & Rio es una promoción de obra nueva (Estados Unidos). Está promovida por ocean_land y con arquitectura de am_studio. El edificio cuenta con 8 plantas y 94 residencias. Las viviendas parten de 109 m² y llegan hasta 213 m². Entrega prevista: 2026. Amenidades: Assigned Parking Barbecue Area Bike Room Cabana Central AC Common Courtyard Common Garden Common Media / Recreation Room Common Outdoor Space Common Roof Deck Garage Gym.",
+  "description": "Sixth & Rio es una promoción de obra nueva en Fort Lauderdale, Florida (Estados Unidos). Está promovida por ocean_land y con arquitectura de am_studio. El edificio cuenta con 8 plantas y 94 residencias. Las viviendas parten de 109 m² y llegan hasta 213 m². Entrega prevista: 2026. Amenidades: Assigned Parking Barbecue Area Bike Room Cabana Central AC Common Courtyard Common Garden Common Media / Recreation Room Common Outdoor Space Common Roof Deck Garage Gym.",
   "description_en": "Comprising only 100 residences, Sixth&Rio is the pinnacle of luxury living on the New River. Blending high-rise amenities with a serene resort feel, you have the best of both worlds at your whim. Situated near the tranquil Rio Vista, vibrant Riverwalk, eclectic Las Olas, and exciting Downtown Fort Lauderdale, a diverse world of wonder is right in your backyard. Sixth&Rio puts you at the intersection of it all. Explore this site then visit the sales center for a glimpse at South Florida’s most anticipated riverfront condominium.",
   "image_url": "https://cerverabrokerportal.com/wp-content/uploads/2025/06/sixth-scaled.jpeg",
   "gallery_urls": [
@@ -1865,9 +1847,7 @@
   ],
   "is_development": true,
   "skip": null,
-  "warnings": [
-   "sin ciudad (no se pudo extraer la dirección)"
-  ],
+  "warnings": [],
   "sourceUrl": "https://cerverabrokerportal.com/projects/sixth-rio/"
  },
  {
@@ -1876,15 +1856,15 @@
   "title": "The Condominium Residences at Pier Sixty-Six",
   "slug": "the-condominium-residences-at-pier-sixty-six-3203",
   "country": "Estados Unidos",
-  "province": null,
-  "location": null,
+  "province": "Florida",
+  "location": "Fort Lauderdale Beach",
   "property_type": "apartment",
   "price": 3400000,
   "currency": "USD",
   "area_sqm": 153,
   "bedrooms": null,
   "bathrooms": null,
-  "description": "The Condominium Residences at Pier Sixty-Six es una promoción de obra nueva (Estados Unidos). Está promovida por tavistock_group y con arquitectura de garcia_stomberg. El edificio cuenta con 11 plantas y 92 residencias. Las viviendas parten de 153 m². Entrega prevista: 2024. Amenidades: The Club Room – for entertaining and socializing Marina-front VIP pool with private cabanas and chaise lounge service VIP pool – with private cabanas and chaise lounge service Adult pool Resort pool Waterfront restaurant Marina restaurant…",
+  "description": "The Condominium Residences at Pier Sixty-Six es una promoción de obra nueva en Fort Lauderdale Beach, Florida (Estados Unidos). Está promovida por tavistock_group y con arquitectura de garcia_stomberg. El edificio cuenta con 11 plantas y 92 residencias. Las viviendas parten de 153 m². Entrega prevista: 2024. Amenidades: The Club Room – for entertaining and socializing Marina-front VIP pool with private cabanas and chaise lounge service VIP pool – with private cabanas and chaise lounge service Adult pool Resort pool Waterfront restaurant Marina restaurant…",
   "description_en": "Step into an exclusive world in the Venice of the Americas, with like-minded people who share a passion for the best in life and a desire for the true luxury… time. Time to slow down and appreciate every experience, every moment. Discover this luxury at Pier Sixty-Six, a legendary destination on the Florida coast with an intimate new collection of 90 exquisite residences.",
   "image_url": "https://cerverabrokerportal.com/wp-content/uploads/2025/06/Pier-Sixty-Six-Residences.jpg",
   "gallery_urls": [
@@ -1901,9 +1881,7 @@
   ],
   "is_development": true,
   "skip": null,
-  "warnings": [
-   "sin ciudad (no se pudo extraer la dirección)"
-  ],
+  "warnings": [],
   "sourceUrl": "https://cerverabrokerportal.com/projects/the-condominium-residences-at-pier-sixty-six/"
  },
  {
@@ -1912,15 +1890,15 @@
   "title": "Selene Oceanfront Residences",
   "slug": "selene-oceanfront-residences-3201",
   "country": "Estados Unidos",
-  "province": null,
-  "location": null,
+  "province": "Florida",
+  "location": "Fort Lauderdale",
   "property_type": "apartment",
   "price": 1600000,
   "currency": "USD",
   "area_sqm": 131,
   "bedrooms": 2,
   "bathrooms": null,
-  "description": "Selene Oceanfront Residences es una promoción de obra nueva (Estados Unidos). Está promovida por kolter y con arquitectura de kobi_karp_architecture. El edificio cuenta con 27 plantas y 194 residencias. Las viviendas parten de 131 m² y llegan hasta 301 m². Entrega prevista: 2025. Amenidades: 5,300 square feet of oceanfront restaurant on the ground floor Two elevated pool terraces Resort-style pool Lap fitness pool plus spa Open gathering spaces and intimate conversation areas Outdoor kitchen Multiple fire pit lounge areas…",
+  "description": "Selene Oceanfront Residences es una promoción de obra nueva en Fort Lauderdale, Florida (Estados Unidos). Está promovida por kolter y con arquitectura de kobi_karp_architecture. El edificio cuenta con 27 plantas y 194 residencias. Las viviendas parten de 131 m² y llegan hasta 301 m². Entrega prevista: 2025. Amenidades: 5,300 square feet of oceanfront restaurant on the ground floor Two elevated pool terraces Resort-style pool Lap fitness pool plus spa Open gathering spaces and intimate conversation areas Outdoor kitchen Multiple fire pit lounge areas…",
   "description_en": "Fort Lauderdale’s most thoughtfully designed new oceanfront condominium brings contemporary architecture together with a host of indoor and outdoor amenities, including two elevated pool terraces. Selene’s two slender towers rise from a three-story podium and soar above neighboring buildings, offering spectacular Atlantic Ocean views and dramatic long range city views.",
   "image_url": "https://cerverabrokerportal.com/wp-content/uploads/2025/06/SelectionHero-Selene-1.jpg",
   "gallery_urls": [
@@ -1938,9 +1916,7 @@
   ],
   "is_development": true,
   "skip": null,
-  "warnings": [
-   "sin ciudad (no se pudo extraer la dirección)"
-  ],
+  "warnings": [],
   "sourceUrl": "https://cerverabrokerportal.com/projects/selene-oceanfront-residences/"
  },
  {
@@ -2080,16 +2056,16 @@
   "title": "2000 Ocean",
   "slug": "2000-ocean-3196",
   "country": "Estados Unidos",
-  "province": null,
-  "location": null,
+  "province": "Florida",
+  "location": "Hollywood",
   "property_type": "apartment",
   "price": null,
   "currency": "USD",
   "area_sqm": 271,
   "bedrooms": 5,
   "bathrooms": null,
-  "description": "2000 Ocean es una promoción de obra nueva (Estados Unidos). Está promovida por Kar Properties y con arquitectura de Enrique Norton. El edificio cuenta con 39 plantas y 64 residencias. Las viviendas parten de 271 m² y llegan hasta 542 m². Entrega prevista: 2022.",
-  "description_en": "2000 Ocean is a new development (United States). It is developed by Kar Properties and with architecture by Enrique Norton. The building has 39 floors and 64 residences. Homes start at 271 sqm and go up to 542 sqm. Estimated delivery: 2022.",
+  "description": "2000 Ocean es una promoción de obra nueva en Hollywood, Florida (Estados Unidos). Está promovida por Kar Properties y con arquitectura de Enrique Norton. El edificio cuenta con 39 plantas y 64 residencias. Las viviendas parten de 271 m² y llegan hasta 542 m². Entrega prevista: 2022.",
+  "description_en": "2000 Ocean is a new development in Hollywood, Florida (United States). It is developed by Kar Properties and with architecture by Enrique Norton. The building has 39 floors and 64 residences. Homes start at 271 sqm and go up to 542 sqm. Estimated delivery: 2022.",
   "image_url": null,
   "gallery_urls": [],
   "features": [
@@ -2102,8 +2078,7 @@
   "is_development": true,
   "skip": "sin imagen ni precio",
   "warnings": [
-   "precio sospechoso (1400 = PSF, no total) → sin precio",
-   "sin ciudad (no se pudo extraer la dirección)"
+   "precio sospechoso (1400 = PSF, no total) → sin precio"
   ],
   "sourceUrl": "https://cerverabrokerportal.com/projects/2000-ocean/"
  },
@@ -2113,7 +2088,7 @@
   "title": "Rosewood Hillsboro",
   "slug": "rosewood-hillsboro-3194",
   "country": "Estados Unidos",
-  "province": null,
+  "province": "Florida",
   "location": null,
   "property_type": "apartment",
   "price": null,
@@ -2121,8 +2096,8 @@
   "area_sqm": 261,
   "bedrooms": null,
   "bathrooms": null,
-  "description": "Rosewood Hillsboro es una promoción de obra nueva (Estados Unidos). Está promovida por related_group,dezer_development y con arquitectura de arquitectonica. El edificio cuenta con 10 plantas y 92 residencias. Las viviendas parten de 261 m² y llegan hasta 596 m². Entrega prevista: Q3 2026.",
-  "description_en": "Rosewood Hillsboro is a new development (United States). It is developed by related_group,dezer_development and with architecture by arquitectonica. The building has 10 floors and 92 residences. Homes start at 261 sqm and go up to 596 sqm. Estimated delivery: Q3 2026.",
+  "description": "Rosewood Hillsboro es una promoción de obra nueva, Florida (Estados Unidos). Está promovida por related_group,dezer_development y con arquitectura de arquitectonica. El edificio cuenta con 10 plantas y 92 residencias. Las viviendas parten de 261 m² y llegan hasta 596 m². Entrega prevista: Q3 2026.",
+  "description_en": "Rosewood Hillsboro is a new development, Florida (United States). It is developed by related_group,dezer_development and with architecture by arquitectonica. The building has 10 floors and 92 residences. Homes start at 261 sqm and go up to 596 sqm. Estimated delivery: Q3 2026.",
   "image_url": null,
   "gallery_urls": [],
   "features": [
@@ -2180,16 +2155,16 @@
   "title": "One Metropica",
   "slug": "one-metropica-3191",
   "country": "Estados Unidos",
-  "province": null,
-  "location": null,
+  "province": "Florida",
+  "location": "Sunrise",
   "property_type": "apartment",
   "price": null,
   "currency": "USD",
   "area_sqm": 69,
   "bedrooms": 3,
   "bathrooms": null,
-  "description": "One Metropica es una promoción de obra nueva (Estados Unidos). Está promovida por Metropica Developments, LLC y con arquitectura de Oppenheim Architecture. El edificio cuenta con 28 plantas y 263 residencias. Las viviendas parten de 69 m² y llegan hasta 128 m². Entrega prevista: 2022.",
-  "description_en": "One Metropica is a new development (United States). It is developed by Metropica Developments, LLC and with architecture by Oppenheim Architecture. The building has 28 floors and 263 residences. Homes start at 69 sqm and go up to 128 sqm. Estimated delivery: 2022.",
+  "description": "One Metropica es una promoción de obra nueva en Sunrise, Florida (Estados Unidos). Está promovida por Metropica Developments, LLC y con arquitectura de Oppenheim Architecture. El edificio cuenta con 28 plantas y 263 residencias. Las viviendas parten de 69 m² y llegan hasta 128 m². Entrega prevista: 2022.",
+  "description_en": "One Metropica is a new development in Sunrise, Florida (United States). It is developed by Metropica Developments, LLC and with architecture by Oppenheim Architecture. The building has 28 floors and 263 residences. Homes start at 69 sqm and go up to 128 sqm. Estimated delivery: 2022.",
   "image_url": null,
   "gallery_urls": [],
   "features": [
@@ -2202,8 +2177,7 @@
   "is_development": true,
   "skip": "sin imagen ni precio",
   "warnings": [
-   "precio sospechoso (550 = PSF, no total) → sin precio",
-   "sin ciudad (no se pudo extraer la dirección)"
+   "precio sospechoso (550 = PSF, no total) → sin precio"
   ],
   "sourceUrl": "https://cerverabrokerportal.com/projects/one-metropica/"
  },
@@ -3903,15 +3877,15 @@
   "title": "Natiivo Fort Lauderdale",
   "slug": "natiivo-fort-lauderdale-91",
   "country": "Estados Unidos",
-  "province": null,
-  "location": null,
+  "province": "Florida",
+  "location": "Fort Lauderdale",
   "property_type": "apartment",
   "price": 621000,
   "currency": "USD",
   "area_sqm": null,
   "bedrooms": 0,
   "bathrooms": 1,
-  "description": "Natiivo Fort Lauderdale es una promoción de obra nueva (Estados Unidos). Está promovida por newgard_development_group y con arquitectura de arquitectonica. El edificio cuenta con 40 plantas y 384 residencias. Entrega prevista: Q2 2027.",
+  "description": "Natiivo Fort Lauderdale es una promoción de obra nueva en Fort Lauderdale, Florida (Estados Unidos). Está promovida por newgard_development_group y con arquitectura de arquitectonica. El edificio cuenta con 40 plantas y 384 residencias. Entrega prevista: Q2 2027.",
   "description_en": "Natiivo Fort Lauderdale is the first turnkey, residential and hospitality property in Fort Lauderdale. Purposefully designed, built, and licensed for short term rentals, Natiivo offers a homeshare opportunity that allows residents a smart way to own.",
   "image_url": "https://cerverabrokerportal.com/wp-content/uploads/2023/12/hero-natiivo-fll.jpg",
   "gallery_urls": [
@@ -3929,9 +3903,7 @@
   ],
   "is_development": true,
   "skip": null,
-  "warnings": [
-   "sin ciudad (no se pudo extraer la dirección)"
-  ],
+  "warnings": [],
   "sourceUrl": "https://cerverabrokerportal.com/projects/natiivo-fort-lauderdale/"
  },
  {

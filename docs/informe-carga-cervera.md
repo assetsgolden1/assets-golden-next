@@ -48,21 +48,12 @@ La fuente trae el precio por pie cuadrado en el campo de precio. Se cargan SIN p
 | Visions at Brickell Station | 1080 |
 | Diesel Wynwood Condos | 913 |
 
-## Sin ciudad (11) — decisión tuya
+## Sin ciudad (2) — decisión tuya
 
 La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados Unidos) pero **sin ciudad**: no aparecerían en filtros por ciudad y la ficha queda más pobre. Opciones: cargarlas igual, o dejarlas para completar a mano.
 
-- Mandarin Oriental Residences, West Palm Beach — https://cerverabrokerportal.com/projects/mandarin-oriental-residences-west-palm-beach/
 - Seven Park — https://cerverabrokerportal.com/projects/seven-park/
-- Hollywood Moon — https://cerverabrokerportal.com/projects/hollywood-moon/
-- Bay Harbor Towers — https://cerverabrokerportal.com/projects/bay-harbor-towers/
 - Casa Murano Las Olas — https://cerverabrokerportal.com/projects/casa-murano-las-olas/
-- Alba Palm Beach — https://cerverabrokerportal.com/projects/alba-palm-beach/
-- Andare Residences — https://cerverabrokerportal.com/projects/andare-residences/
-- Sixth & Rio — https://cerverabrokerportal.com/projects/sixth-rio/
-- The Condominium Residences at Pier Sixty-Six — https://cerverabrokerportal.com/projects/the-condominium-residences-at-pier-sixty-six/
-- Selene Oceanfront Residences — https://cerverabrokerportal.com/projects/selene-oceanfront-residences/
-- Natiivo Fort Lauderdale — https://cerverabrokerportal.com/projects/natiivo-fort-lauderdale/
 
 ## Muestra de 5 fichas normalizadas
 
@@ -75,8 +66,8 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
  "title": "Mandarin Oriental Residences, West Palm Beach",
  "slug": "mandarin-oriental-residences-west-palm-beach-4107",
  "country": "Estados Unidos",
- "province": null,
- "location": null,
+ "province": "Florida",
+ "location": "West Palm Beach",
  "property_type": "apartment",
  "price": 3500000,
  "currency": "USD",
@@ -97,9 +88,7 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
  ],
  "is_development": true,
  "skip": null,
- "warnings": [
-  "sin ciudad (no se pudo extraer la dirección)"
- ],
+ "warnings": [],
  "sourceUrl": "https://cerverabrokerportal.com/projects/mandarin-oriental-residences-west-palm-beach/"
 }
 ```

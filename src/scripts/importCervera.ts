@@ -78,6 +78,41 @@ async function getJson<T>(url: string): Promise<T> {
  * HTML server-rendered: tras el encabezado "Site Address" vienen 3 campos JetEngine
  * (calle / "Ciudad, ST" / zip).
  */
+const STATE_WORDS = 'FL|FLORIDA|NY|NEW YORK|TX|TEXAS|CA|CALIFORNIA|NJ'
+// Sufijos de vía: lo que viene DESPUÉS del último es, casi siempre, la ciudad.
+const STREET_SUFFIX = /\b(?:blvd|boulevard|ave|avenue|st|street|dr|drive|rd|road|way|ter|terrace|pl|place|ct|court|ln|lane|hwy|highway|cir|circle|pkwy|parkway|causeway|walk)\b\.?/gi
+
+const titleCase = (s: string) =>
+  s.toLowerCase().replace(/\b[a-z]/g, (c) => c.toUpperCase()).replace(/\s+/g, ' ').trim()
+
+// Encabezados de la ficha que NO son ciudades ("About Seven Park", "Sales Gallery Address").
+const NOT_A_CITY = /\b(about|sales|gallery|address|facts|team|contact|developer|architect|overview|residences?|condominium)\b/i
+
+/** Extrae "ciudad, estado" de una línea de dirección en cualquiera de los formatos de la fuente. */
+function cityFromLine(line: string): { city: string; state: string } | null {
+  if (!line || NOT_A_CITY.test(line)) return null
+  // 1) Cortar tras el último sufijo de vía: "…Blvd, Fort Lauderdale, FL 33301" → "Fort Lauderdale, FL 33301"
+  let tail = line
+  const matches = [...line.matchAll(STREET_SUFFIX)]
+  if (matches.length) {
+    const last = matches[matches.length - 1]
+    tail = line.slice((last.index ?? 0) + last[0].length)
+  }
+  tail = tail.replace(/^[\s,.\-]+/, '').trim()
+  if (!tail) return null
+
+  // 2) "Ciudad, ST [zip]" o "Ciudad ST zip" (sin comas)
+  const m =
+    tail.match(new RegExp(`^([A-Za-z][A-Za-z .'\\-]{2,40}?)\\s*,\\s*(${STATE_WORDS})\\b`, 'i')) ??
+    tail.match(new RegExp(`^([A-Za-z][A-Za-z .'\\-]{2,40}?)\\s+(${STATE_WORDS})\\s+\\d{5}\\b`, 'i'))
+  if (m) return { city: titleCase(m[1]), state: /^fl/i.test(m[2]) ? 'FL' : m[2].toUpperCase().slice(0, 2) }
+
+  // 3) Solo ciudad, sin estado: "Bay Harbor Drive Bay Harbor Islands"
+  const only = tail.replace(/\d{5}(-\d{4})?/g, '').replace(new RegExp(`\\b(${STATE_WORDS})\\b`, 'gi'), '').replace(/[,.]/g, ' ').trim()
+  if (only && /^[A-Za-z][A-Za-z .'\-]{2,40}$/.test(only)) return { city: titleCase(only), state: '' }
+  return null
+}
+
 function parseAddress(html: string): CerveraRaw['address'] {
   const i = html.indexOf('Site Address')
   if (i === -1) return null
@@ -87,12 +122,25 @@ function parseAddress(html: string): CerveraRaw['address'] {
     .split('|')
     .map((s) => decodeEntities(s).replace(/\s+/g, ' ').trim())
     .filter((s) => s && s !== 'Site Address')
-  const cityState = parts.find((p) => /^[A-Za-z .'\-]+,\s*[A-Z]{2}$/.test(p))
+
   const zip = parts.find((p) => /^\d{5}(-\d{4})?$/.test(p))
-  const street = parts.find((p) => /^\d+\s+\S/.test(p))
-  if (!cityState && !street) return null
-  const [city, state] = (cityState ?? ', ').split(',').map((s) => s.trim())
-  return { street: street ?? '', city: city ?? '', state: state ?? '', zip: zip ?? '' }
+    ?? parts.map((p) => p.match(/\b(\d{5})(?:-\d{4})?\b/)?.[1]).find(Boolean) ?? ''
+  const street = parts.find((p) => /^\d+\s+\S/.test(p)) ?? ''
+
+  // Campo propio "Ciudad, ST" (formato limpio) — si no, se deduce de la línea de calle.
+  const clean = parts.find((p) => new RegExp(`^[A-Za-z][A-Za-z .'\\-]+,\\s*(${STATE_WORDS})$`, 'i').test(p))
+  // El fallback solo mira partes que PARECEN dirección (tienen número, estado o zip):
+  // barrer todos los bloques colaba encabezados como "About Seven Park".
+  // (RegExp nuevo por llamada: STREET_SUFFIX es /g y .test() sería stateful vía lastIndex)
+  const hasStreetWord = (p: string) => new RegExp(STREET_SUFFIX.source, 'i').test(p)
+  const addressLike = parts.filter((p) =>
+    /\d/.test(p) && p.length > 8 && (new RegExp(`\\b(${STATE_WORDS})\\b`, 'i').test(p) || hasStreetWord(p)))
+  const parsed = clean
+    ? { city: titleCase(clean.split(',')[0]), state: clean.split(',')[1].trim().toUpperCase().slice(0, 2) }
+    : (cityFromLine(street) ?? addressLike.map(cityFromLine).find(Boolean) ?? null)
+
+  if (!parsed && !street) return null
+  return { street, city: parsed?.city ?? '', state: parsed?.state || 'FL', zip }
 }
 
 // ─── F1 · EXTRACT ─────────────────────────────────────────────────────────
@@ -134,7 +182,8 @@ async function extract() {
     : {}
   const isCandidate = (p: WpProject) =>
     idsOf(p).length > 0 || Number(p.meta?.price_range_from) > 0
-  const pending = projects.filter((p) => isCandidate(p) && !(p.slug in cache))
+  // Se refetchea también lo cacheado SIN ciudad: puede haber fallado el parser, no la fuente.
+  const pending = projects.filter((p) => isCandidate(p) && !cache[p.slug]?.city)
   console.log(`· Direcciones: ${pending.length} por bajar (crawl-delay ${CRAWL_DELAY_MS / 1000}s, ~${Math.ceil((pending.length * CRAWL_DELAY_MS) / 60000)} min)…`)
 
   for (const [n, p] of pending.entries()) {
@@ -341,8 +390,43 @@ function normalize(r: CerveraRaw): Normalized {
 }
 
 // ─── F4 · INFORME (dry-run, no toca la BD) ────────────────────────────────
+/**
+ * Rescata la ciudad de los proyectos cuya dirección no la incluye, cruzando datos
+ * DENTRO del propio dataset (no se inventa geografía):
+ *  1. código postal → ciudad, tomado de otros proyectos ya resueltos.
+ *  2. el título nombra la ciudad ("Natiivo Fort Lauderdale") — se prueba el nombre
+ *     más largo primero para que "West Palm Beach" gane a "Palm Beach".
+ * Después se rehace el mapa de zips, porque (2) puede desbloquear (1).
+ */
+function backfillCities(raw: CerveraRaw[]): number {
+  let fixed = 0
+  for (let pass = 0; pass < 2; pass++) {
+    const zipCity = new Map<string, string>()
+    const vocab = new Set<string>()
+    for (const r of raw) {
+      if (r.address?.city) {
+        vocab.add(r.address.city)
+        if (r.address.zip) zipCity.set(r.address.zip, r.address.city)
+      }
+    }
+    const byLen = [...vocab].sort((a, b) => b.length - a.length)
+    for (const r of raw) {
+      if (!r.address || r.address.city) continue
+      const byZip = r.address.zip ? zipCity.get(r.address.zip) : undefined
+      // La fuente nombra la ciudad tras la coma: "Mandarin Oriental Residences, West Palm Beach".
+      const afterComma = r.title.match(/,\s*([A-Z][A-Za-z .'\-]{3,40})\s*$/)?.[1]?.trim()
+      const byTitle = byLen.find((c) => r.title.toLowerCase().includes(c.toLowerCase()))
+      const city = byZip ?? (afterComma && !NOT_A_CITY.test(afterComma) ? afterComma : undefined) ?? byTitle
+      if (city) { r.address.city = city; fixed++ }
+    }
+  }
+  return fixed
+}
+
 async function report() {
   const raw: CerveraRaw[] = JSON.parse(readFileSync(RAW, 'utf8'))
+  const rescued = backfillCities(raw)
+  if (rescued) console.log(`· ciudades recuperadas por zip/título: ${rescued}`)
   const all = raw.map(normalize)
   const ok = all.filter((n) => !n.skip)
   const out = all.filter((n) => n.skip)
@@ -447,7 +531,12 @@ async function load() {
   const { data: already } = await supa.from('properties').select('external_id').eq('external_source', 'cervera')
   const done = new Set((already ?? []).map((r) => r.external_id))
 
-  let queue = all.filter((n) => !n.skip && !done.has(n.external_id))
+  // Sin ciudad no se cargan por defecto: la ficha queda fuera de los filtros por
+  // ciudad y es una decisión de negocio, no técnica. Forzar con --allow-no-city.
+  const allowNoCity = process.argv.includes('--allow-no-city')
+  let queue = all.filter((n) => !n.skip && !done.has(n.external_id) && (allowNoCity || n.location))
+  const held = all.filter((n) => !n.skip && !done.has(n.external_id) && !n.location).length
+  if (held && !allowNoCity) console.log(`· ${held} en espera por no tener ciudad (--allow-no-city para incluirlas)`)
   if (limit > 0) queue = queue.slice(0, limit)
 
   console.log(`· ${queue.length} a cargar${limit ? ` (limit ${limit})` : ''}${confirm ? '' : ' — DRY-RUN, usá --confirm para escribir'}`)

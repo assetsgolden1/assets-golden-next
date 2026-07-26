@@ -2,7 +2,7 @@
  "mandarin-oriental-residences-west-palm-beach": {
   "street": "5400 N Flagler Dr",
   "city": "",
-  "state": "",
+  "state": "FL",
   "zip": "33407"
  },
  "seventeen-gables": {
@@ -14,7 +14,7 @@
  "aria-reserve-south": {
   "street": "700 NE 24th Street",
   "city": "",
-  "state": "",
+  "state": "FL",
   "zip": "33137"
  },
  "edgehouse": {
@@ -57,8 +57,8 @@
  },
  "hollywood-moon": {
   "street": "901 S Ocean Drive, Hollywood, FL",
-  "city": "",
-  "state": "",
+  "city": "Hollywood",
+  "state": "FL",
   "zip": ""
  },
  "midtown-park": {
@@ -69,9 +69,9 @@
  },
  "bay-harbor-towers": {
   "street": "10143 E. Bay Harbor Drive Bay Harbor Islands",
-  "city": "",
-  "state": "",
-  "zip": ""
+  "city": "Bay Harbor Islands",
+  "state": "FL",
+  "zip": "10143"
  },
  "ziggurat": {
   "street": "3130 Grand Ave",
@@ -82,7 +82,7 @@
  "atelier": {
   "street": "1265 SW 22nd Street",
   "city": "",
-  "state": "",
+  "state": "FL",
   "zip": ""
  },
  "the-lincoln": {
@@ -182,37 +182,37 @@
  "one-west-palm": {
   "street": "550 North Quadrille Boulevard",
   "city": "",
-  "state": "",
+  "state": "FL",
   "zip": "33401"
  },
  "shorecrest": {
   "street": "1901 N. Flagler Drive",
   "city": "",
-  "state": "",
+  "state": "FL",
   "zip": "33304"
  },
  "nautilus-220": {
   "street": "220 Lake Shore Dirve",
   "city": "",
-  "state": "",
+  "state": "FL",
   "zip": "33403"
  },
  "the-ritz-carlton-residences-west-palm-beach": {
   "street": "1717 N. Flagler Drive",
   "city": "",
-  "state": "",
+  "state": "FL",
   "zip": "33407"
  },
  "alba-palm-beach": {
   "street": "4714 N Flagler Drive",
   "city": "",
-  "state": "",
+  "state": "FL",
   "zip": "33407"
  },
  "olara-residences": {
   "street": "1919 N Flagler Drive",
   "city": "",
-  "state": "",
+  "state": "FL",
   "zip": "33407"
  },
  "la-mare": {
@@ -253,26 +253,26 @@
  },
  "andare-residences": {
   "street": "521 E LAS OLAS BLVD. FORT LAUDERDALE, FLORIDA 33301",
-  "city": "",
-  "state": "",
+  "city": "Fort Lauderdale",
+  "state": "FL",
   "zip": "33301"
  },
  "sixth-rio": {
   "street": "501 SE 6th Ave, Fort Lauderdale, FL 33301",
-  "city": "",
-  "state": "",
+  "city": "Fort Lauderdale",
+  "state": "FL",
   "zip": "33301"
  },
  "the-condominium-residences-at-pier-sixty-six": {
   "street": "2301 SE 17th St. Fort Lauderdale Beach FL 33316",
-  "city": "",
-  "state": "",
+  "city": "Fort Lauderdale Beach",
+  "state": "FL",
   "zip": "33316"
  },
  "selene-oceanfront-residences": {
   "street": "3026 Alhambra St and 151 N Seabreeze Blvd, Fort Lauderdale, FL 33304",
-  "city": "",
-  "state": "",
+  "city": "Fort Lauderdale",
+  "state": "FL",
   "zip": "33304"
  },
  "river-district": {
@@ -289,14 +289,14 @@
  },
  "2000-ocean": {
   "street": "2000 S. Ocean Drive Hollywood",
-  "city": "",
-  "state": "",
+  "city": "Hollywood",
+  "state": "FL",
   "zip": ""
  },
  "rosewood-hillsboro": {
   "street": "1180 Hillsboro Mile Hillsboro Beach",
   "city": "",
-  "state": "",
+  "state": "FL",
   "zip": "33062"
  },
  "mercedes-benz": {
@@ -307,8 +307,8 @@
  },
  "one-metropica": {
   "street": "2000 Metropica Way Sunrise",
-  "city": "",
-  "state": "",
+  "city": "Sunrise",
+  "state": "FL",
   "zip": ""
  },
  "bentley-residences": {
@@ -590,7 +590,7 @@
  "natiivo-fort-lauderdale": {
   "street": "200 West Broward Blvd.",
   "city": "",
-  "state": "",
+  "state": "FL",
   "zip": "33311"
  },
  "the-residences-at-1428-brickell": {
