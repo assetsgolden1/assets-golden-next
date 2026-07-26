@@ -1,6 +1,6 @@
 [
  {
-  "external_id": "4107",
+  "external_id": "cv-4107",
   "external_source": "cervera",
   "title": "Mandarin Oriental Residences, West Palm Beach",
   "slug": "mandarin-oriental-residences-west-palm-beach-4107",
@@ -11,7 +11,7 @@
   "price": 3500000,
   "currency": "USD",
   "area_sqm": 200,
-  "bedrooms": null,
+  "bedrooms": 2,
   "bathrooms": null,
   "description": "Ubicada a lo largo de la vía navegable intracoastal de Palm Beach y envueltas en serenos jardines tropicales, Mandarin Oriental Residences, West Palm Beach inauguran una nueva era de refinada vida frente al mar. Concebida como un santuario íntimo dentro de un vibrante entorno costero, esta exclusiva colección de 87 residencias, diseñada por Safdie Architects bajo la dirección de Moshe Safdie, ofrece una presencia arquitectónica depurada y una excepcional cercanía con la costa que pocas direcciones pueden ofrecer.",
   "description_en": "Set along a private shore of the Intracoastal Waterway and enveloped in tranquil tropical gardens, Mandarin Oriental Residences, West Palm Beach introduces a new era of refined waterfront living. Developed as an intimate sanctuary within a vibrant coastal setting, this limited collection of 87 residences, designed by Safdie Architects, led by Moshe Safdie, presents a refined architectural presence and a rare sense of closeness to the coast that few addresses can claim.",
@@ -21,6 +21,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2026/02/overview-mo-wpb.jpg"
   ],
   "features": [
+   "Dormitorios: 2 a 4",
    "31 plantas",
    "87 residencias",
    "Entrega 2031"
@@ -31,7 +32,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/mandarin-oriental-residences-west-palm-beach/"
  },
  {
-  "external_id": "3768",
+  "external_id": "cv-3768",
   "external_source": "cervera",
   "title": "Seventeen Gables",
   "slug": "seventeen-gables-3768",
@@ -42,7 +43,7 @@
   "price": 634900,
   "currency": "USD",
   "area_sqm": 52,
-  "bedrooms": null,
+  "bedrooms": 1,
   "bathrooms": null,
   "description": "Seventeen Gabes se encuentra en el corazón de todo — cerca de Miracle Mile y The Shops at Merrick Park, con fácil acceso a Brickell y al centro de la ciudad. Una dirección boutique rodeada de calles arboladas, las mejores escuelas y todo lo que hace que la vida en los Gables se sienta sin esfuerzo. Elegante, atemporal y inconfundiblemente Coral Gables — próximamente.",
   "description_en": "Seventeen Gables is set in the heart of it all — near Miracle Mile and The Shops at Merrick Park, with easy access to Brickell and Downtown. A boutique address surrounded by tree-lined streets, top schools, and everything that makes life in the Gables feel effortless. Elegant, timeless, and unmistakably Coral Gables — coming soon.",
@@ -52,6 +53,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/10/25_235_02_FACHADA_2_DIA_FINAL-scaled.jpg"
   ],
   "features": [
+   "Dormitorios: 1 a 3",
    "8 plantas",
    "117 residencias",
    "Entrega 2028"
@@ -62,7 +64,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/seventeen-gables/"
  },
  {
-  "external_id": "3752",
+  "external_id": "cv-3752",
   "external_source": "cervera",
   "title": "Aria Reserve South",
   "slug": "aria-reserve-south-3752",
@@ -73,13 +75,14 @@
   "price": 300000,
   "currency": "USD",
   "area_sqm": 95,
-  "bedrooms": null,
+  "bedrooms": 1,
   "bathrooms": null,
   "description": "Aria Reserve South es una promoción de obra nueva en Miami, Florida (Estados Unidos). Está promovida por melo_group y con arquitectura de arquitectonica. El edificio cuenta con 391 residencias. Las viviendas parten de 95 m² y llegan hasta 213 m². Entrega prevista: 2025.",
   "description_en": "Aria Reserve South is a new development in Miami, Florida (United States). It is developed by melo_group and with architecture by arquitectonica. The building has 391 residences. Homes start at 95 sqm and go up to 213 sqm. Estimated delivery: 2025.",
   "image_url": null,
   "gallery_urls": [],
   "features": [
+   "Dormitorios: 1 a 3",
    "Promotora: melo_group",
    "Arquitectura: arquitectonica",
    "391 residencias",
@@ -91,7 +94,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/aria-reserve-south/"
  },
  {
-  "external_id": "3749",
+  "external_id": "cv-3749",
   "external_source": "cervera",
   "title": "Edgehouse",
   "slug": "edgehouse-3749",
@@ -111,6 +114,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/10/2-scaled-1.jpg"
   ],
   "features": [
+   "Dormitorios: Studios a 3",
    "Promotora: grupo_tc",
    "Arquitectura: kobi_karp_architecture",
    "600 residencias",
@@ -122,7 +126,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/edgehouse/"
  },
  {
-  "external_id": "3693",
+  "external_id": "cv-3693",
   "external_source": "cervera",
   "title": "Missioni Baia",
   "slug": "missioni-baia-3693",
@@ -133,7 +137,7 @@
   "price": 560000,
   "currency": "USD",
   "area_sqm": 63,
-  "bedrooms": null,
+  "bedrooms": 1,
   "bathrooms": null,
   "description": "Missioni Baia es una promoción de obra nueva en Miami, Florida (Estados Unidos). Está promovida por oko_group y con arquitectura de revuelta_architecture_international,asymptote_architecture. Las viviendas parten de 63 m² y llegan hasta 635 m². Entrega prevista: 2023.",
   "description_en": "Missioni Baia is a new development in Miami, Florida (United States). It is developed by oko_group and with architecture by revuelta_architecture_international,asymptote_architecture. Homes start at 63 sqm and go up to 635 sqm. Estimated delivery: 2023.",
@@ -142,6 +146,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/09/missioni-baia.webp"
   ],
   "features": [
+   "Dormitorios: 1 a 5",
    "Promotora: oko_group",
    "Arquitectura: revuelta_architecture_international,asymptote_architecture",
    "Entrega 2023"
@@ -152,7 +157,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/missioni-baia/"
  },
  {
-  "external_id": "3690",
+  "external_id": "cv-3690",
   "external_source": "cervera",
   "title": "Twenty Sixth & 2nd Wynwood",
   "slug": "twenty-sixth-2nd-wynwood-3690",
@@ -183,7 +188,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/twenty-sixth-2nd-wynwood/"
  },
  {
-  "external_id": "3461",
+  "external_id": "cv-3461",
   "external_source": "cervera",
   "title": "The Well Bay Harbor Islands",
   "slug": "the-well-bay-harbor-islands-3461",
@@ -194,13 +199,14 @@
   "price": 1275000,
   "currency": "USD",
   "area_sqm": 106,
-  "bedrooms": null,
+  "bedrooms": 1,
   "bathrooms": null,
   "description": "The Well Bay Harbor Islands es una promoción de obra nueva en Bay Harbor Islands, Florida (Estados Unidos). Está promovida por terra_group y con arquitectura de arquitectonica. El edificio cuenta con 8 plantas y 54 residencias. Las viviendas parten de 106 m² y llegan hasta 303 m². Entrega prevista: Q1 2025.",
   "description_en": "The Well Bay Harbor Islands is a new development in Bay Harbor Islands, Florida (United States). It is developed by terra_group and with architecture by arquitectonica. The building has 8 floors and 54 residences. Homes start at 106 sqm and go up to 303 sqm. Estimated delivery: Q1 2025.",
   "image_url": null,
   "gallery_urls": [],
   "features": [
+   "Dormitorios: 1 a 4",
    "Promotora: terra_group",
    "Arquitectura: arquitectonica",
    "8 plantas",
@@ -213,7 +219,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/the-well-bay-harbor-islands/"
  },
  {
-  "external_id": "3512",
+  "external_id": "cv-3512",
   "external_source": "cervera",
   "title": "Seven Park",
   "slug": "seven-park-3512",
@@ -224,7 +230,7 @@
   "price": 370000,
   "currency": "USD",
   "area_sqm": 46,
-  "bedrooms": null,
+  "bedrooms": 0,
   "bathrooms": null,
   "description": "Seven Park es una promoción de obra nueva (Estados Unidos). Las viviendas parten de 46 m² y llegan hasta 153 m². Amenidades: Elevated Amenities That Inspire Leisure & Wellness: • Resort-style pool, 2 hot tubs, private cabanas • Game room with theatre screen & wet bar • 3,000 sqft fitness center + yoga, lawn gym, cold plunges • Wellness center with sauna, steam,…",
   "description_en": "SEVEN PARK is more than a building — it’s a signal of what’s next. Across from a $30 million green space and minutes from everywhere that matters, it’s the new pulse of Hallandale’s creative and residential revival. Designed for contemporary adults who want lifestyle, flexibility, and smart ownership — it’s modern living made greener. This is city living with outdoor soul. A community that values space, flow, and cultural energy. A new landmark for a city that’s finally stepping into its potential. Seven Park is urban by nature — and built for the way we want to live next.",
@@ -232,7 +238,9 @@
   "gallery_urls": [
    "https://cerverabrokerportal.com/wp-content/uploads/2025/07/Screen-Shot-2025-07-23-at-11.28.09-AM.png"
   ],
-  "features": [],
+  "features": [
+   "Dormitorios: Studios a 3"
+  ],
   "is_development": true,
   "skip": null,
   "warnings": [
@@ -241,7 +249,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/seven-park/"
  },
  {
-  "external_id": "3511",
+  "external_id": "cv-3511",
   "external_source": "cervera",
   "title": "The Cloud One Hotel & Residences",
   "slug": "the-cloud-one-hotel-residences-3511",
@@ -269,7 +277,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/the-cloud-one-hotel-residences/"
  },
  {
-  "external_id": "3504",
+  "external_id": "cv-3504",
   "external_source": "cervera",
   "title": "Poolhaus",
   "slug": "poolhaus-3504",
@@ -280,7 +288,7 @@
   "price": 1990000,
   "currency": "USD",
   "area_sqm": 203,
-  "bedrooms": null,
+  "bedrooms": 2,
   "bathrooms": null,
   "description": "Poolhaus es una promoción de obra nueva en Bay Harbor Islands, Florida (Estados Unidos). El edificio cuenta con 18 residencias. Las viviendas parten de 203 m² y llegan hasta 297 m². Entrega prevista: Q2 2026.",
   "description_en": "Nestled in the serene enclave of Bay Harbor Islands, Pool Haus features a limited collection of eighteen expansive residences and is designed for those who value luxury, and unparalleled comfort. Each unique residential layout is a testament to thoughtful design, with spacious floorplans that blend modern aesthetics with timeless charm. From the light-filled great rooms to the exquisite primary bathrooms, each element is meticulously crafted to offer an elevated sense of tranquility and privacy.",
@@ -289,6 +297,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/07/Screen-Shot-2025-07-22-at-12.58.57-PM.png"
   ],
   "features": [
+   "Dormitorios: 2 a 4",
    "18 residencias",
    "Entrega 2026"
   ],
@@ -298,7 +307,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/poolhaus/"
  },
  {
-  "external_id": "3502",
+  "external_id": "cv-3502",
   "external_source": "cervera",
   "title": "Jean-Georges Miami Tropic Residences",
   "slug": "jean-georges-miami-tropic-residences-3502",
@@ -330,7 +339,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/jean-georges-miami-tropic-residences/"
  },
  {
-  "external_id": "3500",
+  "external_id": "cv-3500",
   "external_source": "cervera",
   "title": "Hollywood Moon",
   "slug": "hollywood-moon-3500",
@@ -341,7 +350,7 @@
   "price": 1395000,
   "currency": "USD",
   "area_sqm": 109,
-  "bedrooms": null,
+  "bedrooms": 1,
   "bathrooms": null,
   "description": "Hollywood Moon es una promoción de obra nueva en Hollywood, Florida (Estados Unidos). El edificio cuenta con 48 residencias. Las viviendas parten de 109 m² y llegan hasta 204 m². Entrega prevista: Q4 2027.",
   "description_en": "Hollywood Beach: A Coveted Coastal Haven Tucked between Miami Beach and Fort Lauderdale, Hollywood Beach offers a slower, more soulful rhythm with an iconic Ocean Broadwalk, preserved dunes, and that nostalgic Art Deco charm.",
@@ -350,6 +359,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/07/PHOTO-2025-06-30-16-06-25.jpg"
   ],
   "features": [
+   "Dormitorios: 1 a 3",
    "48 residencias",
    "Entrega 2027"
   ],
@@ -359,7 +369,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/hollywood-moon/"
  },
  {
-  "external_id": "3498",
+  "external_id": "cv-3498",
   "external_source": "cervera",
   "title": "Midtown Park",
   "slug": "midtown-park-3498",
@@ -392,7 +402,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/midtown-park/"
  },
  {
-  "external_id": "3492",
+  "external_id": "cv-3492",
   "external_source": "cervera",
   "title": "Season One Brickell",
   "slug": "season-one-brickell-3492",
@@ -424,7 +434,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/season-one-brickell/"
  },
  {
-  "external_id": "3491",
+  "external_id": "cv-3491",
   "external_source": "cervera",
   "title": "Millux Place Miami",
   "slug": "millux-place-miami-3491",
@@ -455,7 +465,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/millux-place-miami/"
  },
  {
-  "external_id": "3488",
+  "external_id": "cv-3488",
   "external_source": "cervera",
   "title": "Bay Harbor Towers",
   "slug": "bay-harbor-towers-3488",
@@ -466,7 +476,7 @@
   "price": 2600000,
   "currency": "USD",
   "area_sqm": 177,
-  "bedrooms": null,
+  "bedrooms": 2,
   "bathrooms": null,
   "description": "Bay Harbor Towers es una promoción de obra nueva en Bay Harbor Islands, Florida (Estados Unidos). Está promovida por pmg y con arquitectura de kobi_karp_architecture. El edificio cuenta con 8 plantas y 44 residencias. Las viviendas parten de 177 m² y llegan hasta 426 m². Entrega prevista: Q2 2026.",
   "description_en": "Introducing Bay Harbor Towers, a boutique collection of forty-four private residences that elevate luxury island living to a new echelon. Nestled along the northern shoreline where the pristine Indian Creek waterfront meets the vast expanse of Biscayne Bay, this striking architectural gem is a beacon of opulence and exclusivity.",
@@ -475,6 +485,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/07/thumbnail_PastedGraphic-3.png"
   ],
   "features": [
+   "Dormitorios: 2 a 4",
    "Promotora: pmg",
    "Arquitectura: kobi_karp_architecture",
    "Interiorismo: interiors_by_steven_g",
@@ -488,7 +499,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/bay-harbor-towers/"
  },
  {
-  "external_id": "3463",
+  "external_id": "cv-3463",
   "external_source": "cervera",
   "title": "Ziggurat",
   "slug": "ziggurat-3463",
@@ -520,7 +531,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/ziggurat/"
  },
  {
-  "external_id": "3462",
+  "external_id": "cv-3462",
   "external_source": "cervera",
   "title": "Atelier",
   "slug": "atelier-3462",
@@ -531,13 +542,14 @@
   "price": 400000,
   "currency": "USD",
   "area_sqm": 33,
-  "bedrooms": null,
+  "bedrooms": 0,
   "bathrooms": null,
   "description": "Atelier es una promoción de obra nueva, Florida (Estados Unidos). El edificio cuenta con 10 plantas y 148 residencias. Las viviendas parten de 33 m² y llegan hasta 139 m². Entrega prevista: Q2 2027. Amenidades: 24/7 concierge Signature restaurant Serene Pool Brand-name fitness center Spa, steam, sauna & cold plunge Lounges & private meeting rooms.",
   "description_en": "Atelier is a new development, Florida (United States). The building has 10 floors and 148 residences. Homes start at 33 sqm and go up to 139 sqm. Estimated delivery: Q2 2027. Amenities: 24/7 concierge Signature restaurant Serene Pool Brand-name fitness center Spa, steam, sauna & cold plunge Lounges & private meeting rooms.",
   "image_url": null,
   "gallery_urls": [],
   "features": [
+   "Dormitorios: Studios a 3",
    "10 plantas",
    "148 residencias",
    "Entrega 2027"
@@ -550,7 +562,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/atelier/"
  },
  {
-  "external_id": "3457",
+  "external_id": "cv-3457",
   "external_source": "cervera",
   "title": "The Lincoln",
   "slug": "the-lincoln-3457",
@@ -570,6 +582,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/The-Lincoln-Coconut-Grove.jpg"
   ],
   "features": [
+   "Dormitorios: 1 a 4",
    "8 plantas",
    "48 residencias",
    "Entrega 2027"
@@ -580,7 +593,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/the-lincoln/"
  },
  {
-  "external_id": "3458",
+  "external_id": "cv-3458",
   "external_source": "cervera",
   "title": "Opus Coconut Grove",
   "slug": "opus-coconut-grove-3458",
@@ -591,7 +604,7 @@
   "price": 2500000,
   "currency": "USD",
   "area_sqm": 188,
-  "bedrooms": null,
+  "bedrooms": 3,
   "bathrooms": null,
   "description": "Opus Coconut Grove es una promoción de obra nueva en Miami, Florida (Estados Unidos). Está con arquitectura de kobi_karp_architecture. El edificio cuenta con 6 plantas y 14 residencias. Las viviendas parten de 188 m² y llegan hasta 369 m². Entrega prevista: Q3 2026.",
   "description_en": "Opus Coconut Grove is a boutique-style luxury residence tucked away in one of Miami’s most lush and historic neighborhoods. Designed with elegance and privacy in mind, the building features only a handful of exclusive homes that blend modern design with warm, natural materials. Each residence offers an airy, open-concept feel with expansive windows that invite in the surrounding greenery and natural light. The interiors are thoughtfully crafted with refined finishes, high-end appliances, and private elevator access. The atmosphere at Opus is serene and sophisticated, with amenities that create a true sanctuary—like a rooftop pool and lounge, spa with steam and sauna rooms, and a peaceful fitness center. Just steps from the charm of Coconut Grove’s parks, marinas, and outdoor cafes, Opus is ideal for those who appreciate quiet luxury in a walkable, tree-lined community.",
@@ -600,6 +613,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/opus.jpg"
   ],
   "features": [
+   "Dormitorios: 3 a 4",
    "Arquitectura: kobi_karp_architecture",
    "6 plantas",
    "14 residencias",
@@ -611,7 +625,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/opus-coconut-grove/"
  },
  {
-  "external_id": "3455",
+  "external_id": "cv-3455",
   "external_source": "cervera",
   "title": "Ponce Park",
   "slug": "ponce-park-3455",
@@ -631,6 +645,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/Ponce-Park.jpg"
   ],
   "features": [
+   "Dormitorios: 2 a 4",
    "Promotora: allen_morris_company",
    "Arquitectura: zyscovich_architects",
    "11 plantas",
@@ -643,7 +658,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/ponce-parc/"
  },
  {
-  "external_id": "3451",
+  "external_id": "cv-3451",
   "external_source": "cervera",
   "title": "Missoni Baia",
   "slug": "missoni-baia-3451",
@@ -671,7 +686,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/missoni-baia/"
  },
  {
-  "external_id": "3440",
+  "external_id": "cv-3440",
   "external_source": "cervera",
   "title": "1212 Aventura",
   "slug": "1212-aventura-3440",
@@ -699,7 +714,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/1212-aventura/"
  },
  {
-  "external_id": "3438",
+  "external_id": "cv-3438",
   "external_source": "cervera",
   "title": "Quadro Design District",
   "slug": "quadro-design-district-3438",
@@ -727,7 +742,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/quadro-design-district/"
  },
  {
-  "external_id": "3432",
+  "external_id": "cv-3432",
   "external_source": "cervera",
   "title": "Villa Miami",
   "slug": "villa-miami-3432",
@@ -738,7 +753,7 @@
   "price": 600000,
   "currency": "USD",
   "area_sqm": 307,
-  "bedrooms": null,
+  "bedrooms": 3,
   "bathrooms": null,
   "description": "Villa Miami es una promoción de obra nueva en Miami, Florida (Estados Unidos). Está promovida por terra_group. El edificio cuenta con 55 plantas y 70 residencias. Las viviendas parten de 307 m² y llegan hasta 613 m². Entrega prevista: Q2 2027. Amenidades: Health & Wellness • Spa experience inspired by Italian thermal spas containing plunge pools, steam room and sauna, chromotherapy sensory showers, salon, and treatment rooms • Spacious, light-filled fitness center with state-of-the-art…",
   "description_en": "Step into a life curated by Major Food Group. Head in the sky with a hand in the water. An invitation to the best of Miami. First class days, epicurean evenings & Dionysian nights. This is an entirely new proposal for how to live in Miami. These aren’t just views of the water. This is an open window with a breeze coming off the bay. Dinner on the veranda with the sunset refracted in the water. A home steeped in romance and warmth with a buzzing city waiting beyond.",
@@ -747,6 +762,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/HomeCarousel_A.jpg"
   ],
   "features": [
+   "Dormitorios: 3 a 5",
    "Promotora: terra_group",
    "Interiorismo: charles_co",
    "55 plantas",
@@ -760,7 +776,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/villa-miami/"
  },
  {
-  "external_id": "3434",
+  "external_id": "cv-3434",
   "external_source": "cervera",
   "title": "Casa Murano Las Olas",
   "slug": "casa-murano-las-olas-3434",
@@ -792,7 +808,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/casa-murano-las-olas/"
  },
  {
-  "external_id": "3424",
+  "external_id": "cv-3424",
   "external_source": "cervera",
   "title": "Surfrow Surfside",
   "slug": "surfrow-surfside-3424",
@@ -823,7 +839,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/surfrow-surfside/"
  },
  {
-  "external_id": "3420",
+  "external_id": "cv-3420",
   "external_source": "cervera",
   "title": "Twenty Nine Indian Creek",
   "slug": "twenty-nine-indian-creek-3420",
@@ -834,7 +850,7 @@
   "price": 2500000,
   "currency": "USD",
   "area_sqm": 163,
-  "bedrooms": null,
+  "bedrooms": 3,
   "bathrooms": null,
   "description": "Twenty Nine Indian Creek es una promoción de obra nueva en Miami Beach, Florida (Estados Unidos). Está promovida por jmh_development y con arquitectura de urban_robot_associates. El edificio cuenta con 7 plantas y 11 residencias. Las viviendas parten de 163 m² y llegan hasta 214 m².",
   "description_en": "Presenting just nine exclusive, waterfront homes with a residents-only Yacht Club and Private Marina. Crafted with an unprecedented attenion to detail by a nationally recognized team of designers, architects, and engineers at the top of their field. Each residence enjoys water frontage with water, golf course, and city views.",
@@ -843,6 +859,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/Screenshot-2023-06-07-at-12.07.43-PM-1-scaled.png"
   ],
   "features": [
+   "Dormitorios: 3 a 4",
    "Promotora: jmh_development",
    "Arquitectura: urban_robot_associates",
    "7 plantas",
@@ -854,7 +871,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/twenty-nine-indian-creek/"
  },
  {
-  "external_id": "3401",
+  "external_id": "cv-3401",
   "external_source": "cervera",
   "title": "Villa 17",
   "slug": "villa-17-3401",
@@ -884,7 +901,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/villa-17/"
  },
  {
-  "external_id": "3415",
+  "external_id": "cv-3415",
   "external_source": "cervera",
   "title": "The Perigon Miami Beach",
   "slug": "the-perigon-miami-beach-3415",
@@ -905,6 +922,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/BuildingElevation_HeroHummingbird.jpg"
   ],
   "features": [
+   "Dormitorios: 2 a 4",
    "Promotora: mast_capital,starwood_capital",
    "Arquitectura: oma_office_of_metropolitan_architecture",
    "Interiorismo: tara_bernerd_partners",
@@ -918,7 +936,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/the-perigon-miami-beach/"
  },
  {
-  "external_id": "3409",
+  "external_id": "cv-3409",
   "external_source": "cervera",
   "title": "The Links at Fisher Island",
   "slug": "the-links-at-fisher-island-3409",
@@ -948,7 +966,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/the-links-at-fisher-island/"
  },
  {
-  "external_id": "3402",
+  "external_id": "cv-3402",
   "external_source": "cervera",
   "title": "Six Fisher Island",
   "slug": "six-fisher-island-3402",
@@ -980,7 +998,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/six-fisher-island/"
  },
  {
-  "external_id": "3393",
+  "external_id": "cv-3393",
   "external_source": "cervera",
   "title": "Olakino House",
   "slug": "olakino-house-3393",
@@ -1009,7 +1027,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/olakino-house/"
  },
  {
-  "external_id": "3386",
+  "external_id": "cv-3386",
   "external_source": "cervera",
   "title": "100 Las Olas",
   "slug": "100-las-olas-3386",
@@ -1040,7 +1058,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/100-las-olas/"
  },
  {
-  "external_id": "3357",
+  "external_id": "cv-3357",
   "external_source": "cervera",
   "title": "COVE Miami",
   "slug": "cove-miami-3357",
@@ -1071,7 +1089,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/cove-miami-2/"
  },
  {
-  "external_id": "3355",
+  "external_id": "cv-3355",
   "external_source": "cervera",
   "title": "Cora",
   "slug": "cora-3355",
@@ -1100,7 +1118,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/cora/"
  },
  {
-  "external_id": "3351",
+  "external_id": "cv-3351",
   "external_source": "cervera",
   "title": "Faena",
   "slug": "faena-3351",
@@ -1120,6 +1138,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/Faena-Residences-3-1.jpg"
   ],
   "features": [
+   "Dormitorios: 1 a 4",
    "Promotora: fortune_international_group,Kar Properties",
    "Arquitectura: rafael_vinoly",
    "Interiorismo: bryan_osullivan_studio",
@@ -1133,7 +1152,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/faena/"
  },
  {
-  "external_id": "3341",
+  "external_id": "cv-3341",
   "external_source": "cervera",
   "title": "Aria Reserve North",
   "slug": "aria-reserve-north-3341",
@@ -1144,7 +1163,7 @@
   "price": 300000,
   "currency": "USD",
   "area_sqm": 95,
-  "bedrooms": null,
+  "bedrooms": 1,
   "bathrooms": null,
   "description": "Aria Reserve North es una promoción de obra nueva en Miami, Florida (Estados Unidos). Está promovida por melo_group y con arquitectura de arquitectonica. El edificio cuenta con 58 plantas y 391 residencias. Las viviendas parten de 95 m² y llegan hasta 213 m². Entrega prevista: Q1 2026.",
   "description_en": "Aria Reserve brings the tallest waterfront, residential set of towers in the USA. The iconic profile in the heart of Miami, and the prestigious waterfront position on Biscayne Bay, make Aria Reserve feel like a private estate hidden away from the rest of the world.",
@@ -1153,6 +1172,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/aria.jpeg"
   ],
   "features": [
+   "Dormitorios: 1 a 3",
    "Promotora: melo_group",
    "Arquitectura: arquitectonica",
    "Interiorismo: morada_haute_design",
@@ -1167,7 +1187,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/aria-reserve/"
  },
  {
-  "external_id": "3335",
+  "external_id": "cv-3335",
   "external_source": "cervera",
   "title": "Alhambra Parc",
   "slug": "alhambra-parc-3335",
@@ -1187,6 +1207,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/Alhambra-Parc-6.jpg"
   ],
   "features": [
+   "Dormitorios: 1 a 3",
    "Promotora: mg_developer",
    "11 plantas",
    "78 residencias",
@@ -1198,7 +1219,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/alhambra-parc/"
  },
  {
-  "external_id": "3332",
+  "external_id": "cv-3332",
   "external_source": "cervera",
   "title": "Alana Bay Harbor",
   "slug": "alana-bay-harbor-3332",
@@ -1227,7 +1248,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/alana-bay-harbor/"
  },
  {
-  "external_id": "3326",
+  "external_id": "cv-3326",
   "external_source": "cervera",
   "title": "9900 West",
   "slug": "9900-west-3326",
@@ -1238,7 +1259,7 @@
   "price": 1450000,
   "currency": "USD",
   "area_sqm": 112,
-  "bedrooms": null,
+  "bedrooms": 2,
   "bathrooms": null,
   "description": "9900 West es una promoción de obra nueva en Bay Harbor Islands, Florida (Estados Unidos). Está promovida por the_horizon_group y con arquitectura de frank_benayoun_architects. El edificio cuenta con 23 residencias. Las viviendas parten de 112 m² y llegan hasta 298 m². Entrega prevista: 2027.",
   "description_en": "A limited collection of only 23 two, three and four-bedroom luxury waterside residences with private boat slips, located in Miami's coveted Bay Harbor Island.",
@@ -1247,6 +1268,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/9900-West-Bay-Harbor-2.jpg"
   ],
   "features": [
+   "Dormitorios: 2 a 4",
    "Promotora: the_horizon_group",
    "Arquitectura: frank_benayoun_architects",
    "23 residencias",
@@ -1258,7 +1280,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/9900-west/"
  },
  {
-  "external_id": "3271",
+  "external_id": "cv-3271",
   "external_source": "cervera",
   "title": "One West Palm",
   "slug": "one-west-palm-3271",
@@ -1293,7 +1315,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/one-west-palm/"
  },
  {
-  "external_id": "3270",
+  "external_id": "cv-3270",
   "external_source": "cervera",
   "title": "Shorecrest",
   "slug": "shorecrest-3270",
@@ -1324,7 +1346,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/shorecrest/"
  },
  {
-  "external_id": "3269",
+  "external_id": "cv-3269",
   "external_source": "cervera",
   "title": "Nautilus 220",
   "slug": "nautilus-220-3269",
@@ -1335,13 +1357,14 @@
   "price": null,
   "currency": "USD",
   "area_sqm": 102,
-  "bedrooms": null,
+  "bedrooms": 1,
   "bathrooms": null,
   "description": "Nautilus 220 es una promoción de obra nueva, Florida (Estados Unidos). Está promovida por forest_development y con arquitectura de rn_architecture. El edificio cuenta con 24 plantas y 330 residencias. Las viviendas parten de 102 m² y llegan hasta 316 m². Entrega prevista: 2024.",
   "description_en": "Nautilus 220 is a new development, Florida (United States). It is developed by forest_development and with architecture by rn_architecture. The building has 24 floors and 330 residences. Homes start at 102 sqm and go up to 316 sqm. Estimated delivery: 2024.",
   "image_url": null,
   "gallery_urls": [],
   "features": [
+   "Dormitorios: 1 a 4",
    "Promotora: forest_development",
    "Arquitectura: rn_architecture",
    "24 plantas",
@@ -1358,7 +1381,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/nautilus-220/"
  },
  {
-  "external_id": "3267",
+  "external_id": "cv-3267",
   "external_source": "cervera",
   "title": "Forte On Flagler",
   "slug": "forte-on-flagler-3267",
@@ -1391,7 +1414,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/forte-on-flagler/"
  },
  {
-  "external_id": "3221",
+  "external_id": "cv-3221",
   "external_source": "cervera",
   "title": "The Ritz-Carlton Residences, West Palm Beach",
   "slug": "the-ritz-carlton-residences-west-palm-beach-3221",
@@ -1402,13 +1425,14 @@
   "price": 5000000,
   "currency": "USD",
   "area_sqm": 258,
-  "bedrooms": null,
+  "bedrooms": 3,
   "bathrooms": null,
   "description": "The Ritz-Carlton Residences, West Palm Beach es una promoción de obra nueva en West Palm Beach, Florida (Estados Unidos). Está promovida por related_group y con arquitectura de arquitectonica. El edificio cuenta con 7 plantas y 106 residencias. Las viviendas parten de 258 m² y llegan hasta 465 m². Entrega prevista: Q1 2026. Amenidades: • Private Marina with 29 boat slips • Concierge, pool, and cabana services • 100’ infinity edge heated swimming pool • Heated whirlpool spa • Six poolside cabanas with chaise lounges • Six poolside cabanas with private bathrooms, available…",
   "description_en": "The Ritz-Carlton Residences, West Palm Beach is a new development in West Palm Beach, Florida (United States). It is developed by related_group and with architecture by arquitectonica. The building has 7 floors and 106 residences. Homes start at 258 sqm and go up to 465 sqm. Estimated delivery: Q1 2026. Amenities: • Private Marina with 29 boat slips • Concierge, pool, and cabana services • 100’ infinity edge heated swimming pool • Heated whirlpool spa • Six poolside cabanas with chaise lounges • Six poolside cabanas with private bathrooms, available…",
   "image_url": null,
   "gallery_urls": [],
   "features": [
+   "Dormitorios: 3 a 5",
    "Promotora: related_group",
    "Arquitectura: arquitectonica",
    "Interiorismo: rockwell_group",
@@ -1423,7 +1447,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/the-ritz-carlton-residences-west-palm-beach/"
  },
  {
-  "external_id": "3220",
+  "external_id": "cv-3220",
   "external_source": "cervera",
   "title": "Alba Palm Beach",
   "slug": "alba-palm-beach-3220",
@@ -1443,6 +1467,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/alba-scaled.webp"
   ],
   "features": [
+   "Dormitorios: 2 a 4",
    "Promotora: kenneth_baboun,blue_road_group",
    "Arquitectura: spina_orourke",
    "22 plantas",
@@ -1456,7 +1481,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/alba-palm-beach/"
  },
  {
-  "external_id": "3219",
+  "external_id": "cv-3219",
   "external_source": "cervera",
   "title": "Olara Residences",
   "slug": "olara-residences-3219",
@@ -1474,6 +1499,7 @@
   "image_url": null,
   "gallery_urls": [],
   "features": [
+   "Dormitorios: 2 a 4",
    "Promotora: savanna",
    "Arquitectura: arquitectonica",
    "Interiorismo: gabellini_sheppard",
@@ -1488,7 +1514,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/olara-residences/"
  },
  {
-  "external_id": "3217",
+  "external_id": "cv-3217",
   "external_source": "cervera",
   "title": "La Mare",
   "slug": "la-mare-3217",
@@ -1499,13 +1525,14 @@
   "price": null,
   "currency": "USD",
   "area_sqm": 146,
-  "bedrooms": null,
+  "bedrooms": 2,
   "bathrooms": null,
   "description": "La Mare es una promoción de obra nueva en Bay Harbor Islands, Florida (Estados Unidos). Está promovida por regency_development_group y con arquitectura de kobi_karp_architecture. El edificio cuenta con 8 plantas y 33 residencias. Las viviendas parten de 146 m² y llegan hasta 397 m². Entrega prevista: Q4 2026.",
   "description_en": "La Mare is a new development in Bay Harbor Islands, Florida (United States). It is developed by regency_development_group and with architecture by kobi_karp_architecture. The building has 8 floors and 33 residences. Homes start at 146 sqm and go up to 397 sqm. Estimated delivery: Q4 2026.",
   "image_url": null,
   "gallery_urls": [],
   "features": [
+   "Dormitorios: 2 a 4",
    "Promotora: regency_development_group",
    "Arquitectura: kobi_karp_architecture",
    "8 plantas",
@@ -1521,7 +1548,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/la-mare/"
  },
  {
-  "external_id": "3216",
+  "external_id": "cv-3216",
   "external_source": "cervera",
   "title": "La Baia North Tower",
   "slug": "la-baia-north-tower-3216",
@@ -1554,7 +1581,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/la-baia-north-tower/"
  },
  {
-  "external_id": "3215",
+  "external_id": "cv-3215",
   "external_source": "cervera",
   "title": "The Raleigh Rosewood Hotel & Residences",
   "slug": "the-raleigh-rosewood-hotel-residences-3215",
@@ -1565,13 +1592,14 @@
   "price": null,
   "currency": "USD",
   "area_sqm": 242,
-  "bedrooms": null,
+  "bedrooms": 2,
   "bathrooms": null,
   "description": "The Raleigh Rosewood Hotel & Residences es una promoción de obra nueva en Miami Beach, Florida (Estados Unidos). Está promovida por shvo y con arquitectura de kobi_karp_architecture. El edificio cuenta con 17 plantas y 40 residencias. Las viviendas parten de 242 m² y llegan hasta 726 m². Entrega prevista: 2026. Amenidades: — Indoor and Outdoor yoga — Sunrise Hammock area — Sunrise Lounge for entertaining and events — Stylish Cocktail Lounge — Sundry Shop & Creamery serving fresh coffee, pastries, and seasonal fare — Private Salon for personalized beauty…",
   "description_en": "The Raleigh Rosewood Hotel & Residences is a new development in Miami Beach, Florida (United States). It is developed by shvo and with architecture by kobi_karp_architecture. The building has 17 floors and 40 residences. Homes start at 242 sqm and go up to 726 sqm. Estimated delivery: 2026. Amenities: — Indoor and Outdoor yoga — Sunrise Hammock area — Sunrise Lounge for entertaining and events — Stylish Cocktail Lounge — Sundry Shop & Creamery serving fresh coffee, pastries, and seasonal fare — Private Salon for personalized beauty…",
   "image_url": null,
   "gallery_urls": [],
   "features": [
+   "Dormitorios: 2 a 5",
    "Promotora: shvo",
    "Arquitectura: kobi_karp_architecture",
    "Interiorismo: peter_marino_architect",
@@ -1587,7 +1615,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/the-raleigh-rosewood-hotel-residences/"
  },
  {
-  "external_id": "3214",
+  "external_id": "cv-3214",
   "external_source": "cervera",
   "title": "Pagani Residences Miami",
   "slug": "pagani-residences-miami-3214",
@@ -1619,7 +1647,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/pagani-residences-miami/"
  },
  {
-  "external_id": "3213",
+  "external_id": "cv-3213",
   "external_source": "cervera",
   "title": "Shoma Bay",
   "slug": "shoma-bay-3213",
@@ -1639,6 +1667,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/1.jpg"
   ],
   "features": [
+   "Dormitorios: Studios a 3",
    "Promotora: shoma_group",
    "Arquitectura: msa_architects",
    "21 plantas",
@@ -1651,7 +1680,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/shoma-bay/"
  },
  {
-  "external_id": "3212",
+  "external_id": "cv-3212",
   "external_source": "cervera",
   "title": "Continuum Club & Residences",
   "slug": "continuum-club-residences-3212",
@@ -1671,6 +1700,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/Screenshot-2024-03-21-at-5.36.28-PM.png"
   ],
   "features": [
+   "Dormitorios: 1 a 3",
    "Promotora: continuum_companies",
    "Arquitectura: arquitectonica",
    "32 plantas",
@@ -1683,7 +1713,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/continuum-club-residences/"
  },
  {
-  "external_id": "3211",
+  "external_id": "cv-3211",
   "external_source": "cervera",
   "title": "Ella Miami Beach",
   "slug": "ella-miami-beach-3211",
@@ -1704,6 +1734,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/2.-Ella-Hero-Daytime-Exterior-scaled.jpg"
   ],
   "features": [
+   "Dormitorios: Studios a 2",
    "Arquitectura: arquitectonica",
    "Interiorismo: interiors_by_steven_g",
    "10 plantas",
@@ -1716,7 +1747,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/ella-miami-beach/"
  },
  {
-  "external_id": "3210",
+  "external_id": "cv-3210",
   "external_source": "cervera",
   "title": "Una",
   "slug": "una-3210",
@@ -1736,6 +1767,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/SelectionHero-Una.jpg"
   ],
   "features": [
+   "Dormitorios: 2 a 5",
    "Promotora: oko_group",
    "Arquitectura: as_gg",
    "Interiorismo: as_gg",
@@ -1749,7 +1781,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/una/"
  },
  {
-  "external_id": "3209",
+  "external_id": "cv-3209",
   "external_source": "cervera",
   "title": "Sage on the Intracoastal",
   "slug": "sage-on-the-intracoastal-3209",
@@ -1783,7 +1815,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/sage-on-the-intracoastal/"
  },
  {
-  "external_id": "3208",
+  "external_id": "cv-3208",
   "external_source": "cervera",
   "title": "Andare Residences",
   "slug": "andare-residences-3208",
@@ -1803,6 +1835,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/andare.webp"
   ],
   "features": [
+   "Dormitorios: 2 a 5",
    "Promotora: related_group",
    "Arquitectura: ohen_freeman_encinosa",
    "Interiorismo: pininfarina",
@@ -1817,7 +1850,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/andare-residences/"
  },
  {
-  "external_id": "3206",
+  "external_id": "cv-3206",
   "external_source": "cervera",
   "title": "Sixth & Rio",
   "slug": "sixth-rio-3206",
@@ -1837,6 +1870,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/sixth-scaled.jpeg"
   ],
   "features": [
+   "Dormitorios: 2 a 4",
    "Promotora: ocean_land",
    "Arquitectura: am_studio",
    "Interiorismo: iddi",
@@ -1851,7 +1885,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/sixth-rio/"
  },
  {
-  "external_id": "3203",
+  "external_id": "cv-3203",
   "external_source": "cervera",
   "title": "The Condominium Residences at Pier Sixty-Six",
   "slug": "the-condominium-residences-at-pier-sixty-six-3203",
@@ -1885,7 +1919,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/the-condominium-residences-at-pier-sixty-six/"
  },
  {
-  "external_id": "3201",
+  "external_id": "cv-3201",
   "external_source": "cervera",
   "title": "Selene Oceanfront Residences",
   "slug": "selene-oceanfront-residences-3201",
@@ -1906,6 +1940,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/SelectionHero-Selene.jpg"
   ],
   "features": [
+   "Dormitorios: 2 a 3",
    "Promotora: kolter",
    "Arquitectura: kobi_karp_architecture",
    "Interiorismo: iddi",
@@ -1920,7 +1955,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/selene-oceanfront-residences/"
  },
  {
-  "external_id": "3200",
+  "external_id": "cv-3200",
   "external_source": "cervera",
   "title": "One W12",
   "slug": "one-w12-3200",
@@ -1952,7 +1987,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/one-w12/"
  },
  {
-  "external_id": "3199",
+  "external_id": "cv-3199",
   "external_source": "cervera",
   "title": "Edge House",
   "slug": "edge-house-3199",
@@ -1984,7 +2019,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/edge-house/"
  },
  {
-  "external_id": "3198",
+  "external_id": "cv-3198",
   "external_source": "cervera",
   "title": "River District",
   "slug": "river-district-3198",
@@ -2016,7 +2051,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/river-district/"
  },
  {
-  "external_id": "3197",
+  "external_id": "cv-3197",
   "external_source": "cervera",
   "title": "Viceroy Brickell",
   "slug": "viceroy-brickell-3197",
@@ -2027,7 +2062,7 @@
   "price": 600000,
   "currency": "USD",
   "area_sqm": 50,
-  "bedrooms": null,
+  "bedrooms": 0,
   "bathrooms": null,
   "description": "Viceroy Brickell es una promoción de obra nueva en Miami, Florida (Estados Unidos). Está promovida por related_group y con arquitectura de arquitectonica. El edificio cuenta con 45 plantas y 498 residencias. Las viviendas parten de 50 m² y llegan hasta 134 m². Entrega prevista: Q1 2026. Amenidades: Fantastic outdoor spa for reaching all your wellness goals – State-of-the-art fitness center with the newest equipment – Exclusive clubroom with billiards and bar; multimedia facilities and a catering kitchen – Complimentary memberships to…",
   "description_en": "Viceroy Brickell is a new development in Miami, Florida (United States). It is developed by related_group and with architecture by arquitectonica. The building has 45 floors and 498 residences. Homes start at 50 sqm and go up to 134 sqm. Estimated delivery: Q1 2026. Amenities: Fantastic outdoor spa for reaching all your wellness goals – State-of-the-art fitness center with the newest equipment – Exclusive clubroom with billiards and bar; multimedia facilities and a catering kitchen – Complimentary memberships to…",
@@ -2037,6 +2072,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/Viceroy-Brickell-Residences.jpg"
   ],
   "features": [
+   "Dormitorios: Studios a 2",
    "Promotora: related_group",
    "Arquitectura: arquitectonica",
    "Interiorismo: meyer_davis",
@@ -2051,7 +2087,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/viceroy/"
  },
  {
-  "external_id": "3196",
+  "external_id": "cv-3196",
   "external_source": "cervera",
   "title": "2000 Ocean",
   "slug": "2000-ocean-3196",
@@ -2069,6 +2105,7 @@
   "image_url": null,
   "gallery_urls": [],
   "features": [
+   "Dormitorios: 3 a 5",
    "Promotora: Kar Properties",
    "Arquitectura: Enrique Norton",
    "39 plantas",
@@ -2083,7 +2120,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/2000-ocean/"
  },
  {
-  "external_id": "3194",
+  "external_id": "cv-3194",
   "external_source": "cervera",
   "title": "Rosewood Hillsboro",
   "slug": "rosewood-hillsboro-3194",
@@ -2094,13 +2131,14 @@
   "price": null,
   "currency": "USD",
   "area_sqm": 261,
-  "bedrooms": null,
+  "bedrooms": 2,
   "bathrooms": null,
   "description": "Rosewood Hillsboro es una promoción de obra nueva, Florida (Estados Unidos). Está promovida por related_group,dezer_development y con arquitectura de arquitectonica. El edificio cuenta con 10 plantas y 92 residencias. Las viviendas parten de 261 m² y llegan hasta 596 m². Entrega prevista: Q3 2026.",
   "description_en": "Rosewood Hillsboro is a new development, Florida (United States). It is developed by related_group,dezer_development and with architecture by arquitectonica. The building has 10 floors and 92 residences. Homes start at 261 sqm and go up to 596 sqm. Estimated delivery: Q3 2026.",
   "image_url": null,
   "gallery_urls": [],
   "features": [
+   "Dormitorios: 2 a 5",
    "Promotora: related_group,dezer_development",
    "Arquitectura: arquitectonica",
    "10 plantas",
@@ -2116,7 +2154,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/rosewood-hillsboro/"
  },
  {
-  "external_id": "3193",
+  "external_id": "cv-3193",
   "external_source": "cervera",
   "title": "Mercedes-Benz",
   "slug": "mercedes-benz-3193",
@@ -2150,7 +2188,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/mercedes-benz/"
  },
  {
-  "external_id": "3191",
+  "external_id": "cv-3191",
   "external_source": "cervera",
   "title": "One Metropica",
   "slug": "one-metropica-3191",
@@ -2168,6 +2206,7 @@
   "image_url": null,
   "gallery_urls": [],
   "features": [
+   "Dormitorios: 1 a 3",
    "Promotora: Metropica Developments, LLC",
    "Arquitectura: Oppenheim Architecture",
    "28 plantas",
@@ -2182,7 +2221,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/one-metropica/"
  },
  {
-  "external_id": "3190",
+  "external_id": "cv-3190",
   "external_source": "cervera",
   "title": "Nexxo Residences",
   "slug": "nexxo-residences-3190",
@@ -2214,7 +2253,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/nexxo-residences/"
  },
  {
-  "external_id": "3189",
+  "external_id": "cv-3189",
   "external_source": "cervera",
   "title": "Bentley Residences",
   "slug": "bentley-residences-3189",
@@ -2246,7 +2285,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/bentley-residences/"
  },
  {
-  "external_id": "3185",
+  "external_id": "cv-3185",
   "external_source": "cervera",
   "title": "One Park Tower by Turnberry",
   "slug": "one-park-tower-by-turnberry-3185",
@@ -2257,13 +2296,14 @@
   "price": null,
   "currency": "USD",
   "area_sqm": 83,
-  "bedrooms": null,
+  "bedrooms": 1,
   "bathrooms": null,
   "description": "One Park Tower by Turnberry es una promoción de obra nueva en North Miami, Florida (Estados Unidos). Está promovida por turnberry y con arquitectura de arquitectonica. El edificio cuenta con 32 plantas y 299 residencias. Las viviendas parten de 83 m² y llegan hasta 194 m². Entrega prevista: Q4 2025.",
   "description_en": "One Park Tower by Turnberry is a new development in North Miami, Florida (United States). It is developed by turnberry and with architecture by arquitectonica. The building has 32 floors and 299 residences. Homes start at 83 sqm and go up to 194 sqm. Estimated delivery: Q4 2025.",
   "image_url": null,
   "gallery_urls": [],
   "features": [
+   "Dormitorios: 1 a 6",
    "Promotora: turnberry",
    "Arquitectura: arquitectonica",
    "32 plantas",
@@ -2278,7 +2318,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/one-park-tower-by-turnberry/"
  },
  {
-  "external_id": "3184",
+  "external_id": "cv-3184",
   "external_source": "cervera",
   "title": "The Village at Coral Gables",
   "slug": "the-village-at-coral-gables-3184",
@@ -2309,7 +2349,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/the-village-at-coral-gables-2/"
  },
  {
-  "external_id": "3183",
+  "external_id": "cv-3183",
   "external_source": "cervera",
   "title": "District 14",
   "slug": "district-14-3183",
@@ -2320,13 +2360,14 @@
   "price": 550000,
   "currency": "USD",
   "area_sqm": 48,
-  "bedrooms": null,
+  "bedrooms": 0,
   "bathrooms": null,
   "description": "District 14 es una promoción de obra nueva en Miami, Florida (Estados Unidos). Está promovida por alta_developers y con arquitectura de behar_font_partners. El edificio cuenta con 16 plantas y 283 residencias. Las viviendas parten de 48 m² y llegan hasta 105 m². Entrega prevista: Q3 2025. Amenidades: Resort-style Pool & Cabanas Spacious Co-Working Centers Indoor Pickleball Courts State of the Art Fitness Center Spacious lounge and media area to meet friends and relax Short walk to River Landing mall and restaurants on the Miami River…",
   "description_en": "District 14 is a new development in Miami, Florida (United States). It is developed by alta_developers and with architecture by behar_font_partners. The building has 16 floors and 283 residences. Homes start at 48 sqm and go up to 105 sqm. Estimated delivery: Q3 2025. Amenities: Resort-style Pool & Cabanas Spacious Co-Working Centers Indoor Pickleball Courts State of the Art Fitness Center Spacious lounge and media area to meet friends and relax Short walk to River Landing mall and restaurants on the Miami River…",
   "image_url": null,
   "gallery_urls": [],
   "features": [
+   "Dormitorios: Studios a 2",
    "Promotora: alta_developers",
    "Arquitectura: behar_font_partners",
    "16 plantas",
@@ -2339,7 +2380,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/district-14/"
  },
  {
-  "external_id": "3182",
+  "external_id": "cv-3182",
   "external_source": "cervera",
   "title": "Smart Brickell 3",
   "slug": "smart-brickell-3-3182",
@@ -2370,7 +2411,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/smart-brickell-3/"
  },
  {
-  "external_id": "3177",
+  "external_id": "cv-3177",
   "external_source": "cervera",
   "title": "Casa Bella",
   "slug": "casa-bella-3177",
@@ -2390,6 +2431,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/download-2.jpeg"
   ],
   "features": [
+   "Dormitorios: 1 a 3",
    "Promotora: related_group,alta_developers",
    "Arquitectura: arquitectonica",
    "Interiorismo: piero_lissoni",
@@ -2403,7 +2445,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/casa-bella/"
  },
  {
-  "external_id": "3176",
+  "external_id": "cv-3176",
   "external_source": "cervera",
   "title": "Visions at Brickell Station",
   "slug": "visions-at-brickell-station-3176",
@@ -2436,7 +2478,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/visions-at-brickell-station/"
  },
  {
-  "external_id": "3175",
+  "external_id": "cv-3175",
   "external_source": "cervera",
   "title": "Ora By Casa Tua",
   "slug": "ora-by-casa-tua-3175",
@@ -2456,6 +2498,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/Screenshot-2023-06-21-094751.png"
   ],
   "features": [
+   "Dormitorios: Studios a 4",
    "Promotora: fortune_international_group",
    "Arquitectura: arquitectonica",
    "Interiorismo: m2atelier",
@@ -2469,7 +2512,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/ora-by-casa-tua/"
  },
  {
-  "external_id": "3171",
+  "external_id": "cv-3171",
   "external_source": "cervera",
   "title": "JEM Residences",
   "slug": "jem-residences-3171",
@@ -2502,7 +2545,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/jem-residences/"
  },
  {
-  "external_id": "3174",
+  "external_id": "cv-3174",
   "external_source": "cervera",
   "title": "St Regis Sunny Isles Beach",
   "slug": "st-regis-sunny-isles-beach-3174",
@@ -2534,7 +2577,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/st-regis-sunny-isles-beach/"
  },
  {
-  "external_id": "3173",
+  "external_id": "cv-3173",
   "external_source": "cervera",
   "title": "HUB Miami",
   "slug": "hub-miami-3173",
@@ -2555,6 +2598,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/Hub-Downtown-Building.jpg"
   ],
   "features": [
+   "Dormitorios: Studios a 2",
    "Promotora: The John Buck Company + FVP",
    "Arquitectura: ODP Architects",
    "Interiorismo: One Line Design",
@@ -2568,7 +2612,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/hub-miami/"
  },
  {
-  "external_id": "3172",
+  "external_id": "cv-3172",
   "external_source": "cervera",
   "title": "Flow House Miami",
   "slug": "flow-house-miami-3172",
@@ -2598,7 +2642,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/flow-house-miami/"
  },
  {
-  "external_id": "3169",
+  "external_id": "cv-3169",
   "external_source": "cervera",
   "title": "West E11eventh",
   "slug": "west-e11eventh-3169",
@@ -2631,7 +2675,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/west-e11even/"
  },
  {
-  "external_id": "3167",
+  "external_id": "cv-3167",
   "external_source": "cervera",
   "title": "The Elser Hotel & Residences",
   "slug": "the-elser-hotel-residences-3167",
@@ -2651,6 +2695,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/The-Elser-Hotel-Residences-scaled.webp"
   ],
   "features": [
+   "Dormitorios: Studios a 3",
    "Promotora: pmg,greybook_partners",
    "Arquitectura: sieger_suarez_architects",
    "Interiorismo: Cotofana Designs",
@@ -2664,7 +2709,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/the-elser-hotel-residences/"
  },
  {
-  "external_id": "3163",
+  "external_id": "cv-3163",
   "external_source": "cervera",
   "title": "One Twenty Brickell",
   "slug": "one-twenty-brickell-3163",
@@ -2698,21 +2743,21 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/one-twenty-brickell/"
  },
  {
-  "external_id": "3166",
+  "external_id": "cv-3166",
   "external_source": "cervera",
   "title": "600 Miami World Center",
   "slug": "600-miami-world-center-3166",
   "country": "Estados Unidos",
-  "province": "Florida",
-  "location": "Miami",
+  "province": null,
+  "location": null,
   "property_type": "apartment",
   "price": 400000,
   "currency": "USD",
   "area_sqm": 38,
   "bedrooms": 0,
   "bathrooms": 1,
-  "description": "600 Miami World Center es una promoción de obra nueva en Miami, Florida (Estados Unidos). Está promovida por aria_development_group,merrimac_ventures y con arquitectura de revuelta_architecture_international. El edificio cuenta con 32 plantas y 606 residencias. Las viviendas parten de 38 m² y llegan hasta 77 m². Entrega prevista: Q3 2026. Amenidades: • Covered porte-cochère • 24-Hour attended lobby • Luxer one automated parcel storage • Dedicated co-working space • Resident lounge and entertaining space • Air conditioned resident storage • Bike storage • Summer kitchen • Rooftop…",
-  "description_en": "600 Miami World Center is a new development in Miami, Florida (United States). It is developed by aria_development_group,merrimac_ventures and with architecture by revuelta_architecture_international. The building has 32 floors and 606 residences. Homes start at 38 sqm and go up to 77 sqm. Estimated delivery: Q3 2026. Amenities: • Covered porte-cochère • 24-Hour attended lobby • Luxer one automated parcel storage • Dedicated co-working space • Resident lounge and entertaining space • Air conditioned resident storage • Bike storage • Summer kitchen • Rooftop…",
+  "description": "600 Miami World Center es una promoción de obra nueva (Estados Unidos). Está promovida por aria_development_group,merrimac_ventures y con arquitectura de revuelta_architecture_international. El edificio cuenta con 32 plantas y 606 residencias. Las viviendas parten de 38 m² y llegan hasta 77 m². Entrega prevista: Q3 2026. Amenidades: • Covered porte-cochère • 24-Hour attended lobby • Luxer one automated parcel storage • Dedicated co-working space • Resident lounge and entertaining space • Air conditioned resident storage • Bike storage • Summer kitchen • Rooftop…",
+  "description_en": "600 Miami World Center is a new development (United States). It is developed by aria_development_group,merrimac_ventures and with architecture by revuelta_architecture_international. The building has 32 floors and 606 residences. Homes start at 38 sqm and go up to 77 sqm. Estimated delivery: Q3 2026. Amenities: • Covered porte-cochère • 24-Hour attended lobby • Luxer one automated parcel storage • Dedicated co-working space • Resident lounge and entertaining space • Air conditioned resident storage • Bike storage • Summer kitchen • Rooftop…",
   "image_url": "https://cerverabrokerportal.com/wp-content/uploads/2025/06/600-1.png",
   "gallery_urls": [
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/600-1.png"
@@ -2726,11 +2771,13 @@
   ],
   "is_development": true,
   "skip": null,
-  "warnings": [],
+  "warnings": [
+   "sin ciudad (no se pudo extraer la dirección)"
+  ],
   "sourceUrl": "https://cerverabrokerportal.com/projects/600-miami-world-center/"
  },
  {
-  "external_id": "3165",
+  "external_id": "cv-3165",
   "external_source": "cervera",
   "title": "888 Brickell by Dolce & Gabbana",
   "slug": "888-brickell-by-dolce-gabbana-3165",
@@ -2763,7 +2810,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/888-brickell-by-dolce-gabbana/"
  },
  {
-  "external_id": "3161",
+  "external_id": "cv-3161",
   "external_source": "cervera",
   "title": "Cipriani Residences Miami",
   "slug": "cipriani-residences-miami-3161",
@@ -2783,6 +2830,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/Cipriani-Residences-Miami-Hummingbird-1-scaled.jpg"
   ],
   "features": [
+   "Dormitorios: 1 a 4",
    "Promotora: mast_capital",
    "Arquitectura: arquitectonica",
    "Interiorismo: 1508_london",
@@ -2797,7 +2845,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/cipriani-residences-miami/"
  },
  {
-  "external_id": "3159",
+  "external_id": "cv-3159",
   "external_source": "cervera",
   "title": "2200 Brickell",
   "slug": "2200-brickell-3159",
@@ -2818,6 +2866,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/4051_MIAMI_HERO_DAY_02_FINAL_ZG_lrLEGAL.jpg"
   ],
   "features": [
+   "Dormitorios: 1 a 4",
    "Promotora: aria_development_group",
    "Arquitectura: revuelta_architecture_international",
    "Interiorismo: oda_new_york",
@@ -2831,7 +2880,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/2200-brickell/"
  },
  {
-  "external_id": "3155",
+  "external_id": "cv-3155",
   "external_source": "cervera",
   "title": "Mandarin Oriental Residences",
   "slug": "mandarin-oriental-residences-3155",
@@ -2864,7 +2913,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/mandarin-oriental-residences/"
  },
  {
-  "external_id": "3158",
+  "external_id": "cv-3158",
   "external_source": "cervera",
   "title": "The St. Regis Residences",
   "slug": "the-st-regis-residences-3158",
@@ -2884,6 +2933,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/06/regis.png"
   ],
   "features": [
+   "Dormitorios: 2 a 4",
    "Promotora: related_group",
    "Arquitectura: robert_am_stern_architects",
    "Interiorismo: rockwell_group",
@@ -2899,7 +2949,7 @@
   "dupeOf": "AG-00808 — APARTAMENTO EN THE PARK REGIS"
  },
  {
-  "external_id": "3151",
+  "external_id": "cv-3151",
   "external_source": "cervera",
   "title": "Okan Tower",
   "slug": "okan-tower-3151",
@@ -2920,6 +2970,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/05/03-Okan-Tower-Building-November-2021.jpg"
   ],
   "features": [
+   "Dormitorios: 1 a 3",
    "Promotora: okan_group",
    "Arquitectura: carlos_ott",
    "70 plantas",
@@ -2932,7 +2983,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/okan-tower/"
  },
  {
-  "external_id": "3149",
+  "external_id": "cv-3149",
   "external_source": "cervera",
   "title": "Baccarat Residences Miami",
   "slug": "baccarat-residences-miami-3149",
@@ -2952,6 +3003,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/05/SelectionHero-Baccarat.png"
   ],
   "features": [
+   "Dormitorios: 1 a 4",
    "Promotora: related_group",
    "Arquitectura: arquitectonica",
    "Interiorismo: meyer_davis",
@@ -2965,7 +3017,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/baccarat/"
  },
  {
-  "external_id": "3147",
+  "external_id": "cv-3147",
   "external_source": "cervera",
   "title": "Waldorf Astoria Hotel and Residences Miami",
   "slug": "waldorf-astoria-hotel-and-residences-miami-3147",
@@ -2985,6 +3037,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/05/SelectionHero-Waldorf.jpg"
   ],
   "features": [
+   "Dormitorios: Studios a 3",
    "Promotora: pmg",
    "Arquitectura: sieger_suarez_architects,carlos_ott",
    "Interiorismo: bamo",
@@ -2998,7 +3051,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/waldorf-astoria-hotel-and-residences-miami/"
  },
  {
-  "external_id": "2904",
+  "external_id": "cv-2904",
   "external_source": "cervera",
   "title": "Palma Miami Beach Residences",
   "slug": "palma-miami-beach-residences-2904",
@@ -3009,7 +3062,7 @@
   "price": 600000,
   "currency": "USD",
   "area_sqm": 38,
-  "bedrooms": null,
+  "bedrooms": 1,
   "bathrooms": null,
   "description": "PALMA Miami Beach es un hito moderno que redefine la vida costera con innovación, lujo y diseño cuidadoso. Perfectamente ubicadas a pocos pasos de la playa, estas residencias completamente amuebladas ofrecen la máxima flexibilidad, permitiendo alquileres a corto plazo. Disfruta de un estilo de vida inspirado por el sol y el mar.",
   "description_en": "PALMA Miami Beach is a modern landmark that redefines coastal living with innovation, luxury, and thoughtful design. Perfectly located just steps from the beach, these fully furnished residences offer the ultimate flexibility, permitting short term rentals. Enjoy a lifestyle inspired by the sun and sea.",
@@ -3019,6 +3072,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/04/overview-palma.jpg"
   ],
   "features": [
+   "Dormitorios: 1 a 2",
    "14 plantas",
    "121 residencias",
    "Entrega 2027"
@@ -3029,7 +3083,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/palma-miami-beach-residences/"
  },
  {
-  "external_id": "2829",
+  "external_id": "cv-2829",
   "external_source": "cervera",
   "title": "Four Seasons Coconut Grove",
   "slug": "four-seasons-coconut-grove-2829",
@@ -3050,6 +3104,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/02/66c89d32e923fb07d2394180_TU1329_VP15_Exterior_General_Rev16-copia.webp"
   ],
   "features": [
+   "Dormitorios: 2 a 4",
    "Promotora: cmc_group",
    "20 plantas",
    "70 residencias",
@@ -3061,7 +3116,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/four-seasons-hotel-and-residences-coconut-grove/"
  },
  {
-  "external_id": "2828",
+  "external_id": "cv-2828",
   "external_source": "cervera",
   "title": "Mr.C Tigertail",
   "slug": "mrc-tigertail-2828",
@@ -3090,7 +3145,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/mr-c-tigertail/"
  },
  {
-  "external_id": "2826",
+  "external_id": "cv-2826",
   "external_source": "cervera",
   "title": "ELLE Miami",
   "slug": "elle-miami-2826",
@@ -3120,7 +3175,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/elle-miami/"
  },
  {
-  "external_id": "2823",
+  "external_id": "cv-2823",
   "external_source": "cervera",
   "title": "COVE Miami",
   "slug": "cove-miami-2823",
@@ -3152,7 +3207,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/cove-miami/"
  },
  {
-  "external_id": "2819",
+  "external_id": "cv-2819",
   "external_source": "cervera",
   "title": "The Standard",
   "slug": "the-standard-2819",
@@ -3172,6 +3227,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/02/01_Hero-1.jpg"
   ],
   "features": [
+   "Dormitorios: Studios a 2",
    "Promotora: rosso_development",
    "Arquitectura: arquitectonica",
    "12 plantas",
@@ -3185,7 +3241,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/the-standard/"
  },
  {
-  "external_id": "2817",
+  "external_id": "cv-2817",
   "external_source": "cervera",
   "title": "Edition Residences",
   "slug": "edition-residences-2817",
@@ -3205,6 +3261,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/02/13968df2-d02c-449c-bc48-77d188d415bb.webp"
   ],
   "features": [
+   "Dormitorios: 1 a 4",
    "Promotora: two_roads_development",
    "Arquitectura: arquitectonica,bernardo_fort-brescia",
    "55 plantas",
@@ -3217,7 +3274,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/edition-residences/"
  },
  {
-  "external_id": "2814",
+  "external_id": "cv-2814",
   "external_source": "cervera",
   "title": "Diesel Wynwood Condos",
   "slug": "diesel-wynwood-condos-2814",
@@ -3250,7 +3307,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/diesel-wynwood/"
  },
  {
-  "external_id": "2811",
+  "external_id": "cv-2811",
   "external_source": "cervera",
   "title": "Rose Wynwood",
   "slug": "rose-wynwood-2811",
@@ -3261,7 +3318,7 @@
   "price": null,
   "currency": "USD",
   "area_sqm": 40,
-  "bedrooms": null,
+  "bedrooms": 0,
   "bathrooms": null,
   "description": "Rose Wynwood es una promoción de obra nueva en Miami, Florida (Estados Unidos). El edificio cuenta con 6 plantas y 140 residencias. Las viviendas parten de 40 m² y llegan hasta 125 m². Entrega prevista: Q1 2027.",
   "description_en": "Rose Wynwood is a new development in Miami, Florida (United States). The building has 6 floors and 140 residences. Homes start at 40 sqm and go up to 125 sqm. Estimated delivery: Q1 2027.",
@@ -3270,6 +3327,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/02/Screenshot-2025-02-25-at-12.02.57.png"
   ],
   "features": [
+   "Dormitorios: Studios a 3",
    "6 plantas",
    "140 residencias",
    "Entrega 2027"
@@ -3280,7 +3338,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/rose-wynwood/"
  },
  {
-  "external_id": "2807",
+  "external_id": "cv-2807",
   "external_source": "cervera",
   "title": "Nomad Wynwood",
   "slug": "nomad-wynwood-2807",
@@ -3291,7 +3349,7 @@
   "price": 622900,
   "currency": "USD",
   "area_sqm": 43,
-  "bedrooms": null,
+  "bedrooms": 0,
   "bathrooms": null,
   "description": "Nomad Wynwood es una promoción de obra nueva en Miami, Florida (Estados Unidos). Está promovida por related_group y con arquitectura de arquitectonica. El edificio cuenta con 9 plantas y 329 residencias. Las viviendas parten de 43 m² y llegan hasta 86 m². Entrega prevista: Q4 2022.",
   "description_en": "Nomad Wynwood is a new development in Miami, Florida (United States). It is developed by related_group and with architecture by arquitectonica. The building has 9 floors and 329 residences. Homes start at 43 sqm and go up to 86 sqm. Estimated delivery: Q4 2022.",
@@ -3300,6 +3358,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/02/Wynwood_Dusk_r03_final-1.jpeg"
   ],
   "features": [
+   "Dormitorios: Studios a 2",
    "Promotora: related_group",
    "Arquitectura: arquitectonica",
    "9 plantas",
@@ -3312,7 +3371,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/nomad-wynwood/"
  },
  {
-  "external_id": "2804",
+  "external_id": "cv-2804",
   "external_source": "cervera",
   "title": "Vida Residences",
   "slug": "vida-residences-2804",
@@ -3323,7 +3382,7 @@
   "price": 389000,
   "currency": "USD",
   "area_sqm": 36,
-  "bedrooms": null,
+  "bedrooms": 0,
   "bathrooms": null,
   "description": "Vida Residences es una promoción de obra nueva en Miami, Florida (Estados Unidos). El edificio cuenta con 9 plantas y 138 residencias. Las viviendas parten de 36 m² y llegan hasta 165 m². Entrega prevista: 2024.",
   "description_en": "Vida Residences is a new development in Miami, Florida (United States). The building has 9 floors and 138 residences. Homes start at 36 sqm and go up to 165 sqm. Estimated delivery: 2024.",
@@ -3332,6 +3391,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/02/Screenshot-2025-02-25-at-11.32.25.png"
   ],
   "features": [
+   "Dormitorios: Studios a 4",
    "9 plantas",
    "138 residencias",
    "Entrega 2024"
@@ -3342,7 +3402,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/vida-residences/"
  },
  {
-  "external_id": "2805",
+  "external_id": "cv-2805",
   "external_source": "cervera",
   "title": "Mr.C",
   "slug": "mrc-2805",
@@ -3372,7 +3432,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/mr-c/"
  },
  {
-  "external_id": "2594",
+  "external_id": "cv-2594",
   "external_source": "cervera",
   "title": "Viceroy Residences Aventura",
   "slug": "viceroy-residences-aventura-2594",
@@ -3383,7 +3443,7 @@
   "price": 925000,
   "currency": "USD",
   "area_sqm": 80,
-  "bedrooms": null,
+  "bedrooms": 1,
   "bathrooms": null,
   "description": "Energía vibrante de ciudad. Una costa resplandeciente. Un estilo de vida de elegancia y comodidad. Ubicadas en el corazón de Aventura, las Viceroy Residences se definen por una combinación distintiva de diseño sofisticado, carácter individual y los reconocidos servicios y comodidades de cinco estrellas de Viceroy Hotels & Resorts—todo complementado por tu equipo residencial dedicado para atender cada solicitud.",
   "description_en": "Thriving city energy. A glittering coastline. A lifestyle of elegance and ease. Set in the heart of Aventura, Viceroy Residences are defined by a distinctive combination of sophisticated design, individual character, and the renowned five-star services and amenities of Viceroy Hotels & Resorts—all complemented by your dedicated residential team to attend to every request.",
@@ -3393,6 +3453,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2025/01/overview-viceroy-aventura.jpg"
   ],
   "features": [
+   "Dormitorios: 1 a 4",
    "Promotora: related_group,bh_group",
    "Arquitectura: arquitectonica",
    "Interiorismo: designagency",
@@ -3407,7 +3468,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/viceroy-residences-aventura/"
  },
  {
-  "external_id": "1939",
+  "external_id": "cv-1939",
   "external_source": "cervera",
   "title": "14 Roc Miami",
   "slug": "14-roc-miami-1939",
@@ -3418,7 +3479,7 @@
   "price": 565000,
   "currency": "USD",
   "area_sqm": 39,
-  "bedrooms": null,
+  "bedrooms": 0,
   "bathrooms": null,
   "description": "En 14 Roc Miami, la arquitectura innovadora se encuentra con la conectividad urbana en el corazón del Downtown de Miami. Las residencias diseñadas cuidadosamente se elevan desde una forma orgánica similar a una roca en la base de la torre, creando una estructura que también es una Obra de Arte. 14 Roc Miami es un edificio que permite alquileres a corto plazo.",
   "description_en": "At 14 Roc, innovative architecture meets urban connectivity in the heart of Downtown Miami. Thoughtfully designed residences rise from an organic, rock-like form at the tower’s base, creating a structure that’s also a work of art. 14 Roc is a short-term rental friendly building.",
@@ -3429,6 +3490,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2024/08/hero-14-roc.jpg"
   ],
   "features": [
+   "Dormitorios: Studios a 2",
    "Promotora: 14th_st_miami_investments",
    "Arquitectura: rsp_archtects",
    "Interiorismo: march_white_design",
@@ -3443,7 +3505,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/14-roc-miami/"
  },
  {
-  "external_id": "1474",
+  "external_id": "cv-1474",
   "external_source": "cervera",
   "title": "Arbor Residences Coconut Grove",
   "slug": "arbor-residences-coconut-grove-1474",
@@ -3454,7 +3516,7 @@
   "price": 1700000,
   "currency": "USD",
   "area_sqm": 136,
-  "bedrooms": null,
+  "bedrooms": 2,
   "bathrooms": null,
   "description": "Arbor es un refugio frondoso enclavado dentro del paraíso tropical de Miami, Coconut Grove. Diseñado para acercarte a la naturaleza y disfrutar de un estilo de vida más equilibrado, más natural y más relajado, estas 45 residencias están inspiradas por la luz del sol y los domingos tranquilos.",
   "description_en": "Nestled in the heart of the Village of Coconut Grove, Arbor blends timeless modern design with nature-inspired living just steps from CocoWalk, parks, marinas, cafés, and top schools.",
@@ -3465,6 +3527,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2024/05/hero-arbor.jpg"
   ],
   "features": [
+   "Dormitorios: 2 a 4",
    "Promotora: arbor_grove_developers",
    "Arquitectura: behar_font_partners",
    "Interiorismo: samuel_amoia_associates",
@@ -3479,7 +3542,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/arbor-residences-coconut-grove/"
  },
  {
-  "external_id": "957",
+  "external_id": "cv-957",
   "external_source": "cervera",
   "title": "Gale Miami Hotel and Residences",
   "slug": "gale-miami-hotel-and-residences-957",
@@ -3501,6 +3564,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2024/05/hero-gale.jpg"
   ],
   "features": [
+   "Dormitorios: Studios a 2",
    "Promotora: sixth_street",
    "Interiorismo: id_design_international",
    "51 plantas",
@@ -3514,7 +3578,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/gale-miami-hotel-residences/"
  },
  {
-  "external_id": "560",
+  "external_id": "cv-560",
   "external_source": "cervera",
   "title": "Cassia – The Residences at Coral Gables",
   "slug": "cassia-the-residences-at-coral-gables-560",
@@ -3525,7 +3589,7 @@
   "price": 800000,
   "currency": "USD",
   "area_sqm": 62,
-  "bedrooms": null,
+  "bedrooms": 1,
   "bathrooms": null,
   "description": "Cassia es una colección de 174 residencias exclusivas completamente amuebladas llave en mano de uno, dos y tres dormitorios ubicadas en el corazón del distrito de Merrick Park, con cada unidad bellamente diseñada y bien equipada con muebles y accesorios de RH.",
   "description_en": "Cassia is a collection of 174 bespoke residences, fully furnished, turnkey one, two and three-bedrooms. Cassia is located in the heart of the Merrick Park district, with each unit beautifully designed and well- appointed with furniture and furnishings from RH.",
@@ -3536,6 +3600,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2024/05/hero-cassia-residences.jpg"
   ],
   "features": [
+   "Dormitorios: 1 a 3",
    "Promotora: alta_developers",
    "Arquitectura: revuelta_architecture_international",
    "Interiorismo: id_design_international",
@@ -3550,7 +3615,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/cassia-residences-coral-gables/"
  },
  {
-  "external_id": "374",
+  "external_id": "cv-374",
   "external_source": "cervera",
   "title": "The Rider Residences",
   "slug": "the-rider-residences-374",
@@ -3561,7 +3626,7 @@
   "price": 650000,
   "currency": "USD",
   "area_sqm": 36,
-  "bedrooms": null,
+  "bedrooms": 0,
   "bathrooms": null,
   "description": "Ubicadas en el epicentro de los modernos vecindarios de Wynwood, Midtown y Design District de Miami, se encuentran The Rider Residences, un condominio boutique de lujo de 12 pisos sin restricciones de alquiler. Desarrolladas por Rilea Group con sede en el Sur de Florida, las residencias van desde estudios completamente amueblados hasta tres dormitorios, combinando estilo, funcionalidad y tecnología avanzada mientras empoderan a los propietarios con una vida flexible.",
   "description_en": "Nestled at the epicenter of Miami’s trendy Wynwood, Midtown, and Design District neighborhoods is The Rider Residences, a 12-story boutique luxury condominium with no rental restrictions. Developed by South Florida-based Rilea Group, residences range from fully furnished studios to three bedrooms, blending style, functionality, and advanced technology while empowering owners with flexible living.",
@@ -3571,6 +3636,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2024/02/hero-the-rider.jpg"
   ],
   "features": [
+   "Dormitorios: Bedrooms Range: Studio a 3  + Lockout",
    "Promotora: rilea_group",
    "Arquitectura: deforma_studio",
    "Interiorismo: radyca",
@@ -3586,7 +3652,7 @@
   "dupeOf": "AG-00805 — THE RIDER MIAMI 1, 2 y 3 D"
  },
  {
-  "external_id": "453",
+  "external_id": "cv-453",
   "external_source": "cervera",
   "title": "Domus Brickell Center",
   "slug": "domus-brickell-center-453",
@@ -3597,7 +3663,7 @@
   "price": 515000,
   "currency": "USD",
   "area_sqm": 35,
-  "bedrooms": null,
+  "bedrooms": 0,
   "bathrooms": null,
   "description": "Domus Brickell Center es una colección de FLATS (Apartamentos Flexibles para Estancias Temporales) diseñados para funcionar para ti—con acceso interno a la vida en el corazón de Brickell y los servicios, seguridad y consistencia de un hotel—todo en el centro del vecindario más emocionante de Miami.",
   "description_en": "Domus Brickell Center is a collection of FLATS (Flexible Apartments for Temporary Stays) designed to work for you, with inside access to life in the heart of Brickell and the services, security, and consistency of a hotel; all at the center of Miami’s most exciting neighborhood.",
@@ -3608,6 +3674,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2024/05/hero-domus-brickell-center.jpg"
   ],
   "features": [
+   "Dormitorios: Studios a 2",
    "Promotora: north_development",
    "Arquitectura: dieguez_friedman_arquitectos_asociados",
    "Interiorismo: urban_robot_associates",
@@ -3623,7 +3690,7 @@
   "dupeOf": "AG-00020 — CONDO HOTEL DOMUS EN BRICKELL - MIAMI"
  },
  {
-  "external_id": "301",
+  "external_id": "cv-301",
   "external_source": "cervera",
   "title": "Vita at Grove Isle",
   "slug": "vita-at-grove-isle-301",
@@ -3644,6 +3711,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2024/01/vita-renderings-tile.jpg"
   ],
   "features": [
+   "Dormitorios: 3 a 4",
    "Promotora: cmc_group",
    "Arquitectura: callisonrtkl,s_e_architects",
    "Interiorismo: a_plus_plus_group",
@@ -3658,7 +3726,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/vita-grove-isle/"
  },
  {
-  "external_id": "298",
+  "external_id": "cv-298",
   "external_source": "cervera",
   "title": "Lofty Brickell",
   "slug": "lofty-brickell-298",
@@ -3680,6 +3748,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2024/05/hero-lofty-brickell.jpg"
   ],
   "features": [
+   "Dormitorios: 2 a 3",
    "Promotora: newgard_development_group",
    "Arquitectura: arquitectonica",
    "Interiorismo: id_design_international",
@@ -3694,7 +3763,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/lofty-brickell/"
  },
  {
-  "external_id": "295",
+  "external_id": "cv-295",
   "external_source": "cervera",
   "title": "Domus Brickell Park",
   "slug": "domus-brickell-park-295",
@@ -3705,7 +3774,7 @@
   "price": 630000,
   "currency": "USD",
   "area_sqm": 31,
-  "bedrooms": null,
+  "bedrooms": 0,
   "bathrooms": null,
   "description": "Domus FLATS Brickell Park está ubicado en el corazón del vecindario más emocionante de Miami. Residencias de estudio, uno y dos dormitorios completamente amuebladas diseñadas para adaptarse a tu vida. Todos los elementos esenciales con excelente gusto, todas las comodidades que importan.",
   "description_en": "Domus FLATS Brickell Park is set at the heart of Miami’s most exciting neighborhood. Fully furnished studio, one- and two-bedroom residences designed to fit your life. All the essentials in excellent taste, all the amenities that matter.",
@@ -3716,6 +3785,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2024/05/hero-domus-brickell-park.jpg"
   ],
   "features": [
+   "Dormitorios: Studios a 2",
    "Promotora: north_development",
    "Arquitectura: dieguez_friedman_arquitectos_asociados",
    "Interiorismo: urban_robot_associates",
@@ -3731,7 +3801,7 @@
   "dupeOf": "AG-00020 — CONDO HOTEL DOMUS EN BRICKELL - MIAMI"
  },
  {
-  "external_id": "292",
+  "external_id": "cv-292",
   "external_source": "cervera",
   "title": "The Avenue Coral Gables",
   "slug": "the-avenue-coral-gables-292",
@@ -3752,6 +3822,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2024/01/overview-the-avenue.jpg"
   ],
   "features": [
+   "Dormitorios: 1 a 2",
    "Promotora: roger_development_group",
    "Arquitectura: kobi_karp_architecture",
    "Interiorismo: adriana_hoyos",
@@ -3766,7 +3837,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/the-avenue-coral-gables/"
  },
  {
-  "external_id": "289",
+  "external_id": "cv-289",
   "external_source": "cervera",
   "title": "Aston Martin Residences",
   "slug": "aston-martin-residences-289",
@@ -3800,7 +3871,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/aston-martin-residences/"
  },
  {
-  "external_id": "286",
+  "external_id": "cv-286",
   "external_source": "cervera",
   "title": "Origin Residences by Artefacto",
   "slug": "origin-residences-by-artefacto-286",
@@ -3811,7 +3882,7 @@
   "price": 3800000,
   "currency": "USD",
   "area_sqm": 198,
-  "bedrooms": null,
+  "bedrooms": 3,
   "bathrooms": null,
   "description": "Una exquisita colección de 27 residencias de lujo de edición limitada frente al mar en colaboración con Artefacto, los proveedores del sofisticado estilo de vida del Sur de Florida. Cuenta con una marina con 9 amarres para barcos, además de un muelle de recogida/desembarco. Pregunta sobre nuestra Ventaja Origin: Un crédito del 5% para muebles de Artefacto disponible al cierre.",
   "description_en": "An exquisite collection of 27 waterfront limited edition luxury residences in collaboration with Artefacto, the purveyors of sophisticated South Florida living. Featuring a marina with 9 boat slips, plus a pick-up/drop-off dock. Ask about our Origin Advantage: a 5% credit towards Artefacto furniture available upon closing.",
@@ -3822,6 +3893,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2024/05/hero-origin-bay-harbour-residences-by-artefacto.jpg"
   ],
   "features": [
+   "Dormitorios: 3 a 4",
    "Promotora: vda_miami",
    "Arquitectura: arquitectonica",
    "Interiorismo: carla_hilhem",
@@ -3836,7 +3908,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/origin-residences-by-artefacto/"
  },
  {
-  "external_id": "279",
+  "external_id": "cv-279",
   "external_source": "cervera",
   "title": "72 Park Miami Beach",
   "slug": "72-park-miami-beach-279",
@@ -3858,6 +3930,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2024/01/hero-72-park.jpg"
   ],
   "features": [
+   "Dormitorios: 1 a 3",
    "Promotora: lefferts",
    "Arquitectura: built_form",
    "Interiorismo: urban_robot_associates",
@@ -3872,7 +3945,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/72-park-miami-beach/"
  },
  {
-  "external_id": "91",
+  "external_id": "cv-91",
   "external_source": "cervera",
   "title": "Natiivo Fort Lauderdale",
   "slug": "natiivo-fort-lauderdale-91",
@@ -3907,7 +3980,7 @@
   "sourceUrl": "https://cerverabrokerportal.com/projects/natiivo-fort-lauderdale/"
  },
  {
-  "external_id": "87",
+  "external_id": "cv-87",
   "external_source": "cervera",
   "title": "The Residences at 1428 Brickell",
   "slug": "the-residences-at-1428-brickell-87",
@@ -3929,6 +4002,7 @@
    "https://cerverabrokerportal.com/wp-content/uploads/2023/12/hero-1428-bricklell.jpg"
   ],
   "features": [
+   "Dormitorios: 1 a 5",
    "Promotora: ytech",
    "Arquitectura: arquitectonica",
    "Interiorismo: acpv_architects",

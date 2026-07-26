@@ -207,20 +207,27 @@ async function extract() {
   const pending = projects.filter((p) => isCandidate(p) && needs(p.slug))
   console.log(`· Fichas a leer: ${pending.length} (crawl-delay ${CRAWL_DELAY_MS / 1000}s, ~${Math.ceil((pending.length * CRAWL_DELAY_MS) / 60000)} min)…`)
 
+  let failed = 0
   for (const [n, p] of pending.entries()) {
-    try {
-      const res = await fetch(p.link, { headers: { 'User-Agent': UA } })
-      if (res.ok) {
-        const html = await res.text()
-        cache[p.slug] = { address: parseAddress(html), bedroomsText: parseBedroomsRange(html) }
-      } else cache[p.slug] = { address: null, bedroomsText: '' }
-    } catch {
-      cache[p.slug] = { address: null, bedroomsText: '' }
+    // Reintento con backoff: un fallo puntual (429/red) no debe cachearse como
+    // "esta ficha no tiene datos" — antes se guardaba el fallo y la propiedad
+    // quedaba sin ciudad ni dormitorios para siempre.
+    let html: string | null = null
+    for (let attempt = 0; attempt < 3 && html === null; attempt++) {
+      if (attempt) await sleep(CRAWL_DELAY_MS * (attempt + 1))
+      try {
+        const res = await fetch(p.link, { headers: { 'User-Agent': UA } })
+        if (res.ok) html = await res.text()
+      } catch { /* reintenta */ }
     }
+    if (html === null) { failed++; console.error(`  ! sin respuesta: ${p.slug} (se reintenta en la próxima corrida)`) }
+    else cache[p.slug] = { address: parseAddress(html), bedroomsText: parseBedroomsRange(html) }
+
     writeFileSync(ADDR_CACHE, JSON.stringify(cache, null, 1))
     if ((n + 1) % 10 === 0) console.log(`  ${n + 1}/${pending.length}`)
     if (n < pending.length - 1) await sleep(CRAWL_DELAY_MS)
   }
+  if (failed) console.log(`· ${failed} fichas sin respuesta (no se cachearon: se reintentan)`)
 
   const raw: CerveraRaw[] = projects.map((p) => ({
     id: p.id,
@@ -400,7 +407,11 @@ function normalize(r: CerveraRaw): Normalized {
   else if (price === null) skip = 'sin precio válido'
 
   return {
-    external_id: String(r.id),
+    // Prefijo obligatorio: `properties.external_id` es ÚNICO GLOBAL y los IDs de
+    // WordPress (87-4107) caen dentro del rango de los del feed HabiHub (435-43955).
+    // Sin prefijo, una propiedad de Cervera "ocupa" el id de una de HabiHub y el
+    // sync falla al insertarla (unique violation) perdiendo esa ficha del feed.
+    external_id: `cv-${r.id}`,
     external_source: 'cervera',
     title: r.title,
     slug: `${slugify(r.title)}-${r.id}`,
@@ -480,22 +491,30 @@ async function report() {
   const GENERIC = new Set(['the', 'la', 'el', 'los', 'las', 'de', 'del', 'en', 'y', 'and', 'by', 'at', 'on',
     'residences', 'residence', 'condos', 'condo', 'hotel', 'tower', 'towers', 'apartamento', 'apartamentos',
     'miami', 'beach', 'brickell', 'coral', 'gables', 'bay', 'harbor', 'islands', 'island', 'aventura',
-    'surfside', 'north', 'south', 'west', 'east', 'park', 'center', 'centre', 'club', 'house', 'new', 'york'])
+    'surfside', 'north', 'south', 'west', 'east', 'park', 'center', 'centre', 'club', 'house', 'new', 'york',
+    // Geográficos que provocaban falsos positivos ("Alba Palm Beach" vs "…West Palm Beach").
+    'palm', 'lauderdale', 'fort', 'hollywood', 'grove', 'coconut', 'village', 'ocean', 'sunny', 'isles'])
   const tokens = (s: string) => new Set(
     slugify(s).split('-').filter((t) => t.length >= 4 && !GENERIC.has(t) && !/^\d+$/.test(t)))
 
+  // Ya importadas por este script: no son "duplicados a revisar", son trabajo hecho.
+  const already = new Set((existing ?? [])
+    .filter((e) => e.external_source === 'cervera')
+    .map((e) => e.external_id))
+
   const dupes: { nuevo: string; existente: string; motivo: string }[] = []
   for (const n of ok) {
+    if (already.has(n.external_id)) continue
     const tn = tokens(n.title)
     const hit = (existing ?? []).find((e) => {
-      if (e.external_source === 'cervera' && e.external_id === n.external_id) return true
+      if (e.external_source === 'cervera') return false   // se compara solo contra el catálogo previo
       const te = tokens(e.title ?? '')
       return [...tn].some((t) => te.has(t))
     })
     if (hit) dupes.push({
       nuevo: n.title,
       existente: `${hit.ref_code} — ${hit.title}`,
-      motivo: [...tokens(n.title)].filter((t) => tokens(hit.title ?? '').has(t)).join(', ') || 'mismo external_id',
+      motivo: [...tokens(n.title)].filter((t) => tokens(hit.title ?? '').has(t)).join(', '),
     })
   }
   const dupeTitles = new Set(dupes.map((d) => d.nuevo))
@@ -628,10 +647,16 @@ async function load() {
  * Requiere `unzip` en el PATH (viene con Git Bash en Windows).
  */
 const GRAPHIC_FIELDS = ['renderings-link', 'non-cervera-db-link', 'floor-plans-link', 'brochure-link', 'fact-sheet-link']
+/** Tope de descarga por carpeta. Ajustable con --max-gb=N. */
+const DEFAULT_MAX_GB = 2
+/** Con esta cantidad de fotos la galería ya está enriquecida: no se vuelve a bajar. */
+const ENRICHED_AT = 8
 
 async function renders() {
   const limit = Number(process.argv.find((a) => a.startsWith('--limit='))?.split('=')[1] ?? 0)
   const confirm = process.argv.includes('--confirm')
+  const maxGb = Number(process.argv.find((a) => a.startsWith('--max-gb='))?.split('=')[1] ?? DEFAULT_MAX_GB)
+  const MAX_ZIP_BYTES = maxGb * 1073741824
   const { execFileSync } = await import('node:child_process')
   const os = await import('node:os')
   const { rmSync, mkdtempSync, readdirSync, statSync } = await import('node:fs')
@@ -656,9 +681,15 @@ async function renders() {
     return null
   }
 
-  let queue = raw.filter((r) => byExt.has(String(r.id)) && folderOf(r))
+  // Idempotente: si ya tiene galería rica no se vuelve a bajar (--force para rehacer).
+  const force = process.argv.includes('--force')
+  const enriched = (id: string) => {
+    const g = byExt.get(id)?.gallery_urls
+    return Array.isArray(g) && g.length >= ENRICHED_AT
+  }
+  let queue = raw.filter((r) => byExt.has(`cv-${r.id}`) && folderOf(r) && (force || !enriched(`cv-${r.id}`)))
   if (limit > 0) queue = queue.slice(0, limit)
-  console.log(`· ${queue.length} propiedades con carpeta Dropbox${confirm ? '' : ' — DRY-RUN (--confirm para escribir)'}`)
+  console.log(`· ${queue.length} propiedades a enriquecer${force ? ' (--force)' : ''}${confirm ? '' : ' — DRY-RUN (--confirm para escribir)'}`)
   if (!confirm) { queue.forEach((r) => console.log(`  [dry] ${r.title}`)); return }
 
   for (const r of queue) {
@@ -668,7 +699,21 @@ async function renders() {
       const zipPath = path0.join(tmp, 'f.zip')
       const res = await fetch(url.includes('dl=1') ? url : `${url}&dl=1`, { headers: { 'User-Agent': UA } })
       if (!res.ok) { console.error(`  ✗ ${r.title}: descarga ${res.status}`); continue }
-      writeFileSync(zipPath, Buffer.from(await res.arrayBuffer()))
+
+      // Carpetas desproporcionadas (una llegó a 7,4 GB de vídeos y masters): no
+      // compensa bajarlas para sacar 20 fotos.
+      const declared = Number(res.headers.get('content-length') ?? 0)
+      if (declared > MAX_ZIP_BYTES) {
+        console.error(`  ✗ ${r.title}: carpeta de ${(declared / 1073741824).toFixed(1)} GB — omitida (tope ${MAX_ZIP_BYTES / 1073741824} GB)`)
+        continue
+      }
+
+      // Streaming a disco: `Buffer.from(arrayBuffer())` rompe con ZIPs > 2 GB
+      // ("The value of length is out of range") además de cargar todo en memoria.
+      const { createWriteStream } = await import('node:fs')
+      const { pipeline } = await import('node:stream/promises')
+      const { Readable } = await import('node:stream')
+      await pipeline(Readable.fromWeb(res.body as Parameters<typeof Readable.fromWeb>[0]), createWriteStream(zipPath))
       const zipMb = statSync(zipPath).size / 1048576
 
       try { execFileSync('unzip', ['-o', '-j', '-qq', zipPath, '-d', tmp], { stdio: 'ignore' }) }
@@ -680,7 +725,7 @@ async function renders() {
         .sort()
       if (!imgs.length) { console.error(`  ✗ ${r.title}: el ZIP (${zipMb.toFixed(0)} MB) no traía imágenes`); continue }
 
-      const prop = byExt.get(String(r.id))!
+      const prop = byExt.get(`cv-${r.id}`)!
       const existing: string[] = Array.isArray(prop.gallery_urls) ? prop.gallery_urls : []
       const uploaded: string[] = []
       let mb = 0

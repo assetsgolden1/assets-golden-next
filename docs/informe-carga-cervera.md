@@ -48,12 +48,13 @@ La fuente trae el precio por pie cuadrado en el campo de precio. Se cargan SIN p
 | Visions at Brickell Station | 1080 |
 | Diesel Wynwood Condos | 913 |
 
-## Sin ciudad (2) — decisión tuya
+## Sin ciudad (3) — decisión tuya
 
 La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados Unidos) pero **sin ciudad**: no aparecerían en filtros por ciudad y la ficha queda más pobre. Opciones: cargarlas igual, o dejarlas para completar a mano.
 
 - Seven Park — https://cerverabrokerportal.com/projects/seven-park/
 - Casa Murano Las Olas — https://cerverabrokerportal.com/projects/casa-murano-las-olas/
+- 600 Miami World Center — https://cerverabrokerportal.com/projects/600-miami-world-center/
 
 ## Muestra de 5 fichas normalizadas
 
@@ -61,7 +62,7 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
 
 ```
 {
- "external_id": "4107",
+ "external_id": "cv-4107",
  "external_source": "cervera",
  "title": "Mandarin Oriental Residences, West Palm Beach",
  "slug": "mandarin-oriental-residences-west-palm-beach-4107",
@@ -72,7 +73,7 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
  "price": 3500000,
  "currency": "USD",
  "area_sqm": 200,
- "bedrooms": null,
+ "bedrooms": 2,
  "bathrooms": null,
  "description": "Ubicada a lo largo de la vía navegable intracoastal de Palm Beach y envueltas en serenos jardines tropicales, Mandarin Oriental Residences, West Palm Beach inauguran una nueva era de refinada vida frente al mar. Concebid…",
  "description_en": "Set along a private shore of the Intracoastal Waterway and enveloped in tranquil tropical gardens, Mandarin Oriental Res…",
@@ -82,6 +83,7 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
   "https://cerverabrokerportal.com/wp-content/uploads/2026/02/overview-mo-wpb.jpg"
  ],
  "features": [
+  "Dormitorios: 2 a 4",
   "31 plantas",
   "87 residencias",
   "Entrega 2031"
@@ -97,7 +99,7 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
 
 ```
 {
- "external_id": "3768",
+ "external_id": "cv-3768",
  "external_source": "cervera",
  "title": "Seventeen Gables",
  "slug": "seventeen-gables-3768",
@@ -108,7 +110,7 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
  "price": 634900,
  "currency": "USD",
  "area_sqm": 52,
- "bedrooms": null,
+ "bedrooms": 1,
  "bathrooms": null,
  "description": "Seventeen Gabes se encuentra en el corazón de todo — cerca de Miracle Mile y The Shops at Merrick Park, con fácil acceso a Brickell y al centro de la ciudad. Una dirección boutique rodeada de calles arboladas, las mejore…",
  "description_en": "Seventeen Gables is set in the heart of it all — near Miracle Mile and The Shops at Merrick Park, with easy access to Br…",
@@ -118,6 +120,7 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
   "https://cerverabrokerportal.com/wp-content/uploads/2025/10/25_235_02_FACHADA_2_DIA_FINAL-scaled.jpg"
  ],
  "features": [
+  "Dormitorios: 1 a 3",
   "8 plantas",
   "117 residencias",
   "Entrega 2028"
@@ -133,7 +136,7 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
 
 ```
 {
- "external_id": "3693",
+ "external_id": "cv-3693",
  "external_source": "cervera",
  "title": "Missioni Baia",
  "slug": "missioni-baia-3693",
@@ -144,7 +147,7 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
  "price": 560000,
  "currency": "USD",
  "area_sqm": 63,
- "bedrooms": null,
+ "bedrooms": 1,
  "bathrooms": null,
  "description": "Missioni Baia es una promoción de obra nueva en Miami, Florida (Estados Unidos). Está promovida por oko_group y con arquitectura de revuelta_architecture_international,asymptote_architecture. Las viviendas parten de 63 m…",
  "description_en": "Missioni Baia is a new development in Miami, Florida (United States). It is developed by oko_group and with architecture…",
@@ -153,6 +156,7 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
   "https://cerverabrokerportal.com/wp-content/uploads/2025/09/missioni-baia.webp"
  ],
  "features": [
+  "Dormitorios: 1 a 5",
   "Promotora: oko_group",
   "Arquitectura: revuelta_architecture_international,asymptote_architecture",
   "Entrega 2023"
@@ -168,7 +172,7 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
 
 ```
 {
- "external_id": "3512",
+ "external_id": "cv-3512",
  "external_source": "cervera",
  "title": "Seven Park",
  "slug": "seven-park-3512",
@@ -179,7 +183,7 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
  "price": 370000,
  "currency": "USD",
  "area_sqm": 46,
- "bedrooms": null,
+ "bedrooms": 0,
  "bathrooms": null,
  "description": "Seven Park es una promoción de obra nueva (Estados Unidos). Las viviendas parten de 46 m² y llegan hasta 153 m². Amenidades: Elevated Amenities That Inspire Leisure & Wellness: • Resort-style pool, 2 hot tubs, private ca…",
  "description_en": "SEVEN PARK is more than a building — it’s a signal of what’s next. Across from a $30 million green space and minutes fro…",
@@ -187,7 +191,9 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
  "gallery_urls": [
   "https://cerverabrokerportal.com/wp-content/uploads/2025/07/Screen-Shot-2025-07-23-at-11.28.09-AM.png"
  ],
- "features": [],
+ "features": [
+  "Dormitorios: Studios a 3"
+ ],
  "is_development": true,
  "skip": null,
  "warnings": [
@@ -201,7 +207,7 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
 
 ```
 {
- "external_id": "3504",
+ "external_id": "cv-3504",
  "external_source": "cervera",
  "title": "Poolhaus",
  "slug": "poolhaus-3504",
@@ -212,7 +218,7 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
  "price": 1990000,
  "currency": "USD",
  "area_sqm": 203,
- "bedrooms": null,
+ "bedrooms": 2,
  "bathrooms": null,
  "description": "Poolhaus es una promoción de obra nueva en Bay Harbor Islands, Florida (Estados Unidos). El edificio cuenta con 18 residencias. Las viviendas parten de 203 m² y llegan hasta 297 m². Entrega prevista: Q2 2026.…",
  "description_en": "Nestled in the serene enclave of Bay Harbor Islands, Pool Haus features a limited collection of eighteen expansive resid…",
@@ -221,6 +227,7 @@ La dirección no se pudo extraer de la ficha. Se cargarían con país (Estados U
   "https://cerverabrokerportal.com/wp-content/uploads/2025/07/Screen-Shot-2025-07-22-at-12.58.57-PM.png"
  ],
  "features": [
+  "Dormitorios: 2 a 4",
   "18 residencias",
   "Entrega 2026"
  ],
