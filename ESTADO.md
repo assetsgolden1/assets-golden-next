@@ -15,7 +15,7 @@ Next.js 15 / React 19 / TypeScript · Tailwind v4 (config en @theme de globals.c
 ## Producción
 - Web: https://assetsgolden.com (dominio conectado, en producción).
 - Builds Vercel: más lentos desde el ISR (prerenderiza ~2.600 fichas). Verificar prod con SHA correcto, no con "Redeploy".
-- **Caché/ISR (29/06)**: 21 rutas públicas son estáticas/ISR (revalidate 1h) — home, fichas `propiedades/[slug]` (~2.600, SSG), blog (listado/posts/categorías), servicios, sobre-nosotros, equipo, partners, destinos listado, legales, etc. Se sirven desde el CDN (x-vercel-cache PRERENDER/HIT). Las que usan `searchParams` (propiedades listado, destinos/[slug], inversiones, promociones) siguen dinámicas (correcto). Patrón: lecturas públicas con `createStaticClient` (sin cookies) + `setRequestLocale`; root layout con lang estático + HtmlLangSync.
+- **Caché/ISR (29/06, revisado 26/07)**: 21 rutas públicas son estáticas/ISR (**revalidate 43200s = 12h**, no 1h) — home, fichas `propiedades/[slug]` (~2.600, SSG), blog (listado/posts/categorías), servicios, sobre-nosotros, equipo, partners, destinos listado, legales, etc. Se sirven desde el CDN (x-vercel-cache PRERENDER/HIT). Las que usan `searchParams` (propiedades listado, destinos/[slug], inversiones, promociones) siguen dinámicas (correcto). Patrón: lecturas públicas con `createStaticClient` (sin cookies) + `setRequestLocale`; root layout con lang estático + HtmlLangSync. **Invalidación:** `revalidatePropertyPaths()` revalida por locale (`/es/...`, `/en/...`) — sin el prefijo NO invalida nada (fix 26/07).
 - **Imágenes**: servidas vía Supabase Image Transformation (WebP/resize, ~−90% egress) en todo el sitio; helper `lib/utils/optimizedImage.ts`.
 
 ## Catálogo (al 29/06/2026)

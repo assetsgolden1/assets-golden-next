@@ -67,6 +67,28 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-07-26 — [CACHE] Las rutas públicas nunca se revalidaban (bug de locale en revalidatePath)
+
+**Contexto:** Iván reportó que Atilio cargó una propiedad de Brasil (AG-05969, Gramado) y "no se generó la tarjeta del país".
+
+**Diagnóstico — la tarjeta SÍ se generó:** la fila `brasil` estaba en `country_destinations` (activa, con hero+card image) creada 0,3 s después de la propiedad. La auto-creación de `create-property` funciona bien. El problema era que **no se veía**: `/destinos` y la home servían `X-Vercel-Cache: HIT` con `Age` ≈ 8,6 h.
+
+**Causa raíz (más amplia que Brasil):** las páginas públicas viven bajo `/[locale]/(public)/...` y se prerenderizan como `/es/destinos` y `/en/destinos`. `revalidatePropertyPaths()` llamaba `revalidatePath('/destinos')` (sin prefijo), que **NO matchea** esas entradas de caché → nunca se invalidaban → había que esperar el `revalidate = 43200` (**12 h**). Las rutas `/admin/*` no sufrían el bug por no estar bajo `[locale]`, por eso el panel siempre se veía al día y nadie lo detectó.
+
+**Alcance:** afectaba a las **16 llamadas** del helper en 6 archivos (crear/editar/borrar/destacar propiedad, sync habihub, scraper). TODO cambio de propiedad tardaba hasta 12 h en reflejarse en home/destinos/listado.
+
+**Fix (commit `37fa398`):** `revalidatePropertyPaths()` ahora revalida cada path público para todos los `routing.locales` (`/es/...`, `/en/...`) además del path sin prefijo. Central → cubre los 6 archivos. TSC 0, ESLint 0.
+
+**Verificado en prod:** Brasil visible en `/destinos` (ES), `/en/destinos` (EN) y la home; `/destinos/brasil` 200; la propiedad aparece dentro del destino y su ficha da 200 en ES y EN.
+
+**Archivos tocados:** MODIFIED `src/lib/cache/revalidateProperties.ts`.
+
+**Nota:** el `revalidate` real de home/destinos/fichas es **43200 s (12 h)**, no 1 h como decía ESTADO.md.
+
+**Próximo paso sugerido:** ninguno bloqueante. Opcional: considerar bajar el `revalidate` de 12 h o exponer un endpoint de revalidación manual para casos urgentes.
+
+---
+
 ### 2026-07-13 — [FIX-ISR-WRITES] Subidos los intervalos de revalidate para reducir ISR Writes de Vercel
 
 **Contexto:** Iván reportó 644K ISR Writes en Vercel contra un límite de 200K del plan. Todas las páginas públicas revalidaban cada 3600s (1h), demasiado agresivo para el volumen de páginas (~2.600 fichas SSG + blog + listados). Pedido exacto: subir SOLO la constante `revalidate` en 19 páginas, sin tocar `dynamicParams`, lógica ni API routes.
