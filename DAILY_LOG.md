@@ -67,6 +67,47 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-07-27 — [CERVERA] Importadas 62 promociones de Miami desde Cervera Broker Portal
+
+**Contexto:** Atilio pidió cargar las propiedades de cerverabrokerportal.com. Atilio confirmó la relación de colaboración antes de empezar.
+
+**Análisis de la fuente (docs/plan-carga-cervera.md):**
+- El portal es WordPress y expone **WP REST API pública** con 97 campos por proyecto → **no hace falta scrapear HTML**. 122 proyectos = promociones de obra nueva (off-plan) en Florida.
+- `robots.txt` declara `Crawl-delay: 10` → respetado en todo el scrape.
+
+**Herramienta nueva:** `src/scripts/importCervera.ts` (`npm run cervera`), 4 modos: `extract` · `report` (dry-run, no toca BD) · `load` · `renders`. Idempotente y re-ejecutable.
+
+**Resultado: 62 propiedades cargadas** (AG-05970…AG-06031). Todas con ciudad y precio, 52 con dormitorios, 29 con galería rica (máx 40 fotos, promedio 14), 0 imágenes rotas (verificado con 125 HEAD).
+
+**Trampas de la fuente detectadas y resueltas:**
+1. **PSF disfrazado de precio (11 proyectos):** traían el precio por pie cuadrado en `price_range_from` (One Metropica = "550"). Sin el filtro se publicaba un condo de lujo "desde 550 USD".
+2. **La dirección no está en la API.** Se scrapea de la ficha. Regla: cortar tras el último sufijo de vía (Blvd/Ave/Dr/St) y parsear lo que queda. Backfill cruzando zip↔ciudad y ciudad nombrada en el título, siempre dentro del propio dataset. De 11 sin ciudad → 2.
+3. **"Bedrooms Range: 2 to 4 Beds" tampoco está en la API** (campo JetEngine) → se scrapea. Dormitorios pasaron de 39 a 52.
+4. **Los Dropbox SÍ eran usables** (el plan los había descartado por error, lo marcó Iván): 50/122 proyectos con carpeta. Modo `renders` baja el ZIP, extrae solo imágenes, recomprime (−89%: 4 MB → ~480 KB) y sube a nuestro bucket. El ZIP se descarta.
+
+**Bugs propios encontrados y corregidos (todos detectados verificando contra la BD, no confiando en la salida del script):**
+- **`external_id` sin prefijo** → la columna es UNIQUE global y los ids de WordPress (87-4107) caen dentro del rango del feed HabiHub (435-43955): un sync futuro habría fallado al insertar, **perdiendo fichas del feed en silencio**. Ahora `cv-{id}`; las 60 ya cargadas se migraron.
+- **Fallos de red cacheados como dato definitivo** → 12 fichas quedaron sin ciudad ni dormitorios teniendo los datos. Ahora 3 reintentos con backoff y, si falla, NO se cachea.
+- **ZIPs > 2 GB rompían** (`Buffer.from(arrayBuffer())` → "length out of range"; una carpeta pesaba 7,4 GB) → descarga por streaming + tope configurable.
+- **Purga incoherente que rompió imágenes en prod:** el orden era purgar del bucket → subir 40 → fusionar con la galería vieja. La fusión reponía URLs ya borradas (404) y anulaba el tope. Corregido: de la galería previa solo se conservan las no-renders.
+- **Galerías desmedidas:** sin tope, 2200 Brickell quedó con 399 fotos / 123 MB. Tope de 40 + curaduría por carpeta (se conserva la estructura del ZIP; `unzip -j` la perdía).
+- **Filtro de renders demasiado agresivo:** Vita at Grove Isle cayó de 53 a 3 fotos porque una sola imagen tenía "render" en la ruta. Ahora el subconjunto se usa solo si tiene ≥5 archivos.
+
+**Mejora colateral:** `revalidatePropertyPaths` no revalidaba la **ficha individual** → editar una propiedad dejaba su detalle viejo hasta 12 h. Ahora acepta `slug`; create y update-property lo pasan.
+
+**Archivos:** CREATED `src/scripts/importCervera.ts`, `docs/plan-carga-cervera.md`, `docs/informe-carga-cervera.md`, `outputs/cervera-*.json`. MODIFIED `src/lib/cache/revalidateProperties.ts`, `create-property/route.ts`, `update-property/route.ts`, `package.json`.
+**Commits:** e8022bc, 47e7a42, 08e762f, 5c41ed2, 4f99e8e.
+
+**Qué NO entró y por qué (límites de la fuente, no del método):**
+- 53 de 122 sin datos mínimos (sin imagen y/o sin precio válido) — listadas en el informe para carga manual.
+- 3 sin ciudad (Seven Park, Casa Murano Las Olas, 600 Miami World Center): sus fichas no publican dirección. **En espera de decisión de Iván.**
+- 4 frenadas como posibles duplicados: The St. Regis Residences (probable falso positivo — el AG-00808 es de Nueva York), The Rider Residences (duplicado real de AG-00805), Domus Brickell Center y Domus Brickell Park (ambiguo vs AG-00020). **Decisión de Iván.**
+- 10 sin galería rica: 5 con carpetas de 4,6–28 GB (no compensa) y 5 cuyos links devuelven HTML en vez de ZIP. Intenté listar la carpeta para bajar solo los renders pero el endpoint de Dropbox responde 403.
+
+**Próximo paso sugerido:** (1) Iván decide sobre los 4 duplicados y las 3 sin ciudad. (2) Evaluar si se agrega un campo de adjuntos para los brochures/planos PDF de las carpetas. (3) Re-sync periódico con `npm run cervera -- extract && report && load`.
+
+---
+
 ### 2026-07-26 — [CACHE] Las rutas públicas nunca se revalidaban (bug de locale en revalidatePath)
 
 **Contexto:** Iván reportó que Atilio cargó una propiedad de Brasil (AG-05969, Gramado) y "no se generó la tarjeta del país".

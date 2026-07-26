@@ -5,7 +5,7 @@
 > - Al cerrar una sesión: tachar/quitar lo resuelto y agregar lo nuevo que surja.
 > - El detalle de CÓMO se hizo cada cosa va en DAILY_LOG.md, no acá.
 > - El estado actual del proyecto (números, stack) va en ESTADO.md, no acá.
-> Última actualización: 13/07/2026
+> Última actualización: 27/07/2026
 
 Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
@@ -38,7 +38,11 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - (Cerrado 29/06: Atilio validó los textos legales de cookies/privacidad; banner + gateo GA4/Pixel ya estaban. GDPR técnico + legal OK para escalar ads.)
 
 ## 6. Operación / Cliente
-- [Ivan+Claude·M] **PRIORIDAD CERCANA (Ivan, 29/06): hacer pronto, no ya.** Carga Cervera/Miami EEUU (cerverabrokerportal.com): directa vs manual.
+- (CERRADO 27/07: **Carga Cervera/Miami — 62 promociones importadas** vía `npm run cervera` (WP REST API, no scraping). Ver DAILY_LOG 27/07 y `docs/plan-carga-cervera.md`.)
+  - [Ivan·S] **Decidir 4 posibles duplicados:** The St. Regis Residences (probable falso positivo: AG-00808 es de Nueva York) · The Rider Residences (duplicado real de AG-00805) · Domus Brickell Center y Domus Brickell Park (ambiguo vs AG-00020). Están detectadas y NO cargadas.
+  - [Ivan·S] **Decidir 3 sin ciudad** (Seven Park, Casa Murano Las Olas, 600 Miami World Center): sus fichas no publican dirección. Cargarlas igual (`--allow-no-city`) o completarlas a mano.
+  - [Ivan decide] Los brochures/planos PDF de las carpetas de Dropbox NO se importan: AG no tiene campo de adjuntos. Habría que agregarlo si interesa.
+  - (10 propiedades quedan con 1-3 fotos: 5 tienen carpetas de 4,6-28 GB y 5 con links que devuelven HTML en vez de ZIP. Irrecuperables automáticamente; el endpoint de listado de Dropbox da 403.)
 
 ## 7. Higiene / deuda técnica baja
 
@@ -52,6 +56,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - (3 props con external_id UUID pero foto de medianewbuild quedaron como 'habihub' — ambiguas, podrían ser del feed; NO re-etiquetadas para no arriesgar duplicados. CC puede revisarlas caso por caso si se quiere; bajo valor.)
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 27/07: **Cervera cargado** — 62 promociones de Miami vía WP REST API (no scraping). Script `npm run cervera` re-ejecutable. Quedan 4 duplicados y 3 sin ciudad a decidir por Iván.
 - 13/07: **Fix ISR Writes de Vercel** — subidos los intervalos de `revalidate` (estaban todos en 1h): fichas/blog/partners/consejos/noticias → 24h (12 páginas), listados/home/destinos → 12h (7 páginas). `equipo` (24h) y `sobre-nosotros` (1h) sin tocar. Motivo: 644K ISR Writes vs límite de 200K del plan. Sin cambios de lógica ni de `dynamicParams`. Ver DAILY_LOG 13/07.
 - 06/07: **Portal PDF — selector de fotos (hasta 10) + fix logo invisible + optimización de imágenes.** El agente ahora elige qué fotos y en qué orden (1ª = portada) vía modal; backend valida índices contra las fotos reales (anti-SSRF). Header del PDF pasó a navy para que el logo blanco de AG se vea (bug de prod). Imágenes del PDF vía transform Supabase (WebP/resize). Creado demo agent `demo.agente@assetsgolden.com` para validar. Falta la validación humana en prod (ver sección 3).
 - 05/07: slugs 7b CERRADO Y DEPLOYADO (opción 2) — 990 renombrados + redirect 308. Deploy tomó 3 iteraciones (fix real: `setRequestLocale` en la ficha). Verificado en prod: legacy → 308 → canónico → 200.

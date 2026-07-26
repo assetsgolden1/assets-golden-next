@@ -4,7 +4,7 @@
 > - Esta es la foto del estado VIGENTE. Leerla al arrancar para tener contexto.
 > - Se SOBRESCRIBE cuando algo cambia (no se acumula como un diario).
 > - El historial va en DAILY_LOG.md; el backlog en PENDIENTES.md.
-> Última actualización: 06/07/2026
+> Última actualización: 27/07/2026
 
 ## Qué es
 Web inmobiliaria internacional bilingüe (ES/EN), Next.js 15 App Router SSR sobre Vercel + Supabase Pro. Cliente: Atilio Montironi (+ socio Joan). Proveedor: IBott (Ivan). Marca: "Inmobiliaria Internacional de Propiedades Exclusivas".
@@ -15,14 +15,16 @@ Next.js 15 / React 19 / TypeScript · Tailwind v4 (config en @theme de globals.c
 ## Producción
 - Web: https://assetsgolden.com (dominio conectado, en producción).
 - Builds Vercel: más lentos desde el ISR (prerenderiza ~2.600 fichas). Verificar prod con SHA correcto, no con "Redeploy".
-- **Caché/ISR (29/06, revisado 26/07)**: 21 rutas públicas son estáticas/ISR (**revalidate 43200s = 12h**, no 1h) — home, fichas `propiedades/[slug]` (~2.600, SSG), blog (listado/posts/categorías), servicios, sobre-nosotros, equipo, partners, destinos listado, legales, etc. Se sirven desde el CDN (x-vercel-cache PRERENDER/HIT). Las que usan `searchParams` (propiedades listado, destinos/[slug], inversiones, promociones) siguen dinámicas (correcto). Patrón: lecturas públicas con `createStaticClient` (sin cookies) + `setRequestLocale`; root layout con lang estático + HtmlLangSync. **Invalidación:** `revalidatePropertyPaths()` revalida por locale (`/es/...`, `/en/...`) — sin el prefijo NO invalida nada (fix 26/07).
+- **Caché/ISR (29/06, revisado 26/07)**: 21 rutas públicas son estáticas/ISR (**revalidate 12h listados / 24h fichas y blog** — subido el 13/07 por el límite de ISR Writes del plan) — home, fichas `propiedades/[slug]` (~2.600, SSG), blog (listado/posts/categorías), servicios, sobre-nosotros, equipo, partners, destinos listado, legales, etc. Se sirven desde el CDN (x-vercel-cache PRERENDER/HIT). Las que usan `searchParams` (propiedades listado, destinos/[slug], inversiones, promociones) siguen dinámicas (correcto). Patrón: lecturas públicas con `createStaticClient` (sin cookies) + `setRequestLocale`; root layout con lang estático + HtmlLangSync. **Invalidación:** `revalidatePropertyPaths()` revalida por locale (`/es/...`, `/en/...`) — sin el prefijo NO invalida nada (fix 26/07).
 - **Imágenes**: servidas vía Supabase Image Transformation (WebP/resize, ~−90% egress) en todo el sitio; helper `lib/utils/optimizedImage.ts`.
 
-## Catálogo (al 29/06/2026)
-- ~2.696 propiedades · 12 países (creció vía sync HabiHub desde el 26/06).
+## Catálogo (al 27/07/2026)
+- **2.544 propiedades visibles · 13 países** (incluye Brasil, alta manual de Atilio el 26/07).
 - Tope esperado (Ivan, 29/06): NO crecerá mucho más — a lo sumo ~500 más (~3.200 máx). Por eso el prerender SSG de las fichas en el build es aceptable; NO hace falta limitar `generateStaticParams`.
-- Distribución: España 2.572, Indonesia 35, México 9, EEUU 7, EAU 5, Argentina 3, y 1 c/u en Rep. Dominicana, Ecuador, Costa Rica, Reino Unido, Grecia, Paraguay.
-- Sync HabiHub operativo: oculta no borra (hidden_by_sync), scope external_source='habihub' + external_id numérico + featured!=true. Dry-run obligatorio antes de sync real.
+- **EEUU: 69 propiedades** — 62 son promociones de obra nueva de Miami/Florida importadas de Cervera el 27/07 (`external_source='cervera'`, `external_id` con prefijo `cv-`).
+- **Dos fuentes automatizadas, aisladas entre sí:**
+  - *HabiHub* (España): oculta no borra (hidden_by_sync), scope `external_source='habihub'` + external_id numérico + featured!=true. Dry-run obligatorio antes de sync real.
+  - *Cervera* (Miami, obra nueva): `npm run cervera -- extract | report | load | renders`. Idempotente por `external_id`. El prefijo `cv-` es OBLIGATORIO: la columna es UNIQUE global y sin él los ids chocan con los del feed HabiHub. Ver `docs/plan-carga-cervera.md`.
 
 ## Contenido
 - Blog: 30 posts publicados (17 ES + 13 EN). Patrón: filas separadas por idioma (columnas _en son legacy, vacías). Categorías guías/guides, inversion/investment, zonas/locations.
