@@ -13,6 +13,9 @@ export default function MetaPixelPageViewTracker() {
       mounted.current = true
       return
     }
+    // El panel /admin y el /portal son uso interno: sus navegaciones no deben
+    // contar como PageView de campaña (este tracker vive en el layout RAÍZ).
+    if (/^\/(admin|portal)(\/|$)/.test(pathname)) return
     if (typeof window.fbq !== 'undefined') {
       window.fbq('track', 'PageView')
     }

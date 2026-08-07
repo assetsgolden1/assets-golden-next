@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { PhoneInput } from '@/components/PhoneInput'
 import { fbqTrack, sendServerEvent } from '@/lib/meta/track'
+import { getAttribution } from '@/lib/attribution'
 
 const inputClass =
   'w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-colors'
@@ -59,6 +60,7 @@ export default function ContactForm() {
           type: (TYPE_MAP[form.interest] ?? form.interest) || undefined,
           message: form.message.trim(),
           source: 'contacto',
+          attribution: getAttribution(),
         }),
       })
       if (!res.ok) throw new Error('Error')

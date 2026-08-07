@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { PhoneInput } from '@/components/PhoneInput'
 import { fbqTrack, sendServerEvent } from '@/lib/meta/track'
+import { getAttribution } from '@/lib/attribution'
 
 export default function MiDemandaForm() {
   const t = useTranslations('MyDemand')
@@ -63,7 +64,7 @@ export default function MiDemandaForm() {
       const res = await fetch('/api/demands', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, phone_country: phoneCountry, phone_prefix: phonePrefix }),
+        body: JSON.stringify({ ...form, phone_country: phoneCountry, phone_prefix: phonePrefix, attribution: getAttribution() }),
       })
       if (!res.ok) throw new Error('Error')
       const eventId = crypto.randomUUID()

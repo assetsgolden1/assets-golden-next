@@ -83,7 +83,26 @@ export async function POST(req: NextRequest) {
     }
     const body = await req.json()
     console.log('[leads] Body recibido:', body)
-    const { name, email, phone, phone_country, phone_prefix, interest, type, message, location, source, property_id, property_title, property_url, budget } = body
+    const { name, email, phone, phone_country, phone_prefix, interest, type, message, location, source, property_id, property_title, property_url, budget, attribution } = body
+
+    // Atribución de campaña (WEB-ATRIB-1): llega del cliente desde sessionStorage.
+    // Se sanea acá porque es input de usuario: solo strings, recortados.
+    const attr = (attribution ?? {}) as Record<string, unknown>
+    const attrField = (k: string): string | null => {
+      const v = attr[k]
+      if (typeof v !== 'string') return null
+      const t = v.trim().slice(0, 200)
+      return t.length ? t : null
+    }
+    const utm = {
+      utm_source: attrField('utm_source'),
+      utm_medium: attrField('utm_medium'),
+      utm_campaign: attrField('utm_campaign'),
+      utm_content: attrField('utm_content'),
+      fbclid: attrField('fbclid'),
+      landing_page: attrField('landing_page'),
+      referrer: attrField('referrer'),
+    }
 
     if (!name?.trim() || !email?.trim()) {
       return NextResponse.json({ error: 'Nombre y email son obligatorios' }, { status: 400 })
@@ -108,6 +127,7 @@ export async function POST(req: NextRequest) {
       property_id: property_id || null,
       property_title: property_title || null,
       property_url: property_url || null,
+      ...utm,
     }).select('id').single()
 
     if (dbError) {
@@ -117,8 +137,13 @@ export async function POST(req: NextRequest) {
     console.log('[leads] INSERT result OK, id:', insertData?.id)
 
     // 2. Google Sheets — awaited para que Vercel no mate la promesa antes de completar
+    const campaignParts = [utm.utm_source, utm.utm_campaign, utm.utm_content].filter(Boolean)
+    const sheetSource = campaignParts.length
+      ? campaignParts.join('/')
+      : (utm.fbclid ? 'meta/fbclid' : source)
+
     console.log('[leads] Antes de appendLeadToSheets')
-    console.log('[leads] Datos enviados a sheets:', { name, email, phone, phone_country, phone_prefix, type: type ?? interest, message, property_title, property_url, budget, source })
+    console.log('[leads] Datos enviados a sheets:', { name, email, phone, phone_country, phone_prefix, type: type ?? interest, message, property_title, property_url, budget, source: sheetSource })
     try {
       await appendLeadToSheets({
         name,
@@ -131,7 +156,9 @@ export async function POST(req: NextRequest) {
         property_title,
         property_url,
         budget,
-        source,
+        // Columna "Fuente": con UTMs → "{source}/{campaign}/{content}";
+        // sin atribución queda exactamente el valor de siempre.
+        source: sheetSource,
       })
       console.log('[leads] Sheets append OK')
     } catch (e) {

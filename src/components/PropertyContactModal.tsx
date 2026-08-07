@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { PhoneInput } from '@/components/PhoneInput'
 import { fbqTrack, sendServerEvent } from '@/lib/meta/track'
+import { getAttribution } from '@/lib/attribution'
 
 interface Props {
   propertyId: string
@@ -37,6 +38,7 @@ export default function PropertyContactModal({ propertyId, propertyTitle, proper
       property_id: propertyId,
       property_title: propertyTitle,
       property_url: `${baseUrl}/propiedades/${propertySlug}`,
+      attribution: getAttribution(),
     }
 
     try {

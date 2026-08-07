@@ -19,6 +19,16 @@ const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-5E27WGKEDF'
 
 /**
+ * El Pixel es solo para la web pública: el panel de admin y el portal de agentes
+ * son uso interno y sus visitas ensucian la atribución de campañas. Este layout es
+ * el RAÍZ, así que envuelve /admin y /portal salvo que se excluyan explícitamente.
+ */
+function isInternalArea(): boolean {
+  if (typeof window === 'undefined') return false
+  return /^\/(admin|portal)(\/|$)/.test(window.location.pathname)
+}
+
+/**
  * Dynamically injects and initializes Google Analytics 4 (gtag.js).
  * Safe to call multiple times — exits early if the init script already exists.
  * Loaded ONLY after the user grants the "analytics" consent category.
@@ -112,7 +122,7 @@ export default function CookieConsentInit() {
         if (GA_ID && cookie.categories.includes('analytics')) {
           initGA4(GA_ID)
         }
-        if (PIXEL_ID && cookie.categories.includes('marketing')) {
+        if (PIXEL_ID && !isInternalArea() && cookie.categories.includes('marketing')) {
           initMetaPixel(PIXEL_ID)
         }
       },
@@ -127,6 +137,7 @@ export default function CookieConsentInit() {
         }
         if (
           PIXEL_ID &&
+          !isInternalArea() &&
           changedCategories.includes('marketing') &&
           cookie.categories.includes('marketing')
         ) {

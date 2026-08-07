@@ -2,6 +2,7 @@ import { setRequestLocale } from 'next-intl/server'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
+import AttributionCapture from '@/components/analytics/AttributionCapture'
 
 export default async function PublicLayout({
   children,
@@ -16,6 +17,7 @@ export default async function PublicLayout({
   setRequestLocale(locale)
   return (
     <>
+      <AttributionCapture />
       <Header />
       <main className="flex-1 pt-20">{children}</main>
       <Footer />

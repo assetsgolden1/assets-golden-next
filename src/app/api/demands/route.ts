@@ -10,7 +10,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Detección de bot' }, { status: 403 })
     }
     const body = await req.json()
-    const { name, email, phone, propertyType, country, budget, features, timeline } = body
+    const { name, email, phone, propertyType, country, budget, features, timeline, attribution } = body
+
+    // Atribución de campaña (WEB-ATRIB-1). Input de usuario → se sanea.
+    const attr = (attribution ?? {}) as Record<string, unknown>
+    const attrField = (k: string): string | null => {
+      const v = attr[k]
+      if (typeof v !== 'string') return null
+      const t = v.trim().slice(0, 200)
+      return t.length ? t : null
+    }
+    const utm = {
+      utm_source: attrField('utm_source'),
+      utm_medium: attrField('utm_medium'),
+      utm_campaign: attrField('utm_campaign'),
+      utm_content: attrField('utm_content'),
+      fbclid: attrField('fbclid'),
+      landing_page: attrField('landing_page'),
+      referrer: attrField('referrer'),
+    }
+    const campaignParts = [utm.utm_source, utm.utm_campaign, utm.utm_content].filter(Boolean)
+    const sheetSource = campaignParts.length
+      ? campaignParts.join('/')
+      : (utm.fbclid ? 'meta/fbclid' : 'demand_form')
 
     if (!name?.trim() || !email?.trim()) {
       return NextResponse.json({ error: 'Nombre y email son obligatorios' }, { status: 400 })
@@ -31,6 +53,7 @@ export async function POST(req: NextRequest) {
       features: features?.trim() || null,
       timeline: timeline || null,
       status: 'new',
+      ...utm,
     })
 
     if (dbError) {
@@ -38,15 +61,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Error al guardar' }, { status: 500 })
     }
 
-    // Google Sheets — fire and forget
-    appendLeadToSheets({
-      name: body.name,
-      email: body.email,
-      phone: body.phone,
-      type: 'demanda',
-      message: body.features,
-      source: 'demand_form',
-    }).catch((e) => console.error('[demands API] Sheets error:', e.message))
+    // Google Sheets — AWAITED: en Vercel la función puede terminar antes de que
+    // resuelva una promesa suelta y el lead no llegaría nunca al Sheet.
+    try {
+      await appendLeadToSheets({
+        name: body.name,
+        email: body.email,
+        phone: body.phone,
+        type: 'demanda',
+        message: body.features,
+        source: sheetSource,
+      })
+    } catch (e) {
+      console.error('[demands API] Sheets error:', e)
+    }
 
     // n8n webhook — fire and forget
     const webhookUrl = process.env.N8N_WEBHOOK_URL
