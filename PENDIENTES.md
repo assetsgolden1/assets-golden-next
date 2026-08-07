@@ -5,12 +5,14 @@
 > - Al cerrar una sesión: tachar/quitar lo resuelto y agregar lo nuevo que surja.
 > - El detalle de CÓMO se hizo cada cosa va en DAILY_LOG.md, no acá.
 > - El estado actual del proyecto (números, stack) va en ESTADO.md, no acá.
-> Última actualización: 27/07/2026
+> Última actualización: 07/08/2026
 
 Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
 
 ## 0. Lo más urgente
+0. [Ivan·S] **DEPLOY BLOQUEADO EN VERCEL.** El commit `c73d62a` (atribución UTM) se pusheó pero el deployment quedó `BLOCKED` sin construir y el proyecto figura `live: false` — probable límite de uso del plan (ver nota del 13/07 sobre ISR Writes). La web sigue online con el deploy anterior, pero **nada nuevo se puede publicar hasta desbloquearlo**. Al resolverlo: repetir la verificación de atribución en prod (`?utm_source=meta&utm_medium=paid&utm_campaign=sitges-atico-ag00804&utm_content=test-verificacion` → enviar form → revisar Supabase + Sheet), saltando la caché ISR.
+0b. [Ivan decide] **`/mi-demanda` está ROTO en producción:** `/api/demands` inserta en una tabla `demands` que **no existe** en Supabase → cada envío devuelve 500 y el lead se pierde (ni siquiera llega al Sheet). Hay que decidir dónde persisten esas solicitudes: crear la tabla `demands`, o mandarlas a `leads` con `source='demand_form'` mapeando propertyType/budget/timeline/features. No lo toqué porque es decisión de producto.
 1. [Ivan·S] Monitorear en GSC (cuenta assetsgolden1@gmail.com) que el sitemap pase de "No se ha podido obtener" a "Correcto" y que el title nuevo reemplace al viejo en resultados (días).
 
 ## 1. SEO / Posicionamiento
@@ -56,6 +58,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - (3 props con external_id UUID pero foto de medianewbuild quedaron como 'habihub' — ambiguas, podrían ser del feed; NO re-etiquetadas para no arriesgar duplicados. CC puede revisarlas caso por caso si se quiere; bajo valor.)
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 07/08: **Atribución UTM en leads** (WEB-ATRIB-1) — 7 columnas en leads+demands, captura first-touch en sessionStorage, los 3 forms la envían, columna Fuente del Sheet con la campaña. Pixel acotado a la web pública (excluye /admin y /portal). Verificado en local; **falta la verificación en prod: deploy BLOQUEADO**.
 - 27/07: **Cervera cargado** — 62 promociones de Miami vía WP REST API (no scraping). Script `npm run cervera` re-ejecutable. Quedan 4 duplicados y 3 sin ciudad a decidir por Iván.
 - 13/07: **Fix ISR Writes de Vercel** — subidos los intervalos de `revalidate` (estaban todos en 1h): fichas/blog/partners/consejos/noticias → 24h (12 páginas), listados/home/destinos → 12h (7 páginas). `equipo` (24h) y `sobre-nosotros` (1h) sin tocar. Motivo: 644K ISR Writes vs límite de 200K del plan. Sin cambios de lógica ni de `dynamicParams`. Ver DAILY_LOG 13/07.
 - 06/07: **Portal PDF — selector de fotos (hasta 10) + fix logo invisible + optimización de imágenes.** El agente ahora elige qué fotos y en qué orden (1ª = portada) vía modal; backend valida índices contra las fotos reales (anti-SSRF). Header del PDF pasó a navy para que el logo blanco de AG se vea (bug de prod). Imágenes del PDF vía transform Supabase (WebP/resize). Creado demo agent `demo.agente@assetsgolden.com` para validar. Falta la validación humana en prod (ver sección 3).

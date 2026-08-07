@@ -67,6 +67,39 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-07 — [WEB-ATRIB-1] Atribución UTM en leads + Pixel acotado a la web pública
+
+**Contexto:** arranca campaña de Meta hacia la ficha AG-00804 y los leads web entraban con `source` fijo → un lead pagado y uno orgánico eran indistinguibles. Prompt: `PROMPT-WEB-ATRIBUCION-UTM-PIXEL.md`.
+
+**Hecho:**
+- **Migraciones:** 7 columnas nullable (`utm_source/medium/campaign/content`, `fbclid`, `landing_page`, `referrer`) + índice parcial por campaña, en `leads` **y en `demands`**. Ninguna columna existente tocada.
+- **`src/lib/attribution.ts`:** captura/lectura en `sessionStorage` (`ag_attribution`) con **first-touch de sesión** y saneo de valores (recorte a 200 chars).
+- **`AttributionCapture`** montado en el layout público → cubre toda la web pública. Solo cliente, sin impacto en SSR/ISR. Sin parámetros no escribe nada.
+- **Los 3 formularios** envían la atribución; `/api/leads` y `/api/demands` la sanean server-side e insertan.
+- **Columna "Fuente" del Sheet:** con UTMs `{source}/{campaign}/{content}`; sin atribución, el valor de siempre.
+- **Pixel:** ya estaba implementado (env guardada, gateado por consentimiento, evento `Lead` en los 3 forms, + CAPI). Lo único que faltaba del punto 4 era **excluir `/admin` y `/portal`**: el Pixel vive en el layout RAÍZ y se cargaba también ahí, ensuciando la atribución con visitas internas.
+
+**Bugs encontrados al verificar:**
+- `/api/demands` hacía el append al Sheet en **fire-and-forget** → en Vercel la función puede terminar antes y el lead nunca llegaba al Sheet. Ahora `await`.
+- El log `[leads] Datos enviados a sheets` mostraba el `source` viejo, no el que realmente se escribe.
+
+**⚠️ HALLAZGO GRAVE (fuera del alcance del prompt, NO corregido):** `/api/demands` inserta en una tabla **`demands` que NO EXISTE** en Supabase (el esquema público tiene 12 tablas y no está). Verificado con `to_regclass` e `information_schema`. Es decir: **el formulario `/mi-demanda` viene fallando — cada envío devuelve 500 y el lead se pierde** (el append al Sheet ni siquiera se ejecuta porque está después del return de error). No lo arreglé porque decidir dónde persisten esas solicitudes (crear `demands` vs. mandarlas a `leads` con `source='demand_form'`, mapeando propertyType/budget/timeline/features) es una decisión de producto, no técnica.
+
+**Verificaciones (6 pedidas):**
+1. ✅ Build local sin errores (tsc 0, eslint 0, `next build` OK).
+2. ✅ Ficha AG-00804 con UTMs → `sessionStorage.ag_attribution` correcto; navegué a `/propiedades` y volví **sin** UTMs y el origen **no se pisó** (first-touch).
+3. ✅ Supabase: `utm_source=meta`, `utm_medium=paid`, `utm_campaign=sitges-atico-ag00804`, `utm_content=test-verificacion`, `landing_page=/propiedades/atico-duplex-…`, `source=property_contact` intacto. Sheet: **Fuente = `meta/sitges-atico-ag00804/test-verificacion`**.
+4. ✅ Lead orgánico: los 7 campos en `null`, Fuente = `property_contact` (igual que siempre).
+5. ✅ Filas de prueba borradas del Sheet (quedó solo el header). **Desviación:** el prompt pedía `status='test'` pero hay un CHECK que solo admite new/contacted/in_progress/closed/discarded → se usó `discarded` + nota `[WEB-ATRIB-1]`. No se alteró el constraint para no romper el panel admin.
+6. ❌ **NO COMPLETADA — deploy BLOQUEADO por Vercel.** El push salió (commit `c73d62a`) pero el deployment quedó en estado `BLOCKED` sin llegar a construir (sin build logs) y el proyecto figura `live: false`. No es un problema del código. Producción sigue sana sirviendo el deploy anterior (200), pero **el código nuevo no está vivo**.
+
+**Archivos:** CREATED `src/lib/attribution.ts`, `src/components/analytics/AttributionCapture.tsx`. MODIFIED `api/leads/route.ts`, `api/demands/route.ts`, `PropertyContactModal.tsx`, `ContactForm.tsx`, `MiDemandaForm.tsx`, `(public)/layout.tsx`, `CookieConsentInit.tsx`, `MetaPixel.tsx`.
+**Commit:** `c73d62a` (pusheado).
+
+**Próximo paso sugerido:** (1) **Desbloquear Vercel** (probablemente límite de uso del plan — ver la nota del 13/07 sobre ISR Writes) y repetir la verificación 2–3 en producción con la caché saltada. (2) Decidir qué hacer con `/mi-demanda`. (3) El Pixel ya está listo; solo falta que exista el Pixel real en Business Manager si se quiere uno nuevo.
+
+---
+
 ### 2026-07-27 — [CERVERA] Importadas 62 promociones de Miami desde Cervera Broker Portal
 
 **Contexto:** Atilio pidió cargar las propiedades de cerverabrokerportal.com. Atilio confirmó la relación de colaboración antes de empezar.
