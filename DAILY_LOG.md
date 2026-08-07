@@ -91,12 +91,12 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 3. ✅ Supabase: `utm_source=meta`, `utm_medium=paid`, `utm_campaign=sitges-atico-ag00804`, `utm_content=test-verificacion`, `landing_page=/propiedades/atico-duplex-…`, `source=property_contact` intacto. Sheet: **Fuente = `meta/sitges-atico-ag00804/test-verificacion`**.
 4. ✅ Lead orgánico: los 7 campos en `null`, Fuente = `property_contact` (igual que siempre).
 5. ✅ Filas de prueba borradas del Sheet (quedó solo el header). **Desviación:** el prompt pedía `status='test'` pero hay un CHECK que solo admite new/contacted/in_progress/closed/discarded → se usó `discarded` + nota `[WEB-ATRIB-1]`. No se alteró el constraint para no romper el panel admin.
-6. ❌ **NO COMPLETADA — deploy BLOQUEADO por Vercel.** El push salió (commit `c73d62a`) pero el deployment quedó en estado `BLOCKED` sin llegar a construir (sin build logs) y el proyecto figura `live: false`. No es un problema del código. Producción sigue sana sirviendo el deploy anterior (200), pero **el código nuevo no está vivo**.
+6. ✅ **COMPLETADA (07/08, tras desbloquear Vercel).** Los deployments `c73d62a` y `37c988b` quedaron `BLOCKED` por el límite de la cuenta; Iván lo desbloqueó y un commit vacío (`da13a95`) disparó el build → READY. Verificado EN PRODUCCIÓN: ficha AG-00804 con UTMs → `ag_attribution` correcto; navegué a /propiedades y volví sin UTMs → first-touch respetado; lead enviado → Supabase con `utm_campaign=sitges-atico-ag00804`, `utm_content=test-prod`, `landing_page` correcto y `source=property_contact` intacto; Sheet con **Fuente=`meta/sitges-atico-ag00804/test-prod`**. Fila de prueba borrada del Sheet y lead marcado `discarded` con nota.
 
 **Archivos:** CREATED `src/lib/attribution.ts`, `src/components/analytics/AttributionCapture.tsx`. MODIFIED `api/leads/route.ts`, `api/demands/route.ts`, `PropertyContactModal.tsx`, `ContactForm.tsx`, `MiDemandaForm.tsx`, `(public)/layout.tsx`, `CookieConsentInit.tsx`, `MetaPixel.tsx`.
 **Commit:** `c73d62a` (pusheado).
 
-**Próximo paso sugerido:** (1) **Desbloquear Vercel** (probablemente límite de uso del plan — ver la nota del 13/07 sobre ISR Writes) y repetir la verificación 2–3 en producción con la caché saltada. (2) Decidir qué hacer con `/mi-demanda`. (3) El Pixel ya está listo; solo falta que exista el Pixel real en Business Manager si se quiere uno nuevo.
+**Próximo paso sugerido:** (1) Decidir qué hacer con `/mi-demanda` (sigue roto: la tabla `demands` no existe). (2) El Pixel ya está listo en código; solo falta que exista el Pixel real en Business Manager si se quiere uno nuevo y cargar `NEXT_PUBLIC_META_PIXEL_ID` en Vercel Production. (3) Ojo con el límite de la cuenta de Vercel que bloqueó los deployments.
 
 ---
 
