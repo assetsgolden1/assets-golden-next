@@ -213,12 +213,20 @@ export function generatePropertyPdfHtml(
   const location = [property.location, property.province, property.country].filter(Boolean).join(', ')
   const description = (property.description ?? '').trim()
 
-  const logoUrl = agent?.logo_url ?? `${siteOrigin}/logo.png`
-  const logoAlt = esc(agent?.agency_name ?? agent?.full_name ?? 'Assets Golden')
+  // Marca del documento: por defecto SIEMPRE Assets Golden (decisión de Atilio,
+  // 07/08/2026). El white-label con la marca del asesor solo se usa si está
+  // habilitado explícitamente para ese agente (`white_label_enabled`).
+  // Los datos de CONTACTO del asesor se muestran siempre: el cliente tiene que
+  // saber con quién hablar.
+  const whiteLabel = agent?.white_label_enabled === true && !!agent?.logo_url
+
+  const logoUrl = whiteLabel ? agent!.logo_url! : `${siteOrigin}/logo.png`
+  const logoAlt = esc(whiteLabel ? (agent?.agency_name ?? agent?.full_name ?? '') : 'Assets Golden')
   const agentName   = esc(agent?.full_name   ?? '')
   const agentPhone  = esc(agent?.phone       ?? '')
   const agentEmail  = esc(agent?.email       ?? '')
-  const agentAgency = esc(agent?.agency_name ?? '')
+  // La agencia (cabecera y pie del bloque de contacto) solo aparece en white-label.
+  const agentAgency = esc(whiteLabel ? (agent?.agency_name ?? '') : '')
 
   // Página 1: SIEMPRE la portada (image_url) + hasta 2 secundarias de la galería,
   // como el layout histórico (independiente de lo que elija el agente).
@@ -231,7 +239,7 @@ export function generatePropertyPdfHtml(
 
   // Logo de AG (blanco) va directo sobre el navy; el logo propio del agente
   // (white-label, posiblemente oscuro) va dentro de un chip blanco.
-  const usingCustomLogo = !!agent?.logo_url
+  const usingCustomLogo = whiteLabel
   const logoEl = usingCustomLogo
     ? `<span class="header-logo-chip"><img class="header-logo" src="${esc(logoUrl)}" alt="${logoAlt}" /></span>`
     : `<img class="header-logo" src="${esc(logoUrl)}" alt="${logoAlt}" />`

@@ -21,6 +21,11 @@ export function ProfileForm({ initialData, userId }: Props) {
   const fileRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
 
+  // Los PDFs salen con la marca Assets Golden salvo que este asesor tenga el
+  // white-label habilitado. Si no lo tiene, el logo y la agencia no aparecen en
+  // ningun lado: se ocultan para no pedirle datos que no se van a usar.
+  const whiteLabelOn = initialData.white_label_enabled === true
+
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -79,7 +84,8 @@ export function ProfileForm({ initialData, userId }: Props) {
 
   return (
     <form onSubmit={handleSave} className="bg-white rounded-2xl border border-border shadow-elegant p-6 space-y-6">
-      {/* Logo */}
+      {/* Logo — solo si el asesor tiene white-label habilitado */}
+      {whiteLabelOn && (
       <div>
         <label className="block text-sm font-medium mb-3">Logo de la agencia</label>
         <div className="flex items-center gap-4">
@@ -118,6 +124,7 @@ export function ProfileForm({ initialData, userId }: Props) {
           </div>
         </div>
       </div>
+      )}
 
       {/* Nombre completo */}
       <div>
@@ -155,7 +162,8 @@ export function ProfileForm({ initialData, userId }: Props) {
         />
       </div>
 
-      {/* Agencia */}
+      {/* Agencia — idem: solo aplica en white-label */}
+      {whiteLabelOn && (
       <div>
         <label className="block text-sm font-medium mb-1">Nombre de la inmobiliaria / agencia</label>
         <input
@@ -166,6 +174,7 @@ export function ProfileForm({ initialData, userId }: Props) {
           placeholder="Tu agencia o empresa"
         />
       </div>
+      )}
 
       {/* Mensaje de estado */}
       {message && (

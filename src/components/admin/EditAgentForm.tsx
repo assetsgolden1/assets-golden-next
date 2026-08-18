@@ -11,6 +11,9 @@ export function EditAgentForm({ agent }: { agent: Agent }) {
     phone: agent.phone ?? '',
     agency_name: agent.agency_name ?? '',
   })
+  // Marca del PDF: por defecto Assets Golden. Este toggle permite devolverle la
+  // marca propia a un colaborador sin necesidad de un deploy.
+  const [whiteLabel, setWhiteLabel] = useState(agent.white_label_enabled === true)
 
   function set(field: keyof typeof form) {
     return (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -23,7 +26,7 @@ export function EditAgentForm({ agent }: { agent: Agent }) {
     const res = await fetch('/api/admin/update-agent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: agent.id, ...form }),
+      body: JSON.stringify({ id: agent.id, ...form, white_label_enabled: whiteLabel }),
     })
     setLoading(false)
     if (res.ok) {
@@ -79,6 +82,25 @@ export function EditAgentForm({ agent }: { agent: Agent }) {
           />
         </div>
       </div>
+
+      <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={whiteLabel}
+            onChange={e => setWhiteLabel(e.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300"
+          />
+          <span>
+            <span className="block text-sm font-medium text-gray-700">Marca propia en el PDF (white-label)</span>
+            <span className="block text-xs text-gray-500 mt-0.5">
+              Desactivado (por defecto): los PDF salen con el logo de Assets Golden. Los datos de
+              contacto del asesor se muestran siempre, en ambos casos.
+            </span>
+          </span>
+        </label>
+      </div>
+
       <div className="flex gap-3 pt-2">
         <button
           type="submit"

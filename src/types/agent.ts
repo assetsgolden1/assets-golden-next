@@ -5,6 +5,8 @@ export interface Agent {
   phone: string | null
   agency_name: string | null
   logo_url: string | null
+  /** Si es true el PDF usa el logo/agencia del asesor; por defecto false = marca Assets Golden. */
+  white_label_enabled: boolean
   active: boolean
   created_at: string
   updated_at: string

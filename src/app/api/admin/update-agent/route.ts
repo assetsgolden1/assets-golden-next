@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const { id, full_name, phone, agency_name } = await request.json()
+  const { id, full_name, phone, agency_name, white_label_enabled } = await request.json()
 
   if (!id || !full_name?.trim()) {
     return NextResponse.json({ error: 'ID y nombre son requeridos' }, { status: 400 })
@@ -34,6 +34,9 @@ export async function POST(request: NextRequest) {
       full_name: full_name.trim(),
       phone: phone?.trim() || null,
       agency_name: agency_name?.trim() || null,
+      // Solo se toca si viene explicitamente booleano: un cliente que no mande el
+      // campo no debe resetear el white-label del asesor.
+      ...(typeof white_label_enabled === 'boolean' ? { white_label_enabled } : {}),
     })
     .eq('id', id)
 
@@ -46,7 +49,11 @@ export async function POST(request: NextRequest) {
     entity_type: 'agent',
     entity_id: id,
     entity_label: full_name.trim(),
-    metadata: { fields_updated: ['full_name', 'phone', 'agency_name'] },
+    metadata: {
+      fields_updated: ['full_name', 'phone', 'agency_name',
+        ...(typeof white_label_enabled === 'boolean' ? ['white_label_enabled'] : [])],
+      ...(typeof white_label_enabled === 'boolean' ? { white_label_enabled } : {}),
+    },
   })
 
   return NextResponse.json({ success: true })
