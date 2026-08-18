@@ -67,6 +67,29 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-07 — [PORTAL-PDF] Los PDF del portal salen siempre con marca Assets Golden
+
+**Contexto:** Atilio pidió que los asesores solo puedan descargar PDFs con logo e info de Assets Golden. Iván confirmó la lectura correcta: **marca AG siempre, pero cada asesor conserva sus datos de contacto** (el cliente tiene que saber con quién hablar).
+
+**Situación previa:** el white-label estaba activo de hecho —  del asesor ganaba y AG era solo el fallback. **Estaba en uso real por 3 colaboradores externos**: MM REALTY (Mateo), ZF Realtor (Zaira) y Carola Uribe - Inversiones. No era una función dormida.
+
+**Implementación — flag en vez de borrar el white-label:**
+- Migración  → todos pasan a marca AG automáticamente y **no se destruye ningún ** ya cargado.
+- Template del PDF: logo y agencia salen del asesor SOLO si el flag está activo. Nombre, teléfono y email del asesor se muestran **siempre**, en ambos casos.
+- Toggle en el panel admin (EditAgentForm + ) → Atilio puede devolverle la marca propia a un colaborador **sin deploy**. Queda registrado en el audit log.
+- : se ocultan los campos de logo y agencia cuando el flag está off, para no pedirle al asesor datos que no aparecen en ningún lado.
+
+**Por qué flag y no hardcodear:** revierte una decisión de producto previa; si mañana se quiere reactivar para alguien, es un booleano y no un deploy + volver a pedir los logos.
+
+**Verificación:** renderizado el HTML del PDF en los dos casos. Sin white-label → logo AG, sin agencia propia, con nombre/teléfono/email del asesor. Con white-label → logo y agencia propios, mismos datos de contacto. TSC 0, ESLint 0. Los 6 asesores quedaron en  conservando sus logos.
+
+**Archivos:** MODIFIED , , , , . Migración .
+**Commit:** .
+
+**Próximo paso sugerido:** validar el PDF end-to-end en prod con un asesor real (sigue pendiente desde el 06/07) — ahora conviene hacerlo junto con este cambio, verificando que sale el logo AG y el contacto del asesor.
+
+---
+
 ### 2026-08-07 — [WEB-ATRIB-1] Atribución UTM en leads + Pixel acotado a la web pública
 
 **Contexto:** arranca campaña de Meta hacia la ficha AG-00804 y los leads web entraban con `source` fijo → un lead pagado y uno orgánico eran indistinguibles. Prompt: `PROMPT-WEB-ATRIBUCION-UTM-PIXEL.md`.

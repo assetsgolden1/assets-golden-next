@@ -25,7 +25,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [Claude+Ivan·L] Plan editorial por clústeres: 4–6 art/mes, guías por zona/fiscalidad/proceso, con enlazado a fichas y destinos.
 
 ## 3. Web / Técnico
-- [Ivan·S] **VALIDAR PDF del portal end-to-end en prod (ahora con selector de fotos).** El 06/07 se deployó el selector de fotos (hasta 10) + fix del logo. Falta la validación humana en prod.
+- [Ivan·S] **VALIDAR PDF del portal end-to-end en prod (selector de fotos + marca AG).** Desde el 07/08 el PDF sale con logo Assets Golden y el contacto del asesor; verificar ambas cosas en la misma pasada. El 06/07 se deployó el selector de fotos (hasta 10) + fix del logo. Falta la validación humana en prod.
   - Acción: entrar a `/portal` en PRODUCCIÓN con `demo.agente@assetsgolden.com` (agente de prueba creado el 06/07), abrir una propiedad, **elegir fotos (hasta 10)** y descargar el PDF. Verificar: portada correcta, orden de fotos = orden de selección, galería paginada OK, **logo visible** (header navy), precio/specs/agente/footer OK, sin páginas rotas.
   - Cuidados: (a) Chromium clavado en `@sparticuz/chromium-min@143.0.4` — si Vercel cambia el runtime de Node o el paquete se actualiza, puede romper el binario. (b) Probar SÍ O SÍ en prod, NO en local (el binario/entorno difiere). (c) `serverExternalPackages` en next.config mantiene puppeteer server-side — no romper esa config.
   - Al terminar: desactivar/borrar el demo agent si no se necesita más (sin tocar los otros 6 usuarios).
@@ -58,6 +58,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - (3 props con external_id UUID pero foto de medianewbuild quedaron como 'habihub' — ambiguas, podrían ser del feed; NO re-etiquetadas para no arriesgar duplicados. CC puede revisarlas caso por caso si se quiere; bajo valor.)
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 07/08: **PDF del portal con marca Assets Golden** — el white-label (en uso por 3 colaboradores externos) pasa a estar OFF por defecto vía flag `agents.white_label_enabled`, reversible desde el panel sin deploy. El contacto del asesor se mantiene siempre.
 - 07/08: **Atribución UTM en leads** (WEB-ATRIB-1) — 7 columnas en leads+demands, captura first-touch en sessionStorage, los 3 forms la envían, columna Fuente del Sheet con la campaña. Pixel acotado a la web pública (excluye /admin y /portal). **Verificado en producción** (Supabase + Sheet).
 - 27/07: **Cervera cargado** — 62 promociones de Miami vía WP REST API (no scraping). Script `npm run cervera` re-ejecutable. Quedan 4 duplicados y 3 sin ciudad a decidir por Iván.
 - 13/07: **Fix ISR Writes de Vercel** — subidos los intervalos de `revalidate` (estaban todos en 1h): fichas/blog/partners/consejos/noticias → 24h (12 páginas), listados/home/destinos → 12h (7 páginas). `equipo` (24h) y `sobre-nosotros` (1h) sin tocar. Motivo: 644K ISR Writes vs límite de 200K del plan. Sin cambios de lógica ni de `dynamicParams`. Ver DAILY_LOG 13/07.
