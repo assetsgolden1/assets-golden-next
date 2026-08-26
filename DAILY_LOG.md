@@ -67,6 +67,31 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-07 — [PORTAL] Acceso directo a Expertos de Gestión desde el portal de asesores
+
+**Contexto:** Atilio pidió que cada asesor tenga un botón directo al portal de gestoría (`expertosgestion.com/inmoges4`) y, si se podía, con el Nº de experto (3440) prerrellenado.
+
+**El autorelleno NO es posible — verificado, no asumido.** Se inspeccionó su login: `inicio.php` redirige a `index.php`, que pide Nº de experto + usuario + contraseña. Bajando su `js/index.js` se confirmó que el input trae `value=""` fijo y que el formulario se envía por AJAX a `index.php?accion=identificar` **sin leer nunca la query string** (no hay `URLSearchParams` ni `location.search`). Pasarle `?login_experto=3440` no produce ningún efecto.
+
+**Sustituto práctico:** se muestra el Nº 3440 junto al botón con un "Copiar". El asesor pega el número y solo escribe usuario y clave. Además ese login tiene su propio checkbox "Recordar" para las siguientes veces.
+
+**Implementado:**
+- `lib/constants/externalPortals.ts`: URL + número, con la nota de por qué no hay autorelleno (para que nadie repita la investigación).
+- `ExpertosGestionCard`: tarjeta en la home del portal con el número, botón copiar y "Abrir portal".
+- `PortalHeader`: link "Gestoría" disponible desde cualquier página del portal.
+- Ambos abren en pestaña nueva con `rel="noopener noreferrer"`.
+
+**Decisión de seguridad:** NO se guardan ni autocompletan usuario/contraseña de ese portal — son credenciales de un tercero.
+
+**Verificación:** tsc 0, eslint 0, `next build` OK. **La verificación visual queda pendiente**: el portal exige login de asesor (307 a `/portal/login`), misma limitación que la validación pendiente del PDF.
+
+**Archivos:** CREATED `lib/constants/externalPortals.ts`, `components/portal/ExpertosGestionCard.tsx`. MODIFIED `app/portal/(authed)/page.tsx`, `components/portal/PortalHeader.tsx`.
+**Commit:** `67d21fd`.
+
+**Próximo paso sugerido:** confirmar con Atilio si el 3440 es compartido por todos los asesores (implementado así) o si cada uno tiene el suyo — en ese caso habría que moverlo a una columna en `agents`. Y hacer la verificación visual del portal junto con la del PDF, en una sola sesión de asesor.
+
+---
+
 ### 2026-08-07 — [PORTAL-PDF] Los PDF del portal salen siempre con marca Assets Golden
 
 **Contexto:** Atilio pidió que los asesores solo puedan descargar PDFs con logo e info de Assets Golden. Iván confirmó la lectura correcta: **marca AG siempre, pero cada asesor conserva sus datos de contacto** (el cliente tiene que saber con quién hablar).

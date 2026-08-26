@@ -29,6 +29,8 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
   - Acción: entrar a `/portal` en PRODUCCIÓN con `demo.agente@assetsgolden.com` (agente de prueba creado el 06/07), abrir una propiedad, **elegir fotos (hasta 10)** y descargar el PDF. Verificar: portada correcta, orden de fotos = orden de selección, galería paginada OK, **logo visible** (header navy), precio/specs/agente/footer OK, sin páginas rotas.
   - Cuidados: (a) Chromium clavado en `@sparticuz/chromium-min@143.0.4` — si Vercel cambia el runtime de Node o el paquete se actualiza, puede romper el binario. (b) Probar SÍ O SÍ en prod, NO en local (el binario/entorno difiere). (c) `serverExternalPackages` en next.config mantiene puppeteer server-side — no romper esa config.
   - Al terminar: desactivar/borrar el demo agent si no se necesita más (sin tocar los otros 6 usuarios).
+  - **Aprovechar la misma sesión** para ver el acceso a Expertos de Gestión (tarjeta en la home del portal + link "Gestoría" en el header) — añadido el 07/08, sin verificación visual todavía.
+- [Atilio·S] **Confirmar si el Nº de experto 3440 es compartido** por todos los asesores (está implementado así) o si cada uno tiene el suyo; en ese caso hay que moverlo a una columna en `agents`.
 - [Atilio+CC·S] Criterios de /inversiones (definición de Atilio) + verificar filtro.
 - (CERRADO 03/07: imágenes rotas por fuente >25 MB del proyecto secundario `wloneprkibfjioxwypaw`. Escaneadas las 58 props → 37 con rotas (204 imgs) → todas re-hosteadas comprimidas al proyecto principal + BD actualizada. Re-escaneo: 0 rotas. Ver DAILY_LOG 03/07.)
 - [CC·S opcional] **Prevención:** fijar `file_size_limit` al bucket `property-images` del proyecto principal (hoy sin límite) para que subidas manuales grandes no vuelvan a romper el transform. Verificar que el flujo admin comprime siempre.
@@ -58,6 +60,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - (3 props con external_id UUID pero foto de medianewbuild quedaron como 'habihub' — ambiguas, podrían ser del feed; NO re-etiquetadas para no arriesgar duplicados. CC puede revisarlas caso por caso si se quiere; bajo valor.)
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 07/08: **Acceso a Expertos de Gestión en el portal** — botón en la home del portal + link en el header, con el Nº 3440 y "copiar". El autorelleno no es posible: su login no lee la query string (verificado sobre su JS).
 - 07/08: **PDF del portal con marca Assets Golden** — el white-label (en uso por 3 colaboradores externos) pasa a estar OFF por defecto vía flag `agents.white_label_enabled`, reversible desde el panel sin deploy. El contacto del asesor se mantiene siempre.
 - 07/08: **Atribución UTM en leads** (WEB-ATRIB-1) — 7 columnas en leads+demands, captura first-touch en sessionStorage, los 3 forms la envían, columna Fuente del Sheet con la campaña. Pixel acotado a la web pública (excluye /admin y /portal). **Verificado en producción** (Supabase + Sheet).
 - 27/07: **Cervera cargado** — 62 promociones de Miami vía WP REST API (no scraping). Script `npm run cervera` re-ejecutable. Quedan 4 duplicados y 3 sin ciudad a decidir por Iván.
