@@ -91,6 +91,19 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://mromkwpqrxpxbbxhdofs.supabase.co" />
         <link rel="preconnect" href="https://wloneprkibfjioxwypaw.supabase.co" />
         <link rel="preconnect" href="https://medianewbuild.com" />
+        {/*
+          Corrige <html lang> ANTES del primer paint en /en. El atributo se
+          sirve estático "es" (leer el locale en el root layout forzaría render
+          dinámico en todo el sitio); este script bloqueante lo fija según el
+          pathname, así el DOM renderizado (el que indexa Googlebot) ya es
+          correcto. HtmlLangSync sigue cubriendo las navegaciones SPA.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){var p=location.pathname;document.documentElement.lang=(p==='/en'||p.indexOf('/en/')===0)?'en':'es'})()",
+          }}
+        />
       </head>
       <body className="flex min-h-full flex-col bg-background text-foreground">
         {children}

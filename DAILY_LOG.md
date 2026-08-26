@@ -67,6 +67,23 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-27 (cont.) — [SEO-FIX-2] lang correcto en /en antes del paint + schema EN con URLs /en
+
+**Contexto:** segundo bloque de Highs del ACTION-PLAN 26/08, con OK de Iván. Ataca las **532 páginas "Duplicada: Google eligió otra canónica"** vistas en GSC: las páginas /en declaraban tres señales "ES" (lang, JSON-LD, breadcrumbs) y Google elegía la versión española como canónica.
+
+**Trabajo hecho:**
+- **`<html lang>`**: `unstable_rootParams` fue REMOVIDO en Next 16 → no hay forma server-side de poner el locale en el root layout sin volver dinámico todo el sitio (el fix de junio). Solución: **script inline bloqueante en el `<head>`** del root layout que fija `document.documentElement.lang` según el pathname ANTES del primer paint — el DOM renderizado (lo que indexa Googlebot) queda correcto al instante. `HtmlLangSync` se mantiene para navegaciones SPA. El HTML crudo sigue diciendo `lang="es"` (limitación estructural documentada). CSP ya permite `unsafe-inline`.
+- **Ficha (`propiedades/[slug]`)**: JSON-LD `@id`/`url` con prefijo `/en` en inglés + `inLanguage` (en-GB/es-ES) + breadcrumbs (visibles y schema) con `/en`.
+- **`GlobalSchemaOrg`**: `WebSite.url` locale-aware (`/en` en inglés); `@id` de entidades quedan globales (correcto).
+
+**Verificación:** tsc/eslint 0, build exit 0. Server prod LOCAL: script presente en el HTML servido y ejecutando (`document.documentElement.lang === 'en'` en /en, chequeado con el browser); ficha EN con @id/url/breadcrumbs `/en` + `inLanguage: en-GB` + WebSite url `/en`; ficha ES sin regresión (todo sin prefijo, es-ES).
+
+**Archivos MODIFIED:** `src/app/layout.tsx`, `src/components/seo/GlobalSchemaOrg.tsx`, `src/app/[locale]/(public)/propiedades/[slug]/page.tsx`.
+
+**Próximo paso sugerido:** las 532 "canónica diferente" deberían drenar en las próximas semanas (monitorear en GSC). Siguientes Highs: canonical de paginación, imágenes del feed medianewbuild, hreflang en /servicios y legales.
+
+---
+
 ### 2026-08-27 — [SEO-FIX-1] Blog EN desbloqueado + sitemap bilingüe con lastmod real
 
 **Contexto:** Iván dio OK a ejecutar los críticos nº1 y nº2 del ACTION-PLAN de la auditoría 26/08 (blog EN roto + sitemap sin versión EN). También aclarado con él: lo de GA4 no es que "no leyó" leads — es que no hay eventos clave configurados; la ausencia real de leads la confirmó él en el Sheet (fuente fiable, atribución UTM propia).

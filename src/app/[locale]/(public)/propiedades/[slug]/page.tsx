@@ -110,13 +110,19 @@ export default async function PropertyDetailPage({ params }: Props) {
 
   const localizedTitle = translatePropertyTitle(property.title, locale)
 
+  // URL canónica de ESTA versión de idioma: el schema debe coincidir con el
+  // canonical de la página (/en/... en inglés), no apuntar siempre a la ES.
+  const pagePrefix = locale === 'en' ? '/en' : ''
+  const pageUrl = `https://assetsgolden.com${pagePrefix}/propiedades/${slug}`
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'RealEstateListing',
-    '@id': `https://assetsgolden.com/propiedades/${slug}`,
+    '@id': pageUrl,
     name: localizedTitle,
     description: description ?? undefined,
-    url: `https://assetsgolden.com/propiedades/${slug}`,
+    url: pageUrl,
+    inLanguage: locale === 'en' ? 'en-GB' : 'es-ES',
     image: allImages.length > 0 ? allImages : undefined,
     ...(property.location && {
       address: {
@@ -152,9 +158,9 @@ export default async function PropertyDetailPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <Breadcrumb items={[
-        { name: t('breadcrumb_home'), url: '/' },
-        { name: t('breadcrumb_properties'), url: '/propiedades' },
-        { name: localizedTitle, url: `/propiedades/${slug}` },
+        { name: t('breadcrumb_home'), url: pagePrefix || '/' },
+        { name: t('breadcrumb_properties'), url: `${pagePrefix}/propiedades` },
+        { name: localizedTitle, url: `${pagePrefix}/propiedades/${slug}` },
       ]} />
 
       <div className="container-luxury pb-2">

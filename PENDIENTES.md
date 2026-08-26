@@ -18,7 +18,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 ## 1. SEO / Posicionamiento
 - **AUDITORÍA COMPLETA 26/08 — score 67/100. Plan priorizado en `docs/seo-audit-2026-08-26/ACTION-PLAN.md`** (informe + 8 secciones de detalle en la misma carpeta). Los críticos/altos:
   - (✅ CERRADO 27/08 — **Blog EN + sitemap**: links/canonical/JSON-LD/breadcrumbs de blog ahora locale-aware; sitemap reescrito: 5.604 URLs (2.800 `<loc>` /en nuevas), posts EN bajo /en/blog, lastmod real de BD (1.946 fechas distintas), 4 categorías de blog, x-default, sin changefreq/priority. Verificado con build + server local. Ver DAILY_LOG 27/08.)
-  - [CC·S] `lang="es"` en el HTML servido de /en (HtmlLangSync lo corrige por JS, tarde) + schema de páginas EN con URLs ES en el resto del sitio (fichas/destinos; el blog ya quedó bien el 27/08).
+  - (✅ CERRADO 27/08 cont. — **lang + schema EN**: script inline bloqueante fija `lang` antes del paint (server-side imposible sin volver dinámico el sitio: `unstable_rootParams` removido en Next 16); JSON-LD de fichas con `@id`/`url`/breadcrumbs `/en` + `inLanguage`; `WebSite.url` locale-aware. Debería drenar las 532 "Google eligió otra canónica" de GSC — monitorear. Ver DAILY_LOG 27/08 cont.)
   - [CC·S] Canonical de paginación de /propiedades apunta a página 1 → ~2.576 fichas sin enlazado interno rastreable.
   - [CC·M] Imágenes del feed medianewbuild SIN transform Supabase: listado carga 13,4 MB, LCP mobile 13–14 s (lab). + El banner de cookies es el elemento LCP de home/listado.
   - [CC·M] Fichas Cervera/Miami: ES con amenidades en inglés crudo y "mast_capital" sin formatear; thin content (<300 palabras) en varias manuales; plantilla HabiHub repetida (riesgo scaled content).

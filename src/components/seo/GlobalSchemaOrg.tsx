@@ -65,7 +65,9 @@ function buildSchema(locale: string) {
       {
         '@type': 'WebSite',
         '@id': 'https://assetsgolden.com/#website',
-        url: 'https://assetsgolden.com',
+        // La URL del WebSite refleja la versión de idioma servida (en EN, /en)
+        // para no contradecir el canonical de las páginas EN.
+        url: locale === 'en' ? 'https://assetsgolden.com/en' : 'https://assetsgolden.com',
         name: 'Assets Golden',
         description: locale === 'en'
           ? 'International real estate consultancy for exclusive properties'
