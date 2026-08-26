@@ -30,7 +30,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
   - Cuidados: (a) Chromium clavado en `@sparticuz/chromium-min@143.0.4` — si Vercel cambia el runtime de Node o el paquete se actualiza, puede romper el binario. (b) Probar SÍ O SÍ en prod, NO en local (el binario/entorno difiere). (c) `serverExternalPackages` en next.config mantiene puppeteer server-side — no romper esa config.
   - Al terminar: desactivar/borrar el demo agent si no se necesita más (sin tocar los otros 6 usuarios).
   - **Aprovechar la misma sesión** para ver el acceso a Expertos de Gestión (tarjeta en la home del portal + link "Gestoría" en el header) — añadido el 07/08, sin verificación visual todavía.
-- [Atilio·S] **Confirmar si el Nº de experto 3440 es compartido** por todos los asesores (está implementado así) o si cada uno tiene el suyo; en ese caso hay que moverlo a una columna en `agents`.
+- (RESUELTO 07/08: Iván confirmó que el Nº de experto **3440 es compartido** por todos los asesores. La implementación actual —constante, no columna por agente— es la correcta.)
 - [Atilio+CC·S] Criterios de /inversiones (definición de Atilio) + verificar filtro.
 - (CERRADO 03/07: imágenes rotas por fuente >25 MB del proyecto secundario `wloneprkibfjioxwypaw`. Escaneadas las 58 props → 37 con rotas (204 imgs) → todas re-hosteadas comprimidas al proyecto principal + BD actualizada. Re-escaneo: 0 rotas. Ver DAILY_LOG 03/07.)
 - [CC·S opcional] **Prevención:** fijar `file_size_limit` al bucket `property-images` del proyecto principal (hoy sin límite) para que subidas manuales grandes no vuelvan a romper el transform. Verificar que el flujo admin comprime siempre.

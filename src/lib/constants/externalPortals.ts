@@ -11,6 +11,10 @@ export const EXPERTOS_GESTION = {
   name: 'Expertos de Gestión',
   description: 'Gestoría y trámites para operaciones inmobiliarias',
   url: 'https://expertosgestion.com/inmoges4/inicio.php',
-  /** Nº de experto de Assets Golden. Es el mismo para todos los asesores. */
+  /**
+   * Nº de experto de Assets Golden. **Compartido por todos los asesores**
+   * (confirmado por Iván, 07/08/2026): no es un dato por-agente, así que vive acá
+   * como constante y no en una columna de `agents`.
+   */
   expertNumber: '3440',
 } as const
