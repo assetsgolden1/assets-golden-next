@@ -3,7 +3,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { LogOut, User, Home } from 'lucide-react'
+import { LogOut, User, Home, ExternalLink } from 'lucide-react'
+import { EXPERTOS_GESTION } from '@/lib/constants/externalPortals'
 
 export function PortalHeader() {
   const router = useRouter()
@@ -40,6 +41,16 @@ export function PortalHeader() {
             <User className="w-4 h-4" />
             <span className="hidden sm:inline">Mi perfil</span>
           </Link>
+          <a
+            href={EXPERTOS_GESTION.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={EXPERTOS_GESTION.name + ' (Nº de experto ' + EXPERTOS_GESTION.expertNumber + ')'}
+            className="px-3 py-2 text-white hover:text-gold transition-colors flex items-center gap-2 text-sm"
+          >
+            <ExternalLink className="w-4 h-4" />
+            <span className="hidden sm:inline">Gestoría</span>
+          </a>
           <button
             onClick={handleLogout}
             className="px-3 py-2 text-white/80 hover:text-red-400 transition-colors flex items-center gap-2 text-sm"
