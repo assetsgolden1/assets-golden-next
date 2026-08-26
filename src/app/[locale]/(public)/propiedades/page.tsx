@@ -14,14 +14,31 @@ import { translateCountry, translateProvince } from '@/lib/utils/translateGeogra
 import { PropiedadesFilters } from '@/components/PropiedadesFilters'
 import { PaginationBar } from '@/components/PaginationBar'
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const sp = await searchParams
   const t = await getTranslations('Properties')
   const locale = await getLocale()
+
+  // Paginación "limpia" (?page=N sin filtros) → canonical self-referencing con
+  // el número de página. Antes TODO canonicalizaba a /propiedades y las ~115
+  // páginas del listado no aportaban enlazado interno rastreable a las fichas
+  // (hallazgo High de la auditoría 26/08). Las vistas FILTRADAS siguen
+  // canonicalizando a la base (no queremos indexar combinaciones de filtros).
+  const page = Math.max(1, parseInt(sp.page ?? '1', 10))
+  const hasFilters = Boolean(
+    sp.tipo || sp.precio_min || sp.precio_max || sp.ciudad || sp.habitaciones ||
+    sp.pais || sp.zona || sp.orden || sp.destacadas || sp.q,
+  )
+  const isCleanPagination = page > 1 && !hasFilters
+  const path = isCleanPagination ? `/propiedades?page=${page}` : '/propiedades'
+
   return {
-    title: t('meta_title'),
+    title: isCleanPagination
+      ? `${t('meta_title')} · ${locale === 'en' ? 'Page' : 'Página'} ${page}`
+      : t('meta_title'),
     description: t('meta_description'),
-    alternates: buildAlternates('/propiedades', locale),
-    openGraph: { url: '/propiedades' },
+    alternates: buildAlternates(path, locale),
+    openGraph: { url: path },
   }
 }
 
@@ -165,7 +182,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
                   </div>
 
                   {totalPages > 1 && (
-                    <PaginationBar currentPage={page} totalPages={totalPages} basePath="/propiedades" currentParams={pageParams} />
+                    <PaginationBar currentPage={page} totalPages={totalPages} basePath="/propiedades" currentParams={pageParams} locale={locale} />
                   )}
                 </>
               ) : (

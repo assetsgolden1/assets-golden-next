@@ -1,10 +1,11 @@
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 
 interface PaginationBarProps {
   currentPage: number
   totalPages: number
   basePath: string
   currentParams?: Record<string, string | undefined>
+  locale?: string
 }
 
 export function PaginationBar({
@@ -12,7 +13,9 @@ export function PaginationBar({
   totalPages,
   basePath,
   currentParams = {},
+  locale = 'es',
 }: PaginationBarProps) {
+  const en = locale === 'en'
   function buildUrl(page: number) {
     const params = new URLSearchParams()
     for (const [k, v] of Object.entries(currentParams)) {
@@ -41,7 +44,7 @@ export function PaginationBar({
     }}>
       {currentPage > 1 && (
         <Link href={buildUrl(currentPage - 1)} style={linkStyle(false)}>
-          ← Anterior
+          ← {en ? 'Previous' : 'Anterior'}
         </Link>
       )}
 
@@ -67,7 +70,7 @@ export function PaginationBar({
 
       {currentPage < totalPages && (
         <Link href={buildUrl(currentPage + 1)} style={linkStyle(false)}>
-          Siguiente →
+          {en ? 'Next' : 'Siguiente'} →
         </Link>
       )}
     </div>

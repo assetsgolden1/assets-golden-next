@@ -67,6 +67,24 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-27 (cont. 2) — [SEO-FIX-3] Canonical de paginación self-referencing + bug de paginación en /inversiones
+
+**Contexto:** tercer High del ACTION-PLAN 26/08 (con OK de Iván): las páginas 2–115 de /propiedades canonicalizaban a la página 1 → ~2.576 fichas sin enlazado interno rastreable (solo las sostenía el sitemap).
+
+**Trabajo hecho:**
+- **`/propiedades`**: `generateMetadata` ahora lee `searchParams`. Paginación LIMPIA (`?page=N` sin filtros) → canonical self-referencing (`/propiedades?page=N`) + title "· Página N" + hreflang con la misma query. Vistas con filtros siguen canonicalizando a la base (no se indexan combinaciones de filtros).
+- **`/destinos/[slug]`**: mismo patrón (EEUU con 69 props ya paginaba oculto). Nota: `/destinos/espana` es página dedicada SIN paginación — su canonical a base es correcto, no se tocó.
+- **`PaginationBar`**: `next/link` → `Link` de i18n (en /en los links de paginación tiraban a la versión ES) + labels Previous/Next por locale (prop `locale`).
+- **BUG encontrado y arreglado — la paginación de `/inversiones` nunca funcionó**: la página leía `?pagina=` pero PaginationBar emite `?page=` → cualquier click de paginación volvía a mostrar la página 1. Alineado a `page`.
+
+**Verificación (server prod local + curl):** `/propiedades?page=2` → canonical self + title "· Página 2"; `?page=2&tipo=villa` → canonical base; `/en/propiedades` → links `/en/propiedades?page=N`; `/inversiones?page=2` muestra contenido DISTINTO a la 1 (bug arreglado); `/destinos/estados-unidos?page=2` → canonical self, filtrada → base. tsc/eslint 0 (solo warning pre-existente de `EXCLUDED_FROM_INVESTMENT` sin uso), build exit 0.
+
+**Archivos MODIFIED:** `src/components/PaginationBar.tsx`, `src/app/[locale]/(public)/propiedades/page.tsx`, `src/app/[locale]/(public)/destinos/[slug]/page.tsx`, `src/app/[locale]/(public)/inversiones/page.tsx`.
+
+**Próximo paso sugerido:** imágenes del feed medianewbuild (P1 de performance: 13,4 MB el listado) — decidir approach (re-host a Supabase tipo job 03/07 vs optimización Vercel con costo) dimensionando primero cuántas imágenes son.
+
+---
+
 ### 2026-08-27 (cont.) — [SEO-FIX-2] lang correcto en /en antes del paint + schema EN con URLs /en
 
 **Contexto:** segundo bloque de Highs del ACTION-PLAN 26/08, con OK de Iván. Ataca las **532 páginas "Duplicada: Google eligió otra canónica"** vistas en GSC: las páginas /en declaraban tres señales "ES" (lang, JSON-LD, breadcrumbs) y Google elegía la versión española como canónica.

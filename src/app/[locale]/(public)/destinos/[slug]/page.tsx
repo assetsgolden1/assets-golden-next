@@ -56,9 +56,19 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const ciudad = sp.ciudad ?? null
   const countryName = translateCountry(data.country_name, locale)
 
-  const title = ciudad
+  // Paginación limpia (?page=N sin filtros) → canonical self-referencing,
+  // igual que en /propiedades (enlazado interno rastreable hacia las fichas).
+  const metaPage = Math.max(1, parseInt(sp.page ?? '1', 10))
+  const hasFilters = Boolean(sp.ciudad || sp.tipo || sp.precio_min || sp.precio_max || sp.habitaciones || sp.orden)
+  const isCleanPagination = metaPage > 1 && !hasFilters
+  const metaPath = isCleanPagination ? `/destinos/${slug}?page=${metaPage}` : `/destinos/${slug}`
+
+  const baseTitle = ciudad
     ? t('meta_title_city', { city: ciudad, country: countryName })
     : t('meta_title', { country: countryName })
+  const title = isCleanPagination
+    ? `${baseTitle} · ${locale === 'en' ? 'Page' : 'Página'} ${metaPage}`
+    : baseTitle
 
   const description = ciudad
     ? t('meta_description_city', { city: ciudad, country: countryName })
@@ -67,8 +77,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   return {
     title,
     description,
-    alternates: buildAlternates(`/destinos/${slug}`, locale),
-    openGraph: { images: data.hero_image_url ? [{ url: data.hero_image_url }] : [], url: `/destinos/${slug}` },
+    alternates: buildAlternates(metaPath, locale),
+    openGraph: { images: data.hero_image_url ? [{ url: data.hero_image_url }] : [], url: metaPath },
     twitter: { images: data.hero_image_url ? [data.hero_image_url] : undefined },
   }
 }
@@ -295,7 +305,7 @@ export default async function DestinoPage({ params, searchParams }: Props) {
                     ))}
                   </div>
                   {totalPages > 1 && (
-                    <PaginationBar currentPage={page} totalPages={totalPages} basePath={`/destinos/${slug}`} currentParams={pageParams} />
+                    <PaginationBar currentPage={page} totalPages={totalPages} basePath={`/destinos/${slug}`} currentParams={pageParams} locale={locale} />
                   )}
                 </>
               ) : (
