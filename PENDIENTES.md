@@ -13,7 +13,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 ## 0. Lo más urgente
 0. (RESUELTO 07/08: el deploy estaba BLOCKED por el límite de la cuenta; Iván lo desbloqueó y el build `da13a95` quedó READY. Atribución UTM **verificada en producción**. Ojo con ese límite a futuro.)
 0b. [Ivan decide] **`/mi-demanda` está ROTO en producción:** `/api/demands` inserta en una tabla `demands` que **no existe** en Supabase → cada envío devuelve 500 y el lead se pierde (ni siquiera llega al Sheet). Hay que decidir dónde persisten esas solicitudes: crear la tabla `demands`, o mandarlas a `leads` con `source='demand_form'` mapeando propertyType/budget/timeline/features. No lo toqué porque es decisión de producto.
-1. [Ivan·S] Monitorear en GSC (cuenta assetsgolden1@gmail.com) que el sitemap pase de "No se ha podido obtener" a "Correcto" y que el title nuevo reemplace al viejo en resultados (días).
+1. (✅ RESUELTO 27/08: Iván revisó GSC y exportó Coverage+Performance. **5.462 páginas indexadas** (era ~solo la home en junio); impresiones ×7 desde junio; el title nuevo ya rankea para "assets golden" en pos 1. Datos analizados en DAILY_LOG 27/08 y ESTADO. Nuevo pendiente: identificar las 878 URLs 404 — exportar el detalle del motivo "No se ha encontrado (404)" en GSC.)
 
 ## 1. SEO / Posicionamiento
 - **AUDITORÍA COMPLETA 26/08 — score 67/100. Plan priorizado en `docs/seo-audit-2026-08-26/ACTION-PLAN.md`** (informe + 8 secciones de detalle en la misma carpeta). Los críticos/altos:
