@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
 import type { BlogPost } from '@/types'
 import { optimizedImage } from '@/lib/utils/optimizedImage'
@@ -13,9 +13,19 @@ const CATEGORY_LABELS: Record<string, string> = {
   article: 'Artículo',
 }
 
-function formatDate(dateStr: string | null): string {
+const CATEGORY_LABELS_EN: Record<string, string> = {
+  consejos: 'Tips',
+  noticias: 'News',
+  inversiones: 'Investment',
+  mercado: 'Market',
+  tip: 'Tips',
+  news: 'News',
+  article: 'Article',
+}
+
+function formatDate(dateStr: string | null, locale = 'es'): string {
   if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('es-ES', {
+  return new Date(dateStr).toLocaleDateString(locale === 'en' ? 'en-GB' : 'es-ES', {
     day: 'numeric', month: 'long', year: 'numeric',
   })
 }
@@ -23,10 +33,13 @@ function formatDate(dateStr: string | null): string {
 interface Props {
   posts: BlogPost[]
   category: string
+  locale?: string
 }
 
-export default function BlogCategoryGrid({ posts, category }: Props) {
-  const label = CATEGORY_LABELS[category] ?? category
+export default function BlogCategoryGrid({ posts, category, locale = 'es' }: Props) {
+  const en = locale === 'en'
+  const labels = en ? CATEGORY_LABELS_EN : CATEGORY_LABELS
+  const label = labels[category] ?? category
 
   return (
     <>
@@ -52,14 +65,14 @@ export default function BlogCategoryGrid({ posts, category }: Props) {
                   : 'border-border text-muted-foreground hover:border-gold hover:text-foreground'
               }`}
             >
-              {CATEGORY_LABELS[cat]}
+              {labels[cat]}
             </Link>
           ))}
           <Link
             href="/blog"
             className="shrink-0 rounded-full px-4 py-1.5 text-xs font-medium border border-border text-muted-foreground hover:border-gold hover:text-foreground transition-colors"
           >
-            Todos
+            {en ? 'All' : 'Todos'}
           </Link>
         </div>
       </section>
@@ -69,9 +82,11 @@ export default function BlogCategoryGrid({ posts, category }: Props) {
         <div className="container-luxury">
           {posts.length === 0 ? (
             <div className="py-20 text-center">
-              <p className="text-muted-foreground mb-4">No hay artículos en esta categoría todavía.</p>
+              <p className="text-muted-foreground mb-4">
+                {en ? 'No articles in this category yet.' : 'No hay artículos en esta categoría todavía.'}
+              </p>
               <Link href="/blog" className="text-sm text-gold hover:underline">
-                Ver todos los artículos
+                {en ? 'See all articles' : 'Ver todos los artículos'}
               </Link>
             </div>
           ) : (
@@ -105,7 +120,7 @@ export default function BlogCategoryGrid({ posts, category }: Props) {
                       <p className="mt-2 text-sm text-muted-foreground line-clamp-2 leading-relaxed">{post.excerpt}</p>
                     )}
                     <p className="mt-4 text-xs text-muted-foreground/50">
-                      {formatDate(post.published_at ?? post.created_at)}
+                      {formatDate(post.published_at ?? post.created_at, locale)}
                     </p>
                   </div>
                 </Link>

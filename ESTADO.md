@@ -4,7 +4,7 @@
 > - Esta es la foto del estado VIGENTE. Leerla al arrancar para tener contexto.
 > - Se SOBRESCRIBE cuando algo cambia (no se acumula como un diario).
 > - El historial va en DAILY_LOG.md; el backlog en PENDIENTES.md.
-> Última actualización: 27/07/2026
+> Última actualización: 26/08/2026
 
 ## Qué es
 Web inmobiliaria internacional bilingüe (ES/EN), Next.js 15 App Router SSR sobre Vercel + Supabase Pro. Cliente: Atilio Montironi (+ socio Joan). Proveedor: IBott (Ivan). Marca: "Inmobiliaria Internacional de Propiedades Exclusivas".
@@ -34,11 +34,11 @@ Next.js 15 / React 19 / TypeScript · Tailwind v4 (config en @theme de globals.c
 - Admin: Atilio + socio Joan (mismo nivel). Agentes: 4 reales activos + 1 de prueba (`demo.agente@assetsgolden.com`, creado 06/07 para validar el PDF; borrar cuando no se use). Acceso solo a /portal.
 - Portal de agentes con PDF white-label. Desde 06/07: el agente elige hasta 10 fotos (orden = portada) al descargar; header del PDF navy (logo visible); imágenes vía transform Supabase. Pendiente validación humana E2E en prod.
 
-## SEO — estado real (29/06)
-- Bases técnicas: muy buenas (auditoría CC 83/100; técnico 92, schema 95).
-- Posicionamiento real: incipiente. Google indexa parcialmente (esencialmente la home) y aún cachea el title viejo ("lujo") hasta que procese el recrawl. Horizonte 6–12 meses.
-- **GSC**: la propiedad (URL-prefix `https://assetsgolden.com/`) está verificada bajo la cuenta **assetsgolden1@gmail.com (Atilio)**, NO bajo ivalberini. El 29/06 se envió el sitemap por primera vez y se solicitó re-indexación de la home. Sitemap sano (HTTP 200, XML válido).
-- Coherencia de marca: VERIFICADO LIMPIO (29/06) — 0 residuos "lujo"/"Nest Seekers" user-facing en código, i18n, public/, blog y destinos. llms.txt rebrandeado, sitemap incluye `/destinos/[país]`. H1 home ES = "Propiedades exclusivas, sin fronteras".
+## SEO — estado real (auditoría completa 26/08)
+- **Score 26/08: 67/100** (7 especialistas sobre prod + GA4). Informe y plan en `docs/seo-audit-2026-08-26/`. La base técnica de junio sigue sólida (técnico 82; canonicals/redirects/security/SSR impecables), pero la auditoría profunda encontró: **blog EN roto** (13 posts huérfanos, 12 URLs 404 en el sitemap), versión EN (~2.800 págs) no enviada como `<loc>` + `lang="es"` en /en + schema EN con URLs ES, canonical de paginación que deja ~2.576 fichas sin enlazado rastreable, imágenes del feed medianewbuild sin transform (13,4 MB el listado, LCP mobile 13–14 s lab), fichas Cervera con inglés crudo en ES y thin content (contenido 54/100).
+- **Tráfico real (GA4, 17/06→25/08)**: 305 usuarios; orgánico ya es el 2º canal (70 usuarios, 23%, 127 sesiones) y el de mejor engagement (121 s vs 57 s del paid). Long-tail activo (fichas Miami ya reciben visitas). Demanda nórdica detectada (visitantes traduciendo a sueco/polaco). **GA4 sin eventos clave configurados** — no se mide ninguna conversión. Propiedad GA4: G-5E27WGKEDF, gateada por consentimiento (subconteo estructural).
+- **GSC**: propiedad verificada bajo **assetsgolden1@gmail.com (Atilio)**. Sin revisión humana desde el 29/06 (cuando se envió el sitemap por primera vez). Pendiente #1: cobertura de indexación y queries.
+- Coherencia de marca: OK desde 29/06 (0 residuos "lujo"/Nest Seekers user-facing). H1 home ES = "Propiedades exclusivas, sin fronteras".
 
 ## Privacidad / GDPR
 - Banner de cookies real = vanilla-cookieconsent v3 (Aceptar/Rechazar/Personalizar, ES, 3 categorías), montado en RootLayout vía `CookieConsentInit`.

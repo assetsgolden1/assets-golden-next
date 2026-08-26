@@ -5,7 +5,7 @@
 > - Al cerrar una sesión: tachar/quitar lo resuelto y agregar lo nuevo que surja.
 > - El detalle de CÓMO se hizo cada cosa va en DAILY_LOG.md, no acá.
 > - El estado actual del proyecto (números, stack) va en ESTADO.md, no acá.
-> Última actualización: 07/08/2026
+> Última actualización: 27/08/2026
 
 Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
@@ -16,7 +16,15 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 1. [Ivan·S] Monitorear en GSC (cuenta assetsgolden1@gmail.com) que el sitemap pase de "No se ha podido obtener" a "Correcto" y que el title nuevo reemplace al viejo en resultados (días).
 
 ## 1. SEO / Posicionamiento
-- [Atilio+Ivan·L] Autoridad/backlinks: menciones, prensa, portales, partners. Lo que falta vs competidores.
+- **AUDITORÍA COMPLETA 26/08 — score 67/100. Plan priorizado en `docs/seo-audit-2026-08-26/ACTION-PLAN.md`** (informe + 8 secciones de detalle en la misma carpeta). Los críticos/altos:
+  - (✅ CERRADO 27/08 — **Blog EN + sitemap**: links/canonical/JSON-LD/breadcrumbs de blog ahora locale-aware; sitemap reescrito: 5.604 URLs (2.800 `<loc>` /en nuevas), posts EN bajo /en/blog, lastmod real de BD (1.946 fechas distintas), 4 categorías de blog, x-default, sin changefreq/priority. Verificado con build + server local. Ver DAILY_LOG 27/08.)
+  - [CC·S] `lang="es"` en el HTML servido de /en (HtmlLangSync lo corrige por JS, tarde) + schema de páginas EN con URLs ES en el resto del sitio (fichas/destinos; el blog ya quedó bien el 27/08).
+  - [CC·S] Canonical de paginación de /propiedades apunta a página 1 → ~2.576 fichas sin enlazado interno rastreable.
+  - [CC·M] Imágenes del feed medianewbuild SIN transform Supabase: listado carga 13,4 MB, LCP mobile 13–14 s (lab). + El banner de cookies es el elemento LCP de home/listado.
+  - [CC·M] Fichas Cervera/Miami: ES con amenidades en inglés crudo y "mast_capital" sin formatear; thin content (<300 palabras) en varias manuales; plantilla HabiHub repetida (riesgo scaled content).
+  - [Ivan+CC·S] **GA4 sin eventos clave** (cero conversiones configuradas: ni leads, ni WhatsApp, ni PDF).
+  - [CC·S] Cifras inconsistentes: "2.622 propiedades" (FAQ) vs 2.364 (schema) vs 11/12/13 países según página.
+- [Atilio+Ivan·L] Autoridad/backlinks: menciones, prensa, portales, partners. Lo que falta vs competidores. (Sin cambios desde junio; sigue siendo el techo estructural.)
 - (ISR cerrado 29/06: 21 rutas públicas estáticas/ISR. Las 8 que siguen ƒ — propiedades listado, destinos/[slug], destinos/espana, inversiones, promociones, propiedades/[slug]/[ciudad] — usan `searchParams` (filtros) → inherentemente dinámicas, no cacheables. Es correcto, no es pendiente.)
 
 ## 2. Blog / Contenido

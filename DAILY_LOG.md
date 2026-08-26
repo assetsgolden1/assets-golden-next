@@ -67,6 +67,47 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-27 — [SEO-FIX-1] Blog EN desbloqueado + sitemap bilingüe con lastmod real
+
+**Contexto:** Iván dio OK a ejecutar los críticos nº1 y nº2 del ACTION-PLAN de la auditoría 26/08 (blog EN roto + sitemap sin versión EN). También aclarado con él: lo de GA4 no es que "no leyó" leads — es que no hay eventos clave configurados; la ausencia real de leads la confirmó él en el Sheet (fuente fiable, atribución UTM propia).
+
+**Trabajo hecho:**
+- **Blog EN desbloqueado (13 posts ya escritos, antes huérfanos):**
+  - `blog/page.tsx`, `BlogCategoryGrid`, `consejos/page.tsx` y `noticias/page.tsx`: `next/link` → `Link` de `@/i18n/navigation` (los hrefs a posts ahora llevan `/en` en inglés).
+  - Listado y 4 categorías del blog: `metadata` estática → `generateMetadata` con `buildAlternates` (canonical correcto por locale + hreflang es/en/x-default; antes /en/blog canonicalizaba a /blog) + title/description EN reales.
+  - `blog/[slug]/page.tsx`: JSON-LD (`@id`, `url`, `mainEntityOfPage`), breadcrumbs (visibles + schema) y `og:url` ahora con `/en` para posts EN; CTA/“Volver”/fechas localizados (en-GB).
+- **Sitemap reescrito** (`sitemap.ts` + `getAllPropertySlugEntries()` nueva en queries.ts):
+  - Cada ruta bilingüe emite `<loc>` ES **y** EN (antes EN solo como alternate) → 2.813 → **5.604 URLs**.
+  - Posts de blog listados según su `language` (`/en/blog/<slug>` para EN) → eliminadas las 12 URLs 404.
+  - `lastModified` solo con fecha real de BD (updated_at de propiedades/posts): 1.946 valores distintos (antes: timestamp del request idéntico en 2.783 URLs). Destinos y estáticas sin lastmod (honesto).
+  - Añadidas las 4 categorías del blog; `x-default` en todos los alternates; eliminados changefreq/priority.
+
+**Verificación:** tsc 0 / eslint 0 / `npm run build` exit 0. Server de prod LOCAL (`npm start`) verificado con curl: sitemap 5.604 locs (2.800 /en, 0 posts EN en ruta ES, x-default 5.574), `/en/blog` canonical `/en/blog` + todos los links con prefijo, post EN 200 con canonical/JSON-LD/breadcrumbs `/en`, listado ES intacto (canonical `/blog`, links sin prefijo).
+
+**Archivos MODIFIED:** `src/app/sitemap.ts`, `src/lib/supabase/queries.ts`, `src/components/blog/BlogCategoryGrid.tsx`, `src/app/[locale]/(public)/blog/{page,consejos/page,inversiones/page,mercado/page,noticias/page,[slug]/page}.tsx`, `src/app/[locale]/(public)/{consejos,noticias}/page.tsx`.
+
+**Próximo paso sugerido:** tras el deploy, reenviar el sitemap en GSC (cuenta assetsgolden1@gmail.com) para acelerar el descubrimiento de las URLs /en; seguir con los High del plan: lang dinámico por locale, canonical de paginación, imágenes del feed medianewbuild.
+
+---
+
+### 2026-08-26 — [SEO-AUDIT] Auditoría SEO completa (7 especialistas + GA4) — score 67/100
+
+**Contexto:** Iván pidió analizar las actualizaciones del proyecto y entender la situación SEO actual; compartió 2 CSV de GA4 ("Informe panorámico", 01/01–26/08) y dio OK a la re-auditoría completa (la anterior era del 29/06).
+
+**Trabajo hecho:**
+- **Auditoría multi-agente sobre PRODUCCIÓN**: 7 subagentes en paralelo (técnico 82, contenido 54, schema 78, sitemap 68, performance mobile 67, visual 78 con screenshots Playwright, GEO/AI 64) + análisis GA4. **Score ponderado global: 67/100.**
+- **Hallazgos críticos nuevos**: (1) blog EN roto — links de /en/blog, canonical y sitemap apuntan a `/blog/<slug>` que da 404 → 13 posts EN huérfanos y 12 URLs 404 dentro del sitemap; (2) sitemap sin `<loc>` /en (~2.800 págs EN no enviadas) + lastmod = timestamp del request; (3) `lang="es"` en el HTML servido de /en + schema EN con URLs ES; (4) canonical de paginación → página 1 (~2.576 fichas sin enlazado rastreable); (5) imágenes del feed medianewbuild sin transform (listado 13,4 MB; LCP mobile 13–14 s lab; banner de cookies como elemento LCP); (6) fichas Cervera con inglés crudo en ES + thin content + plantilla HabiHub repetida; (7) GA4 sin eventos clave (cero conversiones configuradas).
+- **GA4 (datos reales desde ~17/06)**: 305 usuarios; orgánico 2º canal (70 usuarios / 23% / 127 sesiones, engagement 121 s vs 57 s del paid); pico tras el envío del sitemap (27–29/06); long-tail activo incl. fichas Miami; demanda nórdica (visitantes traduciendo a sueco/polaco); ~15 "usuarios" son datacenters (bots).
+- **Verificado que sigue BIEN**: canonicals ES/EN, hreflang principal + x-default, redirects 308 un salto, 404 real, security headers, SSR completo, titles/H1, schema Offer por mercado (EUR/USD), FAQPage 1:1, imágenes propias por Supabase, CLS 0, desktop pasa CWV.
+
+**Archivos CREATED:** `docs/seo-audit-2026-08-26/` con FULL-AUDIT-REPORT.md, ACTION-PLAN.md (25 items priorizados Critical→Low con responsable) y 8 informes de sección (technical/content/schema/sitemap/performance/geo/visual/analytics). MODIFIED: PENDIENTES.md (bloque de auditoría en sección 1), ESTADO.md (sección SEO reescrita con el estado 26/08).
+
+**Commits:** ninguno aún (pendiente de OK del usuario para commitear los docs).
+
+**Próximo paso sugerido:** ejecutar los críticos del ACTION-PLAN — el nº1 es el fix del blog EN (links + canonical + sitemap.ts; desbloquea 13 posts ya escritos con un cambio chico), después sitemap /en + lastmod real, y configurar los eventos clave de GA4. En paralelo, Iván revisa GSC (cuenta assetsgolden1@gmail.com, sin mirar desde el 29/06).
+
+---
+
 ### 2026-08-07 — [PORTAL] Acceso directo a Expertos de Gestión desde el portal de asesores
 
 **Contexto:** Atilio pidió que cada asesor tenga un botón directo al portal de gestoría (`expertosgestion.com/inmoges4`) y, si se podía, con el Nº de experto (3440) prerrellenado.

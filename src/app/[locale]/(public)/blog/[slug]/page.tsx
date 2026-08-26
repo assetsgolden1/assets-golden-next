@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { notFound } from 'next/navigation'
 import { getBlogPostBySlug, getAllBlogSlugs } from '@/lib/supabase/queries'
 import { routing } from '@/i18n/routing'
@@ -103,7 +103,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ...(ogImage && {
         images: [{ url: ogImage, width: 1200, height: 630, alt: post.title }],
       }),
-      url: `/blog/${slug}`,
+      url: post.language === 'en' ? `/en/blog/${slug}` : `/blog/${slug}`,
       ...(post.published_at && {
         publishedTime: post.published_at,
       }),
@@ -114,9 +114,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-function formatDate(dateStr: string | null): string {
+function formatDate(dateStr: string | null, lang: 'es' | 'en' = 'es'): string {
   if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('es-ES', {
+  return new Date(dateStr).toLocaleDateString(lang === 'en' ? 'en-GB' : 'es-ES', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -160,10 +160,13 @@ export default async function BlogPostPage({ params }: Props) {
     ? post.citations
     : undefined
 
+  // URL canónica del post según su idioma (los posts EN viven bajo /en).
+  const postUrl = `https://assetsgolden.com${lang === 'en' ? '/en' : ''}/blog/${slug}`
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
-    '@id': `https://assetsgolden.com/blog/${slug}`,
+    '@id': postUrl,
     headline: post.title,
     description: post.meta_description ?? post.excerpt ?? undefined,
     image: heroImage ? [heroImage] : undefined,
@@ -172,10 +175,10 @@ export default async function BlogPostPage({ params }: Props) {
     inLanguage: post.language === 'en' ? 'en-GB' : 'es-ES',
     author: { '@id': 'https://assetsgolden.com/#organization' },
     publisher: { '@id': 'https://assetsgolden.com/#organization' },
-    url: `https://assetsgolden.com/blog/${slug}`,
+    url: postUrl,
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `https://assetsgolden.com/blog/${slug}`,
+      '@id': postUrl,
     },
     ...(citationsArr && { citation: citationsArr }),
   }
@@ -207,9 +210,9 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <>
       <Breadcrumb items={[
-        { name: 'Inicio', url: '/' },
-        { name: 'Blog', url: '/blog' },
-        { name: post.title, url: `/blog/${slug}` },
+        { name: lang === 'en' ? 'Home' : 'Inicio', url: lang === 'en' ? '/en' : '/' },
+        { name: 'Blog', url: lang === 'en' ? '/en/blog' : '/blog' },
+        { name: post.title, url: `${lang === 'en' ? '/en' : ''}/blog/${slug}` },
       ]} />
       <script
         type="application/ld+json"
@@ -265,7 +268,7 @@ export default async function BlogPostPage({ params }: Props) {
                 </p>
               )}
               <p className="mt-5 text-white/50 text-sm">
-                {formatDate(post.published_at ?? post.created_at)} · Por {(post as { author?: string }).author ?? 'Assets Golden'}
+                {formatDate(post.published_at ?? post.created_at, lang)} · Por {(post as { author?: string }).author ?? 'Assets Golden'}
               </p>
             </div>
           </div>
@@ -292,7 +295,7 @@ export default async function BlogPostPage({ params }: Props) {
                 </p>
               )}
               <p className="mt-6 text-white/40 text-sm">
-                {formatDate(post.published_at ?? post.created_at)}
+                {formatDate(post.published_at ?? post.created_at, lang)}
               </p>
               <p className="mt-2 text-white/50 text-sm">
                 Por {(post as { author?: string }).author ?? 'Assets Golden'}
@@ -334,16 +337,16 @@ export default async function BlogPostPage({ params }: Props) {
           {/* CTA */}
           <div className="mt-16 rounded-xl gradient-navy p-8 text-center">
             <p className="font-display text-xl font-semibold text-white mb-2">
-              ¿Desea saber el valor de su propiedad?
+              {lang === 'en' ? 'Want to know what your property is worth?' : '¿Desea saber el valor de su propiedad?'}
             </p>
             <p className="text-white/60 text-sm mb-6">
-              Tasación gratuita y confidencial en menos de 24 horas.
+              {lang === 'en' ? 'Free, confidential valuation within 24 hours.' : 'Tasación gratuita y confidencial en menos de 24 horas.'}
             </p>
             <Link
               href="/vender-tu-piso"
               className={buttonVariants({ variant: 'hero', size: 'lg' })}
             >
-              Solicitar tasación gratuita
+              {lang === 'en' ? 'Request a free valuation' : 'Solicitar tasación gratuita'}
             </Link>
           </div>
 
@@ -353,7 +356,7 @@ export default async function BlogPostPage({ params }: Props) {
               href="/blog"
               className="text-sm text-muted-foreground hover:text-gold transition-colors"
             >
-              ← Volver al blog
+              ← {lang === 'en' ? 'Back to blog' : 'Volver al blog'}
             </Link>
           </div>
         </div>

@@ -1,78 +1,95 @@
 import type { MetadataRoute } from 'next'
-import { getAllPropertySlugs, getAllDestinationSlugs, createStaticClient } from '@/lib/supabase/queries'
+import {
+  getAllPropertySlugEntries,
+  getAllDestinationSlugs,
+  createStaticClient,
+} from '@/lib/supabase/queries'
 
 const BASE_URL = 'https://assetsgolden.com'
 
-function sitemapEntry(
-  path: string,
-  changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'],
-  priority: number,
-  lastModified?: Date,
-): MetadataRoute.Sitemap[number] {
-  const url = `${BASE_URL}${path}`
+// Cada ruta bilingüe genera DOS entradas (<loc> ES y <loc> EN) que comparten
+// el mismo bloque de alternates es/en/x-default. Sin la entrada EN propia,
+// Google no recibe las ~2.800 páginas /en (hallazgo de la auditoría 26/08).
+// lastModified solo se emite cuando hay fecha real de BD: un lastmod
+// inventado (new Date() en cada request) hace que Google lo ignore.
+function bilingualEntries(path: string, lastModified?: Date): MetadataRoute.Sitemap {
+  const esUrl = `${BASE_URL}${path}`
   const enUrl = `${BASE_URL}/en${path === '/' ? '' : path}`
-  return {
-    url,
-    lastModified: lastModified ?? new Date(),
-    changeFrequency,
-    priority,
-    alternates: { languages: { es: url, en: enUrl } },
+  const alternates = {
+    languages: { es: esUrl, en: enUrl, 'x-default': esUrl },
   }
+  return [
+    { url: esUrl, ...(lastModified && { lastModified }), alternates },
+    { url: enUrl, ...(lastModified && { lastModified }), alternates },
+  ]
 }
 
-const STATIC_PAGES: MetadataRoute.Sitemap = [
-  sitemapEntry('/',                       'weekly',  1.0),
-  sitemapEntry('/propiedades',            'daily',   0.9),
-  sitemapEntry('/vender-tu-piso',         'monthly', 0.8),
-  sitemapEntry('/equipo',                 'monthly', 0.6),
-  sitemapEntry('/blog',                   'weekly',  0.7),
-  sitemapEntry('/inversiones',            'weekly',  0.8),
-  sitemapEntry('/destinos',               'monthly', 0.7),
-  sitemapEntry('/contacto',               'yearly',  0.5),
-  sitemapEntry('/aviso-legal',            'yearly',  0.3),
-  sitemapEntry('/politica-de-privacidad', 'yearly',  0.3),
-  sitemapEntry('/politica-de-cookies',    'yearly',  0.3),
-  sitemapEntry('/sobre-nosotros',         'monthly', 0.8),
-  sitemapEntry('/servicios',              'monthly', 0.8),
-  sitemapEntry('/colabora',               'monthly', 0.6),
-  sitemapEntry('/mi-demanda',             'monthly', 0.7),
-  sitemapEntry('/promociones',            'weekly',  0.5),
-  sitemapEntry('/partners',               'monthly', 0.5),
-  sitemapEntry('/consejos',               'monthly', 0.4),
-  sitemapEntry('/noticias',               'weekly',  0.4),
+const STATIC_PATHS = [
+  '/',
+  '/propiedades',
+  '/vender-tu-piso',
+  '/equipo',
+  '/blog',
+  '/blog/consejos',
+  '/blog/inversiones',
+  '/blog/mercado',
+  '/blog/noticias',
+  '/inversiones',
+  '/destinos',
+  '/contacto',
+  '/aviso-legal',
+  '/politica-de-privacidad',
+  '/politica-de-cookies',
+  '/sobre-nosotros',
+  '/servicios',
+  '/colabora',
+  '/mi-demanda',
+  '/promociones',
+  '/partners',
+  '/consejos',
+  '/noticias',
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createStaticClient()
 
-  const [propertySlugs, destinationSlugs, blogRows] = await Promise.all([
-    getAllPropertySlugs(),
+  const [propertyEntries, destinationSlugs, blogRows] = await Promise.all([
+    getAllPropertySlugEntries(),
     getAllDestinationSlugs(),
     supabase
       .from('blog_posts')
-      .select('slug, published_at')
+      .select('slug, language, published_at, updated_at')
       .eq('published', true)
       .not('slug', 'is', null)
       .then(({ data }) => data ?? []),
   ])
 
-  const propertyUrls: MetadataRoute.Sitemap = propertySlugs.map((slug) =>
-    sitemapEntry(`/propiedades/${slug}`, 'weekly', 0.8),
-  )
+  const staticUrls = STATIC_PATHS.flatMap((path) => bilingualEntries(path))
 
-  // /destinos/[país] — incluye espana (página dedicada) y dedupe
-  const destinationUrls: MetadataRoute.Sitemap = [
-    ...new Set(['espana', ...destinationSlugs]),
-  ].map((slug) => sitemapEntry(`/destinos/${slug}`, 'monthly', 0.7))
-
-  const blogUrls: MetadataRoute.Sitemap = blogRows.map((post) =>
-    sitemapEntry(
-      `/blog/${post.slug}`,
-      'monthly',
-      0.6,
-      post.published_at ? new Date(post.published_at) : undefined,
+  const propertyUrls = propertyEntries.flatMap(({ slug, updated_at }) =>
+    bilingualEntries(
+      `/propiedades/${slug}`,
+      updated_at ? new Date(updated_at) : undefined,
     ),
   )
 
-  return [...STATIC_PAGES, ...destinationUrls, ...propertyUrls, ...blogUrls]
+  // /destinos/[país] — incluye espana (página dedicada) y dedupe
+  const destinationUrls = [...new Set(['espana', ...destinationSlugs])].flatMap(
+    (slug) => bilingualEntries(`/destinos/${slug}`),
+  )
+
+  // Los posts existen en UN solo idioma (filas separadas por language, slugs
+  // distintos): la URL depende del idioma de la fila y no hay par es/en que
+  // declarar como alternate. Antes los posts EN se listaban como /blog/<slug>
+  // (404) — hallazgo crítico de la auditoría 26/08.
+  const blogUrls: MetadataRoute.Sitemap = blogRows.map((post) => {
+    const prefix = post.language === 'en' ? '/en' : ''
+    const modified = post.updated_at ?? post.published_at
+    return {
+      url: `${BASE_URL}${prefix}/blog/${post.slug}`,
+      ...(modified && { lastModified: new Date(modified) }),
+    }
+  })
+
+  return [...staticUrls, ...destinationUrls, ...propertyUrls, ...blogUrls]
 }

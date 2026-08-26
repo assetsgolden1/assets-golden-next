@@ -1,20 +1,24 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
 import { Coffee } from 'lucide-react'
 import { getBlogPosts } from '@/lib/supabase/queries'
 import { optimizedImage } from '@/lib/utils/optimizedImage'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 
-export const metadata: Metadata = {
-  title: 'Blog Inmobiliario',
-  description:
-    'Artículos y análisis sobre el mercado inmobiliario exclusivo en Barcelona y destinos internacionales. Tendencias, consejos e inversión.',
-  alternates: {
-    canonical: '/blog',
-  },
-  openGraph: {
-    url: '/blog',
-  },
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params
+  const en = locale === 'en'
+  return {
+    title: en ? 'Real Estate Blog' : 'Blog Inmobiliario',
+    description: en
+      ? 'Articles and analysis on the exclusive property market in Barcelona and international destinations. Trends, tips and investment.'
+      : 'Artículos y análisis sobre el mercado inmobiliario exclusivo en Barcelona y destinos internacionales. Tendencias, consejos e inversión.',
+    alternates: buildAlternates('/blog', locale),
+    openGraph: {
+      url: en ? '/en/blog' : '/blog',
+    },
+  }
 }
 
 export const revalidate = 86400
@@ -31,9 +35,9 @@ const categoryLabels: Record<string, string> = {
   noticias: 'Noticias',
 }
 
-function formatDate(dateStr: string | null): string {
+function formatDate(dateStr: string | null, locale = 'es'): string {
   if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('es-ES', {
+  return new Date(dateStr).toLocaleDateString(locale === 'en' ? 'en-GB' : 'es-ES', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -47,6 +51,7 @@ interface Props {
 export default async function BlogPage({ params }: Props) {
   const { locale } = await params
   const { data: posts } = await getBlogPosts(20, locale)
+  const en = locale === 'en'
 
   const featured = posts[0]
   const rest = posts.slice(1)
@@ -60,10 +65,10 @@ export default async function BlogPage({ params }: Props) {
             <Coffee className="h-8 w-8 text-gold" />
           </div>
           <p className="text-xs tracking-[0.25em] text-gold uppercase mb-4">
-            Análisis y tendencias
+            {en ? 'Analysis and trends' : 'Análisis y tendencias'}
           </p>
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold text-white">
-            Blog inmobiliario
+            {en ? 'Real estate blog' : 'Blog inmobiliario'}
           </h1>
           <div className="h-px w-12 bg-gold mx-auto mt-6" />
         </div>
@@ -73,7 +78,7 @@ export default async function BlogPage({ params }: Props) {
         <div className="container-luxury">
           {posts.length === 0 ? (
             <p className="text-center text-muted-foreground py-16">
-              Artículos disponibles próximamente.
+              {en ? 'Articles coming soon.' : 'Artículos disponibles próximamente.'}
             </p>
           ) : (
             <>
@@ -107,7 +112,7 @@ export default async function BlogPage({ params }: Props) {
                     <div className="p-8 lg:p-12 flex flex-col justify-center bg-card">
                       <div className="mb-4">
                         <span className="inline-block bg-gold text-primary text-xs px-3 py-1 rounded-full font-semibold">
-                          Destacado
+                          {en ? 'Featured' : 'Destacado'}
                         </span>
                       </div>
                       {featured.category && (
@@ -124,7 +129,7 @@ export default async function BlogPage({ params }: Props) {
                         </p>
                       )}
                       <p className="mt-6 text-xs text-muted-foreground/60">
-                        {formatDate(featured.published_at ?? featured.created_at)}
+                        {formatDate(featured.published_at ?? featured.created_at, locale)}
                       </p>
                     </div>
                   </article>
@@ -172,7 +177,7 @@ export default async function BlogPage({ params }: Props) {
                           </p>
                         )}
                         <p className="mt-4 text-xs text-muted-foreground/50">
-                          {formatDate(post.published_at ?? post.created_at)}
+                          {formatDate(post.published_at ?? post.created_at, locale)}
                         </p>
                       </div>
                     </Link>
