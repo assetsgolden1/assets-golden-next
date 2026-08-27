@@ -79,6 +79,13 @@ async function main() {
       next = next
         .replace('Está con arquitectura de ', 'Cuenta con arquitectura de ')
         .replace('It is with architecture by ', 'It features architecture by ')
+      // Con varias promotoras quedaba "por A y B y con arquitectura de C".
+      const devPretty = src.developer ? formatEntityNames(src.developer, lang) : ''
+      if (devPretty && new RegExp(lang === 'es' ? ' y ' : ' and ').test(devPretty)) {
+        next = next
+          .replace(`${devPretty} y con arquitectura de `, `${devPretty}, con arquitectura de `)
+          .replace(`${devPretty} and with architecture by `, `${devPretty}, with architecture by `)
+      }
       if (next !== text) patch[field] = next
     }
 

@@ -333,7 +333,10 @@ function buildDescription(r: CerveraRaw, n: Partial<Normalized>, lang: 'es' | 'e
   if (dev) {
     const parts = [es ? `promovida por ${dev}` : `developed by ${dev}`]
     if (arch) parts.push(es ? `con arquitectura de ${arch}` : `with architecture by ${arch}`)
-    s.push((es ? 'Está ' : 'It is ') + parts.join(es ? ' y ' : ' and ') + '.')
+    // Con varias promotoras, `dev` ya trae su propia "y": unir las dos frases
+    // con otra "y" daba "por Mast Capital y Starwood Capital y con arquitectura".
+    const glue = new RegExp(es ? ' y ' : ' and ').test(dev) ? ', ' : es ? ' y ' : ' and '
+    s.push((es ? 'Está ' : 'It is ') + parts.join(glue) + '.')
   } else if (arch) {
     s.push(es ? `Cuenta con arquitectura de ${arch}.` : `It features architecture by ${arch}.`)
   }

@@ -82,7 +82,9 @@ Los campos `developer`/`architect` del feed vienen como slugs y se publicaban cr
 - Nuevo `src/lib/utils/formatEntityNames.ts`: convierte los slugs a nombres legibles. **Probado contra los 106 valores reales del feed**, lo que destapó dos bugs de mi primera versión: la regla "token corto = sigla" convertía `carlos_ott` en "Carlos OTT" (→ lista explícita de siglas) y `Metropica Developments, LLC` se partía en dos empresas (→ los sufijos societarios no separan). Respeta los valores que ya venían bien ("Kar Properties", "CUBE 3").
 - `importCervera.ts` usa el helper → **el origen queda arreglado**, las re-ejecuciones ya no reintroducen el problema.
 - Bug de redacción encontrado de paso: sin promotora la frase quedaba *"Está con arquitectura de X"* → ahora *"Cuenta con arquitectura de X"* (y su equivalente EN).
-- Backfill one-off `src/scripts/fixCerveraEntityNames.ts` (dry-run por defecto, `--apply` para escribir): **40 fichas corregidas en ES y EN**. Verificado por SQL: 0 slugs crudos y 0 frases mal redactadas en las 62. Re-ejecutado: idempotente (0 cambios).
+- Backfill one-off `src/scripts/fixCerveraEntityNames.ts` (dry-run por defecto, `--apply` para escribir): **40 fichas corregidas en ES y EN**. Re-ejecutado: idempotente (0 cambios).
+- Segunda pasada tras verificar en prod: con varias promotoras quedaba doble "y" ("por Mast Capital y Starwood Capital **y** con arquitectura de…") — corregido en el importador y en 5 fichas más.
+- **Verificado por SQL sobre las 62**: 0 slugs crudos, 0 "Está con arquitectura", 0 doble "y". Verificado en prod tras el deploy: "promovida por PMG", "Cuenta con arquitectura de Kobi Karp Architecture".
 
 **Archivos CREATED:** `src/lib/utils/formatEntityNames.ts`, `src/scripts/fixCerveraEntityNames.ts`. **MODIFIED:** `src/scripts/importCervera.ts`.
 
