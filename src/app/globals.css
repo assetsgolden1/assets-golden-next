@@ -449,3 +449,16 @@
   --cc-overlay-z-index:        9998;
   --cc-modal-z-index:          9999;
 }
+
+/* ─── Barra de contacto fija en fichas (móvil) ───────────────── */
+/* Cuando la ficha muestra su barra inferior [data-mobile-cta], el botón
+   flotante de WhatsApp sube para no quedar pisado por ella, y la página
+   reserva espacio al pie para que la barra no tape el contenido final. */
+@media (max-width: 1023px) {
+  body:has([data-mobile-cta]) .whatsapp-fab {
+    bottom: 5.5rem;
+  }
+  body:has([data-mobile-cta]) {
+    padding-bottom: 4.5rem;
+  }
+}

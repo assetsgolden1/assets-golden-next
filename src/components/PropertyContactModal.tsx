@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { PhoneInput } from '@/components/PhoneInput'
@@ -8,12 +9,15 @@ import { fbqTrack, sendServerEvent } from '@/lib/meta/track'
 import { getAttribution } from '@/lib/attribution'
 
 interface Props {
+  /** "sidebar" (por defecto) o "bar" para la barra fija de móvil */
+  variant?: 'sidebar' | 'bar'
   propertyId: string
   propertyTitle: string
   propertySlug: string
 }
 
-export default function PropertyContactModal({ propertyId, propertyTitle, propertySlug }: Props) {
+export default function PropertyContactModal({ propertyId, propertyTitle, propertySlug, variant = 'sidebar' }: Props) {
+  const t = useTranslations('ContactForm')
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
@@ -64,7 +68,7 @@ export default function PropertyContactModal({ propertyId, propertyTitle, proper
       })
       setStatus('success')
     } catch {
-      setErrorMsg('Ha ocurrido un error. Por favor inténtelo de nuevo.')
+      setErrorMsg(t('error_generic'))
       setStatus('error')
     }
   }
@@ -73,9 +77,13 @@ export default function PropertyContactModal({ propertyId, propertyTitle, proper
     <>
       <button
         onClick={() => setOpen(true)}
-        className="w-full bg-[#d4af37] hover:bg-[#c9a42e] text-[#0a1628] font-semibold py-3 px-6 rounded-lg transition-colors text-sm"
+        className={
+          variant === 'bar'
+            ? 'shrink-0 bg-[#d4af37] hover:bg-[#c9a42e] text-[#0a1628] font-semibold py-3 px-6 rounded-lg transition-colors text-sm'
+            : 'w-full bg-[#d4af37] hover:bg-[#c9a42e] text-[#0a1628] font-semibold py-3 px-6 rounded-lg transition-colors text-sm'
+        }
       >
-        Solicitar información
+        {variant === 'bar' ? t('bar_cta') : t('cta_request_info')}
       </button>
 
       {open && typeof document !== 'undefined' && createPortal(
@@ -114,8 +122,8 @@ export default function PropertyContactModal({ propertyId, propertyTitle, proper
             {status === 'success' ? (
               <div className="text-center py-8">
                 <div className="text-4xl mb-3">✓</div>
-                <p className="font-semibold text-gray-800">¡Mensaje enviado!</p>
-                <p className="text-sm text-gray-500 mt-1">Nos pondremos en contacto con usted pronto.</p>
+                <p className="font-semibold text-gray-800">{t('sent_title')}</p>
+                <p className="text-sm text-gray-500 mt-1">{t('sent_sub')}</p>
                 <button
                   onClick={() => { setOpen(false); setStatus('idle') }}
                   className="mt-5 text-sm text-[#d4af37] hover:underline"
@@ -126,26 +134,26 @@ export default function PropertyContactModal({ propertyId, propertyTitle, proper
             ) : (
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Nombre *</label>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">{t('field_name')}</label>
                   <input
                     name="name"
                     required
                     className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#d4af37]"
-                    placeholder="Su nombre completo"
+                    placeholder={t('ph_name')}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Email *</label>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">{t('field_email')}</label>
                   <input
                     name="email"
                     type="email"
                     required
                     className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#d4af37]"
-                    placeholder="correo@ejemplo.com"
+                    placeholder={t('ph_email')}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Teléfono</label>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">{t('field_phone')}</label>
                   <PhoneInput
                     value={phone}
                     onChange={(p, country, prefix) => {
@@ -156,12 +164,12 @@ export default function PropertyContactModal({ propertyId, propertyTitle, proper
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Mensaje</label>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">{t('field_message')}</label>
                   <textarea
                     name="message"
                     rows={3}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#d4af37] resize-none"
-                    placeholder="¿Tiene alguna pregunta sobre esta propiedad?"
+                    placeholder={t('ph_message')}
                   />
                 </div>
                 {status === 'error' && (
@@ -172,7 +180,7 @@ export default function PropertyContactModal({ propertyId, propertyTitle, proper
                   disabled={status === 'loading'}
                   className="w-full bg-[#d4af37] hover:bg-[#c9a42e] text-[#0a1628] font-semibold py-3 rounded-lg transition-colors text-sm disabled:opacity-60"
                 >
-                  {status === 'loading' ? 'Enviando...' : 'Enviar consulta'}
+                  {status === 'loading' ? t('sending') : t('submit')}
                 </button>
               </form>
             )}

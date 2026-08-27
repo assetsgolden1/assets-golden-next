@@ -510,5 +510,21 @@
     "cta_sub": "Cuéntenos su proyecto y le asignaremos el especialista adecuado.",
     "breadcrumb_home": "Inicio",
     "breadcrumb_services": "Servicios"
+  },
+  "ContactForm": {
+    "cta_request_info": "Solicitar información",
+    "sent_title": "¡Mensaje enviado!",
+    "sent_sub": "Nos pondremos en contacto con usted pronto.",
+    "field_name": "Nombre *",
+    "ph_name": "Su nombre completo",
+    "field_email": "Email *",
+    "ph_email": "correo@ejemplo.com",
+    "field_phone": "Teléfono",
+    "field_message": "Mensaje",
+    "ph_message": "¿Tiene alguna pregunta sobre esta propiedad?",
+    "sending": "Enviando...",
+    "submit": "Enviar consulta",
+    "error_generic": "Ha ocurrido un error. Por favor inténtelo de nuevo.",
+    "bar_cta": "Contactar"
   }
 }

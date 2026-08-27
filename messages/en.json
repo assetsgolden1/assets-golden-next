@@ -542,5 +542,21 @@
     "cta_sub": "Tell us about your project and we will assign the right specialist.",
     "breadcrumb_home": "Home",
     "breadcrumb_services": "Services"
+  },
+  "ContactForm": {
+    "cta_request_info": "Request information",
+    "sent_title": "Message sent",
+    "sent_sub": "We will get in touch with you shortly.",
+    "field_name": "Name *",
+    "ph_name": "Your full name",
+    "field_email": "Email *",
+    "ph_email": "you@example.com",
+    "field_phone": "Phone",
+    "field_message": "Message",
+    "ph_message": "Any questions about this property?",
+    "sending": "Sending…",
+    "submit": "Send enquiry",
+    "error_generic": "Something went wrong. Please try again.",
+    "bar_cta": "Enquire"
   }
 }

@@ -71,7 +71,7 @@ export default function Header() {
               aria-label={t("search_aria")}
             >
               <Search className="h-4 w-4" />
-              <span>{t("search_property")}</span>
+              <span className="hidden xl:inline">{t("search_property")}</span>
             </button>
 
             {/* Selector idioma */}

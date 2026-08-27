@@ -14,6 +14,7 @@ import { translateProvince, countryToISO } from '@/lib/utils/translateGeography'
 import { formatPrice } from '@/lib/utils/format'
 import { toSentenceCase } from '@/lib/utils/normalizeText'
 import PropertyContactModal from '@/components/PropertyContactModal'
+import PropertyMobileCTABar from '@/components/properties/PropertyMobileCTABar'
 import { ZONE_SLUGS } from '@/lib/constants/spainZones'
 import ViewContentTracker from '@/components/analytics/ViewContentTracker'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
@@ -199,7 +200,7 @@ export default async function PropertyDetailPage({ params }: Props) {
         )}
       </div>
 
-      <section className="section-padding bg-background">
+      <section className="section-padding pt-6 md:pt-10 lg:pt-16 bg-background">
         <div className="container-luxury">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
@@ -327,6 +328,15 @@ export default async function PropertyDetailPage({ params }: Props) {
           </div>
         </div>
       </section>
+      <PropertyMobileCTABar
+        propertyId={property.id}
+        propertyTitle={property.title}
+        propertySlug={property.slug ?? ''}
+        price={property.price}
+        currency={property.currency}
+        locale={locale}
+        sold={property.sold}
+      />
     </>
   )
 }

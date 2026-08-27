@@ -67,6 +67,26 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-27 (cont. 10) — [UX] Barra de contacto en fichas móvil + formulario traducido + header a 1280px
+
+**Contexto:** los 4 hallazgos de la auditoría visual del 26/08 que quedaban sin hacer.
+
+**Trabajo hecho:**
+- **Ficha móvil sin CTA (el importante):** el bloque de contacto vive en el `<aside>`, que en móvil se apila al final — había que scrollear la ficha entera para encontrarlo, y lo único visible era el FAB de WhatsApp. Nuevo `PropertyMobileCTABar`: barra fija al pie (`lg:hidden`) con **precio + botón de contacto**, el patrón habitual en portales inmobiliarios. No se muestra en fichas vendidas.
+- **FAB que tapaba contenido:** el botón de WhatsApp sube a `bottom: 5.5rem` cuando la barra está presente, vía `body:has([data-mobile-cta])` en globals.css (solo <1024px), y el body reserva `padding-bottom: 4.5rem` para que la barra no tape el final de la página. Se resuelven los dos hallazgos con una sola regla.
+- **Hueco entre galería y título:** `section-padding` metía 4rem arriba también en móvil → `pt-6 md:pt-10 lg:pt-16`.
+- **Header cortado a 1280px:** el bloque derecho es `shrink-0` y no entraba, cortando el CTA "Asesoría gratuita". La etiqueta "Buscar propiedad" pasa a `hidden xl:inline` (el icono se mantiene), liberando ancho.
+- **Bonus encontrado de paso:** `PropertyContactModal` tenía **14 textos hardcodeados en español** — se veían así en las 2.751 fichas EN. Traducido con un namespace `ContactForm` nuevo, y se le añadió la variante `bar` para el botón de la barra.
+
+**Verificación:** tsc 0, eslint 0, build exit 0. Sobre el HTML servido: la barra sale con `data-mobile-cta`, `lg:hidden`, precio "900.000 €" y botón "Contactar" (ES) / "Enquire" (EN); el trigger del sidebar dice "Solicitar información" / "Request information". Sobre el CSS compilado y servido: la media query `(max-width: 1023px)` con `body:has([data-mobile-cta]) .whatsapp-fab { bottom: 5.5rem }` y el `padding-bottom: 4.5rem` están presentes.
+**Limitación honesta:** no pude tomar capturas — el panel del navegador no está visible y no compone frames, y `playwright-core` no está instalado en el proyecto (la auditoría del 26/08 lo usó desde otro entorno). La verificación es sobre HTML y CSS servidos, no visual. **Conviene una mirada humana en móvil real** a la barra y a la posición del FAB.
+
+**Archivos CREATED:** `src/components/properties/PropertyMobileCTABar.tsx`. **MODIFIED:** `src/components/PropertyContactModal.tsx`, `src/components/WhatsAppButton.tsx`, `src/components/Header.tsx`, `src/app/globals.css`, `src/app/[locale]/(public)/propiedades/[slug]/page.tsx`, `messages/{es,en}.json`.
+
+**Próximo paso sugerido:** validación visual humana en móvil. Del informe queda el thin content de las 22 fichas Cervera (<300 palabras).
+
+---
+
 ### 2026-08-27 (cont. 9) — [i18n] Traducidas las 7 páginas de marketing + regresión de ISR detectada y corregida
 
 **Contexto:** cierre del aviso de cont. 8 — las páginas /en servían contenido en español mientras declaraban `hreflang="en"`.
