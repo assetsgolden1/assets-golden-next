@@ -9,7 +9,7 @@
  */
 export const EXPERTOS_GESTION = {
   name: 'Expertos de Gestión',
-  description: 'Gestoría y trámites para operaciones inmobiliarias',
+  description: 'CRM de gestión de operaciones inmobiliarias',
   url: 'https://expertosgestion.com/inmoges4/inicio.php',
   /**
    * Nº de experto de Assets Golden. **Compartido por todos los asesores**

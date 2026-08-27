@@ -56,7 +56,7 @@ export function ExpertosGestionCard() {
       </div>
 
       <p className="mt-3 text-xs text-muted-foreground">
-        Se abre en una pestaña nueva. Necesitás tu usuario y contraseña de Expertos de Gestión;
+        Se abre en una pestaña nueva. Necesitás tu usuario y contraseña del CRM;
         el Nº de experto es el mismo para todo el equipo.
       </p>
     </div>

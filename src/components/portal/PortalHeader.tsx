@@ -49,7 +49,7 @@ export function PortalHeader() {
             className="px-3 py-2 text-white hover:text-gold transition-colors flex items-center gap-2 text-sm"
           >
             <ExternalLink className="w-4 h-4" />
-            <span className="hidden sm:inline">Gestoría</span>
+            <span className="hidden sm:inline">CRM</span>
           </a>
           <button
             onClick={handleLogout}
