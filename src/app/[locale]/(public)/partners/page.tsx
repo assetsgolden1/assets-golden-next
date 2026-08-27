@@ -5,12 +5,13 @@ import { getPartners } from '@/lib/supabase/queries'
 import { buttonVariants } from '@/components/ui/button'
 import { getLinkedin } from '@/lib/constants/linkedinMap'
 import { buildAlternates } from '@/lib/utils/seoAlternates'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations , setRequestLocale } from 'next-intl/server'
 
 export async function generateMetadata(
   { params }: { params: Promise<{ locale: string }> },
 ): Promise<Metadata> {
   const { locale } = await params
+  setRequestLocale(locale)
   const t = await getTranslations({ locale, namespace: 'Partners' })
   return {
   title: t('meta_title'),
@@ -22,7 +23,11 @@ export async function generateMetadata(
 
 export const revalidate = 86400
 
-export default async function PartnersPage() {
+export default async function PartnersPage(
+  { params }: { params: Promise<{ locale: string }> },
+) {
+  const { locale } = await params
+  setRequestLocale(locale)
   const t = await getTranslations('Partners')
   const { data: partners } = await getPartners()
 

@@ -67,6 +67,27 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-27 (cont. 9) — [i18n] Traducidas las 7 páginas de marketing + regresión de ISR detectada y corregida
+
+**Contexto:** cierre del aviso de cont. 8 — las páginas /en servían contenido en español mientras declaraban `hreflang="en"`.
+
+**Trabajo hecho — 7 páginas traducidas** con namespaces nuevos en `messages/{es,en}.json`:
+- **/equipo** (`Team`): además de la UI, ahora usa `role_en`/`bio_en`, que **ya estaban en la BD** (15 de 16 pobladas) y la página simplemente ignoraba.
+- **/partners** (`Partners`), **/promociones** (`Promotions`), **/colabora** (`Collaborate`, componente cliente con `useTranslations`), **/vender-tu-piso** (`SellProperty`), **/sobre-nosotros** (`About`), **/servicios** (`Services`: 6 servicios + 3 asesorías + 6 FAQs + UI).
+- Las constantes a nivel de módulo (SERVICES/ADDITIONAL/FAQS/STATS/VALUES) pasaron a builders que reciben `t`.
+- **Cifras corregidas de paso:** "11 países de operación" → 13 en /sobre-nosotros; "más de 15 mercados" → 13 en /colabora; y las listas de países de /sobre-nosotros y /servicios (enumeraban 11) completadas con Brasil y República Dominicana.
+
+**⚠️ REGRESIÓN QUE INTRODUJE Y CORREGÍ — vale la pena anotarla:** al meter `getTranslations`/`getLocale` en estas páginas, **5 rutas pasaron de estáticas (●) a dinámicas (ƒ)** en el build: servicios, sobre-nosotros, vender-tu-piso, partners y promociones. Es exactamente el gotcha ya documentado del proyecto: sin `setRequestLocale(locale)` en la página, next-intl lee el request y rompe el render estático que se construyó en junio. Se detectó comparando el listado de rutas del build, no por tsc ni eslint (ninguno lo marca).
+Corregido añadiendo `params` + `setRequestLocale(locale)` en el componente y en `generateMetadata` de cada página. **Resultado final: todas ● de nuevo**, y `/partners` incluso quedó mejor que antes. `/promociones` sigue ƒ porque usa `searchParams` (correcto, es su naturaleza).
+
+**Verificación:** tsc 0, eslint sin errores nuevos, build exit 0. Sobre el HTML prerenderizado, ES vs EN: servicios "Soluciones Inmobiliarias"/"Property Solutions", equipo "Nuestro equipo"/"Our team", partners "Red Global de Partners"/"Global Partner Network", colabora "Colabora con Nosotros"/"Partner With Us", vender-tu-piso y sobre-nosotros con sus párrafos traducidos, y la FAQ de servicios en ambos idiomas con los 13 países.
+
+**Archivos MODIFIED:** `messages/{es,en}.json` + las 7 páginas (`servicios`, `sobre-nosotros`, `vender-tu-piso`, `partners`, `promociones`, `equipo`, `colabora/{page,ColaboraContent}`).
+
+**Próximo paso sugerido:** al tocar i18n en una página, **verificar SIEMPRE el listado ● / ƒ del build** — es la única señal de que se rompió el render estático. Queda del informe: los 4 hallazgos visuales de mobile y el thin content de 22 fichas Cervera.
+
+---
+
 ### 2026-08-27 (cont. 8) — [SEO-FIX-9] Schema: inmueble como `Accommodation`, Person en /equipo + AVISO sobre las páginas EN sin traducir
 
 **Trabajo hecho (mejoras de schema del informe 26/08):**

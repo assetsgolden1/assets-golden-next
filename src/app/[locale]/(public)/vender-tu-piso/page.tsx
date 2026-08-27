@@ -3,21 +3,28 @@ import Link from 'next/link'
 import VenderForm from '@/components/forms/VenderForm'
 import { buttonVariants } from '@/components/ui/button'
 import { buildAlternates } from '@/lib/utils/seoAlternates'
+import { getTranslations , setRequestLocale } from 'next-intl/server'
 
 export async function generateMetadata(
   { params }: { params: Promise<{ locale: string }> },
 ): Promise<Metadata> {
   const { locale } = await params
+  setRequestLocale(locale)
+  const t = await getTranslations({ locale, namespace: 'SellProperty' })
   return {
-  title: 'Vender Tu Piso en Barcelona — Tasación Gratuita',
-  description:
-    'Vende tu piso o propiedad exclusiva en Barcelona con la máxima discreción y al mejor precio. Tasación gratuita y sin compromiso en menos de 24 horas.',
+  title: t('meta_title'),
+  description: t('meta_description'),
   alternates: buildAlternates('/vender-tu-piso', locale),
   openGraph: { url: locale === 'en' ? '/en/vender-tu-piso' : '/vender-tu-piso' },
 }
 }
 
-export default function VenderTuPisoPage() {
+export default async function VenderTuPisoPage(
+  { params }: { params: Promise<{ locale: string }> },
+) {
+  const { locale } = await params
+  setRequestLocale(locale)
+  const t = await getTranslations('SellProperty')
   return (
     <>
       {/* ─── HERO COMPACTO ────────────────────────────────────── */}
@@ -31,27 +38,26 @@ export default function VenderTuPisoPage() {
         />
         <div className="container-luxury relative z-10 max-w-3xl">
           <p className="text-xs tracking-[0.3em] text-gold uppercase mb-5">
-            Barcelona · Mercado exclusivo
+            {t('eyebrow')}
           </p>
           <h1 className="font-display text-4xl font-semibold text-white leading-tight md:text-5xl">
-            El mercado de Barcelona lleva{' '}
-            <span className="text-gold">-15% de stock.</span>
+            {t('h1_lead')}{' '}
+            <span className="text-gold">{t('h1_highlight')}</span>
             <br />
-            Es el mejor momento para vender.
+            {t('h1_tail')}
           </h1>
           <p className="mt-6 text-white/60 text-lg max-w-xl leading-relaxed">
-            Tasación gratuita y confidencial. Un especialista le contactará
-            en menos de 24 horas.
+            {t('hero_sub')}
           </p>
           <div className="mt-8 flex flex-wrap gap-6 text-sm text-white/50">
             <span className="flex items-center gap-2">
-              <span className="text-gold">✓</span> Sin compromiso
+              <span className="text-gold">✓</span> {t('badge_1')}
             </span>
             <span className="flex items-center gap-2">
-              <span className="text-gold">✓</span> 100% confidencial
+              <span className="text-gold">✓</span> {t('badge_2')}
             </span>
             <span className="flex items-center gap-2">
-              <span className="text-gold">✓</span> Respuesta en 24h
+              <span className="text-gold">✓</span> {t('badge_3')}
             </span>
           </div>
         </div>
@@ -82,18 +88,18 @@ export default function VenderTuPisoPage() {
                 {[
                   {
                     step: '01',
-                    title: 'Tasación gratuita en 24h',
-                    desc: 'Análisis del mercado actual, comparables recientes y valoración confidencial sin coste.',
+                    title: t('step1_title'),
+                    desc: t('step1_desc'),
                   },
                   {
                     step: '02',
-                    title: 'Estrategia personalizada',
-                    desc: 'Diseñamos el plan de venta óptimo: timing, precio de salida y perfil de comprador.',
+                    title: t('step2_title'),
+                    desc: t('step2_desc'),
                   },
                   {
                     step: '03',
-                    title: 'Venta con máxima discreción',
-                    desc: 'Red offmarket exclusiva. Solo acceden compradores verificados y cualificados.',
+                    title: t('step3_title'),
+                    desc: t('step3_desc'),
                   },
                 ].map((item) => (
                   <div key={item.step} className="flex gap-5">
@@ -119,9 +125,9 @@ export default function VenderTuPisoPage() {
         <div className="container-luxury">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
             {[
-              { stat: '+200', label: 'Propiedades vendidas' },
-              { stat: '15', label: 'Países de compradores' },
-              { stat: '24h', label: 'Tiempo medio de respuesta' },
+              { stat: '+200', label: t('stat_1') },
+              { stat: '15', label: t('stat_2') },
+              { stat: '24h', label: t('stat_3') },
             ].map((item) => (
               <div key={item.label}>
                 <div className="font-display text-4xl font-bold text-navy">
@@ -139,13 +145,13 @@ export default function VenderTuPisoPage() {
       {/* ─── NAVEGACIÓN CONTEXTUAL ───────────────────────────── */}
       <section className="section-padding bg-muted/30">
         <div className="container-luxury text-center">
-          <p className="text-sm text-muted-foreground mb-6">¿No está seguro todavía?</p>
+          <p className="text-sm text-muted-foreground mb-6">{t('not_sure')}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/propiedades" className={buttonVariants({ variant: 'goldOutline' })}>
-              Ver propiedades disponibles
+              {t('cta_properties')}
             </Link>
             <Link href="/sobre-nosotros" className={buttonVariants({ variant: 'outline' })}>
-              Conozca nuestro equipo
+              {t('cta_team')}
             </Link>
           </div>
         </div>

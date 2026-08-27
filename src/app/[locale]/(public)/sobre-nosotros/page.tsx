@@ -5,15 +5,17 @@ import { getTeamMembers } from '@/lib/supabase/queries'
 import { buttonVariants } from '@/components/ui/button'
 import { optimizedImage } from '@/lib/utils/optimizedImage'
 import { buildAlternates } from '@/lib/utils/seoAlternates'
+import { getTranslations , setRequestLocale } from 'next-intl/server'
 
 export async function generateMetadata(
   { params }: { params: Promise<{ locale: string }> },
 ): Promise<Metadata> {
   const { locale } = await params
+  setRequestLocale(locale)
+  const t = await getTranslations({ locale, namespace: 'About' })
   return {
-  title: 'Sobre Nosotros',
-  description:
-    'Socios fundadores con más de 40 años de trayectoria conjunta en propiedades exclusivas a nivel internacional. Más de 1.500 operaciones acompañadas en 13 países. Conozca Assets Golden.',
+  title: t('meta_title'),
+  description: 'Socios fundadores con más de 40 años de trayectoria conjunta en propiedades exclusivas a nivel internacional. Más de 1.500 operaciones acompañadas en 13 países. Conozca Assets Golden.',
   alternates: buildAlternates('/sobre-nosotros', locale),
   openGraph: { url: locale === 'en' ? '/en/sobre-nosotros' : '/sobre-nosotros' },
 }
@@ -21,37 +23,44 @@ export async function generateMetadata(
 
 export const revalidate = 3600
 
-const STATS = [
-  { value: '40+', label: 'Años de trayectoria conjunta' },
-  { value: '1.500+', label: 'Operaciones acompañadas' },
-  { value: '11', label: 'Países de operación' },
-  { value: '98%', label: 'Clientes satisfechos' },
+const buildStats = (t: (k: string) => string) => [
+  { value: '40+', label: t('stat1') },
+  { value: '1.500+', label: t('stat2') },
+  { value: '13', label: t('stat3') },
+  { value: '98%', label: t('stat4') },
 ]
 
-const VALUES = [
+const buildValues = (t: (k: string) => string) => [
   {
     icon: Globe,
-    title: 'Alcance global',
-    desc: 'Presencia activa en los principales mercados inmobiliarios internacionales, con red de partners en 13 países.',
+    title: t('v1_title'),
+    desc: t('v1_desc'),
   },
   {
     icon: Users,
-    title: 'Servicio personalizado',
-    desc: 'Cada cliente recibe atención dedicada y soluciones a medida adaptadas a sus objetivos e inversión.',
+    title: t('v2_title'),
+    desc: t('v2_desc'),
   },
   {
     icon: Award,
-    title: 'Excelencia',
-    desc: 'Comprometidos con los más altos estándares de calidad, transparencia y profesionalismo en cada operación.',
+    title: t('v3_title'),
+    desc: t('v3_desc'),
   },
   {
     icon: Target,
-    title: 'Resultados',
-    desc: 'Enfocados en alcanzar los objetivos de inversión de nuestros clientes de forma eficiente y segura.',
+    title: t('v4_title'),
+    desc: t('v4_desc'),
   },
 ]
 
-export default async function SobreNosotrosPage() {
+export default async function SobreNosotrosPage(
+  { params }: { params: Promise<{ locale: string }> },
+) {
+  const { locale } = await params
+  setRequestLocale(locale)
+  const t = await getTranslations('About')
+  const STATS = buildStats(t)
+  const VALUES = buildValues(t)
   const { data: team } = await getTeamMembers()
   const founders = team.filter((m) => m.member_type === 'founder' && m.active)
 
@@ -60,13 +69,13 @@ export default async function SobreNosotrosPage() {
       {/* Hero */}
       <section className="gradient-navy py-24">
         <div className="container-luxury text-center">
-          <p className="text-xs tracking-[0.25em] text-gold uppercase mb-3">Sobre nosotros</p>
+          <p className="text-xs tracking-[0.25em] text-gold uppercase mb-3">{t('eyebrow')}</p>
           <h1 className="font-display text-4xl font-semibold text-white md:text-5xl">
             Assets Golden International
           </h1>
           <p className="mt-4 text-white/60 max-w-2xl mx-auto text-base leading-relaxed">
-            Somos una consultora inmobiliaria internacional especializada en la compraventa de propiedades en los mercados más atractivos del mundo.
-          </p>
+            {t('intro')}
+            </p>
         </div>
       </section>
 
@@ -87,23 +96,23 @@ export default async function SobreNosotrosPage() {
       {/* Misión */}
       <section className="section-padding bg-background">
         <div className="container-luxury max-w-3xl">
-          <h2 className="font-display text-3xl font-semibold mb-6">Nuestra misión</h2>
+          <h2 className="font-display text-3xl font-semibold mb-6">{t('mission_title')}</h2>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            Detrás de Assets Golden hay un equipo con más de 40 años de trayectoria conjunta en el sector inmobiliario, acumulada por sus socios fundadores entre operaciones en España y mercados internacionales. A lo largo de esa trayectoria hemos acompañado más de 1.500 operaciones inmobiliarias, desde viviendas residenciales hasta activos comerciales y de inversión.
-          </p>
+            {t('mission_p1')}
+            </p>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            En Assets Golden International conectamos a inversores, compradores y vendedores con las mejores oportunidades inmobiliarias del mercado global. Nuestra red de partners en 13 países nos permite ofrecer un servicio integral y adaptado a cada perfil de cliente.
-          </p>
+            {t('mission_p2')}
+            </p>
           <p className="text-muted-foreground leading-relaxed">
-            Operamos en España, México, Indonesia, Emiratos Árabes Unidos, Argentina, Estados Unidos, Costa Rica, Reino Unido, Ecuador, Grecia y Paraguay. Permanentemente abrimos nuevos mercados en busca de mejores y más rentables oportunidades para nuestros clientes.
-          </p>
+            {t('mission_p3')}
+            </p>
         </div>
       </section>
 
       {/* Valores */}
       <section className="section-padding bg-muted/30">
         <div className="container-luxury">
-          <h2 className="font-display text-3xl font-semibold mb-12 text-center">Nuestros valores</h2>
+          <h2 className="font-display text-3xl font-semibold mb-12 text-center">{t('values_title')}</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {VALUES.map(({ icon: Icon, title, desc }) => (
               <div key={title} className="text-center">
@@ -123,9 +132,9 @@ export default async function SobreNosotrosPage() {
         <div className="container-luxury">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="font-display text-3xl font-semibold mb-6">Red internacional</h2>
+              <h2 className="font-display text-3xl font-semibold mb-6">{t('network_title')}</h2>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                Nuestra red de partners cubre los principales mercados inmobiliarios de Europa, América y Oriente Próximo. Esta presencia global nos permite ofrecer a nuestros clientes oportunidades únicas y acceso a propiedades exclusivas fuera del mercado convencional.
+                {t('network_p')}
               </p>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 {[
@@ -134,7 +143,9 @@ export default async function SobreNosotrosPage() {
                   'Indonesia: Bali (Uluwatu, Canggu, Ubud)',
                   'Emiratos Árabes Unidos: Dubái',
                   'Argentina: Buenos Aires, Córdoba',
-                  'Estados Unidos: Miami, Nueva York',
+                  'Brasil: Gramado',
+              'Estados Unidos: Miami, Nueva York',
+              'República Dominicana: Samaná',
                   'Costa Rica',
                   'Reino Unido',
                   'Ecuador',
@@ -149,10 +160,10 @@ export default async function SobreNosotrosPage() {
               </ul>
             </div>
             <div className="rounded-2xl bg-gradient-to-br from-navy to-navy/70 p-8 text-white">
-              <p className="text-xs tracking-widest text-gold uppercase mb-2">Presencia global</p>
-              <h3 className="font-display text-2xl font-semibold mb-4">Red de partners independientes</h3>
+              <p className="text-xs tracking-widest text-gold uppercase mb-2">{t('global_eyebrow')}</p>
+              <h3 className="font-display text-2xl font-semibold mb-4">{t('partners_title')}</h3>
               <p className="text-white/70 text-sm leading-relaxed">
-                Contamos con una red consolidada de agentes y partners en 13 países, lo que nos permite ofrecer oportunidades exclusivas y acceso a compradores e inversores de alto perfil en cualquier parte del mundo.
+                {t('partners_p')}
               </p>
               <Link
                 href="/partners"
@@ -169,7 +180,7 @@ export default async function SobreNosotrosPage() {
       {founders.length > 0 && (
         <section className="section-padding bg-muted/30">
           <div className="container-luxury">
-            <h2 className="font-display text-3xl font-semibold mb-10 text-center">Nuestro equipo</h2>
+            <h2 className="font-display text-3xl font-semibold mb-10 text-center">{t('team_title')}</h2>
             <div className="flex flex-wrap justify-center gap-8">
               {founders.map((m) => (
                 <div key={m.id} className="text-center w-64">

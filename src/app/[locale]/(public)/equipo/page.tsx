@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Breadcrumb from '@/components/seo/Breadcrumb'
-import { getTranslations, getLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import Image from 'next/image'
 import { getTeamMembers } from '@/lib/supabase/queries'
 import { getLinkedin } from '@/lib/constants/linkedinMap'
@@ -12,6 +12,7 @@ export async function generateMetadata(
   { params }: { params: Promise<{ locale: string }> },
 ): Promise<Metadata> {
   const { locale } = await params
+  setRequestLocale(locale)
   const t = await getTranslations({ locale, namespace: 'Team' })
   return {
   title: t('meta_title'),
@@ -29,10 +30,13 @@ const memberTypeLabel: Record<string, string> = {
   team: 'Equipo',
 }
 
-export default async function EquipoPage() {
+export default async function EquipoPage(
+  { params }: { params: Promise<{ locale: string }> },
+) {
+  const { locale } = await params
+  setRequestLocale(locale)
   const { data: team } = await getTeamMembers()
   const t = await getTranslations('Team')
-  const locale = await getLocale()
   const en = locale === 'en'
 
   const founders = team.filter((m) => m.member_type === 'founder')

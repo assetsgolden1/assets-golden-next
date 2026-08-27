@@ -1,36 +1,27 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Briefcase, Building2, HardHat } from 'lucide-react'
 import CollaborateDialog from '@/components/CollaborateDialog'
 
 type CollabType = 'profesional' | 'agencia' | 'promotora'
 
-const TYPES = [
-  {
-    id: 'profesional' as CollabType,
-    Icon: Briefcase,
-    title: 'Profesional',
-    description: 'Agentes inmobiliarios, asesores, arquitectos y otros profesionales del sector',
-    cta: 'Unirme como profesional',
-  },
-  {
-    id: 'agencia' as CollabType,
-    Icon: Building2,
-    title: 'Agencia',
-    description: 'Agencias inmobiliarias que buscan expandir su red de colaboración',
-    cta: 'Unirme como agencia',
-  },
-  {
-    id: 'promotora' as CollabType,
-    Icon: HardHat,
-    title: 'Promotora',
-    description: 'Promotoras y desarrolladoras inmobiliarias con proyectos activos',
-    cta: 'Unirme como promotora',
-  },
+const TYPE_IDS = [
+  { id: 'profesional' as CollabType, Icon: Briefcase, key: 'pro' },
+  { id: 'agencia' as CollabType, Icon: Building2, key: 'agency' },
+  { id: 'promotora' as CollabType, Icon: HardHat, key: 'dev' },
 ]
 
 export default function ColaboraContent() {
+  const tr = useTranslations('Collaborate')
+  const TYPES = TYPE_IDS.map(({ id, Icon, key }) => ({
+    id,
+    Icon,
+    title: tr(`type_${key}`),
+    description: tr(`type_${key}_desc`),
+    cta: tr(`type_${key}_cta`),
+  }))
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedType, setSelectedType] = useState<CollabType | null>(null)
 
@@ -44,13 +35,13 @@ export default function ColaboraContent() {
       {/* Hero */}
       <section className="gradient-navy py-20">
         <div className="container-luxury text-center">
-          <p className="text-xs tracking-[0.25em] text-gold uppercase mb-3">Red de colaboración</p>
+          <p className="text-xs tracking-[0.25em] text-gold uppercase mb-3">{tr('eyebrow')}</p>
           <h1 className="font-display text-4xl font-semibold text-white md:text-5xl">
-            Colabora con Nosotros
+            {tr('h1')}
           </h1>
           <div className="mt-6 h-px w-12 bg-gold mx-auto" />
           <p className="mt-6 text-white/60 max-w-xl mx-auto text-sm leading-relaxed">
-            Seleccione el tipo de colaboración que mejor se adapte a su perfil y únase a nuestra red internacional.
+            {tr('intro')}
           </p>
         </div>
       </section>
@@ -78,7 +69,7 @@ export default function ColaboraContent() {
 
           {/* Why collaborate */}
           <div className="mt-20 max-w-2xl mx-auto text-center">
-            <h2 className="font-display text-2xl font-semibold mb-4">¿Por qué colaborar con Assets Golden?</h2>
+            <h2 className="font-display text-2xl font-semibold mb-4">{tr('why_title')}</h2>
             <div className="divider-gold mx-auto mb-8" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
               {[

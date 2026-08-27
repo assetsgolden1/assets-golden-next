@@ -4,12 +4,13 @@ import { getProperties } from '@/lib/supabase/queries'
 import PropertyCard from '@/components/properties/PropertyCard'
 import { buttonVariants } from '@/components/ui/button'
 import { buildAlternates } from '@/lib/utils/seoAlternates'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations , setRequestLocale } from 'next-intl/server'
 
 export async function generateMetadata(
   { params }: { params: Promise<{ locale: string }> },
 ): Promise<Metadata> {
   const { locale } = await params
+  setRequestLocale(locale)
   const t = await getTranslations({ locale, namespace: 'Promotions' })
   return {
   title: t('meta_title'),
@@ -22,6 +23,7 @@ export async function generateMetadata(
 export const revalidate = 43200
 
 interface Props {
+  params: Promise<{ locale: string }>
   searchParams: Promise<{
     tipo?: string
     pagina?: string
@@ -30,7 +32,9 @@ interface Props {
 
 const PAGE_SIZE = 12
 
-export default async function PromocionesPage({ searchParams }: Props) {
+export default async function PromocionesPage({ params: routeParams, searchParams }: Props) {
+  const { locale } = await routeParams
+  setRequestLocale(locale)
   const t = await getTranslations('Promotions')
   const params = await searchParams
   const page = Math.max(1, parseInt(params.pagina ?? '1', 10))
