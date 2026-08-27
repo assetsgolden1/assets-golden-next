@@ -4,6 +4,7 @@ import { translateCountry } from '@/lib/utils/translateGeography'
 // locale vía translateCountry(): en EN salen en inglés, en ES en español.
 const SERVED_COUNTRIES = [
   'Argentina',
+  'Brasil',
   'Costa Rica',
   'Ecuador',
   'Emiratos Árabes Unidos',
@@ -54,7 +55,12 @@ function buildSchema(locale: string) {
         hasOfferCatalog: {
           '@type': 'OfferCatalog',
           name: locale === 'en' ? 'Exclusive properties for sale' : 'Propiedades exclusivas en venta',
-          numberOfItems: 2364,
+          // Conteo del catálogo. Es un valor fijo a propósito: el layout no hace
+          // consultas a la BD (así ninguna página depende de Supabase para render-
+          // izarse). Refrescar al cargar lotes grandes con:
+          //   SELECT count(*) FROM properties WHERE status IN ('active','available')
+          //     AND hidden IS NOT TRUE AND hidden_by_sync IS NOT TRUE;
+          numberOfItems: 2751, // verificado 27/08/2026
         },
         sameAs: [
           'https://www.linkedin.com/company/assets-golden/',

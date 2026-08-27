@@ -120,7 +120,7 @@ const FAQS = [
   },
   {
     q: '¿En qué países opera Assets Golden?',
-    a: 'Estamos presentes en 12 países a través de nuestra red de partners: España, México, Indonesia (Bali), Emiratos Árabes Unidos (Dubái), Argentina, Estados Unidos, Costa Rica, Reino Unido, Ecuador, Grecia y Paraguay. Abrimos nuevos mercados de forma permanente.',
+    a: 'Estamos presentes en 13 países a través de nuestra red de partners: España, México, Indonesia (Bali), Emiratos Árabes Unidos (Dubái), Argentina, Brasil, Estados Unidos, Costa Rica, República Dominicana, Reino Unido, Ecuador, Grecia y Paraguay. Abrimos nuevos mercados de forma permanente.',
   },
   {
     q: '¿Trabajan con compradores e inversores extranjeros?',
@@ -162,7 +162,7 @@ export default function ServiciosPage() {
             Soluciones Inmobiliarias
           </h1>
           <p className="mt-4 text-white/60 max-w-2xl mx-auto text-sm leading-relaxed">
-            Somos un equipo de profesionales con amplia experiencia en el sector inmobiliario e inversiones en todo el mundo. Disponemos de partners en 12 países.
+            Somos un equipo de profesionales con amplia experiencia en el sector inmobiliario e inversiones en todo el mundo. Disponemos de partners en 13 países.
           </p>
         </div>
       </section>

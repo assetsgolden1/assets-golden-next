@@ -26,7 +26,9 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
   - (✅ CERRADO 27/08 cont.4 — **nombres de promotora/arquitecto en fichas Cervera**: 40 de 62 publicaban slugs crudos ("promovida por pmg"). Helper `lib/utils/formatEntityNames.ts` probado contra los 106 valores reales + arreglado el origen en `importCervera.ts` + backfill aplicado. Verificado por SQL: 0 slugs en las 62. Ver DAILY_LOG 27/08 cont.4.)
   - [CC·M] Sigue pendiente del mismo bloque: thin content (<300 palabras) en 22 fichas Cervera y en varias manuales; amenidades cortadas; plantilla HabiHub repetida (riesgo scaled content).
   - [Ivan+CC·S] **GA4 sin eventos clave** (cero conversiones configuradas: ni leads, ni WhatsApp, ni PDF).
-  - [CC·S] Cifras inconsistentes: "2.622 propiedades" (FAQ) vs 2.364 (schema) vs 11/12/13 países según página.
+  - (✅ CERRADO 27/08 cont.6 — **cifras + Brasil sin mapear**: al corregir las cifras apareció que Brasil (cargado 26/07) nunca se sumó a `translateGeography` → las fichas de Brasil publicaban `addressCountry: "ES"` y en EN el país salía "Brasil". Corregidos ambos mapas + areaServed + numberOfItems 2.364→2.751 + 15 reemplazos "12 países"→13 + FAQ de servicios completada (enumeraba 11) + singular/plural en FAQ de destinos. Ver DAILY_LOG 27/08 cont.6.)
+  - [CC·S] **Prevención:** que el importador (o un test) falle si aparece un país sin mapear en `translateGeography`/`SERVED_COUNTRIES` — este bug estuvo un mes sin detectarse.
+  - [CC·S] `numberOfItems` del schema es un valor fijo (2.751 al 27/08) y vuelve a quedar obsoleto al cargar lotes grandes: refrescar con el SQL que está comentado en `GlobalSchemaOrg.tsx`.
 - [Atilio+Ivan·L] Autoridad/backlinks: menciones, prensa, portales, partners. Lo que falta vs competidores. (Sin cambios desde junio; sigue siendo el techo estructural.)
 - (ISR cerrado 29/06: 21 rutas públicas estáticas/ISR. Las 8 que siguen ƒ — propiedades listado, destinos/[slug], destinos/espana, inversiones, promociones, propiedades/[slug]/[ciudad] — usan `searchParams` (filtros) → inherentemente dinámicas, no cacheables. Es correcto, no es pendiente.)
 

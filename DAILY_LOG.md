@@ -67,6 +67,31 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-27 (cont. 6) — [SEO-FIX-7] Brasil faltaba en el mapa de países: propiedades brasileñas declaradas como España
+
+**Contexto:** con el plan grande cerrado, Iván preguntó qué más se podía avanzar sin él. Arranqué por el ítem "cifras inconsistentes" (2.622 vs 2.364 propiedades, 11/12/13 países según página) y al buscar la causa apareció un bug bastante peor.
+
+**El bug de fondo:** Brasil se cargó el 26/07 pero **nunca se sumó a `translateGeography.ts`**, que es justo la regla crítica anotada en ESTADO ("país nuevo debe sumarse a COUNTRY_MAP/ISO"). Consecuencias, las tres verificadas en producción:
+1. `countryToISO('Brasil')` caía al fallback `'ES'` → las fichas de Brasil publicaban **`addressCountry: "ES"`** en su JSON-LD: Google las leía como propiedades en España.
+2. En el sitio en inglés el país salía como "Brasil" en vez de "Brazil".
+3. Brasil faltaba en `areaServed` del schema global.
+
+**Trabajo hecho:**
+- `translateGeography.ts`: Brasil → Brazil / BR en ambos mapas (COUNTRY_MAP y COUNTRY_ISO).
+- `GlobalSchemaOrg`: Brasil sumado a `SERVED_COUNTRIES` (12 → 13) y `numberOfItems` 2.364 → **2.751** (el real), con comentario y el SQL para refrescarlo. Se deja fijo a propósito: el layout no consulta la BD, así ninguna página depende de Supabase para renderizarse.
+- Cifras del sitio: **15 reemplazos** de "12 países" → 13 en 5 páginas + `messages/es.json` y `messages/en.json`.
+- FAQ de /servicios: enumeraba **11** países mientras afirmaba 12 — completada a 13 (faltaban Brasil y República Dominicana).
+- FAQ de destinos: "Actualmente ofrecemos **1 propiedades** en Grecia" → singular/plural correcto en ES y EN.
+
+**Verificación:** tsc/eslint 0, JSON de i18n válido, build exit 0. Sobre el HTML del build, parseando los bloques JSON-LD: Gramado → **BR** (la propiedad) y Sant Joan Despí → ES (la agencia, correcto). /destinos/grecia y /destinos/brasil muestran "1 propiedad" en singular. `numberOfItems: 2751`, "Estamos presentes en 13 países", y "Properties in Brazil" en EN.
+*Nota de método:* el primer chequeo de `addressCountry` dio "ES" y parecía que el fix no funcionaba — era que el grep tomaba el primer match del HTML, que es la dirección de la agencia. Hubo que parsear los bloques por tipo para leer el correcto.
+
+**Archivos MODIFIED:** `src/lib/utils/translateGeography.ts`, `src/components/seo/GlobalSchemaOrg.tsx`, `src/app/[locale]/(public)/{servicios,equipo,noticias,partners,sobre-nosotros}/page.tsx`, `src/app/[locale]/(public)/destinos/[slug]/page.tsx`, `messages/{es,en}.json`.
+
+**Próximo paso sugerido:** al cargar un país nuevo, revisar SIEMPRE `translateGeography` (COUNTRY_MAP + COUNTRY_ISO) y `SERVED_COUNTRIES`; valdría un test o un check en el importador que falle si aparece un país sin mapear. Sigue pendiente: title/meta de /destinos/argentina y /contacto, hreflang en servicios y legales, y las mejoras de schema del informe (Person en /equipo, breadcrumbs, geo).
+
+---
+
 ### 2026-08-27 (cont. 5) — [SEO-FIX-6] Titles del blog que se truncaban en Google: nuevo campo `meta_title`
 
 **Contexto:** último ítem del ACTION-PLAN — posts con muchas impresiones y CTR ~0. En GSC hay páginas en **posición 3-6 con 0 % de CTR** (`/destinos/argentina` pos 3,6 · `/contacto` pos 4,1 · `/en/blog/costa-del-sol-vs-costa-blanca` pos 4,8 · `holiday-rental-yields-costa-del-sol` 438 impresiones, pos 5, 0,23 %).

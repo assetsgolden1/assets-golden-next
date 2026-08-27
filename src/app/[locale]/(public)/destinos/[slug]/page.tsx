@@ -152,8 +152,8 @@ export default async function DestinoPage({ params, searchParams }: Props) {
     faqs.push({
       q: en ? `How many properties does Assets Golden have in ${countryLabel}?`
             : `¿Cuántas propiedades tiene Assets Golden en ${countryLabel}?`,
-      a: en ? `We currently list ${formatNumber(totalCount, locale)} properties in ${countryLabel} through our network, with the catalogue updated continuously.`
-            : `Actualmente ofrecemos ${formatNumber(totalCount, locale)} propiedades en ${countryLabel} a través de nuestra red, con el catálogo actualizándose de forma permanente.`,
+      a: en ? `We currently list ${formatNumber(totalCount, locale)} ${totalCount === 1 ? 'property' : 'properties'} in ${countryLabel} through our network, with the catalogue updated continuously.`
+            : `Actualmente ofrecemos ${formatNumber(totalCount, locale)} ${totalCount === 1 ? 'propiedad' : 'propiedades'} en ${countryLabel} a través de nuestra red, con el catálogo actualizándose de forma permanente.`,
     })
   }
   if (descIntro) {
