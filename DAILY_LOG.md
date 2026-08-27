@@ -87,7 +87,14 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 **Archivos MODIFIED:** `src/lib/utils/optimizedImage.ts`, `next.config.ts`, `src/app/layout.tsx`.
 
-**Próximo paso sugerido:** re-medir CWV mobile con Lighthouse tras el deploy (esperado: LCP de 13-14 s a rango aceptable). Pendientes del plan: cookies fuera del LCP, fichas Cervera en ES, titles con CTR bajo. Y dejar anotado el re-host propio (opción C) por si algún día se quiere quitar la dependencia de wsrv.nl.
+**Incidencia de deploy:** el push llegó a GitHub pero Vercel no publicó durante ~40 min. Causa (Iván): **la integración GitHub↔Vercel se había desconectado**; al reconectarla el deploy salió en ~5 min. NO fue el límite de cuenta (la sospecha inicial por el precedente del 07/08). El conector MCP de Vercel devuelve 403 en esta sesión (sin autorizar), así que el estado del build no se puede consultar desde Claude Code — se diagnosticó por fuera (CSP servido en prod).
+
+**VERIFICADO EN PRODUCCIÓN (medido, no estimado):**
+- Listado: 24/24 tarjetas vía proxy, 0 crudas, CSP con wsrv.nl. Peso de imágenes **25.234 KB → 696 KB (−98%)**.
+- Lighthouse mobile `/propiedades`: **74 → 82**; **LCP 13,4 s → 4,7 s (−65%)**; TBT 30 ms; CLS 0; peso total de página 13,4 MB → **1.082 KB**.
+- Lighthouse mobile home: **59 → 71**; **LCP 14,3 s → 7,4 s**; peso 2.308 KB. Sigue floja porque su elemento LCP es el banner de cookies (pendiente aparte), no las imágenes.
+
+**Próximo paso sugerido:** el LCP de la home ahora está dominado por el banner de cookies → ese fix es el que más mueve la aguja en performance. Después: fichas Cervera en ES, titles con CTR bajo. Y queda anotado el re-host propio (opción C) por si se quiere quitar la dependencia de wsrv.nl.
 
 ---
 
