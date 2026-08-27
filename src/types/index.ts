@@ -92,6 +92,8 @@ export interface BlogPost {
   banner_image_url: string | null
   category: string | null
   language: string | null
+  /** Title corto para el SERP. Si es null se usa `title` (que es el H1 del artículo). */
+  meta_title: string | null
   meta_description: string | null
   published: boolean
   published_at: string | null

@@ -71,7 +71,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const ogImage = resolveOgImage(post)
 
   return {
-    title: post.title,
+    // El H1 del artículo puede ser largo y descriptivo; el title del SERP no:
+    // el template añade " — Assets Golden" (16 chars) y Google corta ~60.
+    // `meta_title` permite acortarlo sin tocar el titular visible.
+    title: post.meta_title ?? post.title,
     // meta_description viene curada desde la DB — no truncar.
     // excerpt puede ser más largo; truncar en último espacio antes de 160.
     description: post.meta_description
@@ -98,6 +101,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     openGraph: {
       type: 'article',
+      // En redes no hay límite de ~60 chars: mostramos el titular completo.
+      title: post.title,
       // If ogImage is undefined, omit the key entirely so the layout-level
       // og:image cascades instead of being suppressed by an empty array.
       ...(ogImage && {

@@ -31,6 +31,9 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - (ISR cerrado 29/06: 21 rutas públicas estáticas/ISR. Las 8 que siguen ƒ — propiedades listado, destinos/[slug], destinos/espana, inversiones, promociones, propiedades/[slug]/[ciudad] — usan `searchParams` (filtros) → inherentemente dinámicas, no cacheables. Es correcto, no es pendiente.)
 
 ## 2. Blog / Contenido
+- (✅ 27/08 cont.5: **titles que se truncaban en Google**. El template añade " — Assets Golden" (16 chars) y los H1 de hasta 108 chars llegaban cortados. Nueva columna `meta_title` (nullable, fallback a `title`) + 8 posts con impresiones poblados. Ver DAILY_LOG 27/08 cont.5.)
+- [CC·S] Poblar `meta_title` en los 14 posts restantes con title >60 o meta >160 chars, **a medida que empiecen a recibir impresiones en GSC** (hoy no tienen: bajo valor).
+- [CC·S] Revisar title/meta de `/destinos/argentina` (posición 3,6 con 0 clics) y `/contacto` (posición 4,1, 120 impresiones, 0 clics).
 - [Claude·L] Fase C blog EN: 7 posts restantes a 1.500–2.000 palabras (van 3 de 10).
 - [Claude·S] Corregir post ES comprar-piso-espana-siendo-extranjero-2026 (Golden Visa/NLV).
 - [Claude+Ivan·L] Plan editorial por clústeres: 4–6 art/mes, guías por zona/fiscalidad/proceso, con enlazado a fichas y destinos.

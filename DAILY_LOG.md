@@ -67,6 +67,28 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-27 (cont. 5) — [SEO-FIX-6] Titles del blog que se truncaban en Google: nuevo campo `meta_title`
+
+**Contexto:** último ítem del ACTION-PLAN — posts con muchas impresiones y CTR ~0. En GSC hay páginas en **posición 3-6 con 0 % de CTR** (`/destinos/argentina` pos 3,6 · `/contacto` pos 4,1 · `/en/blog/costa-del-sol-vs-costa-blanca` pos 4,8 · `holiday-rental-yields-costa-del-sol` 438 impresiones, pos 5, 0,23 %).
+
+**Lo que encontré (distinto de lo que suponía el plan):** los titles NO eran malos de redacción — eran **demasiado largos**. Causa raíz: el template del sitio añade `" — Assets Golden"` (16 chars) a cada title, así que un H1 descriptivo de 90-108 caracteres llegaba a Google cortado por la mitad. Auditados los 30 posts publicados: **22 con problemas** (títulos de hasta 108 chars, metas de hasta 262).
+
+**Trabajo hecho:**
+- Migración `add_meta_title_to_blog_posts`: columna `meta_title` (nullable). Separa el **H1 del artículo** (puede ser largo y descriptivo) del **title del SERP** (≤45 chars). Si es NULL se usa `title`, o sea que los 22 posts sin tocar siguen igual.
+- `blog/[slug]/page.tsx`: `title: post.meta_title ?? post.title`, y `openGraph.title` fijado explícitamente al título completo (en redes no hay límite de 60 chars).
+- Poblados los **8 posts con impresiones reales en GSC**: meta_title de 34-46 chars y meta_description reescritas a 120-144 (venían de hasta 223, truncadas).
+- `types/index.ts`: `meta_title` en la interfaz `BlogPost`.
+
+**Verificación (server prod local):** `<title>` de 58-63 chars en los 3 posts revisados (antes 80-124), H1 y og:title conservan el titular completo, y un post sin `meta_title` sigue cayendo al `title` de siempre. tsc/eslint 0, build exit 0.
+
+**Advertencia honesta sobre el efecto esperado:** el CTR bajo puede deberse también a AI Overviews y otros elementos del SERP que empujan el resultado bajo el pliegue, y la "posición media" esconde la distribución real. El title corto elimina una causa objetiva (truncado), no garantiza el salto de CTR. Medir en GSC en 3-4 semanas.
+
+**Archivos MODIFIED:** `src/app/[locale]/(public)/blog/[slug]/page.tsx`, `src/types/index.ts`. **DB:** columna `meta_title` + 8 filas actualizadas.
+
+**Próximo paso sugerido:** quedan 14 posts con metas >160 chars sin impresiones todavía (bajo valor hasta que reciban tráfico) y los titles largos de esos mismos posts — poblar `meta_title` a medida que empiecen a aparecer en GSC. Fuera del blog: `/destinos/argentina` (pos 3,6 con 0 clics) y `/contacto` (pos 4,1) merecen la misma revisión.
+
+---
+
 ### 2026-08-27 (cont. 4) — [SEO-FIX-5] Fichas de Miami: nombres de promotora/arquitecto legibles + investigación del LCP de la home
 
 **Contexto:** seguían dos ítems del ACTION-PLAN: banner de cookies fuera del LCP y fichas Cervera en ES.
@@ -87,6 +109,8 @@ Los campos `developer`/`architect` del feed vienen como slugs y se publicaban cr
 - **Verificado por SQL sobre las 62**: 0 slugs crudos, 0 "Está con arquitectura", 0 doble "y". Verificado en prod tras el deploy: "promovida por PMG", "Cuenta con arquitectura de Kobi Karp Architecture".
 
 **Archivos CREATED:** `src/lib/utils/formatEntityNames.ts`, `src/scripts/fixCerveraEntityNames.ts`. **MODIFIED:** `src/scripts/importCervera.ts`.
+
+**Commits:** `4cc700b` (nombres legibles + backfill), `bc79307` (doble "y" con varias promotoras).
 
 **Nota:** las fichas tienen ISR de 24 h; el texto nuevo se ve tras este deploy (que regenera el prerender) o al vencer la caché.
 
@@ -114,6 +138,8 @@ Los campos `developer`/`architect` del feed vienen como slugs y se publicaban cr
 
 **Archivos MODIFIED:** `src/lib/utils/optimizedImage.ts`, `next.config.ts`, `src/app/layout.tsx`.
 
+**Commits:** `73936e5` (proxy de imágenes), `a5c3253` (resultados medidos en prod).
+
 **Incidencia de deploy:** el push llegó a GitHub pero Vercel no publicó durante ~40 min. Causa (Iván): **la integración GitHub↔Vercel se había desconectado**; al reconectarla el deploy salió en ~5 min. NO fue el límite de cuenta (la sospecha inicial por el precedente del 07/08). El conector MCP de Vercel devuelve 403 en esta sesión (sin autorizar), así que el estado del build no se puede consultar desde Claude Code — se diagnosticó por fuera (CSP servido en prod).
 
 **VERIFICADO EN PRODUCCIÓN (medido, no estimado):**
@@ -139,6 +165,8 @@ Los campos `developer`/`architect` del feed vienen como slugs y se publicaban cr
 
 **Archivos MODIFIED:** `src/components/PaginationBar.tsx`, `src/app/[locale]/(public)/propiedades/page.tsx`, `src/app/[locale]/(public)/destinos/[slug]/page.tsx`, `src/app/[locale]/(public)/inversiones/page.tsx`.
 
+**Commit:** `57425e6`.
+
 **Próximo paso sugerido:** imágenes del feed medianewbuild (P1 de performance: 13,4 MB el listado) — decidir approach (re-host a Supabase tipo job 03/07 vs optimización Vercel con costo) dimensionando primero cuántas imágenes son.
 
 ---
@@ -155,6 +183,8 @@ Los campos `developer`/`architect` del feed vienen como slugs y se publicaban cr
 **Verificación:** tsc/eslint 0, build exit 0. Server prod LOCAL: script presente en el HTML servido y ejecutando (`document.documentElement.lang === 'en'` en /en, chequeado con el browser); ficha EN con @id/url/breadcrumbs `/en` + `inLanguage: en-GB` + WebSite url `/en`; ficha ES sin regresión (todo sin prefijo, es-ES).
 
 **Archivos MODIFIED:** `src/app/layout.tsx`, `src/components/seo/GlobalSchemaOrg.tsx`, `src/app/[locale]/(public)/propiedades/[slug]/page.tsx`.
+
+**Commit:** `bd34439`.
 
 **Próximo paso sugerido:** las 532 "canónica diferente" deberían drenar en las próximas semanas (monitorear en GSC). Siguientes Highs: canonical de paginación, imágenes del feed medianewbuild, hreflang en /servicios y legales.
 
@@ -179,6 +209,8 @@ Los campos `developer`/`architect` del feed vienen como slugs y se publicaban cr
 
 **Archivos MODIFIED:** `src/app/sitemap.ts`, `src/lib/supabase/queries.ts`, `src/components/blog/BlogCategoryGrid.tsx`, `src/app/[locale]/(public)/blog/{page,consejos/page,inversiones/page,mercado/page,noticias/page,[slug]/page}.tsx`, `src/app/[locale]/(public)/{consejos,noticias}/page.tsx`.
 
+**Commit:** `071614d`.
+
 **Próximo paso sugerido:** tras el deploy, reenviar el sitemap en GSC (cuenta assetsgolden1@gmail.com) para acelerar el descubrimiento de las URLs /en; seguir con los High del plan: lang dinámico por locale, canonical de paginación, imágenes del feed medianewbuild.
 
 ---
@@ -195,7 +227,7 @@ Los campos `developer`/`architect` del feed vienen como slugs y se publicaban cr
 
 **Archivos CREATED:** `docs/seo-audit-2026-08-26/` con FULL-AUDIT-REPORT.md, ACTION-PLAN.md (25 items priorizados Critical→Low con responsable) y 8 informes de sección (technical/content/schema/sitemap/performance/geo/visual/analytics). MODIFIED: PENDIENTES.md (bloque de auditoría en sección 1), ESTADO.md (sección SEO reescrita con el estado 26/08).
 
-**Commits:** ninguno aún (pendiente de OK del usuario para commitear los docs).
+**Commits:** `1fd9b04` (informe + plan + 8 secciones), `4122814` (datos reales de GSC del 27/08 en ESTADO/PENDIENTES).
 
 **Próximo paso sugerido:** ejecutar los críticos del ACTION-PLAN — el nº1 es el fix del blog EN (links + canonical + sitemap.ts; desbloquea 13 posts ya escritos con un cambio chico), después sitemap /en + lastmod real, y configurar los eventos clave de GA4. En paralelo, Iván revisa GSC (cuenta assetsgolden1@gmail.com, sin mirar desde el 29/06).
 
