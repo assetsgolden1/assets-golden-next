@@ -393,6 +393,32 @@
     "view_full_profile": "View full profile",
     "view_linkedin": "View LinkedIn profile",
     "specialties": "Specialities",
-    "close_aria": "Close"
+    "close_aria": "Close",
+    "eyebrow": "Specialists",
+    "h1": "Our team",
+    "intro": "Professionals with international experience and deep knowledge of the exclusive property market in Barcelona and 13 countries.",
+    "empty": "Team coming soon.",
+    "group_founders": "Founders",
+    "group_partners": "Partners",
+    "group_team": "Team",
+    "breadcrumb_home": "Home",
+    "breadcrumb_team": "Team",
+    "meta_title": "Team",
+    "meta_description": "Specialists in exclusive property with international experience. Meet the Assets Golden team in Barcelona and the world’s leading destinations."
+  },
+  "Partners": {
+    "meta_title": "International Partner Network",
+    "meta_description": "A global network of independent property professionals and agencies across 13 countries. Top-tier partners for international exclusive transactions.",
+    "eyebrow": "Collaborators",
+    "h1": "Global Partner Network",
+    "intro": "We work with top-tier professionals worldwide to bring you the best property opportunities.",
+    "empty": "Our partner network is continuously expanding.",
+    "cta_join": "Join the network"
+  },
+  "Promotions": {
+    "meta_title": "New Developments and Off-Plan Property",
+    "meta_description": "Discover our off-plan developments and exclusive new-build projects in Spain and the leading international markets.",
+    "eyebrow": "Exclusive developments",
+    "h1": "New Developments"
   }
 }

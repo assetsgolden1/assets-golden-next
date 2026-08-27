@@ -5,15 +5,16 @@ import { getPartners } from '@/lib/supabase/queries'
 import { buttonVariants } from '@/components/ui/button'
 import { getLinkedin } from '@/lib/constants/linkedinMap'
 import { buildAlternates } from '@/lib/utils/seoAlternates'
+import { getTranslations } from 'next-intl/server'
 
 export async function generateMetadata(
   { params }: { params: Promise<{ locale: string }> },
 ): Promise<Metadata> {
   const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'Partners' })
   return {
-  title: 'Red Internacional de Partners',
-  description:
-    'Red global de colaboradores y agencias inmobiliarias independientes en 13 países. Profesionales de primer nivel para operaciones exclusivas a nivel internacional.',
+  title: t('meta_title'),
+  description: t('meta_description'),
   alternates: buildAlternates('/partners', locale),
   openGraph: { url: locale === 'en' ? '/en/partners' : '/partners' },
 }
@@ -22,6 +23,7 @@ export async function generateMetadata(
 export const revalidate = 86400
 
 export default async function PartnersPage() {
+  const t = await getTranslations('Partners')
   const { data: partners } = await getPartners()
 
   // Agrupar por país
@@ -42,12 +44,12 @@ export default async function PartnersPage() {
       {/* Hero */}
       <section className="gradient-navy py-20">
         <div className="container-luxury text-center">
-          <p className="text-xs tracking-[0.25em] text-gold uppercase mb-3">Colaboradores</p>
+          <p className="text-xs tracking-[0.25em] text-gold uppercase mb-3">{t('eyebrow')}</p>
           <h1 className="font-display text-4xl font-semibold text-white md:text-5xl">
-            Red Global de Partners
+            {t('h1')}
           </h1>
           <p className="mt-4 text-white/60 max-w-2xl mx-auto text-sm">
-            Trabajamos con profesionales de primer nivel en todo el mundo para ofrecer las mejores oportunidades inmobiliarias.
+            {t('intro')}
           </p>
         </div>
       </section>
@@ -57,9 +59,9 @@ export default async function PartnersPage() {
         <div className="container-luxury">
           {partners.length === 0 ? (
             <div className="py-20 text-center">
-              <p className="text-muted-foreground mb-6">Nuestra red de partners está en continua expansión.</p>
+              <p className="text-muted-foreground mb-6">{t('empty')}</p>
               <Link href="/contacto" className={buttonVariants({ variant: 'gold' })}>
-                Unirse a la red
+                {t('cta_join')}
               </Link>
             </div>
           ) : (

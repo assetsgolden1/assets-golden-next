@@ -361,6 +361,32 @@
     "view_full_profile": "Ver perfil completo",
     "view_linkedin": "Ver perfil en LinkedIn",
     "specialties": "Especialidades",
-    "close_aria": "Cerrar"
+    "close_aria": "Cerrar",
+    "eyebrow": "Especialistas",
+    "h1": "Nuestro equipo",
+    "intro": "Profesionales con trayectoria internacional y profundo conocimiento del mercado exclusivo en Barcelona y 13 países.",
+    "empty": "Equipo disponible próximamente.",
+    "group_founders": "Fundadores",
+    "group_partners": "Partners",
+    "group_team": "Equipo",
+    "breadcrumb_home": "Inicio",
+    "breadcrumb_team": "Equipo",
+    "meta_title": "Equipo",
+    "meta_description": "Profesionales especializados en propiedades exclusivas con trayectoria internacional. Conozca al equipo de expertos en Barcelona y en los principales destinos del mundo."
+  },
+  "Partners": {
+    "meta_title": "Red Internacional de Partners",
+    "meta_description": "Red global de colaboradores y agencias inmobiliarias independientes en 13 países. Profesionales de primer nivel para operaciones exclusivas a nivel internacional.",
+    "eyebrow": "Colaboradores",
+    "h1": "Red Global de Partners",
+    "intro": "Trabajamos con profesionales de primer nivel en todo el mundo para ofrecer las mejores oportunidades inmobiliarias.",
+    "empty": "Nuestra red de partners está en continua expansión.",
+    "cta_join": "Unirse a la red"
+  },
+  "Promotions": {
+    "meta_title": "Obra Nueva y Promociones Inmobiliarias",
+    "meta_description": "Descubra nuestras promociones de obra nueva y desarrollos inmobiliarios exclusivos en España y los principales mercados internacionales.",
+    "eyebrow": "Desarrollos exclusivos",
+    "h1": "Obra Nueva y Promociones"
   }
 }

@@ -1,16 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { buildAlternates } from '@/lib/utils/seoAlternates'
+import { buildSpanishOnlyAlternates } from '@/lib/utils/seoAlternates'
 
-export async function generateMetadata(
-  { params }: { params: Promise<{ locale: string }> },
-): Promise<Metadata> {
-  const { locale } = await params
+export function generateMetadata(): Metadata {
   return {
   title: 'Política de Privacidad',
   description: 'Información sobre el tratamiento de datos personales por Assets Golden International conforme al RGPD y la LOPDGDD.',
-  alternates: buildAlternates('/politica-de-privacidad', locale),
-  openGraph: { url: locale === 'en' ? '/en/politica-de-privacidad' : '/politica-de-privacidad' },
+  alternates: buildSpanishOnlyAlternates('/politica-de-privacidad'),
+  openGraph: { url: '/politica-de-privacidad' },
 }
 }
 

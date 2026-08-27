@@ -19,3 +19,23 @@ export function buildAlternates(path: string, locale: string = 'es') {
     },
   }
 }
+
+/**
+ * Alternates para páginas que existen SOLO en español (los textos legales:
+ * son documentos de derecho español —LSSI-CE, RGPD— validados jurídicamente
+ * y no se traducen).
+ *
+ * `/en/aviso-legal` sirve exactamente el mismo documento que `/aviso-legal`,
+ * así que SON la misma página: canonicalizar a la versión ES es lo correcto y
+ * no se declara alternate `en` (declararlo afirmaría que existe una versión
+ * inglesa que no existe).
+ */
+export function buildSpanishOnlyAlternates(path: string) {
+  return {
+    canonical: path,
+    languages: {
+      es: path,
+      'x-default': path,
+    },
+  }
+}

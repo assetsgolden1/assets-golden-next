@@ -4,15 +4,16 @@ import { getProperties } from '@/lib/supabase/queries'
 import PropertyCard from '@/components/properties/PropertyCard'
 import { buttonVariants } from '@/components/ui/button'
 import { buildAlternates } from '@/lib/utils/seoAlternates'
+import { getTranslations } from 'next-intl/server'
 
 export async function generateMetadata(
   { params }: { params: Promise<{ locale: string }> },
 ): Promise<Metadata> {
   const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'Promotions' })
   return {
-  title: 'Obra Nueva y Promociones Inmobiliarias',
-  description:
-    'Descubra nuestras promociones de obra nueva y desarrollos inmobiliarios exclusivos en España y los principales mercados internacionales.',
+  title: t('meta_title'),
+  description: t('meta_description'),
   alternates: buildAlternates('/promociones', locale),
   openGraph: { url: locale === 'en' ? '/en/promociones' : '/promociones' },
 }
@@ -30,6 +31,7 @@ interface Props {
 const PAGE_SIZE = 12
 
 export default async function PromocionesPage({ searchParams }: Props) {
+  const t = await getTranslations('Promotions')
   const params = await searchParams
   const page = Math.max(1, parseInt(params.pagina ?? '1', 10))
   const offset = (page - 1) * PAGE_SIZE
@@ -48,9 +50,9 @@ export default async function PromocionesPage({ searchParams }: Props) {
       {/* Hero */}
       <section className="gradient-navy py-20">
         <div className="container-luxury text-center">
-          <p className="text-xs tracking-[0.25em] text-gold uppercase mb-3">Desarrollos exclusivos</p>
+          <p className="text-xs tracking-[0.25em] text-gold uppercase mb-3">{t('eyebrow')}</p>
           <h1 className="font-display text-4xl font-semibold text-white md:text-5xl">
-            Obra Nueva y Promociones
+            {t('h1')}
           </h1>
           {count > 0 && (
             <p className="mt-4 text-white/50 text-sm">

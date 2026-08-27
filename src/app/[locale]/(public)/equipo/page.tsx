@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Breadcrumb from '@/components/seo/Breadcrumb'
+import { getTranslations, getLocale } from 'next-intl/server'
 import Image from 'next/image'
 import { getTeamMembers } from '@/lib/supabase/queries'
 import { getLinkedin } from '@/lib/constants/linkedinMap'
@@ -11,10 +12,10 @@ export async function generateMetadata(
   { params }: { params: Promise<{ locale: string }> },
 ): Promise<Metadata> {
   const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'Team' })
   return {
-  title: 'Equipo',
-  description:
-    'Profesionales especializados en propiedades exclusivas con trayectoria internacional. Conozca al equipo de expertos en Barcelona y en los principales destinos del mundo.',
+  title: t('meta_title'),
+  description: t('meta_description'),
   alternates: buildAlternates('/equipo', locale),
   openGraph: { url: locale === 'en' ? '/en/equipo' : '/equipo' },
 }
@@ -30,6 +31,9 @@ const memberTypeLabel: Record<string, string> = {
 
 export default async function EquipoPage() {
   const { data: team } = await getTeamMembers()
+  const t = await getTranslations('Team')
+  const locale = await getLocale()
+  const en = locale === 'en'
 
   const founders = team.filter((m) => m.member_type === 'founder')
   const partners = team.filter((m) => m.member_type === 'partner')
@@ -46,8 +50,8 @@ export default async function EquipoPage() {
       item: {
         '@type': 'Person',
         name: m.name,
-        ...(m.role_es && { jobTitle: m.role_es }),
-        ...(m.bio_es && { description: m.bio_es }),
+        ...((en ? m.role_en ?? m.role_es : m.role_es) && { jobTitle: en ? m.role_en ?? m.role_es : m.role_es }),
+        ...((en ? m.bio_en ?? m.bio_es : m.bio_es) && { description: en ? m.bio_en ?? m.bio_es : m.bio_es }),
         ...(m.photo_url && { image: m.photo_url }),
         ...(getLinkedin(m.name) && { sameAs: [getLinkedin(m.name)] }),
         worksFor: { '@id': 'https://assetsgolden.com/#organization' },
@@ -62,22 +66,21 @@ export default async function EquipoPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
       />
       <Breadcrumb items={[
-        { name: 'Inicio', url: '/' },
-        { name: 'Equipo', url: '/equipo' },
+        { name: t('breadcrumb_home'), url: en ? '/en' : '/' },
+        { name: t('breadcrumb_team'), url: en ? '/en/equipo' : '/equipo' },
       ]} />
       {/* Header */}
       <section className="gradient-navy py-24">
         <div className="container-luxury text-center">
           <p className="text-xs tracking-[0.25em] text-gold uppercase mb-3">
-            Especialistas
+            {t('eyebrow')}
           </p>
           <h1 className="font-display text-4xl font-semibold text-white md:text-5xl">
-            Nuestro equipo
+            {t('h1')}
           </h1>
           <div className="h-px w-12 bg-gold mx-auto mt-6" />
           <p className="mt-6 text-white/60 max-w-lg mx-auto">
-            Profesionales con trayectoria internacional y profundo conocimiento
-            del mercado exclusivo en Barcelona y 13 países.
+            {t('intro')}
           </p>
         </div>
       </section>
@@ -87,21 +90,21 @@ export default async function EquipoPage() {
         <div className="container-luxury">
           {team.length === 0 ? (
             <p className="text-center text-muted-foreground py-12">
-              Equipo disponible próximamente.
+              {t('empty')}
             </p>
           ) : (
             <div className="space-y-20">
               {/* Fundadores */}
               {founders.length > 0 && (
-                <TeamGroup title="Fundadores" members={founders} />
+                <TeamGroup title={t('group_founders')} members={founders} en={en} />
               )}
               {/* Partners */}
               {partners.length > 0 && (
-                <TeamGroup title="Partners" members={partners} />
+                <TeamGroup title={t('group_partners')} members={partners} en={en} />
               )}
               {/* Equipo */}
               {members.length > 0 && (
-                <TeamGroup title="Equipo" members={members} />
+                <TeamGroup title={t('group_team')} members={members} en={en} />
               )}
             </div>
           )}
@@ -114,9 +117,11 @@ export default async function EquipoPage() {
 function TeamGroup({
   title,
   members,
+  en,
 }: {
   title: string
   members: Awaited<ReturnType<typeof getTeamMembers>>['data']
+  en: boolean
 }) {
   return (
     <div>
@@ -157,17 +162,17 @@ function TeamGroup({
             <h3 className="font-display text-base font-semibold text-foreground group-hover:text-gold transition-colors">
               {member.name}
             </h3>
-            {member.role_es && (
-              <p className="mt-0.5 text-sm text-muted-foreground">{member.role_es}</p>
+            {(en ? member.role_en ?? member.role_es : member.role_es) && (
+              <p className="mt-0.5 text-sm text-muted-foreground">{en ? member.role_en ?? member.role_es : member.role_es}</p>
             )}
             {member.country && (
               <p className="mt-0.5 text-xs text-muted-foreground/60">{member.country}</p>
             )}
 
             {/* Bio */}
-            {member.bio_es && (
+            {(en ? member.bio_en ?? member.bio_es : member.bio_es) && (
               <p className="mt-3 text-xs text-muted-foreground leading-relaxed line-clamp-4">
-                {member.bio_es}
+                {en ? member.bio_en ?? member.bio_es : member.bio_es}
               </p>
             )}
 
