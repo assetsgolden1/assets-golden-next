@@ -67,6 +67,31 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-27 (cont. 4) — [SEO-FIX-5] Fichas de Miami: nombres de promotora/arquitecto legibles + investigación del LCP de la home
+
+**Contexto:** seguían dos ítems del ACTION-PLAN: banner de cookies fuera del LCP y fichas Cervera en ES.
+
+**1) Banner de cookies — INVESTIGADO, NO TOCADO (a propósito).**
+Confirmado con Lighthouse que el elemento LCP de la home es `p#cm__desc` (396×122 px), el texto del banner, que pinta recién cuando carga el bundle de JS. Pero al buscar la causa aparecieron datos que NO cierran con la hipótesis del plan:
+- El hero (`<Image fill priority>`) ocupa la pantalla completa en mobile (el sidebar está oculto), pesa 60 KB en WebP, está preloaded y responde en 200 ms → debería ganar el LCP por área y por tiempo, y no lo hace. No pude determinar por qué.
+- Variación entre corridas alta: 7,4 s y 9,3 s en dos mediciones de la misma página.
+**Decisión: no tocar.** Es código GDPR con textos legales validados por Atilio (29/06) y la corrección pasaría por reescribir el render del banner. Cambiarlo sobre una hipótesis no confirmada, en esa pieza, no compensa. Queda en PENDIENTES con lo aprendido.
+
+**2) Fichas Cervera/Miami — CORREGIDO.**
+Los campos `developer`/`architect` del feed vienen como slugs y se publicaban crudos: *"Está promovida por pmg y con arquitectura de sieger_suarez_architects,carlos_ott"* — en 40 de las 62 fichas, en el mercado que GSC muestra con 1.563 impresiones y 0,38 % de CTR.
+- Nuevo `src/lib/utils/formatEntityNames.ts`: convierte los slugs a nombres legibles. **Probado contra los 106 valores reales del feed**, lo que destapó dos bugs de mi primera versión: la regla "token corto = sigla" convertía `carlos_ott` en "Carlos OTT" (→ lista explícita de siglas) y `Metropica Developments, LLC` se partía en dos empresas (→ los sufijos societarios no separan). Respeta los valores que ya venían bien ("Kar Properties", "CUBE 3").
+- `importCervera.ts` usa el helper → **el origen queda arreglado**, las re-ejecuciones ya no reintroducen el problema.
+- Bug de redacción encontrado de paso: sin promotora la frase quedaba *"Está con arquitectura de X"* → ahora *"Cuenta con arquitectura de X"* (y su equivalente EN).
+- Backfill one-off `src/scripts/fixCerveraEntityNames.ts` (dry-run por defecto, `--apply` para escribir): **40 fichas corregidas en ES y EN**. Verificado por SQL: 0 slugs crudos y 0 frases mal redactadas en las 62. Re-ejecutado: idempotente (0 cambios).
+
+**Archivos CREATED:** `src/lib/utils/formatEntityNames.ts`, `src/scripts/fixCerveraEntityNames.ts`. **MODIFIED:** `src/scripts/importCervera.ts`.
+
+**Nota:** las fichas tienen ISR de 24 h; el texto nuevo se ve tras este deploy (que regenera el prerender) o al vencer la caché.
+
+**Próximo paso sugerido:** titles/meta de los posts con impresiones altas y CTR bajo (empezando por `holiday-rental-yields-costa-del-sol`: 438 impresiones en posición 5 con 0,23 % de CTR).
+
+---
+
 ### 2026-08-27 (cont. 3) — [SEO-FIX-4] Imágenes del feed HabiHub vía proxy: listado 24,6 MB → 696 KB
 
 **Contexto:** P1 de performance de la auditoría 26/08 (LCP mobile 13-14 s en lab). Las fotos del CDN del feed (medianewbuild) se servían en tamaño original.

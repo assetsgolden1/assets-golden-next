@@ -16,6 +16,7 @@
  */
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'node:fs'
 import path0 from 'node:path'
+import { formatEntityNames } from '../lib/utils/formatEntityNames'
 
 const API = 'https://cerverabrokerportal.com/wp-json/wp/v2'
 const OUT = 'outputs'
@@ -313,8 +314,8 @@ function bedsBaths(meta: Record<string, unknown>): { beds: number | null; baths:
  */
 function buildDescription(r: CerveraRaw, n: Partial<Normalized>, lang: 'es' | 'en'): string {
   const m = r.meta
-  const dev = String(m.developer ?? '').trim()
-  const arch = String(m.architect ?? '').trim()
+  const dev = formatEntityNames(String(m.developer ?? '').trim(), lang)
+  const arch = formatEntityNames(String(m.architect ?? '').trim(), lang)
   const floors = num(m.floors)
   const units = num(m.units)
   const year = num(m.completion_year)
@@ -328,10 +329,14 @@ function buildDescription(r: CerveraRaw, n: Partial<Normalized>, lang: 'es' | 'e
     ? `${r.title} es una promoción de obra nueva${city ? ` en ${city}` : ''}${prov ? `, ${prov}` : ''} (Estados Unidos).`
     : `${r.title} is a new development${city ? ` in ${city}` : ''}${prov ? `, ${prov}` : ''} (United States).`)
 
-  const team: string[] = []
-  if (dev) team.push(es ? `promovida por ${dev}` : `developed by ${dev}`)
-  if (arch) team.push(es ? `con arquitectura de ${arch}` : `with architecture by ${arch}`)
-  if (team.length) s.push((es ? 'Está ' : 'It is ') + team.join(es ? ' y ' : ' and ') + '.')
+  // Sin promotora, "Está con arquitectura de X" quedaba mal redactado.
+  if (dev) {
+    const parts = [es ? `promovida por ${dev}` : `developed by ${dev}`]
+    if (arch) parts.push(es ? `con arquitectura de ${arch}` : `with architecture by ${arch}`)
+    s.push((es ? 'Está ' : 'It is ') + parts.join(es ? ' y ' : ' and ') + '.')
+  } else if (arch) {
+    s.push(es ? `Cuenta con arquitectura de ${arch}.` : `It features architecture by ${arch}.`)
+  }
 
   const bldg: string[] = []
   if (floors) bldg.push(es ? `${floors} plantas` : `${floors} floors`)
