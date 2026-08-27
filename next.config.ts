@@ -45,6 +45,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "medianewbuild.com",
       },
+      {
+        // Proxy de imágenes para el CDN del feed (ver lib/utils/optimizedImage)
+        protocol: "https",
+        hostname: "wsrv.nl",
+      },
     ],
   },
 
@@ -84,7 +89,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               // www.facebook.com: pixel beacon img; google-analytics: GA4 measurement
-              "img-src 'self' blob: data: https://mromkwpqrxpxbbxhdofs.supabase.co https://wloneprkibfjioxwypaw.supabase.co https://*.supabase.co https://images.unsplash.com https://source.unsplash.com https://medianewbuild.com https://www.facebook.com https://www.google-analytics.com https://*.google-analytics.com",
+              "img-src 'self' blob: data: https://mromkwpqrxpxbbxhdofs.supabase.co https://wloneprkibfjioxwypaw.supabase.co https://*.supabase.co https://images.unsplash.com https://source.unsplash.com https://medianewbuild.com https://wsrv.nl https://www.facebook.com https://www.google-analytics.com https://*.google-analytics.com",
               // Meta Pixel XHR + GA4 measurement protocol
               "connect-src 'self' https://*.supabase.co https://www.facebook.com https://connect.facebook.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
               "media-src 'self'",

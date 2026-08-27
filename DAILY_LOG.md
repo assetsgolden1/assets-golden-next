@@ -67,6 +67,30 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-27 (cont. 3) — [SEO-FIX-4] Imágenes del feed HabiHub vía proxy: listado 24,6 MB → 696 KB
+
+**Contexto:** P1 de performance de la auditoría 26/08 (LCP mobile 13-14 s en lab). Las fotos del CDN del feed (medianewbuild) se servían en tamaño original.
+
+**Dimensionado previo (SQL en prod):** no era un caso puntual — **70.819 imágenes en 2.583 propiedades**, o sea TODO el catálogo español, incluida la portada de cada ficha. Verificado además que medianewbuild **ignora `?width`/`?w` y no expone thumbnails** (misma respuesta de 385 KB), así que no había atajo por URL.
+
+**Decisión (3 opciones evaluadas):** (A) optimización de imágenes de Vercel — descartada: es métrica facturada y esta cuenta ya chocó dos veces con límites del plan Hobby (ISR Writes 13/07, deploy bloqueado 07/08); una cuota agotada dejaría el catálogo sin fotos. (C) re-host a Supabase — la solución "dueña de sus assets", pero obliga a tocar el cron de sync (pisa `image_url`/`gallery_urls` en cada corrida) → queda como proyecto pendiente. **(B) proxy wsrv.nl — elegida:** cambio de una línea de configuración, gratis, sin tocar BD ni sync, y REVERSIBLE vaciando `PROXIED_HOSTS`.
+
+**Trabajo hecho:**
+- `optimizedImage()`: nueva rama `PROXIED_HOSTS` → reescribe a `wsrv.nl` con `w`/`q`/`output=webp`. Idempotente (no re-proxea). Gotcha encontrado: la URL debe ir **con esquema y urlencoded** — sin `https://` wsrv intenta http y medianewbuild responde 521.
+- `next.config.ts`: `wsrv.nl` en `images.remotePatterns` y en el `img-src` del CSP (sin esto el navegador las bloquea).
+- `layout.tsx`: `preconnect` a wsrv.nl.
+- Cobertura: se verificó que TODO el sitio público pasa por el helper — tarjetas del listado (640px), galería de ficha (hero 1280 / grid 900 / thumbs 640 / lightbox 2000). Un solo cambio cubre todo.
+
+**Verificación (medida, no estimada):** listado de 24 tarjetas **24,6 MB → 696 KB (−98%)**; lightbox 2000px 1,85 MB → 284 KB (−85%). HTML servido: 24/24 vía wsrv, 0 crudas. En el navegador con el CSP aplicado: 6/6 imágenes del HTML real cargaron a 640px exactos. tsc/eslint 0, build exit 0.
+
+**Nota de verificación:** las imágenes aparecían "en vuelo" en el panel del navegador porque el panel no estaba visible (no compone frames) y son `loading="lazy"` — no era un fallo del cambio; se confirmó cargándolas programáticamente. También apareció un panic de Turbopack por un `next dev` viejo ocupando el puerto 3000: se liberó el puerto y se relanzó en modo producción.
+
+**Archivos MODIFIED:** `src/lib/utils/optimizedImage.ts`, `next.config.ts`, `src/app/layout.tsx`.
+
+**Próximo paso sugerido:** re-medir CWV mobile con Lighthouse tras el deploy (esperado: LCP de 13-14 s a rango aceptable). Pendientes del plan: cookies fuera del LCP, fichas Cervera en ES, titles con CTR bajo. Y dejar anotado el re-host propio (opción C) por si algún día se quiere quitar la dependencia de wsrv.nl.
+
+---
+
 ### 2026-08-27 (cont. 2) — [SEO-FIX-3] Canonical de paginación self-referencing + bug de paginación en /inversiones
 
 **Contexto:** tercer High del ACTION-PLAN 26/08 (con OK de Iván): las páginas 2–115 de /propiedades canonicalizaban a la página 1 → ~2.576 fichas sin enlazado interno rastreable (solo las sostenía el sitemap).

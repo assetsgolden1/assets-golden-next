@@ -91,6 +91,8 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://mromkwpqrxpxbbxhdofs.supabase.co" />
         <link rel="preconnect" href="https://wloneprkibfjioxwypaw.supabase.co" />
         <link rel="preconnect" href="https://medianewbuild.com" />
+        {/* Proxy de imágenes del feed HabiHub (ver lib/utils/optimizedImage) */}
+        <link rel="preconnect" href="https://wsrv.nl" />
         {/*
           Corrige <html lang> ANTES del primer paint en /en. El atributo se
           sirve estático "es" (leer el locale en el root layout forzaría render
