@@ -50,7 +50,7 @@ export function ExpertosGestionCard() {
           rel="noopener noreferrer"
           className="btn-gold inline-flex shrink-0 items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold"
         >
-          Abrir portal
+          Abrir CRM
           <ExternalLink className="h-4 w-4" />
         </a>
       </div>
