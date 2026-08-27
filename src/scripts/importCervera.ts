@@ -312,7 +312,7 @@ function bedsBaths(meta: Record<string, unknown>): { beds: number | null; baths:
  * F3 · Copy bilingüe derivado SOLO de datos duros de la fuente (developer, arquitecto,
  * plantas, unidades, entrega, superficies). No inventa cifras ni afirmaciones.
  */
-function buildDescription(r: CerveraRaw, n: Partial<Normalized>, lang: 'es' | 'en'): string {
+export function buildDescription(r: CerveraRaw, n: Partial<Normalized>, lang: 'es' | 'en'): string {
   const m = r.meta
   const dev = formatEntityNames(String(m.developer ?? '').trim(), lang)
   const arch = formatEntityNames(String(m.architect ?? '').trim(), lang)
@@ -394,9 +394,16 @@ function normalize(r: CerveraRaw): Normalized {
   if (!location) warnings.push('sin ciudad (no se pudo extraer la dirección)')
 
   const n: Partial<Normalized> = { province, location }
-  const descEs = r.excerptEs.trim() || buildDescription(r, n, 'es')
-  const descEnSrc = stripTags(r.excerptHtml) || stripTags(r.contentHtml)
-  const descEn = descEnSrc.length > 60 ? descEnSrc : buildDescription(r, n, 'en')
+  // El copy editorial de la fuente y los datos duros son COMPLEMENTARIOS: antes
+  // se usaba el excerpt EN LUGAR de la ficha técnica y se perdían plantas,
+  // residencias, superficies y entrega (o al revés). Ahora se concatenan.
+  const genEs = buildDescription(r, n, 'es')
+  const exEs = stripTags(r.excerptEs).trim()
+  const descEs = exEs.length > 60 ? `${exEs}\n\n${genEs}` : genEs
+
+  const genEn = buildDescription(r, n, 'en')
+  const exEn = (stripTags(r.excerptHtml) || stripTags(r.contentHtml)).trim()
+  const descEn = exEn.length > 60 ? `${exEn}\n\n${genEn}` : genEn
 
   const features = [
     r.bedroomsText && `Dormitorios: ${r.bedroomsText.replace(/\bto\b/i, 'a').replace(/\bbeds?\b/i, '').trim()}`,
@@ -822,8 +829,14 @@ async function renders() {
 }
 
 // ─── main ─────────────────────────────────────────────────────────────────
-const mode = process.argv[2] ?? 'report'
-const run = mode === 'extract' ? extract : mode === 'report' ? report
-  : mode === 'load' ? load : mode === 'renders' ? renders : null
-if (!run) { console.log('Usá: extract | report | load [--limit=N] [--confirm] | renders [--limit=N] [--confirm]'); process.exit(1) }
-run().catch((e) => { console.error('FALLÓ:', e.message); process.exit(1) })
+// El CLI solo corre si este archivo es el que se ejecutó. Sin el guard, importar
+// `buildDescription` desde otro script (p.ej. enrichCerveraDescriptions) dispararía
+// el modo por defecto ('report') como efecto colateral.
+const isDirectRun = /importCervera\.[cm]?ts$/.test(process.argv[1] ?? '')
+if (isDirectRun) {
+  const mode = process.argv[2] ?? 'report'
+  const run = mode === 'extract' ? extract : mode === 'report' ? report
+    : mode === 'load' ? load : mode === 'renders' ? renders : null
+  if (!run) { console.log('Usá: extract | report | load [--limit=N] [--confirm] | renders [--limit=N] [--confirm]'); process.exit(1) }
+  run().catch((e) => { console.error('FALLÓ:', e.message); process.exit(1) })
+}

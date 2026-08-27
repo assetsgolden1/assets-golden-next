@@ -67,6 +67,29 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-27 (cont. 11) — [CONTENIDO] Thin content de las fichas Cervera: de 22 finas a 5
+
+**Contexto:** último ítem del informe que quedaba de mi lado.
+
+**La causa real (distinta de lo que suponía el plan):** el importador usaba el copy editorial de la fuente (`excerptEs` / `excerptHtml`) **EN LUGAR** de la ficha técnica generada, no además. Resultado: cada ficha tenía o el relato o los datos duros, nunca los dos. Medido en BD: solo **13 de 62** descripciones EN incluían plantas, residencias, superficies y entrega — el excerpt las había sustituido.
+
+**Trabajo hecho:**
+1. **Importador**: ahora concatena `excerpt + ficha técnica` en ambos idiomas (el origen queda arreglado para futuras corridas). Se le añadió un guard al CLI (`isDirectRun`) para poder importar `buildDescription` desde otro script sin disparar el modo 'report' como efecto colateral.
+2. **`enrichCerveraDescriptions.ts`** (dry-run por defecto): reconstruye las 62 fichas ya cargadas completando lo que falte de cada mitad. **49 fichas enriquecidas, +21.722 caracteres de contenido real de la fuente**, sin inventar nada. Las 62 pasan a tener datos técnicos en ES y EN (antes 48 y 13).
+3. **`translateCerveraExcerpts.ts`**: Cervera publica su copy casi siempre solo en inglés, así que 18 fichas seguían cortas en español. De ellas, 14 tenían texto inglés traducible → **13 traducidas a mano**, fieles al original (ni una cifra ni un servicio inventado).
+
+**Decisión consciente — una ficha excluida:** `cv-3463` (Ziggurat). Su "descripción" en la fuente no habla de la promoción sino de **qué es un zigurat mesopotámico**. Traducir eso añadiría texto irrelevante a una ficha inmobiliaria, que es peor que dejarla corta. Queda documentado en el script.
+
+**Resultado medido:** fichas con descripción <300 caracteres: **ES 22 → 5, EN 49 → 5**. Largo medio: ES 392 → **543**, EN → **640**.
+
+**Lo que NO se puede arreglar sin datos nuevos:** las 5 que siguen cortas (4 sin nada de copy en la fuente + Ziggurat). Escribirlas exigiría inventar características de propiedades sobre las que no hay información — justo lo que penaliza el criterio de contenido a escala de Google. Necesitan material de Cervera o texto humano.
+
+**Archivos CREATED:** `src/scripts/enrichCerveraDescriptions.ts`, `src/scripts/translateCerveraExcerpts.ts`. **MODIFIED:** `src/scripts/importCervera.ts`.
+
+**Próximo paso sugerido:** con esto queda cerrado todo lo del informe que no depende de terceros. Lo pendiente es de Iván/Atilio: `/mi-demanda`, eventos de GA4, reenviar el sitemap en GSC, coordenadas/horarios/precio para el schema del negocio, validación visual móvil, y el copy de las 5 fichas sin datos.
+
+---
+
 ### 2026-08-27 (cont. 10) — [UX] Barra de contacto en fichas móvil + formulario traducido + header a 1280px
 
 **Contexto:** los 4 hallazgos de la auditoría visual del 26/08 que quedaban sin hacer.
