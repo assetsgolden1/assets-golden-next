@@ -124,26 +124,36 @@ export default async function PropertyDetailPage({ params }: Props) {
     url: pageUrl,
     inLanguage: locale === 'en' ? 'en-GB' : 'es-ES',
     image: allImages.length > 0 ? allImages : undefined,
-    ...(property.location && {
-      address: {
-        '@type': 'PostalAddress',
-        addressLocality: property.location,
-        ...(property.province && { addressRegion: property.province }),
-        addressCountry: property.country ? countryToISO(property.country) : 'ES',
-      },
-    }),
+    ...(property.created_at && { datePosted: property.created_at }),
+    // RealEstateListing es un tipo de PÁGINA (subtipo de WebPage): habitaciones,
+    // baños, superficie y dirección no son propiedades suyas. Van en el inmueble
+    // descrito por la página, vía `about: Accommodation`.
+    about: {
+      '@type': 'Accommodation',
+      name: localizedTitle,
+      ...(description && { description }),
+      ...(allImages.length > 0 && { image: allImages }),
+      ...(property.location && {
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: property.location,
+          ...(property.province && { addressRegion: property.province }),
+          addressCountry: property.country ? countryToISO(property.country) : 'ES',
+        },
+      }),
+      ...(property.bedrooms != null && { numberOfRooms: property.bedrooms }),
+      ...(property.bathrooms != null && { numberOfBathroomsTotal: property.bathrooms }),
+      ...(property.area_sqm != null && { floorSize: { '@type': 'QuantitativeValue', value: property.area_sqm, unitCode: 'MTK' } }),
+    },
     ...(property.price && {
       offers: {
         '@type': 'Offer',
         price: property.price,
         priceCurrency: property.currency ?? 'EUR',
         availability: 'https://schema.org/InStock',
+        seller: { '@id': 'https://assetsgolden.com/#organization' },
       },
     }),
-    ...(property.bedrooms != null && { numberOfRooms: property.bedrooms }),
-    ...(property.bathrooms != null && { numberOfBathroomsTotal: property.bathrooms }),
-    ...(property.area_sqm != null && { floorSize: { '@type': 'QuantitativeValue', value: property.area_sqm, unitCode: 'MTK' } }),
-    seller: { '@id': 'https://assetsgolden.com/#organization' },
   }
 
   return (

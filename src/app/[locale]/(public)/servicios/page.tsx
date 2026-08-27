@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Breadcrumb from '@/components/seo/Breadcrumb'
 import Link from 'next/link'
 import {
   Building2,
@@ -155,6 +156,10 @@ export default function ServiciosPage() {
 
   return (
     <>
+      <Breadcrumb items={[
+        { name: 'Inicio', url: '/' },
+        { name: 'Servicios', url: '/servicios' },
+      ]} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* Hero */}
       <section className="gradient-navy py-20">

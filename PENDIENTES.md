@@ -41,6 +41,9 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [Claude+Ivan·L] Plan editorial por clústeres: 4–6 art/mes, guías por zona/fiscalidad/proceso, con enlazado a fichas y destinos.
 
 ## 3. Web / Técnico
+- [Claude/CC·M] **PRIORITARIO tras el fix del 27/08 cont.7: traducir las 10 páginas /en** (servicios, equipo, sobre-nosotros, partners, vender-tu-piso, colabora, promociones y las 3 legales). Hoy sirven contenido en ESPAÑOL pero desde el 27/08 se auto-canonicalizan y declaran `hreflang="en"` → declaran ser la versión inglesa de un texto en español. El canonical viejo era peor (apuntaba a la ES), pero esto no queda bien cerrado hasta traducirlas.
+- (✅ 27/08 cont.8 — schema: inmueble en `about: Accommodation` en las 2.751 fichas + `datePosted`; `Person` ×16 y breadcrumb en /equipo; breadcrumb en /servicios.)
+- [Atilio·S] Para completar el schema de empresa hacen falta datos que no se pueden inventar: **coordenadas exactas del local, horario de atención y rango de precios** (`geo`, `openingHours`, `priceRange`).
 - (✅ CERRADO 27/08 cont.7 — **10 páginas EN canonicalizaban a la ES**: servicios, equipo, sobre-nosotros, partners, vender-tu-piso, colabora, promociones y las 3 legales usaban `metadata` estático, así que /en/X declaraba canonical /X y no emitía hreflang. Convertidas a `generateMetadata` + `buildAlternates`. Probablemente parte de las 532 "duplicadas" de GSC. Ver DAILY_LOG 27/08 cont.7.)
 - (✅ CERRADO 27/08 cont.7 — **"0 €" en el listado**: 14 fichas con `price = 0` mostraban "0 €"; ahora `formatPrice` las trata como precio ausente → "Precio a consultar".)
 - [CC·S] Revisar si queda alguna otra página pública con `metadata` estático y canonical fijo (mismo patrón del bug de arriba).

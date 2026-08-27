@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Breadcrumb from '@/components/seo/Breadcrumb'
 import Image from 'next/image'
 import { getTeamMembers } from '@/lib/supabase/queries'
 import { getLinkedin } from '@/lib/constants/linkedinMap'
@@ -34,8 +35,36 @@ export default async function EquipoPage() {
   const partners = team.filter((m) => m.member_type === 'partner')
   const members = team.filter((m) => m.member_type === 'team')
 
+  // Person por cada integrante: señal E-E-A-T (quién está detrás del negocio) y
+  // ayuda al reconocimiento de entidades. Solo datos reales de la BD.
+  const personJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: team.map((m, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'Person',
+        name: m.name,
+        ...(m.role_es && { jobTitle: m.role_es }),
+        ...(m.bio_es && { description: m.bio_es }),
+        ...(m.photo_url && { image: m.photo_url }),
+        ...(getLinkedin(m.name) && { sameAs: [getLinkedin(m.name)] }),
+        worksFor: { '@id': 'https://assetsgolden.com/#organization' },
+      },
+    })),
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+      />
+      <Breadcrumb items={[
+        { name: 'Inicio', url: '/' },
+        { name: 'Equipo', url: '/equipo' },
+      ]} />
       {/* Header */}
       <section className="gradient-navy py-24">
         <div className="container-luxury text-center">

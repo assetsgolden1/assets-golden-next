@@ -67,6 +67,25 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-27 (cont. 8) — [SEO-FIX-9] Schema: inmueble como `Accommodation`, Person en /equipo + AVISO sobre las páginas EN sin traducir
+
+**Trabajo hecho (mejoras de schema del informe 26/08):**
+- **Fichas (2.751 páginas):** `RealEstateListing` es un subtipo de `WebPage`, así que `numberOfRooms`, `numberOfBathroomsTotal`, `floorSize` y `address` NO son propiedades suyas — estaban colgando del tipo equivocado. Ahora van en `about: { '@type': 'Accommodation' }`, que es el inmueble que la página describe. Añadido `datePosted` (fecha de alta real) y `seller` movido dentro de `offers`. Verificado sobre el HTML del build: 0 campos inválidos en el nivel de página.
+- **/equipo:** `ItemList` con **16 `Person`** (nombre, cargo, bio, foto, LinkedIn vía `sameAs`, `worksFor` → la organización). Señal E-E-A-T que el informe marcaba como ausente. Solo datos reales de `team_members`.
+- **Breadcrumbs** en /equipo y /servicios (no los tenían).
+- **NO hecho a propósito:** `geo`, `openingHours` y `priceRange` en el LocalBusiness. Requieren datos que no tengo (coordenadas exactas del local, horarios, rango de precios) e inventarlos sería publicar información falsa sobre el negocio. Necesita input de Atilio.
+
+**⚠️ AVISO IMPORTANTE sobre el fix anterior (cont. 7):** al verificar el schema descubrí que **las páginas /en de servicios, equipo, sobre-nosotros, vender-tu-piso y las legales sirven contenido en ESPAÑOL** (sus H1 son "Soluciones Inmobiliarias", "Nuestro equipo", "Aviso Legal"…). Consecuencia del cambio de cont. 7: antes esas URLs canonicalizaban a la versión ES y Google no las indexaba; ahora se auto-canonicalizan y declaran `hreflang="en"`, o sea que **declaran ser la versión inglesa de un contenido que está en español**.
+Decidí **mantener el cambio** porque el canonical anterior era objetivamente incorrecto (una URL no puede canonicalizar a otra distinta) y era lo que alimentaba las "duplicadas" de GSC; pero el hreflang no será veraz hasta traducir esas páginas. Google suele detectar el desajuste e ignorar la anotación, no penalizarla — aun así, **traducir esas 10 páginas pasa a ser el siguiente paso natural**, no un extra.
+
+**Verificación:** tsc 0, eslint sin errores nuevos, build exit 0. Sobre el HTML generado: ficha con `about: Accommodation` (rooms 3, baths 3, floorSize, address Estepona) y `offers` 900000 EUR con seller anidado; /equipo con 16 Person + BreadcrumbList; /servicios con BreadcrumbList + FAQPage.
+
+**Archivos MODIFIED:** `src/app/[locale]/(public)/propiedades/[slug]/page.tsx`, `src/app/[locale]/(public)/equipo/page.tsx`, `src/app/[locale]/(public)/servicios/page.tsx`.
+
+**Próximo paso sugerido:** traducir las 10 páginas EN (ver aviso). Después: los 4 hallazgos visuales de mobile y el thin content de las 22 fichas Cervera.
+
+---
+
 ### 2026-08-27 (cont. 7) — [SEO-FIX-8] 10 páginas EN canonicalizaban a la versión ES + "0 €" en el listado
 
 **Contexto:** siguiendo con lo que se podía avanzar sin Iván. El plan traía "hreflang ausente en /servicios y legales" como ítem menor; al mirarlo apareció algo bastante peor.
