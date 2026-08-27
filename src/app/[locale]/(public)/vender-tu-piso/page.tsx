@@ -2,17 +2,19 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import VenderForm from '@/components/forms/VenderForm'
 import { buttonVariants } from '@/components/ui/button'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 
-export const metadata: Metadata = {
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> },
+): Promise<Metadata> {
+  const { locale } = await params
+  return {
   title: 'Vender Tu Piso en Barcelona — Tasación Gratuita',
   description:
     'Vende tu piso o propiedad exclusiva en Barcelona con la máxima discreción y al mejor precio. Tasación gratuita y sin compromiso en menos de 24 horas.',
-  alternates: {
-    canonical: '/vender-tu-piso',
-  },
-  openGraph: {
-    url: '/vender-tu-piso',
-  },
+  alternates: buildAlternates('/vender-tu-piso', locale),
+  openGraph: { url: locale === 'en' ? '/en/vender-tu-piso' : '/vender-tu-piso' },
+}
 }
 
 export default function VenderTuPisoPage() {

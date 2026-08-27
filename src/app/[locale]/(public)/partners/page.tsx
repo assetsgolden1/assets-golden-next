@@ -4,17 +4,19 @@ import { MapPin, ArrowRight } from 'lucide-react'
 import { getPartners } from '@/lib/supabase/queries'
 import { buttonVariants } from '@/components/ui/button'
 import { getLinkedin } from '@/lib/constants/linkedinMap'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 
-export const metadata: Metadata = {
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> },
+): Promise<Metadata> {
+  const { locale } = await params
+  return {
   title: 'Red Internacional de Partners',
   description:
     'Red global de colaboradores y agencias inmobiliarias independientes en 13 países. Profesionales de primer nivel para operaciones exclusivas a nivel internacional.',
-  alternates: {
-    canonical: '/partners',
-  },
-  openGraph: {
-    url: '/partners',
-  },
+  alternates: buildAlternates('/partners', locale),
+  openGraph: { url: locale === 'en' ? '/en/partners' : '/partners' },
+}
 }
 
 export const revalidate = 86400

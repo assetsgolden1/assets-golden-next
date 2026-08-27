@@ -67,6 +67,26 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-27 (cont. 7) — [SEO-FIX-8] 10 páginas EN canonicalizaban a la versión ES + "0 €" en el listado
+
+**Contexto:** siguiendo con lo que se podía avanzar sin Iván. El plan traía "hreflang ausente en /servicios y legales" como ítem menor; al mirarlo apareció algo bastante peor.
+
+**El bug:** esas páginas usaban `export const metadata` **estático** con `canonical: '/servicios'`. Como el objeto es estático, la versión inglesa servía exactamente el mismo canonical → **`/en/servicios` le decía a Google que la página real es `/servicios`** (la española), y además no emitían ningún hreflang. Verificado en producción antes de tocar nada, en las 10 páginas: servicios, equipo, sobre-nosotros, partners, vender-tu-piso, colabora, promociones y las 3 legales.
+Es la misma clase de bug que el del blog EN (cont. 1) y muy probablemente alimenta las **532 "Google eligió otra canónica"** de GSC: son 10 páginas EN que Google no puede indexar por separado.
+
+**Trabajo hecho:**
+- Las 10 páginas pasaron de `metadata` estático a `generateMetadata({ params })` con `buildAlternates(path, locale)` — el mismo patrón que ya usaban /contacto y /mi-demanda. Transformación hecha con emparejamiento de llaves (no regex) para no romper los objetos multilínea, y `openGraph.url` también locale-aware.
+- **`formatPrice`**: 14 fichas del catálogo tienen `price = 0` y se mostraban como **"0 €"** en las tarjetas del listado y en la ficha (la auditoría visual lo encontró en la primera posición del listado). Ahora `price <= 0` se trata como precio ausente → "Precio a consultar" / "Price on request". El title SEO ya estaba protegido con `price > 0`, y el bloque `offers` del schema también (0 es falsy), así que no había dato falso en structured data.
+
+**Verificación (server prod local):** las 5 páginas EN revisadas canonicalizan a su propia URL `/en/...` (antes a la ES) y emiten los 3 hreflang (es/en/x-default); las ES siguen sin prefijo. Listado ordenado por precio muestra "Precio a consultar". tsc 0, eslint 0 errores (2 warnings pre-existentes de `<img>` en sobre-nosotros), build exit 0.
+*Nota de método:* el primer chequeo de hreflang dio 0 tags y parecía que faltaban — era que Next los serializa como `hrefLang` (camelCase) y mi grep buscaba `hreflang`. Estaban los tres.
+
+**Archivos MODIFIED:** `src/lib/utils/format.ts` + `src/app/[locale]/(public)/{servicios,equipo,sobre-nosotros,partners,vender-tu-piso,colabora,promociones,aviso-legal,politica-de-privacidad,politica-de-cookies}/page.tsx`.
+
+**Próximo paso sugerido:** revisar si queda alguna otra página pública con `metadata` estático y canonical fijo (mismo patrón). Después: mejoras de schema del informe (Person en /equipo, breadcrumbs en /servicios y /equipo, geo/priceRange en LocalBusiness) y el CTA de contacto en la ficha mobile.
+
+---
+
 ### 2026-08-27 (cont. 6) — [SEO-FIX-7] Brasil faltaba en el mapa de países: propiedades brasileñas declaradas como España
 
 **Contexto:** con el plan grande cerrado, Iván preguntó qué más se podía avanzar sin él. Arranqué por el ítem "cifras inconsistentes" (2.622 vs 2.364 propiedades, 11/12/13 países según página) y al buscar la causa apareció un bug bastante peor.

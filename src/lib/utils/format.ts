@@ -3,7 +3,10 @@ export function formatPrice(
   currency: string | null | undefined = 'EUR',
   locale = 'es'
 ): string {
-  if (price === null || price === undefined) {
+  // 0 no es un precio válido para una propiedad: 14 fichas del catálogo lo
+  // tienen y se mostraban como "0 €" en las tarjetas y en la ficha, que parece
+  // un error de la web. Se tratan igual que un precio ausente.
+  if (price === null || price === undefined || price <= 0) {
     return locale === 'en' ? 'Price on request' : 'Precio a consultar'
   }
   const intlLocale = locale === 'en' ? 'en-GB' : 'es-ES'

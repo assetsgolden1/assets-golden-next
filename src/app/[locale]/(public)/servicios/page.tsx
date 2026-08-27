@@ -13,17 +13,19 @@ import {
   ArrowRight,
 } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 
-export const metadata: Metadata = {
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> },
+): Promise<Metadata> {
+  const { locale } = await params
+  return {
   title: 'Servicios Inmobiliarios',
   description:
     'Asesoramiento experto en compra, venta e inversión de propiedades exclusivas en España y mercados internacionales. Due diligence completo en cada operación.',
-  alternates: {
-    canonical: '/servicios',
-  },
-  openGraph: {
-    url: '/servicios',
-  },
+  alternates: buildAlternates('/servicios', locale),
+  openGraph: { url: locale === 'en' ? '/en/servicios' : '/servicios' },
+}
 }
 
 const SERVICES = [

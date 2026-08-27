@@ -4,17 +4,19 @@ import { getTeamMembers } from '@/lib/supabase/queries'
 import { getLinkedin } from '@/lib/constants/linkedinMap'
 import { getLocalPhoto } from '@/lib/constants/photoMap'
 import { optimizedImage } from '@/lib/utils/optimizedImage'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 
-export const metadata: Metadata = {
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> },
+): Promise<Metadata> {
+  const { locale } = await params
+  return {
   title: 'Equipo',
   description:
     'Profesionales especializados en propiedades exclusivas con trayectoria internacional. Conozca al equipo de expertos en Barcelona y en los principales destinos del mundo.',
-  alternates: {
-    canonical: '/equipo',
-  },
-  openGraph: {
-    url: '/equipo',
-  },
+  alternates: buildAlternates('/equipo', locale),
+  openGraph: { url: locale === 'en' ? '/en/equipo' : '/equipo' },
+}
 }
 
 export const revalidate = 86400

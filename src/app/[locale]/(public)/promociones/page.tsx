@@ -3,17 +3,19 @@ import Link from 'next/link'
 import { getProperties } from '@/lib/supabase/queries'
 import PropertyCard from '@/components/properties/PropertyCard'
 import { buttonVariants } from '@/components/ui/button'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 
-export const metadata: Metadata = {
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> },
+): Promise<Metadata> {
+  const { locale } = await params
+  return {
   title: 'Obra Nueva y Promociones Inmobiliarias',
   description:
     'Descubra nuestras promociones de obra nueva y desarrollos inmobiliarios exclusivos en España y los principales mercados internacionales.',
-  alternates: {
-    canonical: '/promociones',
-  },
-  openGraph: {
-    url: '/promociones',
-  },
+  alternates: buildAlternates('/promociones', locale),
+  openGraph: { url: locale === 'en' ? '/en/promociones' : '/promociones' },
+}
 }
 
 export const revalidate = 43200

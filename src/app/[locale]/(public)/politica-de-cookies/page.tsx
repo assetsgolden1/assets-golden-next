@@ -1,15 +1,17 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 
-export const metadata: Metadata = {
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> },
+): Promise<Metadata> {
+  const { locale } = await params
+  return {
   title: 'Política de Cookies',
   description: 'Información sobre el uso de cookies en el sitio web de Assets Golden International conforme al artículo 22.2 de la LSSI-CE y a la guía de cookies de la AEPD.',
-  alternates: {
-    canonical: '/politica-de-cookies',
-  },
-  openGraph: {
-    url: '/politica-de-cookies',
-  },
+  alternates: buildAlternates('/politica-de-cookies', locale),
+  openGraph: { url: locale === 'en' ? '/en/politica-de-cookies' : '/politica-de-cookies' },
+}
 }
 
 export default function PoliticaCookiesPage() {

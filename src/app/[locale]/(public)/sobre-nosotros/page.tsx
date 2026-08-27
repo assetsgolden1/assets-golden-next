@@ -4,17 +4,19 @@ import { Globe, Users, Award, Target } from 'lucide-react'
 import { getTeamMembers } from '@/lib/supabase/queries'
 import { buttonVariants } from '@/components/ui/button'
 import { optimizedImage } from '@/lib/utils/optimizedImage'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 
-export const metadata: Metadata = {
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> },
+): Promise<Metadata> {
+  const { locale } = await params
+  return {
   title: 'Sobre Nosotros',
   description:
     'Socios fundadores con más de 40 años de trayectoria conjunta en propiedades exclusivas a nivel internacional. Más de 1.500 operaciones acompañadas en 13 países. Conozca Assets Golden.',
-  alternates: {
-    canonical: '/sobre-nosotros',
-  },
-  openGraph: {
-    url: '/sobre-nosotros',
-  },
+  alternates: buildAlternates('/sobre-nosotros', locale),
+  openGraph: { url: locale === 'en' ? '/en/sobre-nosotros' : '/sobre-nosotros' },
+}
 }
 
 export const revalidate = 3600

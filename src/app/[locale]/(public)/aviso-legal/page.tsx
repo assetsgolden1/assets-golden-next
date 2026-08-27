@@ -1,15 +1,17 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 
-export const metadata: Metadata = {
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> },
+): Promise<Metadata> {
+  const { locale } = await params
+  return {
   title: 'Aviso Legal',
   description: 'Información legal del prestador de servicios y condiciones de uso del sitio web de Assets Golden International conforme a la LSSI-CE.',
-  alternates: {
-    canonical: '/aviso-legal',
-  },
-  openGraph: {
-    url: '/aviso-legal',
-  },
+  alternates: buildAlternates('/aviso-legal', locale),
+  openGraph: { url: locale === 'en' ? '/en/aviso-legal' : '/aviso-legal' },
+}
 }
 
 export default function AvisoLegalPage() {
