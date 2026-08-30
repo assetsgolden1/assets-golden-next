@@ -91,6 +91,31 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-27 (cont. 13) — [LEADS] `/mi-demanda` arreglado: las solicitudes van a `leads`
+
+**Contexto:** el formulario devolvía 500 desde antes del 07/08 porque `/api/demands` insertaba en una tabla `demands` que **nunca existió** en Supabase. Cada envío se perdía sin llegar siquiera al Google Sheet. Estaba parado esperando una decisión de producto: tabla propia o dentro de `leads`.
+
+**Decisión de Iván (27/08): van a `leads`** con `source='demand_form'`. Así entran al circuito que ya funciona —panel de admin, Google Sheets y atribución UTM— en lugar de construir un segundo circuito en paralelo.
+
+**Mapeo de campos** (el formulario no cambió, solo el destino):
+| Formulario | Columna en `leads` |
+|---|---|
+| propertyType | `interest` |
+| country | `location` |
+| budget | `property_value_range` |
+| timeline | `sale_timeline` |
+| features | `message` |
+| — | `source = 'demand_form'`, `status = 'new'` |
+Los 7 campos de atribución UTM ya venían saneados en el endpoint y se conservan.
+
+**Verificación:** tsc 0, eslint 0, build exit 0. Además se probó **el mapeo real contra Supabase** con un insert de prueba (fila creada, campos verificados uno a uno, fila borrada después). Lo que NO se puede probar desde aquí es el envío end-to-end: el endpoint está protegido con BotID y un POST por curl se rechaza como bot — hace falta que una persona envíe el formulario desde el navegador.
+
+**Archivo MODIFIED:** `src/app/api/demands/route.ts`.
+
+**Próximo paso sugerido:** Iván envía el formulario una vez en producción y se comprueba que la fila aparece en `leads` con `source='demand_form'` y que llega al Sheet. Recién ahí queda cerrado.
+
+---
+
 ### 2026-08-27 (cont. 12) — [EQUIPO] Revisión de los 17 perfiles: 2 con el inglés desalineado
 
 **Contexto:** Iván actualizó los perfiles de partners y fundadores en la web y pidió comprobar que el texto en inglés de cada uno coincida con el castellano, que está más completo.

@@ -12,7 +12,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 
 ## 0. Lo más urgente
 0. (RESUELTO 07/08: el deploy estaba BLOCKED por el límite de la cuenta; Iván lo desbloqueó y el build `da13a95` quedó READY. Atribución UTM **verificada en producción**. Ojo con ese límite a futuro.)
-0b. [Ivan decide] **`/mi-demanda` está ROTO en producción:** `/api/demands` inserta en una tabla `demands` que **no existe** en Supabase → cada envío devuelve 500 y el lead se pierde (ni siquiera llega al Sheet). Hay que decidir dónde persisten esas solicitudes: crear la tabla `demands`, o mandarlas a `leads` con `source='demand_form'` mapeando propertyType/budget/timeline/features. No lo toqué porque es decisión de producto.
+0b. (✅ CERRADO 27/08 cont.13 — **`/mi-demanda`**: insertaba en una tabla `demands` inexistente y cada envío se perdía. Decisión de Iván: van a `leads` con `source='demand_form'` (propertyType→interest, country→location, budget→property_value_range, timeline→sale_timeline, features→message). Mapeo probado contra la BD. **Falta que Iván envíe el formulario una vez en prod** para validar end-to-end: el endpoint tiene BotID y no se puede probar por curl.)
 1. (✅ RESUELTO 27/08: Iván revisó GSC y exportó Coverage+Performance. **5.462 páginas indexadas** (era ~solo la home en junio); impresiones ×7 desde junio; el title nuevo ya rankea para "assets golden" en pos 1. Datos analizados en DAILY_LOG 27/08 y ESTADO. Nuevo pendiente: identificar las 878 URLs 404 — exportar el detalle del motivo "No se ha encontrado (404)" en GSC.)
 
 ## 1. SEO / Posicionamiento

@@ -43,23 +43,31 @@ export async function POST(req: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    const { error: dbError } = await supabase.from('demands').insert({
+    // Estas solicitudes van a `leads` con source='demand_form' (decisión de
+    // producto, 27/08). Antes se insertaban en una tabla `demands` que nunca
+    // existió en Supabase: cada envío devolvía 500 y el lead se perdía sin
+    // llegar siquiera al Sheet. Al ir a `leads` entran al circuito que ya
+    // funciona: panel de admin, Google Sheets y atribución UTM.
+    const { data: insertData, error: dbError } = await supabase.from('leads').insert({
       name: name.trim(),
       email: email.trim(),
       phone: phone?.trim() || null,
-      property_type: propertyType || null,
-      country: country || null,
-      budget: budget || null,
-      features: features?.trim() || null,
-      timeline: timeline || null,
+      // Campos propios del formulario mapeados a las columnas equivalentes:
+      interest: propertyType || null,        // qué tipo de propiedad busca
+      location: country || null,             // dónde la busca
+      property_value_range: budget || null,  // presupuesto
+      sale_timeline: timeline || null,       // plazo
+      message: features?.trim() || null,     // características deseadas
+      source: 'demand_form',
       status: 'new',
       ...utm,
-    })
+    }).select('id').single()
 
     if (dbError) {
       console.error('[demands API] DB error:', dbError.message)
       return NextResponse.json({ error: 'Error al guardar' }, { status: 500 })
     }
+    console.log('[demands] INSERT OK en leads, id:', insertData?.id)
 
     // Google Sheets — AWAITED: en Vercel la función puede terminar antes de que
     // resuelva una promesa suelta y el lead no llegaría nunca al Sheet.
