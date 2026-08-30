@@ -59,7 +59,12 @@ export default function DemandDialog({ open, onClose }: DemandDialogProps) {
 
     const typeLabel = PROPERTY_TYPES.find((tp) => tp.value === form.propertyType)?.label ?? form.propertyType
     const budgetStr = `${currency} ${form.budget}`
-    const msg = `[DEMANDA] Tipo: ${typeLabel}. Ubicación: ${form.location}. Presupuesto: ${budgetStr}. Habitaciones: ${form.bedrooms || 'No especificado'}. Comentarios: ${form.message || 'Sin comentarios'}`
+    // Tipo, ubicación y presupuesto ya van en sus columnas: aquí solo lo que
+    // no tiene una (habitaciones) y los comentarios del cliente.
+    const msg = [
+      form.bedrooms && `Habitaciones: ${form.bedrooms}`,
+      form.message.trim(),
+    ].filter(Boolean).join(' · ')
 
     try {
       const res = await fetch('/api/leads', {

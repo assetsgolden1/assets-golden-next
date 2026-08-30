@@ -64,7 +64,9 @@ export default function AssetFormDialog({ open, onClose }: Props) {
     const assetTypeLabel = ASSET_TYPES.find((t) => t.value === form.assetType)?.label ?? form.assetType
     const intentionLabel = INTENTIONS.find((i) => i.value === form.intention)?.label ?? form.intention
 
-    const message = `[TENGO UN ACTIVO]\nTipo: ${assetTypeLabel}\nUbicación: ${form.location}\nIntención: ${intentionLabel}\nDescripción: ${form.description || 'No especificada'}`
+    // Tipo, ubicación e intención tienen columna propia en el Sheet desde el
+    // 30/08: repetirlos aquí solo ensuciaba la columna Mensaje.
+    const message = form.description.trim()
 
     try {
       const res = await fetch('/api/leads', {
