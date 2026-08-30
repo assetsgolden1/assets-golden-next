@@ -67,6 +67,30 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-07 — [EQUIPO] Perfiles de fundadores + tarjetas clicables en las 3 páginas
+
+**Contexto:** Iván reportó que en `/sobre-nosotros`, `/equipo` y `/partners` las tarjetas no llevan a ningún perfil, y que Atilio y Joan no tienen perfil.
+
+**Causa real (no era falta de contenido):** `getPartnerById` filtra `member_type='partner'`, así que `/partners/[id]` era la ÚNICA ficha existente y solo servía a partners. **Atilio y Joan sí tenían bio ES+EN, foto y LinkedIn cargados** — les faltaba la página, no los datos.
+
+**Hecho:**
+- Nueva ruta `/equipo/[id]` para fundadores y equipo. Un id de partner redirige **308** a `/partners/[id]`: una sola URL canónica por persona (evita contenido duplicado en SEO).
+- Componente compartido `TeamMemberProfile` usado por ambas rutas → un solo diseño que mantener.
+- Tarjetas clicables en las tres páginas. Donde ya había un `<a>` dentro (LinkedIn, "Más información") se usó el patrón **overlay-link**, el mismo de las tarjetas de propiedad, para no anidar anchors.
+
+**Dos bugs de idioma encontrados en el camino:**
+- La ficha de partner estaba **hardcodeada en español** (usaba siempre `bio_es` y textos fijos): en `/en` se veía en español. El componente nuevo respeta el locale.
+- `/sobre-nosotros` y `/partners` usaban `next/link` plano, no locale-aware: desde `/en` los enlaces caían a la versión ES. Ahora usan el `Link` de `@/i18n/navigation`.
+
+**Verificación (local):** perfiles de Atilio y Joan **200 en ES y EN**, con bio/rol/LinkedIn y textos en el idioma correcto · `/equipo` enlaza 2 fundadores + 14 partners · `/sobre-nosotros` 2 fundadores · `/partners` 14 · `/equipo/{partnerId}` → 308 · id inexistente → 404 · tsc 0, eslint 0 errores.
+
+**Archivos:** CREATED `components/team/TeamMemberProfile.tsx`, `app/[locale]/(public)/equipo/[id]/page.tsx`. MODIFIED `partners/[id]/page.tsx`, `equipo/page.tsx`, `partners/page.tsx`, `sobre-nosotros/page.tsx`, `lib/supabase/queries.ts`, `messages/es.json`, `messages/en.json`.
+**Commit:** `fd102b8`.
+
+**Próximo paso sugerido:** los datos de los 15 partners no tienen `linkedin_url` en BD (se resuelve por `linkedinMap` según el nombre) y ninguno tiene `specialties` visible; si se quiere enriquecer las fichas, ese es el contenido que falta. Verificar en prod tras el deploy.
+
+---
+
 ### 2026-08-27 (cont. 11) — [CONTENIDO] Thin content de las fichas Cervera: de 22 finas a 5
 
 **Contexto:** último ítem del informe que quedaba de mi lado.
