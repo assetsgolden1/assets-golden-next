@@ -47,6 +47,9 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [Claude+Ivan·L] Plan editorial por clústeres: 4–6 art/mes, guías por zona/fiscalidad/proceso, con enlazado a fichas y destinos.
 
 ## 3. Web / Técnico
+- (✅ 30/08 — **contactos web centralizados**: `/api/collaborations` insertaba en una tabla inexistente (mismo bug que /mi-demanda) y perdía todo; ahora los 6 formularios van a `leads` y al mismo Sheet, con 4 columnas nuevas (tipo de inmueble, ubicación, intención, plazo), la columna "Tipo" normalizada y color de fila por tipo de solicitud. Footer: 3 enlaces mal apuntados corregidos + anclas en /servicios. Ver DAILY_LOG 30/08 cont.)
+- [Ivan·S opcional] Renombrar el archivo del Sheet a "Contactos Web" desde Drive (no toca código: todo apunta por ID) y borrar las 4 filas de prueba.
+- [CC·S] **Regla aprendida:** ante "el formulario no manda X", comprobar primero el bundle desplegado y pedir Ctrl+Shift+R. Pasó el 06/07 (modal del portal) y el 30/08 (formulario de activos).
 - (✅ CERRADO 27/08 cont.9 — **traducidas las 7 páginas de marketing** (servicios, equipo, sobre-nosotros, partners, vender-tu-piso, colabora, promociones); las 3 legales quedan solo en ES por decisión (documentos jurídicos). De paso se corrigieron "11 países"→13 y "15 mercados"→13. OJO: meter next-intl en una página la vuelve DINÁMICA salvo que se llame `setRequestLocale` — pasó con 5 rutas y se corrigió; verificar siempre el listado ●/ƒ del build. Ver DAILY_LOG 27/08 cont.9.)
 - (✅ 27/08 cont.8 — schema: inmueble en `about: Accommodation` en las 2.751 fichas + `datePosted`; `Person` ×16 y breadcrumb en /equipo; breadcrumb en /servicios.)
 - [Atilio·S] Para completar el schema de empresa hacen falta datos que no se pueden inventar: **coordenadas exactas del local, horario de atención y rango de precios** (`geo`, `openingHours`, `priceRange`).

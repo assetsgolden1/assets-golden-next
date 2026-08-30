@@ -91,6 +91,34 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-30 (cont.) — [LEADS] Centralización de los contactos web + footer
+
+**Contexto:** al validar `/mi-demanda` Iván detectó que el Sheet recibía unos formularios sí y otros no, pidió centralizar todos los contactos en la misma hoja, desglosar los datos en columnas, colorear las filas por tipo de solicitud, y revisar los enlaces del footer.
+
+**1) Colaboraciones: el mismo bug que /mi-demanda.** `/api/collaborations` insertaba en una tabla `collaborations` que **tampoco existe** en Supabase (verificado: en el esquema público solo está `leads`). Cada envío devolvía 500 y se perdía entero, sin llegar tampoco al Sheet porque el insert falla antes. Ahora van a `leads` con `source='collaboration_form'` (tipo, empresa y especialidad resumidos en el mensaje). Además su llamada al Sheet era **fire-and-forget**: en Vercel la función puede terminar antes de que resuelva y se perdía igual → pasa a `await`.
+
+**2) Estado real de los 6 formularios públicos** (todos apuntan al mismo Sheet `1nkRaLH…`, "Assets Golden — Leads Web"): busco propiedad, contacto, ficha de propiedad y mi-demanda funcionaban; **colabora estaba roto** y **tengo un activo no tenía ni un registro histórico** (`source='asset_form'` con 0 filas en `leads`) — al probarlo con el código nuevo funcionó.
+
+**3) Desglose en columnas.** El Sheet tenía A:L y los datos del formulario iban apelmazados dentro del "Mensaje" ("[TENGO UN ACTIVO] Tipo: … Ubicación: … Intención: …"). Se insertaron 4 columnas **M–P** (Tipo de inmueble · Ubicación · Intención · Plazo) **antes** de "Estado" y "Observación", que se rellenan a mano y quedaron desplazadas a Q/R con su contenido intacto. Los formularios envían esos campos sueltos y el rango pasa a A:P. Los diálogos dejaron de componer el mensaje con todo dentro: en activos queda solo la descripción y en demanda solo habitaciones + comentarios.
+
+**4) Columna "Tipo" normalizada.** Mezclaba valores de distinta naturaleza (`demanda`, `apartment`, `consulta-propiedad`). Ahora es la etiqueta del formulario de origen — Demanda / Tengo un activo / Colaboración / Consulta propiedad / Contacto — vía `etiquetaFormulario(form_source)`. Sin esto el coloreado no podía funcionar.
+
+**5) Color por fila.** Formato condicional sobre la columna G, en pastel: Demanda verde, Tengo un activo azul, Colaboración lila, Consulta propiedad ámbar, Contacto gris. Script `setupLeadsSheet.ts` **idempotente** (dry-run por defecto): detecta si las columnas ya existen y reemplaza las reglas en vez de duplicarlas.
+
+**6) Footer.** Ninguno de los 15 enlaces daba 404, pero tres apuntaban mal: "Inversión internacional" iba a `/destinos` existiendo `/inversiones`; "Asesoría fiscal" y "Gestión patrimonial" iban ambos a `/servicios` sin ancla, y esa página **no tenía ningún id**. Añadidos ids (`inversion-inmobiliaria`, `asesoramiento-internacional`, `gestion-patrimonio`) con `scroll-mt-24` y corregidos los tres destinos.
+
+**Verificación:** tsc/eslint 0, build exit 0. Se probó **escribiendo filas reales** en la BD y en el Sheet y leyéndolas de vuelta (todas borradas después). Confirmado por Iván en producción tras un refresco forzado: columnas llenas, mensaje limpio y filas de color.
+
+**Aprendizaje repetido:** una prueba de Iván pareció fallar por segunda vez y era el **bundle del cliente cacheado en el navegador** — mismo caso que el 06/07 con el modal del portal. Se diagnosticó comparando el bundle servido (que sí traía los campos nuevos) contra lo que llegó al Sheet. **Ante "el formulario no manda X", verificar primero el bundle desplegado y pedir Ctrl+Shift+R antes de tocar código.**
+
+**Archivos CREATED:** `src/scripts/setupLeadsSheet.ts`. **MODIFIED:** `src/lib/googleSheets.ts`, `src/app/api/{demands,collaborations,leads}/route.ts`, `src/components/{AssetFormDialog,DemandDialog,Footer}.tsx`, `src/app/[locale]/(public)/servicios/page.tsx`.
+
+**Commits:** `f2e6c0b`, `8f94ebe`, `d5da36e` (+ `8c2219d`, `8c60b21` del mismo día).
+
+**Próximo paso sugerido:** las 4 filas de prueba del Sheet se pueden borrar. Pendiente de Iván: renombrar el archivo a "Contactos Web" desde Drive si lo quiere (no toca código, todo va por ID).
+
+---
+
 ### 2026-08-30 — [LEADS] Etiquetas legibles y prefijo telefónico en /mi-demanda
 
 **Contexto:** Iván probó el formulario en producción tras el fix del 27/08. El lead **sí llegó** a `leads`, pero reportó que "no se cargan" el prefijo, el país, la propiedad y el presupuesto.
