@@ -18,9 +18,9 @@ export default async function Footer() {
     ],
     servicios: [
       { label: t("link_buy"), href: "/propiedades" },
-      { label: t("link_invest"), href: "/destinos" },
-      { label: t("link_tax"), href: "/servicios" },
-      { label: t("link_wealth"), href: "/servicios" },
+      { label: t("link_invest"), href: "/inversiones" },
+      { label: t("link_tax"), href: "/servicios#asesoramiento-internacional" },
+      { label: t("link_wealth"), href: "/servicios#gestion-patrimonio" },
     ],
     destinos: [
       { label: t("dest_spain"), href: "/destinos/espana" },

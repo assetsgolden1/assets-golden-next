@@ -100,21 +100,25 @@ const buildServices = (t: (k: string) => string) => [
   },
 ]
 
+// El `anchor` permite enlazar cada servicio desde el footer (/servicios#patrimonio).
 const buildAdditional = (t: (k: string) => string) => [
   {
     icon: TrendingUp,
     title: t('a1_title'),
     desc: t('a1_desc'),
+    anchor: 'inversion-inmobiliaria',
   },
   {
     icon: Globe,
     title: t('a2_title'),
     desc: t('a2_desc'),
+    anchor: 'asesoramiento-internacional',
   },
   {
     icon: ShieldCheck,
     title: t('a3_title'),
     desc: t('a3_desc'),
+    anchor: 'gestion-patrimonio',
   },
 ]
 
@@ -214,7 +218,7 @@ export default async function ServiciosPage(
       </section>
 
       {/* Servicios adicionales */}
-      <section className="section-padding bg-background">
+      <section id="asesoramiento" className="section-padding bg-background scroll-mt-24">
         <div className="container-luxury">
           <div className="mb-12 text-center">
             <h2 className="font-display text-3xl font-semibold mb-3">{t('advisory_title')}</h2>
@@ -223,8 +227,8 @@ export default async function ServiciosPage(
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {ADDITIONAL.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="rounded-xl border border-border p-7">
+            {ADDITIONAL.map(({ icon: Icon, title, desc, anchor }) => (
+              <div key={title} id={anchor} className="rounded-xl border border-border p-7 scroll-mt-24">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gold/10">
                   <Icon className="h-6 w-6 text-gold" />
                 </div>

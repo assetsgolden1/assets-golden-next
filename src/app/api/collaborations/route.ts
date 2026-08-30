@@ -21,31 +21,52 @@ export async function POST(req: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    const { error: dbError } = await supabase.from('collaborations').insert({
+    // Mismo caso que /mi-demanda: esto insertaba en una tabla `collaborations`
+    // que NUNCA existió en Supabase → cada envío devolvía 500 y la solicitud se
+    // perdía sin llegar tampoco al Sheet (el insert falla antes). Ahora van a
+    // `leads` con source='collaboration_form', centralizando todos los
+    // contactos de la web en un único sitio.
+    const detalle = [
+      collaborationType && `Tipo: ${collaborationType}`,
+      company?.trim() && `Empresa: ${company.trim()}`,
+      specialty?.trim() && `Especialidad: ${specialty.trim()}`,
+      message?.trim(),
+    ].filter(Boolean).join(' · ')
+
+    const { data: insertData, error: dbError } = await supabase.from('leads').insert({
       name: name.trim(),
       email: email.trim(),
       phone: phone?.trim() || null,
-      company: company?.trim() || null,
-      specialty: specialty?.trim() || null,
-      collaboration_type: collaborationType,
-      message: message?.trim() || null,
+      interest: collaborationType || null,
+      message: detalle || null,
+      source: 'collaboration_form',
       status: 'new',
-    })
+    }).select('id').single()
 
     if (dbError) {
       console.error('[collaborations API] DB error:', dbError.message)
       return NextResponse.json({ error: 'Error al guardar' }, { status: 500 })
     }
+    console.log('[collaborations] INSERT OK en leads, id:', insertData?.id)
 
-    // Google Sheets — fire and forget
-    appendLeadToSheets({
-      name: body.name,
-      email: body.email,
-      phone: body.phone,
-      type: 'colaboracion',
-      message: body.message,
-      source: 'collaboration_form',
-    }).catch((e) => console.error('[collaborations API] Sheets error:', e.message))
+    // Google Sheets — AWAITED, igual que en /api/leads y /api/demands. Estaba
+    // como fire-and-forget: en Vercel la función puede terminar antes de que
+    // resuelva una promesa suelta, y esas colaboraciones no llegaban nunca al
+    // Sheet sin dejar rastro.
+    try {
+      await appendLeadToSheets({
+        name: body.name,
+        email: body.email,
+        phone: body.phone,
+        phone_prefix: typeof body.phone_prefix === 'string' ? body.phone_prefix : undefined,
+        phone_country: typeof body.phone_country === 'string' ? body.phone_country : undefined,
+        type: 'colaboracion',
+        message: detalle || body.message,
+        source: 'collaboration_form',
+      })
+    } catch (e) {
+      console.error('[collaborations API] Sheets error:', e)
+    }
 
     // n8n webhook — fire and forget
     const webhookUrl = process.env.N8N_WEBHOOK_URL
