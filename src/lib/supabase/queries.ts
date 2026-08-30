@@ -624,3 +624,46 @@ export async function createLead(leadData: LeadData) {
   if (error) return { success: false, error: error.message }
   return { success: true, via: 'supabase' as const }
 }
+
+/**
+ * Miembro del equipo por id, SIN filtrar por tipo.
+ *
+ * `getPartnerById` filtra `member_type='partner'`, por eso los fundadores no
+ * tenían ficha posible: cualquier ruta que la usara devolvía 404 para Atilio y
+ * Joan aunque sus datos estuvieran cargados.
+ */
+export async function getTeamMemberById(id: string) {
+  const supabase = createStaticClient()
+  const { data, error } = await supabase
+    .from('team_members')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle()
+  return { data: data as TeamMember | null, error }
+}
+
+/** Otros miembros del mismo tipo, para el bloque de "seguir explorando". */
+export async function getRelatedTeamMembers(currentId: string, memberType: string, limit = 3) {
+  const supabase = createStaticClient()
+  const { data } = await supabase
+    .from('team_members')
+    .select('id, name, country, role_es, role_en, photo_url, member_type')
+    .eq('member_type', memberType)
+    .eq('active', true)
+    .neq('id', currentId)
+    .order('order_index', { ascending: true })
+    .limit(limit)
+  return { data: (data ?? []) as TeamMember[] }
+}
+
+/** Todos los miembros activos que NO son partners (fundadores y equipo). */
+export async function getNonPartnerMembers() {
+  const supabase = createStaticClient()
+  const { data } = await supabase
+    .from('team_members')
+    .select('*')
+    .eq('active', true)
+    .neq('member_type', 'partner')
+    .order('order_index', { ascending: true })
+  return { data: (data ?? []) as TeamMember[] }
+}

@@ -558,5 +558,18 @@
     "submit": "Send enquiry",
     "error_generic": "Something went wrong. Please try again.",
     "bar_cta": "Enquire"
+  },
+  "MemberProfile": {
+    "back_team": "Back to the team",
+    "back_partners": "Back to partners",
+    "profile": "Professional profile",
+    "specialties": "Specialties",
+    "related_founders": "Other founders",
+    "related_team": "Other team members",
+    "related_partners": "Other partners",
+    "contact_title": "Would you like to contact {name}?",
+    "contact_text": "Get in touch and we will connect you directly.",
+    "contact_cta": "Request contact",
+    "no_bio": "Profile coming soon."
   }
 }

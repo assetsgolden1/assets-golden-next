@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { Globe, Users, Award, Target } from 'lucide-react'
 import { getTeamMembers } from '@/lib/supabase/queries'
 import { buttonVariants } from '@/components/ui/button'
+import { memberProfileHref } from '@/components/team/TeamMemberProfile'
 import { optimizedImage } from '@/lib/utils/optimizedImage'
 import { buildAlternates } from '@/lib/utils/seoAlternates'
 import { getTranslations , setRequestLocale } from 'next-intl/server'
@@ -183,7 +184,11 @@ export default async function SobreNosotrosPage(
             <h2 className="font-display text-3xl font-semibold mb-10 text-center">{t('team_title')}</h2>
             <div className="flex flex-wrap justify-center gap-8">
               {founders.map((m) => (
-                <div key={m.id} className="text-center w-64">
+                <Link
+                  key={m.id}
+                  href={memberProfileHref(m)}
+                  className="group block w-64 text-center no-underline"
+                >
                   {m.photo_url && (
                     <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full border-2 border-gold/20">
                       <img
@@ -193,16 +198,16 @@ export default async function SobreNosotrosPage(
                       />
                     </div>
                   )}
-                  <h3 className="font-display text-lg font-semibold">{m.name}</h3>
-                  {m.role_es && (
-                    <p className="text-sm text-gold mt-1">{m.role_es}</p>
+                  <h3 className="font-display text-lg font-semibold group-hover:text-gold transition-colors">{m.name}</h3>
+                  {(locale === 'en' ? m.role_en ?? m.role_es : m.role_es) && (
+                    <p className="text-sm text-gold mt-1">{locale === 'en' ? m.role_en ?? m.role_es : m.role_es}</p>
                   )}
-                  {m.bio_es && (
+                  {(locale === 'en' ? m.bio_en ?? m.bio_es : m.bio_es) && (
                     <p className="text-xs text-muted-foreground mt-2 leading-relaxed line-clamp-3">
-                      {m.bio_es}
+                      {locale === 'en' ? m.bio_en ?? m.bio_es : m.bio_es}
                     </p>
                   )}
-                </div>
+                </Link>
               ))}
             </div>
             <div className="mt-10 text-center">

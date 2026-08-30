@@ -526,5 +526,18 @@
     "submit": "Enviar consulta",
     "error_generic": "Ha ocurrido un error. Por favor inténtelo de nuevo.",
     "bar_cta": "Contactar"
+  },
+  "MemberProfile": {
+    "back_team": "Volver al equipo",
+    "back_partners": "Volver a partners",
+    "profile": "Perfil profesional",
+    "specialties": "Especialidades",
+    "related_founders": "Otros fundadores",
+    "related_team": "Otros miembros del equipo",
+    "related_partners": "Otros partners",
+    "contact_title": "¿Quiere contactar con {name}?",
+    "contact_text": "Escríbanos y le pondremos en contacto directamente.",
+    "contact_cta": "Solicitar contacto",
+    "no_bio": "Perfil en preparación."
   }
 }
