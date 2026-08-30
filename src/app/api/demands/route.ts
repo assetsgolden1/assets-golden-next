@@ -114,13 +114,19 @@ export async function POST(req: NextRequest) {
     // Google Sheets — AWAITED: en Vercel la función puede terminar antes de que
     // resuelva una promesa suelta y el lead no llegaría nunca al Sheet.
     try {
+      // El Sheet tiene columnas propias para prefijo, país del teléfono y
+      // presupuesto (A:L). No se enviaban: las filas de /mi-demanda llegaban
+      // con esas tres vacías, a diferencia de las del diálogo de la home.
       await appendLeadToSheets({
         name: body.name,
         email: body.email,
-        phone: telefono ?? undefined, // con prefijo, igual que en la BD
+        phone: phone?.trim() || undefined,
+        phone_prefix: prefijo || undefined,
+        phone_country: typeof body.phone_country === 'string' ? body.phone_country : undefined,
+        budget: etiqueta('budget', budget) ?? undefined,
         type: 'demanda',
-        // El Sheet solo tiene una columna de texto: se resumen ahí los datos
-        // del formulario, que si no se perderían para quien trabaje desde ahí.
+        // Además de las columnas propias, el mensaje resume la solicitud para
+        // que se lea de un vistazo en el Sheet.
         message: [
           etiqueta('propertyType', propertyType) && `Busca: ${etiqueta('propertyType', propertyType)}`,
           country && `Zona: ${country}`,
