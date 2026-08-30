@@ -35,6 +35,10 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - (ISR cerrado 29/06: 21 rutas públicas estáticas/ISR. Las 8 que siguen ƒ — propiedades listado, destinos/[slug], destinos/espana, inversiones, promociones, propiedades/[slug]/[ciudad] — usan `searchParams` (filtros) → inherentemente dinámicas, no cacheables. Es correcto, no es pendiente.)
 
 ## 2. Blog / Contenido
+- (✅ 27/08 cont.12 — **perfiles del equipo**: revisados los 17; 14 estaban bien. Corregidos Atilio (su bio_en era un texto viejo y distinto, 303 vs 2.432 chars) y Ana Serrat (bio_en y role_en vacíos). Ver DAILY_LOG 27/08 cont.12.)
+- [Ivan·S] La bio **en español** de Ana Serrat mezcla géneros ("Empresaria… Fundador y CEO… Asesor Estratégico… Gerente Administrativo"). El inglés quedó bien porque esos cargos son neutros; revisar el castellano.
+- [Ivan·S] `Diego Javier Carranza` no tiene bio ni rol en inglés. Está inactivo, así que no se ve; traducirlo **antes** de reactivarlo.
+- [CC·S opcional] Aviso en el formulario de equipo del admin cuando `bio_en` quede mucho más corto que `bio_es` — el desajuste de Atilio vino de editar solo el español.
 - (✅ 27/08 cont.5: **titles que se truncaban en Google**. El template añade " — Assets Golden" (16 chars) y los H1 de hasta 108 chars llegaban cortados. Nueva columna `meta_title` (nullable, fallback a `title`) + 8 posts con impresiones poblados. Ver DAILY_LOG 27/08 cont.5.)
 - [CC·S] Poblar `meta_title` en los 14 posts restantes con title >60 o meta >160 chars, **a medida que empiecen a recibir impresiones en GSC** (hoy no tienen: bajo valor).
 - [CC·S] Revisar title/meta de `/destinos/argentina` (posición 3,6 con 0 clics) y `/contacto` (posición 4,1, 120 impresiones, 0 clics).

@@ -81,3 +81,7 @@ async function main() {
 }
 
 main().catch((e) => { console.error(e); process.exit(1) })
+
+// Marca el archivo como módulo: sin imports/exports, TS lo trata como script
+// global y `APPLY`/`main` chocarían con los de los otros scripts.
+export {}

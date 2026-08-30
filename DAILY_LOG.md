@@ -91,6 +91,28 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-27 (cont. 12) — [EQUIPO] Revisión de los 17 perfiles: 2 con el inglés desalineado
+
+**Contexto:** Iván actualizó los perfiles de partners y fundadores en la web y pidió comprobar que el texto en inglés de cada uno coincida con el castellano, que está más completo.
+
+**Método:** comparación de los 17 perfiles de `team_members` en tres pasadas — longitud relativa ES/EN, contenido de apertura y **contenido de cierre** (una traducción truncada se nota al final, no al principio). El ratio EN/ES sano en estos textos es 84–104 %: el inglés suele ser algo más conciso que el español.
+
+**Resultado — 14 de 17 estaban bien.** Las diferencias de recuento de párrafos que aparecían en algunos (Carmen Artero 1 vs 7, Joan Daunis 6 vs 12) eran solo saltos de línea simples vs dobles, no contenido faltante.
+
+**Los 2 problemas reales, corregidos:**
+- **Atilio Miguel Montironi (co-fundador).** No era una traducción incompleta sino **otro texto**: el `bio_en` eran 303 caracteres antiguos que hablaban de "retail y tecnología", frente a una biografía nueva en primera persona de 2.432 caracteres (ingeniero civil, cuatro décadas, Latinoamérica → EE. UU. → Barcelona, innovación y sostenibilidad, por qué nació Assets Golden, su rol y su filosofía). Traducido íntegro: 2.275 caracteres, 94 % del español.
+- **Ana Serrat (partner Miami–Fort Lauderdale).** `bio_en` y `role_en` en NULL: su ficha en inglés salía sin texto ni cargo. Traducida (1.020 caracteres) y `role_en` fijado a "MIAMI - FORT LAUDERDALE" (es un ámbito geográfico, no un cargo: no se traduce).
+
+**Sin tocar, por decisión:** `Diego Javier Carranza` tiene 1.250 caracteres en español y nada en inglés, pero está `active = false` y no se muestra en la web. Si se reactiva, hay que traducirlo antes.
+
+**Observación para Iván (no es un bug técnico):** la biografía **en español** de Ana Serrat mezcla géneros — empieza con "Empresaria Argentina radicada en USA" y sigue con "Fundador y CEO", "Asesor Estratégico" y "Gerente Administrativo" en masculino. En inglés no se nota porque esos cargos son neutros, así que la traducción quedó correcta; el que conviene revisar es el castellano.
+
+**Archivos CREATED:** `src/scripts/fixTeamBiosEn.ts` (dry-run por defecto). **MODIFIED:** `src/scripts/translateCerveraExcerpts.ts` (le faltaba `export {}`: sin imports TS lo trataba como script global y sus `APPLY`/`main` chocaban con los del script nuevo).
+
+**Próximo paso sugerido:** al editar un perfil en el admin, actualizar las dos versiones a la vez — el desajuste de Atilio venía de una edición solo en español. Valdría un aviso en el formulario cuando el `bio_en` quede mucho más corto que el `bio_es`.
+
+---
+
 ### 2026-08-27 (cont. 11) — [CONTENIDO] Thin content de las fichas Cervera: de 22 finas a 5
 
 **Contexto:** último ítem del informe que quedaba de mi lado.
