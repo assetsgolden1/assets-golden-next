@@ -87,7 +87,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - (3 props con external_id UUID pero foto de medianewbuild quedaron como 'habihub' — ambiguas, podrían ser del feed; NO re-etiquetadas para no arriesgar duplicados. CC puede revisarlas caso por caso si se quiere; bajo valor.)
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
-- 07/08: **Perfiles de equipo** — nueva ruta `/equipo/[id]` (Atilio y Joan ya tienen ficha; tenían los datos, faltaba la página) + tarjetas clicables en /sobre-nosotros, /equipo y /partners. De paso: la ficha de partner ya no se ve en español en /en, y esas páginas usan enlaces locale-aware.
+- 30/08: **Perfiles de equipo** — nueva ruta `/equipo/[id]` (Atilio y Joan ya tienen ficha; tenían los datos, faltaba la página) + tarjetas clicables en /sobre-nosotros, /equipo y /partners. De paso: la ficha de partner ya no se ve en español en /en, y esas páginas usan enlaces locale-aware.
 - 07/08: **Acceso a Expertos de Gestión en el portal** — botón en la home del portal + link en el header, con el Nº 3440 y "copiar". El autorelleno no es posible: su login no lee la query string (verificado sobre su JS).
 - 07/08: **PDF del portal con marca Assets Golden** — el white-label (en uso por 3 colaboradores externos) pasa a estar OFF por defecto vía flag `agents.white_label_enabled`, reversible desde el panel sin deploy. El contacto del asesor se mantiene siempre.
 - 07/08: **Atribución UTM en leads** (WEB-ATRIB-1) — 7 columnas en leads+demands, captura first-touch en sessionStorage, los 3 forms la envían, columna Fuente del Sheet con la campaña. Pixel acotado a la web pública (excluye /admin y /portal). **Verificado en producción** (Supabase + Sheet).

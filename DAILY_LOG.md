@@ -67,7 +67,7 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
-### 2026-08-07 — [EQUIPO] Perfiles de fundadores + tarjetas clicables en las 3 páginas
+### 2026-08-30 — [EQUIPO] Perfiles de fundadores + tarjetas clicables en las 3 páginas
 
 **Contexto:** Iván reportó que en `/sobre-nosotros`, `/equipo` y `/partners` las tarjetas no llevan a ningún perfil, y que Atilio y Joan no tienen perfil.
 
