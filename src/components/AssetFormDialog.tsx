@@ -77,6 +77,11 @@ export default function AssetFormDialog({ open, onClose }: Props) {
           phone_country: phoneCountry,
           phone_prefix: phonePrefix,
           interest: form.assetType,
+          // Sueltos para que el Sheet los ponga en columnas propias en vez de
+          // apelmazarlos dentro del mensaje.
+          property_type: assetTypeLabel,
+          zone: form.location.trim(),
+          intention: intentionLabel,
           message,
           location: form.location.trim(),
           source: 'asset_form',

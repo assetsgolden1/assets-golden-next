@@ -118,6 +118,24 @@ export async function readCrmStatuses(spreadsheetId: string): Promise<CrmStatusR
     }))
 }
 
+/**
+ * Etiqueta legible del formulario de origen, para la columna "Tipo" (G).
+ * Antes esa columna mezclaba valores de distinta naturaleza ("demanda",
+ * "apartment", "consulta-propiedad") y no servía ni para leer de un vistazo ni
+ * para pintar las filas por tipo de solicitud.
+ */
+const TIPO_POR_FORMULARIO: Record<string, string> = {
+  demand_form: 'Demanda',
+  asset_form: 'Tengo un activo',
+  collaboration_form: 'Colaboración',
+  property_contact: 'Consulta propiedad',
+  contacto: 'Contacto',
+}
+
+export function etiquetaFormulario(source?: string): string | undefined {
+  return source ? TIPO_POR_FORMULARIO[source] : undefined
+}
+
 export async function appendLeadToSheets(lead: {
   name: string
   email: string
@@ -130,6 +148,13 @@ export async function appendLeadToSheets(lead: {
   property_url?: string
   budget?: string
   source?: string
+  /** Formulario de origen sin la atribución UTM, para la columna "Tipo". */
+  form_source?: string
+  // Datos del formulario que antes se apelmazaban dentro del mensaje:
+  property_type?: string
+  zone?: string
+  intention?: string
+  timeline?: string
 }) {
   try {
     console.log('[Sheets] Iniciando append...')
@@ -166,7 +191,10 @@ export async function appendLeadToSheets(lead: {
 
     const result = await sheets.spreadsheets.values.append({
       spreadsheetId: sheetId,
-      range: "'Hoja 1'!A:L",
+      // A:P — las columnas M-P se añadieron el 30/08 para desglosar los datos
+      // que antes iban apelmazados dentro del mensaje. "Estado" y "Observación"
+      // (que se rellenan a mano) quedaron desplazadas a Q y R y NO se tocan.
+      range: "'Hoja 1'!A:P",
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [[
@@ -176,12 +204,16 @@ export async function appendLeadToSheets(lead: {
           lead.phone_prefix ?? '',
           lead.phone ?? '',
           lead.phone_country ?? '',
-          lead.type ?? '',
+          etiquetaFormulario(lead.form_source) ?? lead.type ?? '',
           lead.message ?? '',
           lead.property_title ?? '',
           lead.property_url ?? '',
           lead.budget ?? '',
           lead.source ?? 'web',
+          lead.property_type ?? '',
+          lead.zone ?? '',
+          lead.intention ?? '',
+          lead.timeline ?? '',
         ]],
       },
     })

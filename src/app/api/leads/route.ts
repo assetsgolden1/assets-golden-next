@@ -156,6 +156,11 @@ export async function POST(req: NextRequest) {
         property_title,
         property_url,
         budget,
+        form_source: source,
+        property_type: typeof body.property_type === 'string' ? body.property_type : undefined,
+        zone: typeof body.zone === 'string' ? body.zone : (location || undefined),
+        intention: typeof body.intention === 'string' ? body.intention : undefined,
+        timeline: typeof body.timeline === 'string' ? body.timeline : undefined,
         // Columna "Fuente": con UTMs → "{source}/{campaign}/{content}";
         // sin atribución queda exactamente el valor de siempre.
         source: sheetSource,

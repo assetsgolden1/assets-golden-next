@@ -124,6 +124,11 @@ export async function POST(req: NextRequest) {
         phone_prefix: prefijo || undefined,
         phone_country: typeof body.phone_country === 'string' ? body.phone_country : undefined,
         budget: etiqueta('budget', budget) ?? undefined,
+        form_source: 'demand_form',
+        property_type: etiqueta('propertyType', propertyType) ?? undefined,
+        zone: typeof country === 'string' ? country : undefined,
+        intention: 'Comprar',
+        timeline: etiqueta('timeline', timeline) ?? undefined,
         type: 'demanda',
         // Además de las columnas propias, el mensaje resume la solicitud para
         // que se lea de un vistazo en el Sheet.
