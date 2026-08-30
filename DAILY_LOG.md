@@ -91,6 +91,28 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-30 — [LEADS] Etiquetas legibles y prefijo telefónico en /mi-demanda
+
+**Contexto:** Iván probó el formulario en producción tras el fix del 27/08. El lead **sí llegó** a `leads`, pero reportó que "no se cargan" el prefijo, el país, la propiedad y el presupuesto.
+
+**Diagnóstico:** los datos SÍ estaban en la BD; el problema era cómo se guardaban.
+- Los desplegables envían el **valor interno**, no la etiqueta: se guardaba `piso`, `menos_300k`, `3_6_meses` — ilegible en el panel y en el Sheet.
+- El formulario manda el prefijo en un campo aparte (`phone_prefix`) que el endpoint **descartaba**: el teléfono quedaba como `692273780`, sin código de país y sin poder llamar desde fuera de España.
+- El país sí se guardaba bien (`España`); lo que fallaba era la lectura del conjunto.
+
+**Trabajo hecho** (`src/app/api/demands/route.ts`):
+- Tabla `ETIQUETAS` que traduce los valores de los tres desplegables a etiquetas legibles. Se usa **siempre el español** como forma canónica, para que un envío desde /en no guarde datos en otro idioma. Un valor no contemplado se guarda tal cual (no se pierde nada si se añade una opción nueva al formulario).
+- El prefijo se concatena al teléfono, salvo que el número ya empiece por `+`.
+- El Google Sheet solo tiene una columna de texto: ahora se le manda un resumen ("Busca: … · Zona: … · Presupuesto: … · Plazo: … · comentarios") en vez de solo el campo libre, que era lo único que llegaba.
+
+**Verificación:** tsc 0, eslint 0, build exit 0. Probado contra Supabase con el **payload real** del envío de Iván: `692273780` → `+34 692273780`, `piso` → `Piso / Apartamento`, `menos_300k` → `Menos de 300.000 €`, `3_6_meses` → `3–6 meses`. Fila de prueba borrada.
+
+**Nota:** las 2 filas de prueba del 30/08 quedaron con los valores crudos. Se pueden dejar (son pruebas) o normalizar a mano desde el panel.
+
+**Próximo paso sugerido:** Iván reenvía el formulario una vez para confirmar el formato final en el panel y en el Sheet.
+
+---
+
 ### 2026-08-27 (cont. 13) — [LEADS] `/mi-demanda` arreglado: las solicitudes van a `leads`
 
 **Contexto:** el formulario devolvía 500 desde antes del 07/08 porque `/api/demands` insertaba en una tabla `demands` que **nunca existió** en Supabase. Cada envío se perdía sin llegar siquiera al Google Sheet. Estaba parado esperando una decisión de producto: tabla propia o dentro de `leads`.

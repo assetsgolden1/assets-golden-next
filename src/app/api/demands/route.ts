@@ -3,6 +3,41 @@ import { createClient } from '@supabase/supabase-js'
 import { appendLeadToSheets } from '@/lib/googleSheets'
 import { checkBotId } from 'botid/server'
 
+/**
+ * Los desplegables del formulario envían el VALOR interno (`menos_300k`), no la
+ * etiqueta. Guardar el valor crudo dejaba el panel y el Sheet ilegibles.
+ * Se traduce siempre al español —etiqueta canónica— para que un envío desde /en
+ * no guarde datos en otro idioma. Si aparece un valor nuevo, se guarda tal cual.
+ */
+const ETIQUETAS: Record<string, Record<string, string>> = {
+  propertyType: {
+    piso: 'Piso / Apartamento',
+    villa: 'Villa',
+    atico: 'Ático',
+    local: 'Local comercial',
+    otro: 'Otro',
+  },
+  budget: {
+    menos_300k: 'Menos de 300.000 €',
+    '300k_600k': '300.000 € – 600.000 €',
+    '600k_1m': '600.000 € – 1.000.000 €',
+    '1m_3m': '1.000.000 € – 3.000.000 €',
+    mas_3m: 'Más de 3.000.000 €',
+  },
+  timeline: {
+    inmediato: 'Inmediato',
+    '3_6_meses': '3–6 meses',
+    '6_12_meses': '6–12 meses',
+    sin_prisa: 'Sin prisa',
+  },
+}
+
+const etiqueta = (campo: keyof typeof ETIQUETAS, valor: unknown): string | null => {
+  if (typeof valor !== 'string' || !valor.trim()) return null
+  const v = valor.trim()
+  return ETIQUETAS[campo][v] ?? v
+}
+
 export async function POST(req: NextRequest) {
   try {
     const verification = await checkBotId()
@@ -11,6 +46,12 @@ export async function POST(req: NextRequest) {
     }
     const body = await req.json()
     const { name, email, phone, propertyType, country, budget, features, timeline, attribution } = body
+    // El formulario manda el prefijo aparte (`phone_prefix`) y antes se descartaba:
+    // el teléfono quedaba sin código de país y no se podía llamar desde fuera.
+    const prefijo = typeof body.phone_prefix === 'string' ? body.phone_prefix.trim() : ''
+    const telefono = phone?.trim()
+      ? (prefijo && !phone.trim().startsWith('+') ? `${prefijo} ${phone.trim()}` : phone.trim())
+      : null
 
     // Atribución de campaña (WEB-ATRIB-1). Input de usuario → se sanea.
     const attr = (attribution ?? {}) as Record<string, unknown>
@@ -51,13 +92,14 @@ export async function POST(req: NextRequest) {
     const { data: insertData, error: dbError } = await supabase.from('leads').insert({
       name: name.trim(),
       email: email.trim(),
-      phone: phone?.trim() || null,
-      // Campos propios del formulario mapeados a las columnas equivalentes:
-      interest: propertyType || null,        // qué tipo de propiedad busca
-      location: country || null,             // dónde la busca
-      property_value_range: budget || null,  // presupuesto
-      sale_timeline: timeline || null,       // plazo
-      message: features?.trim() || null,     // características deseadas
+      phone: telefono,
+      // Campos propios del formulario mapeados a las columnas equivalentes,
+      // con la etiqueta legible en vez del valor interno del desplegable:
+      interest: etiqueta('propertyType', propertyType),        // qué tipo busca
+      location: typeof country === 'string' ? country.trim() || null : null,
+      property_value_range: etiqueta('budget', budget),        // presupuesto
+      sale_timeline: etiqueta('timeline', timeline),           // plazo
+      message: features?.trim() || null,                       // características
       source: 'demand_form',
       status: 'new',
       ...utm,
@@ -75,9 +117,17 @@ export async function POST(req: NextRequest) {
       await appendLeadToSheets({
         name: body.name,
         email: body.email,
-        phone: body.phone,
+        phone: telefono ?? undefined, // con prefijo, igual que en la BD
         type: 'demanda',
-        message: body.features,
+        // El Sheet solo tiene una columna de texto: se resumen ahí los datos
+        // del formulario, que si no se perderían para quien trabaje desde ahí.
+        message: [
+          etiqueta('propertyType', propertyType) && `Busca: ${etiqueta('propertyType', propertyType)}`,
+          country && `Zona: ${country}`,
+          etiqueta('budget', budget) && `Presupuesto: ${etiqueta('budget', budget)}`,
+          etiqueta('timeline', timeline) && `Plazo: ${etiqueta('timeline', timeline)}`,
+          body.features?.trim(),
+        ].filter(Boolean).join(' · '),
         source: sheetSource,
       })
     } catch (e) {
