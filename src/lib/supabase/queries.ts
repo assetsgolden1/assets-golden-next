@@ -321,6 +321,33 @@ export async function getPropertyByLegacySlug(slug: string) {
   return data as { slug: string | null } | null
 }
 
+/**
+ * Rescata las URLs de fichas duplicadas que se borraron: quedaron indexadas con
+ * un sufijo `-2` / `-03` sobre el slug de la que sí sigue publicada
+ * (`…-mijas-27068-2` → `…-mijas-27068`). GSC reportaba 86 así el 30/08, y en 62
+ * de ellas la ficha base seguía viva.
+ *
+ * Solo se acepta un sufijo de 1-2 dígitos (no toca slugs cuyo número final es
+ * parte del identificador, como `…-27068`) y **solo redirige si la ficha base
+ * existe y está publicada**: si no, se devuelve null y la página hace su 404.
+ */
+export async function getPropertyByDuplicateSlug(slug: string) {
+  const base = slug.replace(/-\d{1,2}$/, '')
+  if (base === slug) return null
+
+  const supabase = createStaticClient()
+  const { data } = await supabase
+    .from('properties')
+    .select('slug')
+    // Sin filtros de status/hidden a propósito: la ficha (getPropertyBySlug)
+    // tampoco los aplica, así que una propiedad oculta del listado igual
+    // renderiza su detalle. Filtrar aquí dejaba en 404 23 URLs cuya base sí
+    // devuelve 200.
+    .eq('slug', base)
+    .maybeSingle()
+  return data as { slug: string | null } | null
+}
+
 export async function getFeaturedProperties() {
   // Cliente estático (sin cookies): datos públicos. Permite que las páginas que
   // la consumen (home, etc.) cacheen con ISR en vez de renderizar dinámico.

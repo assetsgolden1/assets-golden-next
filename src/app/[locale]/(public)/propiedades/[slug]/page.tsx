@@ -6,7 +6,7 @@ import { routing } from '@/i18n/routing'
 import { ArrowLeft, Maximize, BedDouble, Bath, MapPin, ExternalLink } from 'lucide-react'
 import Breadcrumb from '@/components/seo/Breadcrumb'
 import { buttonVariants } from '@/components/ui/button'
-import { getPropertyBySlug, getAllPropertySlugs, getPropertyByLegacySlug } from '@/lib/supabase/queries'
+import { getPropertyBySlug, getAllPropertySlugs, getPropertyByLegacySlug, getPropertyByDuplicateSlug } from '@/lib/supabase/queries'
 import PropertyGalleryClient from '@/components/PropertyGalleryClient'
 import PropertyDescriptionExpand from '@/components/properties/PropertyDescriptionExpand'
 import { translatePropertyType, translatePropertyTitle } from '@/lib/propertyTypes'
@@ -90,7 +90,9 @@ export default async function PropertyDetailPage({ params }: Props) {
     // permanentRedirect de next/navigation (NO el de next-intl, que lee headers
     // y rompe el render estático de la ficha). Prefijo de locale manual según
     // localePrefix 'as-needed' (defaultLocale sin prefijo).
-    const canonical = await getPropertyByLegacySlug(slug)
+    // 1) slug renombrado en la migración de julio · 2) duplicado borrado que
+    // dejó su URL con sufijo -N indexada (GSC, 30/08).
+    const canonical = (await getPropertyByLegacySlug(slug)) ?? (await getPropertyByDuplicateSlug(slug))
     if (canonical?.slug) {
       const prefix = locale === routing.defaultLocale ? '' : `/${locale}`
       permanentRedirect(`${prefix}/propiedades/${canonical.slug}`)

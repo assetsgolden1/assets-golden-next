@@ -91,6 +91,32 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-30 (cont. 2) — [SEO] Remediación de los 404 del export de Search Console
+
+**Contexto:** Iván exportó de GSC las URLs "no encontradas" (888 en total) y pidió analizarlas y arreglar lo que se pudiera.
+
+**Clasificación de las 888:**
+- **746** `/property/<uuid>` — ruta que nunca existió en esta web (patrón de un sitio anterior). Verificados 60 uuids al azar contra la BD: **ninguno** existe. 404 correcto, no se toca.
+- **117** con sufijo `-N` (`…-27068-2`, `13615212-01`) — se atacan (ver abajo).
+- **10** posts EN colgando de `/blog/` y **7** slugs ES bajo `/en/blog/` — ambos son secuela de bugs ya corregidos el 27/08; se limpian solos al recrawlear.
+- **3** URLs concatenadas (`/equipoTeam`, `/blogBlog`, `/contactoContact`) — ver punto 2.
+
+**1) Redirect de slugs duplicados (85 URLs recuperadas).** Nueva `getPropertyByDuplicateSlug()`: si el slug pedido no existe y termina en `-N` (1–2 dígitos), busca la base y redirige 308. Se engancha en el camino de not-found de la ficha, encadenado al mecanismo legacy que ya existía: `getPropertyByLegacySlug(slug) ?? getPropertyByDuplicateSlug(slug)`.
+
+**Corrección durante la verificación:** la primera versión filtraba por `status` y `hidden/hidden_by_sync` y dejaba 23 URLs en 404. Al probar las 117 reales del export contra un build local se vio que **esas bases devuelven 200**: la ficha (`getPropertyBySlug`) no aplica ningún filtro, los flags solo afectan al listado. Quitados los filtros → de 62 a **85 redirects**. Las **32** restantes son IDs numéricos de portal cuya base no existe en la BD: 404 correcto (redirigir a otro 404 sería peor).
+
+**2) Las 3 URLs concatenadas NO eran enlaces rotos.** Eran la `key` de React de los `<li>` del footer, construida como `link.href + link.label` → `"/equipoTeam"`. Esa clave viaja como **texto dentro del payload RSC** del HTML y Googlebot la parseó como si fuera una URL. Los `href` renderizados siempre estuvieron bien (`/en/equipo`, `/en/blog`, `/en/contacto`). Las keys pasan a `link.label`.
+
+**Verificación:** tsc/eslint 0, build exit 0. Probadas **las 117 URLs reales del export** contra un build de producción local (85 → 308, 32 → 404), 8 fichas reales al azar siguen en 200, tres 404 legítimos siguen en 404, y el HTML de `/en` ya no contiene ninguna de las cadenas concatenadas.
+
+**Aprendizaje:** el primer diagnóstico ("hay un enlace mal formado en el footer") era falso; el string existía en el HTML pero como clave de React, no como `href`. Verificar **dónde** aparece la cadena, no solo que aparezca.
+
+**Archivos MODIFIED:** `src/lib/supabase/queries.ts`, `src/app/[locale]/(public)/propiedades/[slug]/page.tsx`, `src/components/Footer.tsx`.
+
+**Próximo paso sugerido:** en GSC, "Validar corrección" sobre el grupo de 404 una vez desplegado. Los `/property/<uuid>` seguirán apareciendo hasta que Google los descarte solo.
+
+---
+
 ### 2026-08-30 (cont.) — [LEADS] Centralización de los contactos web + footer
 
 **Contexto:** al validar `/mi-demanda` Iván detectó que el Sheet recibía unos formularios sí y otros no, pidió centralizar todos los contactos en la misma hoja, desglosar los datos en columnas, colorear las filas por tipo de solicitud, y revisar los enlaces del footer.

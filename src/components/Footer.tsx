@@ -7,6 +7,9 @@ import OpenPreferencesButton from "@/components/cookies/OpenPreferencesButton";
 export default async function Footer() {
   const t = await getTranslations("Footer");
 
+  // Las `key` de los <li> van por etiqueta, no por `href + label`: esa clave
+  // viajaba como texto al payload RSC ("/equipoTeam") y Googlebot la indexaba
+  // como si fuera una URL → salían como 404 en Search Console (30/08).
   const footerLinks = {
     empresa: [
       { label: t("link_about"), href: "/sobre-nosotros" },
@@ -107,7 +110,7 @@ export default async function Footer() {
             </h4>
             <ul className="space-y-2">
               {footerLinks.empresa.map((link) => (
-                <li key={link.href + link.label}>
+                <li key={link.label}>
                   <Link
                     href={link.href}
                     className="text-sm text-primary-foreground/60 hover:text-gold transition-colors"
@@ -126,7 +129,7 @@ export default async function Footer() {
             </h4>
             <ul className="space-y-2">
               {footerLinks.servicios.map((link) => (
-                <li key={link.href + link.label}>
+                <li key={link.label}>
                   <Link
                     href={link.href}
                     className="text-sm text-primary-foreground/60 hover:text-gold transition-colors"
@@ -145,7 +148,7 @@ export default async function Footer() {
             </h4>
             <ul className="space-y-2">
               {footerLinks.destinos.map((link) => (
-                <li key={link.href + link.label}>
+                <li key={link.label}>
                   <Link
                     href={link.href}
                     className="text-sm text-primary-foreground/60 hover:text-gold transition-colors"
