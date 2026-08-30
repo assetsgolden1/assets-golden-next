@@ -47,6 +47,10 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [Claude+Ivan·L] Plan editorial por clústeres: 4–6 art/mes, guías por zona/fiscalidad/proceso, con enlazado a fichas y destinos.
 
 ## 3. Web / Técnico
+- (✅ 30/08 — **evento `generate_lead` en los 6 formularios**. La web no disparaba ningún evento propio: "GA4 sin conversiones" no era falta de marcarlas, era que no existían. Ver DAILY_LOG 30/08 cont. 3)
+- [Ivan·S] Enviar un formulario en producción, verlo en GA4 → Tiempo real, y marcar `generate_lead` como **evento clave** (Administrar → Eventos). GA4 no lo ofrece hasta recibirlo una vez.
+- [Ivan·S] Reiniciar el `npm run dev` local: quedó en bucle de panics de Turbopack porque se compiló con él levantado.
+- [CC·S] **Regla:** comprobar que no haya un `next dev` corriendo antes de lanzar `npm run build` — le pisa el `.next`.
 - (✅ 30/08 — **404 de GSC**: de 888, 85 recuperadas con redirect 308 de slugs duplicados y 3 "URLs" que en realidad eran keys de React en el payload RSC del footer. Las 746 `/property/<uuid>` y 32 IDs numéricos son 404 correctos. Ver DAILY_LOG 30/08 cont. 2)
 - [Ivan·S] En GSC, pulsar "Validar corrección" sobre el grupo de 404 cuando el deploy esté arriba.
 - (✅ 30/08 — **contactos web centralizados**: `/api/collaborations` insertaba en una tabla inexistente (mismo bug que /mi-demanda) y perdía todo; ahora los 6 formularios van a `leads` y al mismo Sheet, con 4 columnas nuevas (tipo de inmueble, ubicación, intención, plazo), la columna "Tipo" normalizada y color de fila por tipo de solicitud. Footer: 3 enlaces mal apuntados corregidos + anclas en /servicios. Ver DAILY_LOG 30/08 cont.)

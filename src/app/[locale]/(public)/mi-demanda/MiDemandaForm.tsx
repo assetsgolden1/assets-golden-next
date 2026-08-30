@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { PhoneInput } from '@/components/PhoneInput'
 import { fbqTrack, sendServerEvent } from '@/lib/meta/track'
 import { getAttribution } from '@/lib/attribution'
+import { trackLead } from '@/lib/analytics/ga4'
 
 export default function MiDemandaForm() {
   const t = useTranslations('MyDemand')
@@ -79,6 +80,7 @@ export default function MiDemandaForm() {
           lastName: form.name.trim().split(' ').slice(1).join(' ') || undefined,
         },
       })
+      trackLead('demand_form')
       setDone(true)
     } catch {
       setError(t('form_error'))

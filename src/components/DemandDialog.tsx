@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Search, X, Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { PhoneInput } from '@/components/PhoneInput'
+import { trackLead } from '@/lib/analytics/ga4'
 
 const inputClass =
   'w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-colors'
@@ -87,6 +88,7 @@ export default function DemandDialog({ open, onClose }: DemandDialogProps) {
         }),
       })
       if (!res.ok) throw new Error('Error al enviar')
+      trackLead('demand_form')
       setDone(true)
     } catch {
       setError(t('form_error'))

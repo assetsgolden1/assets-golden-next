@@ -7,6 +7,7 @@ import { X } from 'lucide-react'
 import { PhoneInput } from '@/components/PhoneInput'
 import { fbqTrack, sendServerEvent } from '@/lib/meta/track'
 import { getAttribution } from '@/lib/attribution'
+import { trackLead } from '@/lib/analytics/ga4'
 
 interface Props {
   /** "sidebar" (por defecto) o "bar" para la barra fija de móvil */
@@ -66,6 +67,7 @@ export default function PropertyContactModal({ propertyId, propertyTitle, proper
         },
         customData: { contentName: propertyTitle },
       })
+      trackLead('property_contact')
       setStatus('success')
     } catch {
       setErrorMsg(t('error_generic'))

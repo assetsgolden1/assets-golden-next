@@ -91,6 +91,35 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-08-30 (cont. 3) — [ANALYTICS] Evento generate_lead en los 6 formularios
+
+**Contexto:** al ir a cerrar la tarea "marcar eventos clave en GA4" (que estaba anotada como pendiente de Iván) se vio que **no se podía hacer**: la web no dispara ningún evento propio. Solo hay `gtag('config')` — o sea `page_view` y medición automática. El informe SEO decía "GA4 sin conversiones" y la causa no era que estuvieran sin marcar, sino que no existían. Requería código antes que panel.
+
+**Trabajo hecho:** nuevo `src/lib/analytics/ga4.ts` con `trackLead(source)`, que dispara `generate_lead` (el evento recomendado de GA4 para captación) con parámetro `form_source`. Enganchado en los 6 formularios públicos, **después** del `if (!res.ok) throw`, así que cuenta envíos con respuesta OK y no intentos:
+
+| Formulario | form_source |
+|---|---|
+| `contacto/ContactForm` | `contacto` |
+| `mi-demanda/MiDemandaForm` | `demand_form` |
+| `DemandDialog` | `demand_form` |
+| `AssetFormDialog` | `asset_form` |
+| `CollaborateDialog` | `collaboration_form` |
+| `PropertyContactModal` | `property_contact` |
+
+Los valores son **los mismos** que la columna `form_source` de `leads` y del Sheet de contactos, para poder cruzar GA4 contra los leads reales.
+
+**RGPD:** `window.gtag` solo existe si el usuario aceptó la categoría "analytics" en el banner (ver `CookieConsentInit`). Sin consentimiento `trackLead` es un no-op; no hizo falta añadir ninguna comprobación extra. Se sigue el mismo patrón que el tracking de Meta que ya existía en `src/lib/meta/track.ts`.
+
+**Verificación:** tsc/eslint 0, build exit 0, y comprobado que `generate_lead` con `{form_source:e,...t}` y los 5 valores de origen viajan en el bundle cliente compilado. **NO se pudo probar el disparo en un navegador**: el panel de preview se reenganchaba al `npm run dev` que Iván tenía levantado en el 3000 en vez de arrancar el build de producción, y los `javascript_tool` corren en un mundo aislado que no ve `window.gtag` de la página. La confirmación real queda en el primer envío tras el deploy, vía Tiempo real de GA4 — que además es imprescindible, porque **GA4 no deja marcar un evento como clave hasta haberlo recibido al menos una vez**.
+
+**Efecto colateral causado:** lanzar `npm run build` con el dev server de Iván corriendo le pisó `.next` y lo dejó en bucle de panics de Turbopack ("Next.js package not found"). No se mató el proceso; hay que reiniciarlo a mano. **Regla: comprobar si hay un `next dev` vivo antes de compilar.**
+
+**Archivos CREATED:** `src/lib/analytics/ga4.ts`. **MODIFIED:** los 6 componentes de formulario.
+
+**Próximo paso sugerido:** Iván envía un formulario en producción, lo ve en Tiempo real y marca `generate_lead` como evento clave en Administrar → Eventos.
+
+---
+
 ### 2026-08-30 (cont. 2) — [SEO] Remediación de los 404 del export de Search Console
 
 **Contexto:** Iván exportó de GSC las URLs "no encontradas" (888 en total) y pidió analizarlas y arreglar lo que se pudiera.

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Briefcase, Building2, HardHat, ArrowLeft, Loader2, X } from 'lucide-react'
 import { PhoneInput } from '@/components/PhoneInput'
+import { trackLead } from '@/lib/analytics/ga4'
 
 type CollabType = 'profesional' | 'agencia' | 'promotora'
 
@@ -82,6 +83,7 @@ export default function CollaborateDialog({ open, initialType = null, onClose }:
         }),
       })
       if (!res.ok) throw new Error('Error al enviar')
+      trackLead('collaboration_form')
       setDone(true)
     } catch {
       setError('No se pudo enviar el formulario. Por favor, inténtelo de nuevo.')

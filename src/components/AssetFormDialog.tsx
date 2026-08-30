@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Building2, X, Loader2 } from 'lucide-react'
 import { PhoneInput } from '@/components/PhoneInput'
+import { trackLead } from '@/lib/analytics/ga4'
 
 const ASSET_TYPES = [
   { value: 'apartment', label: 'Apartamento' },
@@ -90,6 +91,7 @@ export default function AssetFormDialog({ open, onClose }: Props) {
         }),
       })
       if (!res.ok) throw new Error('Error al enviar')
+      trackLead('asset_form')
       setDone(true)
     } catch {
       setError('No se pudo enviar el formulario. Inténtalo de nuevo.')
