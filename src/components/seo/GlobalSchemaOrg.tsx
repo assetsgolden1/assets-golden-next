@@ -2,7 +2,7 @@ import { translateCountry } from '@/lib/utils/translateGeography'
 
 // Países servidos (nombres canónicos en español). Se traducen según el
 // locale vía translateCountry(): en EN salen en inglés, en ES en español.
-const SERVED_COUNTRIES = [
+export const SERVED_COUNTRIES = [
   'Argentina',
   'Brasil',
   'Costa Rica',

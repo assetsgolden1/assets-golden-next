@@ -91,6 +91,26 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-09-01 (cont. 3) — [PREVENCIÓN] Detector de países sin mapear + fin del fallback silencioso
+
+**Contexto:** pendiente "[CC·S] que el importador (o un test) falle si aparece un país sin mapear — este bug estuvo un mes sin detectarse".
+
+**La causa raíz seguía viva.** `countryToISO()` devolvía `'ES'` para cualquier país desconocido. Brasil se cargó el 26/07 sin añadirse a los mapas y durante un mes las fichas brasileñas publicaron `addressCountry: "ES"` sin que fallara nada. Ahora devuelve `undefined` y la ficha **omite** el campo: un dato ausente es mejor que uno falso. Solo había un consumidor (el JSON-LD de la ficha), que además duplicaba el mismo fallback en la llamada.
+
+**Detector nuevo: `npm run check-geo`** (`src/scripts/checkCountryMaps.ts`). Consulta los países del catálogo **publicado** (una propiedad oculta con un país raro no justifica romper un build) y los contrasta contra los **tres** mapas: `COUNTRY_ISO`, `COUNTRY_MAP` y `SERVED_COUNTRIES`. Explica en la salida qué se rompe en cada caso. Sale con 1 si falta alguno, así que se puede enganchar a CI o correr tras una carga grande.
+
+**Verificado que el detector detecta de verdad**, no solo que corre: se quitó Brasil de los tres mapas a mano y reprodujo el incidente exacto (los 3 mapas señalados, exit 1); restaurado, vuelve a exit 0. Sin esa prueba solo sabríamos que el script no falla.
+
+**Bug encontrado al probarlo:** `process.exit(1)` con el cliente de Supabase abierto disparaba `Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)` de libuv en Windows. Cambiado por `process.exitCode = 1`. También se corrigió la medición: el primer `echo $?` leía el exit de `tail`, no el del script.
+
+**Verificación:** tsc/eslint 0, build exit 0, diff del listado de rutas contra la línea base **vacío**, y las fichas españolas prerenderizadas siguen publicando `addressCountry: "ES"` (sin regresión).
+
+**Archivos CREATED:** `src/scripts/checkCountryMaps.ts`. **MODIFIED:** `src/lib/utils/translateGeography.ts`, `src/components/seo/GlobalSchemaOrg.tsx` (exportada `SERVED_COUNTRIES`), `src/app/[locale]/(public)/propiedades/[slug]/page.tsx`, `package.json`.
+
+**Próximo paso sugerido:** correr `npm run check-geo` después de cada carga grande. Queda pendiente de Iván confirmar que la dirección fiscal del schema sigue vigente.
+
+---
+
 ### 2026-09-01 (cont. 2) — [SEO] Tres páginas EN más canonicalizando a la española
 
 **Contexto:** cerrada la Tarea 4, se atacó el pendiente "[CC·S] Revisar si queda alguna otra página pública con `metadata` estático y canonical fijo".

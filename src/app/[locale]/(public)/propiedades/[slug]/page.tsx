@@ -141,7 +141,11 @@ export default async function PropertyDetailPage({ params }: Props) {
           '@type': 'PostalAddress',
           addressLocality: property.location,
           ...(property.province && { addressRegion: property.province }),
-          addressCountry: property.country ? countryToISO(property.country) : 'ES',
+          // Se omite si el país no está mapeado: declarar uno equivocado es
+          // peor que no declararlo (ver el incidente de Brasil en countryToISO).
+          ...(property.country && countryToISO(property.country)
+            ? { addressCountry: countryToISO(property.country) }
+            : {}),
         },
       }),
       ...(property.bedrooms != null && { numberOfRooms: property.bedrooms }),
