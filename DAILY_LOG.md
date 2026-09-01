@@ -91,6 +91,26 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-09-01 (cont.) — [ADMIN/MÓVIL] Tarea 4: carrera en el filtro de ciudades y validación visual del móvil
+
+**Contexto:** arranque de la Tarea 4 (validaciones pendientes). Se atacaron las dos que no requerían a Iván.
+
+**1) Carrera en el selector de ciudades (`/admin/nueva-propiedad`).** El refactor de `set-state-in-effect` había añadido el guard de cancelación en `propiedades/[id]/edit` pero **no** en `nueva-propiedad`, que seguía con un `.then()` pelado sin cleanup. Con dos peticiones en vuelo la lenta puede resolver la última: España tiene **3.620** propiedades y Grecia **1**, así que cambiar España → Grecia dejaba las ciudades españolas en el desplegable. Añadido el mismo guard `cancelled`. El tercer consumidor (`admin/propiedades`, el listado) resuelve las ciudades en servidor: ahí no hay carrera posible.
+
+**Descartado como problema:** el endpoint filtra con `ilike('country', '%X%')`. Se comprobaron los **13 países** reales de la BD y ninguno es subcadena de otro (`Estados Unidos` vs `Emiratos Árabes Unidos` no cruzan), así que hoy no da falsos positivos. Queda como fragilidad si algún día entra un país tipo "Guinea" / "Guinea Ecuatorial".
+
+**2) Barra de contacto en móvil — validada con captura.** Era el pendiente que llevaba desde julio sin verificación visual. En producción a 375×812 sobre la ficha `atico-en-marbella-33649`: header fijo 0–80, **barra inferior fija 743–812** con precio y "Contactar", y **FAB de WhatsApp 668–724**. Se solapaban: **no** — quedan 19 px entre uno y otro. Confirmado además por captura de pantalla, que es lo que faltaba.
+
+**Detalle del método:** el panel del navegador seguía sin aceptar clicks (se queda oculto y expiran a los 30 s), así que el banner de cookies se ocultó por DOM sólo para la captura, sin tocar el consentimiento. Las medidas salen de `getBoundingClientRect` sobre los elementos `fixed`/`sticky`, no de mirar la imagen.
+
+**Verificación:** tsc 0, build exit 0. Los 8 errores de eslint del archivo son **preexistentes** (9 antes y 9 después del cambio, comprobado con `git stash`): el `set-state-in-effect` de la rama sin país y unos `<a>` en vez de `<Link>`.
+
+**Archivos MODIFIED:** `src/app/admin/nueva-propiedad/page.tsx`.
+
+**Próximo paso sugerido:** queda la tercera validación de la Tarea 4, el **PDF del portal**, que sí necesita a Iván (hace falta sesión de agente).
+
+---
+
 ### 2026-09-01 — [DATOS] Vaciado de la tabla `leads`
 
 **Contexto:** Iván pidió dejar en cero los leads del panel de admin: todos los que había eran falsos o de las pruebas de los formularios.

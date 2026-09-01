@@ -58,13 +58,20 @@ export default function NuevaPropiedadPage() {
       setLocation('')
       return
     }
+    // Guard de cancelación: al cambiar de país rápido quedan dos peticiones en
+    // vuelo y la lenta puede resolver la última. España tiene 3.620 propiedades
+    // y Grecia una, así que España → Grecia dejaba las ciudades españolas en el
+    // desplegable. Mismo patrón que en propiedades/[id]/edit.
+    let cancelled = false
     fetch(`/api/admin/get-cities?country=${encodeURIComponent(country)}`)
       .then((r) => r.json())
       .then((d) => {
+        if (cancelled) return
         setAvailableCities(d.cities ?? [])
         setUseCustomCity(false)
         setLocation('')
       })
+    return () => { cancelled = true }
   }, [country])
 
   const sensors = useSensors(

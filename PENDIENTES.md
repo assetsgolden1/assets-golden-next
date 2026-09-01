@@ -65,7 +65,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - (✅ CERRADO 27/08 cont.7 — **"0 €" en el listado**: 14 fichas con `price = 0` mostraban "0 €"; ahora `formatPrice` las trata como precio ausente → "Precio a consultar".)
 - [CC·S] Revisar si queda alguna otra página pública con `metadata` estático y canonical fijo (mismo patrón del bug de arriba).
 - (✅ CERRADO 27/08 cont.10 — los 4 hallazgos visuales: barra fija de contacto en fichas móvil (precio + CTA), FAB de WhatsApp elevado sobre la barra + padding del body, menos hueco galería→título, y header ajustado a 1280px. De paso: `PropertyContactModal` tenía 14 textos en español que se veían en las 2.751 fichas EN — traducido.)
-- [Ivan·S] **Validación visual humana en móvil** de la barra de contacto de las fichas y de la posición del FAB: se verificó por HTML y CSS servidos, pero no con capturas (el panel del navegador no compone y playwright-core no está en el proyecto).
+- (✅ 01/09 — **barra de contacto en móvil validada con captura** en producción a 375×812: barra inferior 743–812, FAB de WhatsApp 668–724, 19 px de separación, no se solapan. Ver DAILY_LOG 01/09 cont.)
 - [CC·M] Del informe de schema 26/08, sin hacer: `about: Accommodation` en fichas (rooms/baths/floorSize no son propiedades de RealEstateListing), `datePosted`, `Person` en /equipo, `geo`/`openingHours`/`priceRange` en LocalBusiness, breadcrumbs en /servicios y /equipo.
 - [Ivan·S] **VALIDAR PDF del portal end-to-end en prod (selector de fotos + marca AG).** Desde el 07/08 el PDF sale con logo Assets Golden y el contacto del asesor; verificar ambas cosas en la misma pasada. El 06/07 se deployó el selector de fotos (hasta 10) + fix del logo. Falta la validación humana en prod.
   - Acción: entrar a `/portal` en PRODUCCIÓN con `demo.agente@assetsgolden.com` (agente de prueba creado el 06/07), abrir una propiedad, **elegir fotos (hasta 10)** y descargar el PDF. Verificar: portada correcta, orden de fotos = orden de selección, galería paginada OK, **logo visible** (header navy), precio/specs/agente/footer OK, sin páginas rotas.
@@ -94,7 +94,8 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 
 ### 7a. Deuda de lint pre-existente — ✅ CERRADA (01/07)
 (Los 4 items resueltos: `<a>`→`<Link>`, `<img>`→`<Image>`, `set-state-in-effect`, `any` casts. Baseline 26 err/3 warn → eslint 0/0, tsc exit 0. Detalle en DAILY_LOG 01/07.)
-- [Ivan·S] **Pendiente de testeo manual:** el refactor de `set-state-in-effect` cambió el fetch de ciudades a async con guard de cancelación → probar "cambiar país → recarga ciudades" en crear/editar propiedad (admin) y en los filtros del portal.
+- (✅ 01/09 — **carrera del selector de ciudades corregida**: `nueva-propiedad` no tenía el guard de cancelación que sí tenía `[id]/edit`; España (3.620) → Grecia (1) dejaba las ciudades españolas. El listado resuelve en servidor, no aplica. Ver DAILY_LOG 01/09 cont.)
+- [CC·S] Fragilidad anotada, no urgente: `get-cities` filtra con `ilike %pais%`. Hoy ninguno de los 13 países de la BD es subcadena de otro, pero un "Guinea" / "Guinea Ecuatorial" cruzaría resultados.
 
 ### 7b. Datos / higiene latente
 - (CERRADO Y DEPLOYADO 05/07 — opción 2 del informe: **990 slugs habihub legacy renombrados** a `slugify(título)-external_id` + columna `legacy_slug` + redirect 308 locale-aware en la ficha. Deploy tomó 3 iteraciones por un 500 en render on-demand — causa real: faltaba `setRequestLocale` en la ficha, no el redirect. **Verificado en prod: legacy ES/EN → 308 → canónico → 200.** Ver DAILY_LOG 05/07.)
