@@ -91,6 +91,24 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-09-01 — [DATOS] Vaciado de la tabla `leads`
+
+**Contexto:** Iván pidió dejar en cero los leads del panel de admin: todos los que había eran falsos o de las pruebas de los formularios.
+
+**Antes de borrar** se volcaron los 23 registros completos (todas las columnas, incluido `id`) a `../backup-leads-2026-09-01.json` — **fuera del repositorio git**, porque contienen datos personales y no deben acabar en un commit. Verificada la copia: 23 registros, todos con id y email, rango 13/05 → 30/08.
+
+**Borrado:** `delete from leads` → 0 filas. Reversible reinsertando desde el JSON.
+
+**Dos registros con datos de terceros reales** que se borraron igualmente por indicación de Iván, anotados por si hubiera que recuperarlos: `zaira / zairafortoul@gmail.com` (09/06, ficha de Canggu, mensaje "hola soy zaira", estado *discarded*) y `Prueba / jmpascual76@gmail.com` (15/06, finca en Mallorca, estado *contacted*). Ninguno parece una consulta comercial genuina, pero no son autoevidentes como los `test@test.com`.
+
+**NO se tocó el Google Sheet de contactos web**, que conserva todas las filas. La petición era sobre el panel de admin; el Sheet es un sistema aparte y su limpieza queda pendiente de confirmación.
+
+**Archivos:** ninguno del proyecto. Copia de seguridad en el directorio padre.
+
+**Próximo paso sugerido:** decidir si se limpia también el Sheet y arrancar la Tarea 4 (validaciones).
+
+---
+
 ### 2026-08-30 (cont. 3) — [ANALYTICS] Evento generate_lead en los 6 formularios
 
 **Contexto:** al ir a cerrar la tarea "marcar eventos clave en GA4" (que estaba anotada como pendiente de Iván) se vio que **no se podía hacer**: la web no dispara ningún evento propio. Solo hay `gtag('config')` — o sea `page_view` y medición automática. El informe SEO decía "GA4 sin conversiones" y la causa no era que estuvieran sin marcar, sino que no existían. Requería código antes que panel.

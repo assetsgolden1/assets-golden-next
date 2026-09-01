@@ -47,6 +47,8 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [Claude+Ivan·L] Plan editorial por clústeres: 4–6 art/mes, guías por zona/fiscalidad/proceso, con enlazado a fichas y destinos.
 
 ## 3. Web / Técnico
+- (✅ 01/09 — **tabla `leads` vaciada** a petición de Iván: 23 registros de prueba borrados, con copia previa en `../backup-leads-2026-09-01.json` fuera del repo. Ver DAILY_LOG 01/09)
+- [Ivan·S] Decidir si se limpian también las filas del **Sheet de contactos web** (no se tocó: conserva todo el histórico).
 - (✅ 30/08 — **evento `generate_lead` en los 6 formularios**. La web no disparaba ningún evento propio: "GA4 sin conversiones" no era falta de marcarlas, era que no existían. Ver DAILY_LOG 30/08 cont. 3)
 - [Ivan·S] Enviar un formulario en producción, verlo en GA4 → Tiempo real, y marcar `generate_lead` como **evento clave** (Administrar → Eventos). GA4 no lo ofrece hasta recibirlo una vez.
 - [Ivan·S] Reiniciar el `npm run dev` local: quedó en bucle de panics de Turbopack porque se compiló con él levantado.
