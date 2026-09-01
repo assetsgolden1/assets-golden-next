@@ -5,14 +5,14 @@
 > - Al cerrar una sesión: tachar/quitar lo resuelto y agregar lo nuevo que surja.
 > - El detalle de CÓMO se hizo cada cosa va en DAILY_LOG.md, no acá.
 > - El estado actual del proyecto (números, stack) va en ESTADO.md, no acá.
-> Última actualización: 27/08/2026
+> Última actualización: 01/09/2026
 
 Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
 
 ## 0. Lo más urgente
 0. (RESUELTO 07/08: el deploy estaba BLOCKED por el límite de la cuenta; Iván lo desbloqueó y el build `da13a95` quedó READY. Atribución UTM **verificada en producción**. Ojo con ese límite a futuro.)
-0b. (✅ CERRADO 27/08 cont.13 — **`/mi-demanda`**: insertaba en una tabla `demands` inexistente y cada envío se perdía. Decisión de Iván: van a `leads` con `source='demand_form'` (propertyType→interest, country→location, budget→property_value_range, timeline→sale_timeline, features→message). Mapeo probado contra la BD. **Falta que Iván envíe el formulario una vez en prod** para validar end-to-end: el endpoint tiene BotID y no se puede probar por curl.)
+0b. (✅ CERRADO — **`/mi-demanda`**: insertaba en una tabla `demands` inexistente y cada envío se perdía. Ahora va a `leads` con `source='demand_form'`. Validado end-to-end por Iván en producción el 30/08.)
 1. (✅ RESUELTO 27/08: Iván revisó GSC y exportó Coverage+Performance. **5.462 páginas indexadas** (era ~solo la home en junio); impresiones ×7 desde junio; el title nuevo ya rankea para "assets golden" en pos 1. Datos analizados en DAILY_LOG 27/08 y ESTADO. Nuevo pendiente: identificar las 878 URLs 404 — exportar el detalle del motivo "No se ha encontrado (404)" en GSC.)
 
 ## 1. SEO / Posicionamiento
@@ -27,10 +27,10 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
   - (✅ CERRADO 27/08 cont.11 — **thin content Cervera**: el importador usaba el excerpt EN LUGAR de la ficha técnica. Ahora concatena; 49 fichas enriquecidas (+21.722 chars reales) + 13 traducidas a mano del inglés. Fichas <300 chars: ES 22→5, EN 49→5. Ver DAILY_LOG 27/08 cont.11.)
   - [Atilio·S] Las **5 fichas Cervera que siguen cortas** necesitan copy real: 4 no tienen texto en la fuente y `cv-3463` (Ziggurat) trae una definición de zigurat mesopotámico en vez de describir la promoción. No se pueden completar sin inventar.
   - [CC·M] Sigue pendiente: plantilla HabiHub repetida en ~2.500 fichas (riesgo scaled content) y thin content en varias fichas manuales.
-  - [Ivan+CC·S] **GA4 sin eventos clave** (cero conversiones configuradas: ni leads, ni WhatsApp, ni PDF).
+  - (✅ CERRADO 01/09 — **GA4 con evento clave**: la web no emitía ningún evento propio; se añadió `generate_lead` en los 6 formularios (30/08) e Iván lo marcó como evento clave. Las conversiones cuentan desde ese momento, no retroactivamente.)
   - (✅ CERRADO 27/08 cont.6 — **cifras + Brasil sin mapear**: al corregir las cifras apareció que Brasil (cargado 26/07) nunca se sumó a `translateGeography` → las fichas de Brasil publicaban `addressCountry: "ES"` y en EN el país salía "Brasil". Corregidos ambos mapas + areaServed + numberOfItems 2.364→2.751 + 15 reemplazos "12 países"→13 + FAQ de servicios completada (enumeraba 11) + singular/plural en FAQ de destinos. Ver DAILY_LOG 27/08 cont.6.)
   - [CC·S] **Prevención:** que el importador (o un test) falle si aparece un país sin mapear en `translateGeography`/`SERVED_COUNTRIES` — este bug estuvo un mes sin detectarse.
-  - [CC·S] `numberOfItems` del schema es un valor fijo (2.751 al 27/08) y vuelve a quedar obsoleto al cargar lotes grandes: refrescar con el SQL que está comentado en `GlobalSchemaOrg.tsx`.
+  - [CC·S] `numberOfItems` del schema es un valor fijo (**2.758 al 01/09**) y vuelve a quedar obsoleto al cargar lotes grandes. Refrescar con: `select count(*) from properties where status in ('active','available') and hidden is not true and hidden_by_sync is not true`.
 - [Atilio+Ivan·L] Autoridad/backlinks: menciones, prensa, portales, partners. Lo que falta vs competidores. (Sin cambios desde junio; sigue siendo el techo estructural.)
 - (ISR cerrado 29/06: 21 rutas públicas estáticas/ISR. Las 8 que siguen ƒ — propiedades listado, destinos/[slug], destinos/espana, inversiones, promociones, propiedades/[slug]/[ciudad] — usan `searchParams` (filtros) → inherentemente dinámicas, no cacheables. Es correcto, no es pendiente.)
 
@@ -50,11 +50,11 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - (✅ 01/09 — **tabla `leads` vaciada** a petición de Iván: 23 registros de prueba borrados, con copia previa en `../backup-leads-2026-09-01.json` fuera del repo. Ver DAILY_LOG 01/09)
 - [Ivan·S] Decidir si se limpian también las filas del **Sheet de contactos web** (no se tocó: conserva todo el histórico).
 - (✅ 30/08 — **evento `generate_lead` en los 6 formularios**. La web no disparaba ningún evento propio: "GA4 sin conversiones" no era falta de marcarlas, era que no existían. Ver DAILY_LOG 30/08 cont. 3)
-- [Ivan·S] Enviar un formulario en producción, verlo en GA4 → Tiempo real, y marcar `generate_lead` como **evento clave** (Administrar → Eventos). GA4 no lo ofrece hasta recibirlo una vez.
+- (✅ 01/09 — Iván envió el formulario, vio `generate_lead` en Tiempo real y lo marcó como evento clave.)
 - [Ivan·S] Reiniciar el `npm run dev` local: quedó en bucle de panics de Turbopack porque se compiló con él levantado.
 - [CC·S] **Regla:** comprobar que no haya un `next dev` corriendo antes de lanzar `npm run build` — le pisa el `.next`.
 - (✅ 30/08 — **404 de GSC**: de 888, 85 recuperadas con redirect 308 de slugs duplicados y 3 "URLs" que en realidad eran keys de React en el payload RSC del footer. Las 746 `/property/<uuid>` y 32 IDs numéricos son 404 correctos. Ver DAILY_LOG 30/08 cont. 2)
-- [Ivan·S] En GSC, pulsar "Validar corrección" sobre el grupo de 404 cuando el deploy esté arriba.
+- (✅ 01/09 — Iván lanzó la validación en GSC. Google tarda días; se espera resultado parcial porque los 746 `/property/<uuid>` seguirán siendo 404 correctos.)
 - (✅ 30/08 — **contactos web centralizados**: `/api/collaborations` insertaba en una tabla inexistente (mismo bug que /mi-demanda) y perdía todo; ahora los 6 formularios van a `leads` y al mismo Sheet, con 4 columnas nuevas (tipo de inmueble, ubicación, intención, plazo), la columna "Tipo" normalizada y color de fila por tipo de solicitud. Footer: 3 enlaces mal apuntados corregidos + anclas en /servicios. Ver DAILY_LOG 30/08 cont.)
 - [Ivan·S opcional] Renombrar el archivo del Sheet a "Contactos Web" desde Drive (no toca código: todo apunta por ID) y borrar las 4 filas de prueba.
 - [CC·S] **Regla aprendida:** ante "el formulario no manda X", comprobar primero el bundle desplegado y pedir Ctrl+Shift+R. Pasó el 06/07 (modal del portal) y el 30/08 (formulario de activos).
@@ -63,17 +63,18 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [Atilio·S] Para completar el schema de empresa hacen falta datos que no se pueden inventar: **coordenadas exactas del local, horario de atención y rango de precios** (`geo`, `openingHours`, `priceRange`).
 - (✅ CERRADO 27/08 cont.7 — **10 páginas EN canonicalizaban a la ES**: servicios, equipo, sobre-nosotros, partners, vender-tu-piso, colabora, promociones y las 3 legales usaban `metadata` estático, así que /en/X declaraba canonical /X y no emitía hreflang. Convertidas a `generateMetadata` + `buildAlternates`. Probablemente parte de las 532 "duplicadas" de GSC. Ver DAILY_LOG 27/08 cont.7.)
 - (✅ CERRADO 27/08 cont.7 — **"0 €" en el listado**: 14 fichas con `price = 0` mostraban "0 €"; ahora `formatPrice` las trata como precio ausente → "Precio a consultar".)
-- [CC·S] Revisar si queda alguna otra página pública con `metadata` estático y canonical fijo (mismo patrón del bug de arriba).
+- (✅ 01/09 — **quedaban 3**: `/consejos`, `/inversiones` y `/noticias` canonicalizaban sus versiones EN a la española y no emitían hreflang. Convertidas a `generateMetadata` + `buildAlternates`; listado de rutas del build sin cambios (diff vacío). Ver DAILY_LOG 01/09 cont.2)
 - (✅ CERRADO 27/08 cont.10 — los 4 hallazgos visuales: barra fija de contacto en fichas móvil (precio + CTA), FAB de WhatsApp elevado sobre la barra + padding del body, menos hueco galería→título, y header ajustado a 1280px. De paso: `PropertyContactModal` tenía 14 textos en español que se veían en las 2.751 fichas EN — traducido.)
 - (✅ 01/09 — **barra de contacto en móvil validada con captura** en producción a 375×812: barra inferior 743–812, FAB de WhatsApp 668–724, 19 px de separación, no se solapan. Ver DAILY_LOG 01/09 cont.)
 - [CC·M] Del informe de schema 26/08, sin hacer: `about: Accommodation` en fichas (rooms/baths/floorSize no son propiedades de RealEstateListing), `datePosted`, `Person` en /equipo, `geo`/`openingHours`/`priceRange` en LocalBusiness, breadcrumbs en /servicios y /equipo.
-- [Ivan·S] **VALIDAR PDF del portal end-to-end en prod (selector de fotos + marca AG).** Desde el 07/08 el PDF sale con logo Assets Golden y el contacto del asesor; verificar ambas cosas en la misma pasada. El 06/07 se deployó el selector de fotos (hasta 10) + fix del logo. Falta la validación humana en prod.
+- (✅ CERRADO 01/09 — **PDF del portal validado en producción por Iván**: el selector de fotos funciona y el PDF descarga con la información correcta. Pendiente desde el 07/08.)
+- [Ivan·S] Quedan sin confirmar dos extras de esa misma tarea (ver sub-items): el acceso a **Expertos de Gestión** y el borrado del **agente demo**.
   - Acción: entrar a `/portal` en PRODUCCIÓN con `demo.agente@assetsgolden.com` (agente de prueba creado el 06/07), abrir una propiedad, **elegir fotos (hasta 10)** y descargar el PDF. Verificar: portada correcta, orden de fotos = orden de selección, galería paginada OK, **logo visible** (header navy), precio/specs/agente/footer OK, sin páginas rotas.
   - Cuidados: (a) Chromium clavado en `@sparticuz/chromium-min@143.0.4` — si Vercel cambia el runtime de Node o el paquete se actualiza, puede romper el binario. (b) Probar SÍ O SÍ en prod, NO en local (el binario/entorno difiere). (c) `serverExternalPackages` en next.config mantiene puppeteer server-side — no romper esa config.
   - Al terminar: desactivar/borrar el demo agent si no se necesita más (sin tocar los otros 6 usuarios).
   - **Aprovechar la misma sesión** para ver el acceso a Expertos de Gestión (tarjeta en la home del portal + link "Gestoría" en el header) — añadido el 07/08, sin verificación visual todavía.
 - (RESUELTO 07/08: Iván confirmó que el Nº de experto **3440 es compartido** por todos los asesores. La implementación actual —constante, no columna por agente— es la correcta.)
-- [Atilio+CC·S] Criterios de /inversiones (definición de Atilio) + verificar filtro.
+- [Atilio·S] **Criterios de /inversiones.** Filtro verificado el 01/09: funciona por `classification='investment'`, pero **solo 31 propiedades de 2.758** la tienen y 2.802 están sin clasificar. El código está bien; falta el criterio de negocio y clasificar el catálogo. (Eliminada de paso `EXCLUDED_FROM_INVESTMENT`, definida y nunca usada.)
 - (CERRADO 03/07: imágenes rotas por fuente >25 MB del proyecto secundario `wloneprkibfjioxwypaw`. Escaneadas las 58 props → 37 con rotas (204 imgs) → todas re-hosteadas comprimidas al proyecto principal + BD actualizada. Re-escaneo: 0 rotas. Ver DAILY_LOG 03/07.)
 - [CC·S opcional] **Prevención:** fijar `file_size_limit` al bucket `property-images` del proyecto principal (hoy sin límite) para que subidas manuales grandes no vuelvan a romper el transform. Verificar que el flujo admin comprime siempre.
 

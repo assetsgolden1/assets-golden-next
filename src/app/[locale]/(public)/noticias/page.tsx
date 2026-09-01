@@ -1,20 +1,27 @@
 import type { Metadata } from 'next'
+import { setRequestLocale } from 'next-intl/server'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
 import { Calendar, TrendingUp, Building2, MapPin } from 'lucide-react'
 import { getBlogPostsByCategory } from '@/lib/supabase/queries'
 import { optimizedImage } from '@/lib/utils/optimizedImage'
 
-export const metadata: Metadata = {
-  title: 'Noticias del Mercado Inmobiliario',
-  description:
-    'Últimas noticias y novedades del mercado inmobiliario internacional. Tendencias, análisis y actualizaciones de Assets Golden.',
-  alternates: {
-    canonical: '/noticias',
-  },
-  openGraph: {
-    url: '/noticias',
-  },
+// Con `metadata` estático, /en/noticias declaraba canonical "/noticias" y no
+// emitía hreflang: Google la trataba como duplicada de la española. Mismo bug
+// que se corrigió el 27/08 en otras 10 páginas; estas tres se habían quedado.
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> },
+): Promise<Metadata> {
+  const { locale } = await params
+  setRequestLocale(locale)
+  return {
+    title: 'Noticias del Mercado Inmobiliario',
+    description:
+      'Últimas noticias y novedades del mercado inmobiliario internacional. Tendencias, análisis y actualizaciones de Assets Golden.',
+    alternates: buildAlternates('/noticias', locale),
+    openGraph: { url: locale === 'en' ? '/en/noticias' : '/noticias' },
+  }
 }
 
 export const revalidate = 86400

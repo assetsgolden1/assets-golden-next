@@ -60,7 +60,7 @@ function buildSchema(locale: string) {
           // izarse). Refrescar al cargar lotes grandes con:
           //   SELECT count(*) FROM properties WHERE status IN ('active','available')
           //     AND hidden IS NOT TRUE AND hidden_by_sync IS NOT TRUE;
-          numberOfItems: 2751, // verificado 27/08/2026
+          numberOfItems: 2758, // verificado 01/09/2026 (SQL: status active/available, no ocultas)
         },
         sameAs: [
           'https://www.linkedin.com/company/assets-golden/',

@@ -91,6 +91,26 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-09-01 (cont. 2) — [SEO] Tres páginas EN más canonicalizando a la española
+
+**Contexto:** cerrada la Tarea 4, se atacó el pendiente "[CC·S] Revisar si queda alguna otra página pública con `metadata` estático y canonical fijo".
+
+**Sí quedaban: `/consejos`, `/inversiones` y `/noticias`.** Las tres seguían con `export const metadata` y canonical escrito a mano en español. Verificado en producción antes de tocar nada: `/en/consejos`, `/en/inversiones` y `/en/noticias` declaraban `canonical` a la URL **española** y **no emitían ningún hreflang**. Es el mismo bug que se corrigió el 27/08 en otras 10 páginas; estas tres se habían quedado fuera.
+
+Se comprobó que son bilingües de verdad antes de elegir el helper: `consejos` y `noticias` filtran los posts por idioma (`getBlogPostsByCategory(cat, locale)`), así que corresponde `buildAlternates` y no `buildSpanishOnlyAlternates` (que es lo correcto para las legales). Convertidas a `generateMetadata` + `setRequestLocale` + `buildAlternates`.
+
+**Verificación del riesgo conocido:** meter next-intl en una página la vuelve dinámica si falta `setRequestLocale` — pasó con 5 rutas el 27/08. Esta vez se guardó el listado de rutas del build **antes** y se comparó con el de después: **30 rutas, diff vacío**. `consejos` y `noticias` siguen ● (SSG), `inversiones` sigue ƒ (ya lo era, usa `searchParams`). Además se leyó el HTML prerenderizado: `/en/consejos` y `/en/noticias` ahora se autocanonicalizan y emiten los 3 hreflang; las versiones ES no cambiaron.
+
+**`/inversiones`, de paso:** el warning de eslint destapó `EXCLUDED_FROM_INVESTMENT` (`hotel, building, rural, house, land`) **definida y nunca usada** — resto de un enfoque anterior. El filtro real es `classification: 'investment'`, y por SQL: **solo 31 propiedades** de 2.758 visibles la tienen (2.802 están sin clasificar). O sea: el filtro funciona, lo que falta es el criterio de negocio y clasificar el catálogo. Constante muerta eliminada.
+
+**`numberOfItems` refrescado:** 2.751 → **2.758** (SQL sobre status active/available y no ocultas).
+
+**Archivos MODIFIED:** `src/app/[locale]/(public)/{consejos,inversiones,noticias}/page.tsx`, `src/components/seo/GlobalSchemaOrg.tsx`.
+
+**Próximo paso sugerido:** verificar en producción tras el deploy que `/en/inversiones` (dinámica, no se puede comprobar en el build) se autocanonicaliza. Y pasarle a Atilio el dato de las 31 de 2.758 para definir el criterio.
+
+---
+
 ### 2026-09-01 (cont.) — [ADMIN/MÓVIL] Tarea 4: carrera en el filtro de ciudades y validación visual del móvil
 
 **Contexto:** arranque de la Tarea 4 (validaciones pendientes). Se atacaron las dos que no requerían a Iván.

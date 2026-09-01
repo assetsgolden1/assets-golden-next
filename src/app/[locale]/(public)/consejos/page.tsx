@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { setRequestLocale } from 'next-intl/server'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
 import { CheckCircle } from 'lucide-react'
@@ -6,16 +8,21 @@ import { getBlogPostsByCategory } from '@/lib/supabase/queries'
 import { buttonVariants } from '@/components/ui/button'
 import { optimizedImage } from '@/lib/utils/optimizedImage'
 
-export const metadata: Metadata = {
-  title: 'Consejos Inmobiliarios',
-  description:
-    'Guía práctica para compradores, vendedores e inversores inmobiliarios. Consejos de expertos para tomar las mejores decisiones.',
-  alternates: {
-    canonical: '/consejos',
-  },
-  openGraph: {
-    url: '/consejos',
-  },
+// Con `metadata` estático, /en/consejos declaraba canonical "/consejos" y no
+// emitía hreflang: Google la trataba como duplicada de la española. Mismo bug
+// que se corrigió el 27/08 en otras 10 páginas; estas tres se habían quedado.
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> },
+): Promise<Metadata> {
+  const { locale } = await params
+  setRequestLocale(locale)
+  return {
+    title: 'Consejos Inmobiliarios',
+    description:
+      'Guía práctica para compradores, vendedores e inversores inmobiliarios. Consejos de expertos para tomar las mejores decisiones.',
+    alternates: buildAlternates('/consejos', locale),
+    openGraph: { url: locale === 'en' ? '/en/consejos' : '/consejos' },
+  }
 }
 
 export const revalidate = 86400

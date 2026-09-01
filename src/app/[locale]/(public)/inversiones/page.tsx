@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { setRequestLocale } from 'next-intl/server'
+import { buildAlternates } from '@/lib/utils/seoAlternates'
 import Link from 'next/link'
 import {
   getProperties,
@@ -11,16 +13,21 @@ import { PropiedadesFilters } from '@/components/PropiedadesFilters'
 import { PaginationBar } from '@/components/PaginationBar'
 import { TrendingUp, Globe, Shield, BarChart3 } from 'lucide-react'
 
-export const metadata: Metadata = {
-  title: 'Inversión Inmobiliaria Internacional',
-  description:
-    'Oportunidades de inversión inmobiliaria en los mercados más rentables de Europa y América. Análisis de mercado, rentabilidades y asesoramiento personalizado.',
-  alternates: {
-    canonical: '/inversiones',
-  },
-  openGraph: {
-    url: '/inversiones',
-  },
+// Con `metadata` estático, /en/inversiones declaraba canonical "/inversiones" y no
+// emitía hreflang: Google la trataba como duplicada de la española. Mismo bug
+// que se corrigió el 27/08 en otras 10 páginas; estas tres se habían quedado.
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> },
+): Promise<Metadata> {
+  const { locale } = await params
+  setRequestLocale(locale)
+  return {
+    title: 'Inversión Inmobiliaria Internacional',
+    description:
+      'Oportunidades de inversión inmobiliaria en los mercados más rentables de Europa y América. Análisis de mercado, rentabilidades y asesoramiento personalizado.',
+    alternates: buildAlternates('/inversiones', locale),
+    openGraph: { url: locale === 'en' ? '/en/inversiones' : '/inversiones' },
+  }
 }
 
 export const revalidate = 43200
@@ -47,8 +54,6 @@ const WHY_INVEST = [
     desc: 'Datos actualizados de precios, demanda y perspectivas por zona.',
   },
 ]
-
-const EXCLUDED_FROM_INVESTMENT = ['hotel', 'building', 'rural', 'house', 'land']
 
 const PROPERTY_TYPES = [
   'apartment', 'penthouse', 'villa', 'townhouse', 'commercial', 'other',
