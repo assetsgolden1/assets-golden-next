@@ -15,7 +15,7 @@ reordena si la prioridad cambió.
 
 ### Bloqueantes para go-live
 - [x] BotID Basic implementado en formularios (reemplaza Cloudflare Turnstile — 3 endpoints + 1 server action)
-- [ ] Refactor pipeline de leads: eliminar n8n, consolidar en `processLead`, agregar Resend a todos los endpoints (depende de acceso Resend de Atilio)
+- [x] Refactor pipeline de leads: n8n eliminado del código el 05/09/2026 (los 3 endpoints + `createLead`); Resend ya estaba en `/api/leads`
 - [ ] Rotación de claves SUPABASE_SERVICE_ROLE_KEY y GOOGLE_SHEETS_CREDENTIALS_JSON
 - [ ] Páginas legales GDPR: política de privacidad, términos, banner cookies (BORRADORES creados con [PLACEHOLDER]; pendiente validación legal y banner)
 - [ ] Atilio o asesor legal: validar texto de las 3 páginas legales (`/politica-de-privacidad`, `/aviso-legal`, `/politica-de-cookies`) y reemplazar todos los `[PLACEHOLDER: …]` por valores reales (razón social, CIF, domicilio, registro mercantil, teléfono, emails, jurisdicción) — **CASI COMPLETO**: todos los 7 datos reemplazados excepto Tomo del Registro Mercantil (ver pendiente abajo)
@@ -27,9 +27,9 @@ reordena si la prioridad cambió.
 - [x] [LEADS-SEQ-P03] Motor de secuencia de nurture sobre `meta_leads`: segmento A/B por `presupuesto_raw`, 5 plantillas de email (no 3), envío escalonado con `seq_email1..5_sent_at` + respeto de `seq_paused`, endpoint cron + workflow. **ACTIVADO 2026-06-16** (commit `e5be41a`): `schedule` descomentado → cron diario **09:00 UTC** vivo. `META_LEADS_CRON_SECRET` ya operativo en Vercel (el endpoint validó el Bearer hoy con HTTP 200). Primera corrida automática: 2026-06-17 09:00 UTC.
 - [x] Audit log de cambios admin
 - [ ] EL-1/F — Sección "Propiedades similares" en /propiedades/[slug] (diferido de Fase 3.A — Bloque 4)
-- [ ] Migración de 166 imágenes legacy de Lovable a Supabase actual
+- [x] Migración de imágenes legacy de Lovable a Supabase actual — 902 URLs re-hosteadas el 05/09/2026 (Fase 0 migración de cuentas)
 - [ ] Test PDF en producción end-to-end con agente real
-- [ ] Auditoría proyecto Supabase huérfano `yagrwbmsufpvjcgxkuoz`
+- [x] Auditoría proyecto Supabase huérfano `yagrwbmsufpvjcgxkuoz` — 0 referencias en BD; quitado de config el 05/09/2026
 - [x] Definir criterios `/inversiones` con Atilio — implementado vía `classification='investment'`
 - [ ] Monitoreo del cron y alertas
 - [ ] Opt-out de AI training en Vercel Team Settings (revisar al migrar a Pro). Iván buscó en General, Security & Privacy, Billing, Members, Drains, Alerts del plan Hobby actual — toggle no visible. Posibilidades: (a) opción solo disponible en Pro, (b) Vercel movió/eliminó el setting, (c) está en sub-página no obvia. Re-evaluar después de upgrade.
@@ -88,6 +88,34 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 **Commit:** `fd102b8`.
 
 **Próximo paso sugerido:** los datos de los 15 partners no tienen `linkedin_url` en BD (se resuelve por `linkedinMap` según el nombre) y ninguno tiene `specialties` visible; si se quiere enriquecer las fichas, ese es el contenido que falta. Verificar en prod tras el deploy.
+
+---
+
+### 2026-09-05 — [MIGRACION-CUENTAS] Análisis completo + Fase 0 (código y datos) para entregar la web a Atilio y Joan
+
+**Contexto:** Iván pidió analizar el proyecto y trazar un plan para migrar la web a cuentas de Vercel y Supabase (y resto de servicios) del cliente, para que Atilio y Joan asuman los costes, sin perder nada (APIs, formularios, 100 % del funcionamiento). Tras el análisis dio el OK a arrancar con todo lo que no dependiera de él.
+
+**Análisis (verificado contra Supabase, Vercel CLI, GitHub, Resend y DNS, no solo el repo):** todo vive en cuentas de Iván (repo `I-Bott`, team Vercel Pro, org Supabase Pro, Resend, service account en el GCP de la agencia, Upstash, n8n). Hallazgos que condicionaban la migración: (1) 902 URLs de imagen (58 props visibles + 18 posts + 12 fotos de equipo + 11 destinos + OG image) dependían del proyecto Supabase de Lovable `wloneprkibfjioxwypaw`, que NO está en ninguna cuenta del equipo; (2) los 3 workflows de Actions apuntaban a `assets-golden-next.vercel.app`, que puede cambiar al transferir el proyecto de team; (3) n8n caído y nunca usado; (4) 3 vars de Vercel huérfanas. Decisión de estrategia: **transfer** de proyecto (Supabase org→org, Vercel team→team; ambos documentados oficialmente, sin downtime si el destino está en Pro), no clonar. Plan, inventario, decisiones y checklist en `docs/plan-migracion-cuentas-2026-09.md`.
+
+**Decisiones de Iván:** transfer; una cuenta de email nueva creada por él es titular de todas las plataformas y él conserva acceso con ella; repo se transfiere a la cuenta GitHub creada para Atilio; n8n se elimina; se crean 2 Sheets nuevos; Meta (BM/Pixel/tokens) queda en su BM y fuera de alcance; rotar claves al final. Importar desde GitHub en Vercel queda como plan B.
+
+**Trabajo hecho (Fase 0):**
+- **Re-host de imágenes Lovable → principal**: script `scripts/rehostLovableImages.ts` (dry-run + `--apply`, idempotente, concurrencia 6, retry 429). 902 URLs únicas → mismo bucket bajo `migrated-lovable/`; 295 recomprimidas (>8 MB o >2560 px → JPEG q82), 607 copiadas byte a byte; ~885 MB subidos; 99 filas actualizadas (58 properties, 18 blog_posts, 12 team_members, 11 country_destinations, incl. `city_images`). Verificado por SQL: **0 referencias a `wlone` en BD**, 902 objetos en Storage (3,35 → 4,24 GB). Muestras raw + transform → 200/webp. No se borró nada del proyecto legacy. Log en `scripts/output/rehost-lovable-log.json` (gitignored) y `../backups-migracion-2026-09/`.
+- **OG image** por defecto: descargada del proyecto legacy, recortada a 1200×630 JPEG (3,2 MB → 141 KB) en `public/og/default.jpg`; `layout.tsx` apunta a `https://assetsgolden.com/og/default.jpg` (og + twitter) y pierde el preconnect al host viejo.
+- **Config**: `yagrwbmsufpvjcgxkuoz` (0 refs en BD) y `wloneprkibfjioxwypaw` fuera de `next.config.ts` (remotePatterns + CSP img-src) y de `SUPABASE_HOSTS` en `optimizedImage.ts`.
+- **n8n eliminado** de `/api/leads`, `/api/demands`, `/api/collaborations`, `createLead()` en `queries.ts` (queda solo el INSERT en Supabase) y de `env.production.example`/`.env.local`. Se borró también el `payload` que solo alimentaba al webhook.
+- **Workflows de Actions** (`sync-habihub-weekly`, `meta-leads-sync`, `meta-leads-sequence`) → `https://assetsgolden.com/...`.
+- **Vercel**: borradas `TURNSTILE_SECRET_KEY`, `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `META_SYSTEM_USER_TOKEN`, `N8N_WEBHOOK_URL` (solo existían en Production). Quedan 17 variables.
+- **Backups fuera del repo** en `../backups-migracion-2026-09/`: `vercel env pull` de Production (15 vars "Sensitive" salen como placeholder: Vercel no las expone; viajan con el transfer) + dump JSON de las 12 tablas y lista de usuarios Auth (34 MB) + logs de re-host y build.
+- Verificación local: eslint 0 en los archivos tocados; tsc exit 0; `next build` OK (ver commit). Los 50 errores de eslint del run completo son previos y ajenos: `.vercel/output` (artefacto local de `vercel build`, debería ignorarse), scripts gitignored y 2 páginas del admin (`nueva-propiedad` set-state-in-effect, `admin/page` Date.now).
+
+**Observado sin tocar (fuera de alcance):** `vender-tu-piso` inserta el lead dos veces (`createLead` con anon + `/api/leads` con service role). Anotar como pendiente menor.
+
+**Archivos tocados:** CREATED `docs/plan-migracion-cuentas-2026-09.md`, `scripts/rehostLovableImages.ts`, `public/og/default.jpg`. MODIFIED `next.config.ts`, `src/app/layout.tsx`, `src/lib/utils/optimizedImage.ts`, `src/lib/supabase/queries.ts`, `src/app/api/leads/route.ts`, `src/app/api/demands/route.ts`, `src/app/api/collaborations/route.ts`, `src/app/[locale]/(public)/vender-tu-piso/actions.ts`, `env.production.example`, `.github/workflows/*.yml` (3), `ESTADO.md`, `PENDIENTES.md`, `DAILY_LOG.md`. Datos: 99 filas de BD + 902 objetos de Storage.
+
+**Commits:** `eacf22a` chore(migracion): fase 0 — imagenes Lovable re-hosteadas, sin n8n, workflows al dominio · docs: ver commit siguiente
+
+**Próximo paso sugerido:** Iván crea las cuentas (Fase 1: org Supabase Pro + team Vercel Pro con la cuenta nueva, invitar su cuenta actual a la org Supabase, GitHub de Atilio listo) y confirma acceso a IONOS y si la cuenta nueva es Google. Después: Fase 2 (transfer Supabase) → Fase 3 (repo + transfer Vercel) → Fase 4 (Resend, GCP/Sheets, Upstash) → Fase 5 (E2E) → Fase 6 (rotación + entrega). Checklist en el plan.
 
 ---
 

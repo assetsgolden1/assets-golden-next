@@ -4,7 +4,7 @@
 > - Esta es la foto del estado VIGENTE. Leerla al arrancar para tener contexto.
 > - Se SOBRESCRIBE cuando algo cambia (no se acumula como un diario).
 > - El historial va en DAILY_LOG.md; el backlog en PENDIENTES.md.
-> Última actualización: 26/08/2026
+> Última actualización: 05/09/2026
 
 ## Qué es
 Web inmobiliaria internacional bilingüe (ES/EN), Next.js 15 App Router SSR sobre Vercel + Supabase Pro. Cliente: Atilio Montironi (+ socio Joan). Proveedor: IBott (Ivan). Marca: "Inmobiliaria Internacional de Propiedades Exclusivas".
@@ -16,7 +16,7 @@ Next.js 15 / React 19 / TypeScript · Tailwind v4 (config en @theme de globals.c
 - Web: https://assetsgolden.com (dominio conectado, en producción).
 - Builds Vercel: más lentos desde el ISR (prerenderiza ~2.600 fichas). Verificar prod con SHA correcto, no con "Redeploy".
 - **Caché/ISR (29/06, revisado 26/07)**: 21 rutas públicas son estáticas/ISR (**revalidate 12h listados / 24h fichas y blog** — subido el 13/07 por el límite de ISR Writes del plan) — home, fichas `propiedades/[slug]` (~2.600, SSG), blog (listado/posts/categorías), servicios, sobre-nosotros, equipo, partners, destinos listado, legales, etc. Se sirven desde el CDN (x-vercel-cache PRERENDER/HIT). Las que usan `searchParams` (propiedades listado, destinos/[slug], inversiones, promociones) siguen dinámicas (correcto). Patrón: lecturas públicas con `createStaticClient` (sin cookies) + `setRequestLocale`; root layout con lang estático + HtmlLangSync. **Invalidación:** `revalidatePropertyPaths()` revalida por locale (`/es/...`, `/en/...`) — sin el prefijo NO invalida nada (fix 26/07).
-- **Imágenes**: las PROPIAS vía Supabase Image Transformation (WebP/resize, ~−90% egress). Las del **feed HabiHub (medianewbuild): 70.819 fotos en 2.583 props** se sirven desde el 27/08 vía **proxy wsrv.nl** (WebP+resize) — medido en prod: listado 25.234 KB → 696 KB (−98%), Lighthouse mobile del listado 74→82 y LCP 13,4 s→4,7 s. Todo pasa por el helper `lib/utils/optimizedImage.ts`; **revertir = vaciar `PROXIED_HOSTS`**. Re-host propio a Supabase pendiente (obliga a tocar el sync).
+- **Imágenes**: las PROPIAS vía Supabase Image Transformation (WebP/resize, ~−90% egress). Las del **feed HabiHub (medianewbuild): 70.819 fotos en 2.583 props** se sirven desde el 27/08 vía **proxy wsrv.nl** (WebP+resize) — medido en prod: listado 25.234 KB → 696 KB (−98%), Lighthouse mobile del listado 74→82 y LCP 13,4 s→4,7 s. Todo pasa por el helper `lib/utils/optimizedImage.ts`; **revertir = vaciar `PROXIED_HOSTS`**. Re-host propio a Supabase pendiente (obliga a tocar el sync). **Desde el 05/09 TODAS las imágenes propias viven en el proyecto principal** (las 902 del proyecto Lovable `wloneprkibfjioxwypaw` se re-hostearon bajo `migrated-lovable/`; Storage 4,24 GB). Ya no hay hosts Supabase secundarios en config ni en BD. OG image por defecto en `public/og/default.jpg`.
 
 ## Catálogo (al 27/07/2026)
 - **2.544 propiedades visibles · 13 países** (incluye Brasil, alta manual de Atilio el 26/07).
@@ -29,6 +29,9 @@ Next.js 15 / React 19 / TypeScript · Tailwind v4 (config en @theme de globals.c
 ## Contenido
 - Blog: 30 posts publicados (17 ES + 13 EN). Patrón: filas separadas por idioma (columnas _en son legacy, vacías). Categorías guías/guides, inversion/investment, zonas/locations.
 - Destinos: 12 activos (auto-creación al cargar país nuevo). Carrusel dinámico en home.
+
+## Migración de cuentas (en curso, desde 05/09/2026)
+Objetivo: entregar la web a Atilio y Joan sobre cuentas propias (una cuenta de email nueva creada por Ivan es titular de todo; Ivan conserva acceso con ella). Estrategia: **transfer** de proyecto Supabase y Vercel, no clonado. Fase 0 (código/datos) hecha; faltan cuentas nuevas y transfers. Plan, decisiones y checklist en `docs/plan-migracion-cuentas-2026-09.md`. n8n eliminado del código el 05/09 (nunca se usó). Los 3 workflows de Actions apuntan a `https://assetsgolden.com`.
 
 ## Accesos / roles
 - Admin: Atilio + socio Joan (mismo nivel). Agentes: 4 reales activos + 1 de prueba (`demo.agente@assetsgolden.com`, creado 06/07 para validar el PDF; borrar cuando no se use). Acceso solo a /portal.

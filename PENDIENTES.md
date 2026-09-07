@@ -5,7 +5,7 @@
 > - Al cerrar una sesión: tachar/quitar lo resuelto y agregar lo nuevo que surja.
 > - El detalle de CÓMO se hizo cada cosa va en DAILY_LOG.md, no acá.
 > - El estado actual del proyecto (números, stack) va en ESTADO.md, no acá.
-> Última actualización: 01/09/2026
+> Última actualización: 05/09/2026
 
 Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
@@ -80,6 +80,15 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - [CC·S opcional] **Prevención:** fijar `file_size_limit` al bucket `property-images` del proyecto principal (hoy sin límite) para que subidas manuales grandes no vuelvan a romper el transform. Verificar que el flujo admin comprime siempre.
 
 ## 4. Infraestructura / Seguridad / Datos
+- **MIGRACIÓN DE CUENTAS A ATILIO/JOAN (en curso desde 05/09). Plan completo y decisiones en `docs/plan-migracion-cuentas-2026-09.md`.** Estrategia: transfer de proyecto (Supabase org→org, Vercel team→team), no clonado.
+  - (✅ 05/09 — **Fase 0 (código y datos) HECHA**: 902 imágenes del proyecto Lovable `wloneprkibfjioxwypaw` re-hosteadas al principal (58 props, 18 posts, 12 fotos de equipo, 11 destinos; 0 referencias legacy en BD); hosts viejos fuera de next.config/CSP/optimizedImage; OG image local en `/og/default.jpg`; n8n eliminado del código; workflows de Actions apuntan a assetsgolden.com; 4 vars sin uso borradas de Vercel; backup de tablas + vars en `../backups-migracion-2026-09/`. Ver DAILY_LOG 05/09.)
+  - [Ivan·S] **Fase 1**: crear org Supabase (Pro) y team Vercel (Pro) con la cuenta nueva; invitar la cuenta actual de Ivan a la org Supabase (requisito del transfer); GitHub de Atilio listo.
+  - [CC+Ivan·S] **Fase 2**: transfer del proyecto Supabase → verificar web, login admin/portal, transforms.
+  - [CC+Ivan·M] **Fase 3**: transferir repo a GitHub de Atilio + recrear 2 secrets + transfer del proyecto Vercel + reconectar Git + redeploy verificado.
+  - [CC+Ivan·M] **Fase 4**: Resend nuevo (DKIM en IONOS), GCP + service account + 2 Sheets nuevos, Upstash. Meta queda en el BM de Ivan (fuera de alcance).
+  - [CC·M] **Fase 5**: validación E2E (6 formularios, admin, portal PDF, crons, sitemap) + grep de restos.
+  - [CC+Ivan·S] **Fase 6**: rotar service role + JSON de la SA; documento de entrega; bajar rol de Ivan.
+  - [Ivan·S] Confirmar acceso a IONOS (DNS) y si la cuenta nueva es Google (para GCP y Sheets).
 - (Aceptados, sin acción: buckets con listing, get_property_filters, pg_trgm, leads_public_insert.)
 
 ## 5. GDPR / Legal
@@ -105,6 +114,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 - (3 props con external_id UUID pero foto de medianewbuild quedaron como 'habihub' — ambiguas, podrían ser del feed; NO re-etiquetadas para no arriesgar duplicados. CC puede revisarlas caso por caso si se quiere; bajo valor.)
 
 ## Hecho reciente (referencia rápida; el detalle está en DAILY_LOG.md)
+- 05/09: **Fase 0 de la migración de cuentas** — 902 imágenes de Lovable re-hosteadas (Storage 3,35→4,24 GB), n8n eliminado, workflows al dominio propio, OG image local, 4 vars borradas de Vercel, backups fuera del repo. Plan en `docs/plan-migracion-cuentas-2026-09.md`.
 - 30/08: **Perfiles de equipo** — nueva ruta `/equipo/[id]` (Atilio y Joan ya tienen ficha; tenían los datos, faltaba la página) + tarjetas clicables en /sobre-nosotros, /equipo y /partners. De paso: la ficha de partner ya no se ve en español en /en, y esas páginas usan enlaces locale-aware.
 - 07/08: **Acceso a Expertos de Gestión en el portal** — botón en la home del portal + link en el header, con el Nº 3440 y "copiar". El autorelleno no es posible: su login no lee la query string (verificado sobre su JS).
 - 07/08: **PDF del portal con marca Assets Golden** — el white-label (en uso por 3 colaboradores externos) pasa a estar OFF por defecto vía flag `agents.white_label_enabled`, reversible desde el panel sin deploy. El contacto del asesor se mantiene siempre.
