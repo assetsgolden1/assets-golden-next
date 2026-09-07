@@ -15,7 +15,7 @@ jobs:
       - name: Call sync endpoint
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
-          SYNC_URL: https://assets-golden-next.vercel.app/api/admin/sync-habihub
+          SYNC_URL: https://assetsgolden.com/api/admin/sync-habihub
         run: |
           echo "🔄 Disparando sync HabiHub..."
 

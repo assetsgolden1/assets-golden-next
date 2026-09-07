@@ -170,20 +170,7 @@ export async function POST(req: NextRequest) {
       console.error('[leads] Sheets ERROR:', e)
     }
 
-    const payload = { name, email, phone, interest, message, location, source, timestamp: new Date().toISOString() }
-
-    // 4. n8n webhook — fire and forget
-    const webhookUrl = process.env.N8N_WEBHOOK_URL
-    if (webhookUrl && !webhookUrl.includes('your_')) {
-      fetch(webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(8000),
-      }).catch((e) => console.error('[leads API] n8n error:', e.message))
-    }
-
-    // 5. Email via Resend — fire and forget
+    // 4. Email via Resend — fire and forget
     const resendKey = process.env.RESEND_API_KEY
     if (resendKey && !resendKey.includes('your_')) {
       fetch('https://api.resend.com/emails', {

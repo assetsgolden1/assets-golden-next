@@ -46,7 +46,7 @@ export const metadata: Metadata = {
       {
         // España hero image — used as global og:image fallback for pages
         // without a specific image (home, destinos, servicios, etc.)
-        url: 'https://wloneprkibfjioxwypaw.supabase.co/storage/v1/object/public/property-images/1766763271521.png',
+        url: 'https://assetsgolden.com/og/default.jpg',
         width: 1200,
         height: 630,
         alt: 'Assets Golden — Inmobiliaria Internacional de Propiedades Exclusivas',
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: 'summary_large_image',
-    images: ['https://wloneprkibfjioxwypaw.supabase.co/storage/v1/object/public/property-images/1766763271521.png'],
+    images: ['https://assetsgolden.com/og/default.jpg'],
   },
 
   robots: {
@@ -89,7 +89,6 @@ export default async function RootLayout({
     >
       <head>
         <link rel="preconnect" href="https://mromkwpqrxpxbbxhdofs.supabase.co" />
-        <link rel="preconnect" href="https://wloneprkibfjioxwypaw.supabase.co" />
         <link rel="preconnect" href="https://medianewbuild.com" />
         {/* Proxy de imágenes del feed HabiHub (ver lib/utils/optimizedImage) */}
         <link rel="preconnect" href="https://wsrv.nl" />

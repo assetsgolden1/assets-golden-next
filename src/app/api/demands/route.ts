@@ -145,17 +145,6 @@ export async function POST(req: NextRequest) {
       console.error('[demands API] Sheets error:', e)
     }
 
-    // n8n webhook — fire and forget
-    const webhookUrl = process.env.N8N_WEBHOOK_URL
-    if (webhookUrl && !webhookUrl.includes('your_')) {
-      fetch(webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...body, source: 'demand_form', timestamp: new Date().toISOString() }),
-        signal: AbortSignal.timeout(8000),
-      }).catch((e) => console.error('[demands API] n8n error:', e.message))
-    }
-
     return NextResponse.json({ success: true })
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Unknown error'

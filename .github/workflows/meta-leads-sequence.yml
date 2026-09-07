@@ -29,7 +29,7 @@ jobs:
             --write-out "%{http_code}" \
             --output response.txt \
             -H "Authorization: Bearer $CRON_SECRET" \
-            "https://assets-golden-next.vercel.app/api/leads/sequence")
+            "https://assetsgolden.com/api/leads/sequence")
 
           echo "HTTP status: $HTTP_STATUS"
           echo "Response:"

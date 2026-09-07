@@ -618,23 +618,7 @@ export async function getPropertyCountsByCountry(): Promise<Record<string, numbe
 // ─── Leads ────────────────────────────────────────────────────
 
 export async function createLead(leadData: LeadData) {
-  // Intentar n8n primero
-  const webhookUrl = process.env.N8N_WEBHOOK_URL
-  if (webhookUrl && webhookUrl !== 'your_n8n_webhook_url') {
-    try {
-      const res = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...leadData, source: leadData.source ?? 'website' }),
-        signal: AbortSignal.timeout(8000),
-      })
-      if (res.ok) return { success: true, via: 'n8n' as const }
-    } catch {
-      // fallback a Supabase
-    }
-  }
-
-  // Fallback: guardar en Supabase
+  // Guardar en Supabase
   const supabase = await createClient()
   const { error } = await supabase.from('leads').insert({
     name: leadData.name,

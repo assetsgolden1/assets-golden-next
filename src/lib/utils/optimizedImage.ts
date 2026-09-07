@@ -1,8 +1,6 @@
 // Hosts de Supabase Storage del proyecto (deben coincidir con next.config images).
 const SUPABASE_HOSTS = [
   'mromkwpqrxpxbbxhdofs.supabase.co',
-  'wloneprkibfjioxwypaw.supabase.co',
-  'yagrwbmsufpvjcgxkuoz.supabase.co',
 ]
 
 // Hosts externos SIN transformación propia, que se sirven vía proxy de imágenes.
