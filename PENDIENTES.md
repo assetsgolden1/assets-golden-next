@@ -5,7 +5,7 @@
 > - Al cerrar una sesión: tachar/quitar lo resuelto y agregar lo nuevo que surja.
 > - El detalle de CÓMO se hizo cada cosa va en DAILY_LOG.md, no acá.
 > - El estado actual del proyecto (números, stack) va en ESTADO.md, no acá.
-> Última actualización: 05/09/2026
+> Última actualización: 20/09/2026
 
 Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
@@ -82,9 +82,10 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 ## 4. Infraestructura / Seguridad / Datos
 - **MIGRACIÓN DE CUENTAS A ATILIO/JOAN (en curso desde 05/09). Plan completo y decisiones en `docs/plan-migracion-cuentas-2026-09.md`.** Estrategia: transfer de proyecto (Supabase org→org, Vercel team→team), no clonado.
   - (✅ 05/09 — **Fase 0 (código y datos) HECHA**: 902 imágenes del proyecto Lovable `wloneprkibfjioxwypaw` re-hosteadas al principal (58 props, 18 posts, 12 fotos de equipo, 11 destinos; 0 referencias legacy en BD); hosts viejos fuera de next.config/CSP/optimizedImage; OG image local en `/og/default.jpg`; n8n eliminado del código; workflows de Actions apuntan a assetsgolden.com; 4 vars sin uso borradas de Vercel; backup de tablas + vars en `../backups-migracion-2026-09/`. Ver DAILY_LOG 05/09.)
-  - [Ivan·S] **Fase 1**: crear org Supabase (Pro) y team Vercel (Pro) con la cuenta nueva; invitar la cuenta actual de Ivan a la org Supabase (requisito del transfer); GitHub de Atilio listo.
-  - [CC+Ivan·S] **Fase 2**: transfer del proyecto Supabase → verificar web, login admin/portal, transforms.
-  - [CC+Ivan·M] **Fase 3**: transferir repo a GitHub de Atilio + recrear 2 secrets + transfer del proyecto Vercel + reconectar Git + redeploy verificado.
+  - (✅ 20/09 — **Fase 1 HECHA**: 3 cuentas nuevas creadas; Supabase y Vercel en Pro.)
+  - (✅ 20/09 — **Fase 2 HECHA**: proyecto Supabase transferido a la org de AG `ssgcgkjdcweuabyvswbq` (Pro). Verificado: web, transforms, REST, Auth. Falta que Iván pruebe login admin/portal a mano.)
+  - (✅ 20/09 — **Fase 3 HECHA**: repo en `assetsgolden1/assets-golden-next` (secrets y workflows viajaron), proyecto Vercel transferido al team nuevo sin corte, Git reconectado.)
+  - [Ivan·S] Borrar el repo vacío `assetsgolden1/Webassetgolden`; re-loguear el CLI de Vercel local; al final, sacar el usuario personal del team de Vercel (asiento de pago).
   - [CC+Ivan·M] **Fase 4**: Resend nuevo (DKIM en IONOS), GCP + service account + 2 Sheets nuevos, Upstash. Meta queda en el BM de Ivan (fuera de alcance).
   - [CC·M] **Fase 5**: validación E2E (6 formularios, admin, portal PDF, crons, sitemap) + grep de restos.
   - [CC+Ivan·S] **Fase 6**: rotar service role + JSON de la SA; documento de entrega; bajar rol de Ivan.

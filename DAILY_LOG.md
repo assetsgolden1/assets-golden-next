@@ -91,6 +91,24 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-09-20 — [MIGRACION-CUENTAS] Fases 1–3: Supabase, GitHub y Vercel transferidos a las cuentas de Assets Golden
+
+**Contexto:** Iván creó las 3 cuentas nuevas (Supabase y Vercel en Pro) y fuimos ejecutando los transfers de a uno, verificando producción entre cada paso.
+
+**Trabajo hecho:**
+- **Supabase (Fase 2):** Iván se invitó a la org nueva y transfirió el proyecto desde el dashboard (no existe por API). Proyecto `mromkwpqrxpxbbxhdofs` ahora en la org `ssgcgkjdcweuabyvswbq` (Pro). Misma URL y claves. Verificado: web 200, storage raw + transform WebP, REST anon y service role, Auth health; Iván confirmó login de /admin.
+- **GitHub (Fase 3a):** transfer lanzado por API (`gh api repos/I-Bott/assets-golden-next/transfer`) y aceptado por email. Repo ahora `assetsgolden1/assets-golden-next`. Viajaron historial, los 3 workflows y los 2 secrets de Actions (no hubo que recrearlos). `I-Bott` quedó como colaborador con push. Remote local actualizado. Sync de Meta disparado a mano desde el repo nuevo → success.
+- **Vercel (Fase 3b):** el dashboard solo ofrece como destino teams donde el usuario es miembro (no genera enlace); Iván se invitó al team nuevo y transfirió el proyecto. Sondeo de producción durante el transfer: 12/12 respuestas 200, sin corte. Git reconectado a `assetsgolden1/assets-golden-next`.
+- Se descartó el plan Free de Supabase: Storage 4,24 GB vs 1 GB y las transformaciones de imagen no existen en Free.
+
+**Archivos tocados:** MODIFIED `docs/plan-migracion-cuentas-2026-09.md`, `ESTADO.md`, `PENDIENTES.md`, `DAILY_LOG.md`. Sin cambios de código.
+
+**Commits:** este commit de docs (sirve además de prueba del deploy automático desde el repo y team nuevos).
+
+**Próximo paso sugerido:** Fase 4 — Resend en cuenta nueva (DKIM en IONOS), proyecto GCP + service account + 2 Sheets nuevos, Upstash. Después Fase 5 (E2E de los 6 formularios, portal PDF, crons) y Fase 6 (rotar service role + JSON de la SA, documento de entrega, sacar el usuario personal de Iván del team de Vercel para no pagar asiento extra). Pendiente menor: borrar el repo vacío `assetsgolden1/Webassetgolden`; re-loguear el CLI de Vercel local contra el team nuevo.
+
+---
+
 ### 2026-09-05 — [MIGRACION-CUENTAS] Análisis completo + Fase 0 (código y datos) para entregar la web a Atilio y Joan
 
 **Contexto:** Iván pidió analizar el proyecto y trazar un plan para migrar la web a cuentas de Vercel y Supabase (y resto de servicios) del cliente, para que Atilio y Joan asuman los costes, sin perder nada (APIs, formularios, 100 % del funcionamiento). Tras el análisis dio el OK a arrancar con todo lo que no dependiera de él.

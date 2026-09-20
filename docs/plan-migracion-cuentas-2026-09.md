@@ -118,12 +118,12 @@ Nuevo proyecto Supabase + backup/restore (incluido `auth` con hashes de contrase
 - [ ] Resend, Google Cloud (proyecto nuevo + service account + Sheets API + 2 Sheets nuevos), Upstash (si se mantiene el rate limit).
 - [ ] Confirmar acceso a IONOS con Atilio (DNS para el DKIM de Resend).
 
-### Fase 2 — Transfer de Supabase (5 minutos, sin downtime)
-- [ ] Ivan transfiere `mromkwpqrxpxbbxhdofs` a la org de AG.
-- [ ] Verificar: web en producción sigue sirviendo fichas e imágenes (transform), login admin y portal, `/api/admin/test-sheets`, advisors de seguridad sin cambios.
+### Fase 2 — Transfer de Supabase — ✅ HECHA 20/09/2026 (org nueva `ssgcgkjdcweuabyvswbq`, Pro)
+- [x] Ivan transfiere `mromkwpqrxpxbbxhdofs` a la org de AG.
+- [x] Verificado tras el transfer (web 200, storage raw + transform webp, REST anon y service role 200, Auth health 200, proyecto ACTIVE_HEALTHY). Pendiente de prueba humana: login admin/portal. Original: web en producción sigue sirviendo fichas e imágenes (transform), login admin y portal, `/api/admin/test-sheets`, advisors de seguridad sin cambios.
 - [ ] Revisar en el dashboard nuevo: SMTP de Auth, URL de redirección de Auth, leaked-password protection, límite de tamaño del bucket.
 
-### Fase 3 — Transfer de Vercel y GitHub
+### Fase 3 — Transfer de Vercel y GitHub — ✅ HECHA 20/09/2026
 - [ ] Transferir el repo a la org de AG; recrear los 2 secrets de Actions; lanzar los 3 workflows a mano y comprobar 200.
 - [ ] Transferir el proyecto Vercel al team nuevo; aceptar en 24 h.
 - [ ] Reconectar Git (repo nuevo) y confirmar que las 21 variables, el dominio y la protección BotID siguen.
