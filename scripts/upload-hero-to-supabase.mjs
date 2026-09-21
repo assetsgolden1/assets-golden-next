@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { readFile, readdir } from 'fs/promises'
 import { join } from 'path'
 
-const SUPABASE_URL = 'https://mromkwpqrxpxbbxhdofs.supabase.co'
+const SUPABASE_URL = 'https://ecvaqiotrzdjokaevsrz.supabase.co'
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 if (!SERVICE_ROLE_KEY) {

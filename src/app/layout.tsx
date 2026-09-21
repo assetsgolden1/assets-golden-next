@@ -88,7 +88,7 @@ export default async function RootLayout({
       className={`${playfair.variable} ${dmSans.variable} h-full antialiased`}
     >
       <head>
-        <link rel="preconnect" href="https://mromkwpqrxpxbbxhdofs.supabase.co" />
+        <link rel="preconnect" href="https://ecvaqiotrzdjokaevsrz.supabase.co" />
         <link rel="preconnect" href="https://medianewbuild.com" />
         {/* Proxy de imágenes del feed HabiHub (ver lib/utils/optimizedImage) */}
         <link rel="preconnect" href="https://wsrv.nl" />
