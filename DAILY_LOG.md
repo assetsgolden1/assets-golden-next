@@ -116,7 +116,9 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 **Commits:** este commit de docs.
 
-**Próximo paso sugerido:** (1) Iván desactiva las Legacy API keys en Supabase — ANTES revisar si otras herramientas suyas usan la clave vieja (p. ej. el pipeline de reels en `../assets-golden`). (2) Pasar la variable de Preview a Sensitive. (3) E2E de los 5 formularios restantes, PDF del portal, dry-run HabiHub. (4) Documento de entrega. (5) Limpieza: sacar a Iván del team de Vercel, borrar repo `Webassetgolden` y el proyecto Supabase sobrante de la org nueva (si existe), bajar la org personal a Free, borrar Upstash y service account viejos.
+- **Cierre de la rotación:** Iván desactivó las Legacy API keys (21/09 22:08 UTC). Verificado: clave vieja → 401 "Legacy API keys are disabled"; clave nueva y publishable → 200; formulario en producción → 200; `../assets-golden/.env.local` solo usa la publishable key (pipeline de reels no afectado).
+
+**Próximo paso sugerido:** (2) Pasar la variable de Preview a Sensitive. (3) E2E de los 5 formularios restantes, PDF del portal, dry-run HabiHub. (4) Documento de entrega. (5) Limpieza: sacar a Iván del team de Vercel, borrar repo `Webassetgolden` y el proyecto Supabase sobrante de la org nueva (si existe), bajar la org personal a Free, borrar Upstash y service account viejos.
 
 ---
 

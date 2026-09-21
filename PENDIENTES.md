@@ -92,7 +92,7 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
   - [CC·S] `appendLeadToSheets` traga los errores de Google: valorar que al menos `/api/admin/test-sheets` devuelva el error real (hoy responde success aunque falle).
   - [CC·M] **Fase 5**: validación E2E (6 formularios, admin, portal PDF, crons, sitemap) + grep de restos.
   - (✅ 22/09 — **clave de servidor de Supabase ROTADA**: secret key nueva en Production como Sensitive, validada antes de promover. Hubo un incidente de ~25 min en formularios el 21/09 por una clave de otro proyecto; ver DAILY_LOG 22/09.)
-  - [Ivan·S] **Desactivar las Legacy API keys** en Supabase (Project Settings → API Keys → Legacy → Disable). ANTES: comprobar que ninguna otra herramienta use la clave vieja (pipeline de reels en `../assets-golden`, scripts sueltos).
+  - (✅ 22/09 — **Legacy API keys DESACTIVADAS** en Supabase (21/09 22:08 UTC). Verificado: la clave vieja devuelve "Legacy API keys are disabled"; web, formulario y scripts locales OK con las nuevas. El pipeline de reels (`../assets-golden`) usa la publishable key → no afectado.)
   - [CC·S] Pasar `SUPABASE_SERVICE_ROLE_KEY` de Preview a Sensitive.
   - [CC+Ivan·S] **Fase 6 resto**: documento de entrega; sacar a Ivan del team de Vercel; borrar `Webassetgolden`, proyecto Supabase sobrante de la org nueva (si existe), Upstash y service account viejos.
   - [Ivan·S] Confirmar acceso a IONOS (DNS) y si la cuenta nueva es Google (para GCP y Sheets).
