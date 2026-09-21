@@ -90,7 +90,9 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
   - (✅ 20/09 — **Fase 4b HECHA**: Upstash nuevo en cuenta de AG (2 vars cambiadas, admin verificado por Iván). Resend: Iván confirma que la cuenta ya era de Assets Golden → sin cambios. Meta queda en el BM de Ivan, fuera de alcance.)
   - [CC·S] Build de Vercel avisa `npm warn allow-scripts` (7 paquetes con install scripts: sharp, esbuild, puppeteer, @swc/core, @parcel/watcher, msw, unrs-resolver). Hoy es solo aviso; declarar `allowScripts` en package.json antes de que npm lo vuelva obligatorio.
   - [CC·S] `appendLeadToSheets` traga los errores de Google: valorar que al menos `/api/admin/test-sheets` devuelva el error real (hoy responde success aunque falle).
-  - [CC·M] **Fase 5**: validación E2E (6 formularios, admin, portal PDF, crons, sitemap) + grep de restos.
+  - (✅ 22/09 — **Fase 5 E2E**: los 6 formularios → lead en BD + fila en el Sheet nuevo (confirmado en logs de Vercel: "Sheets append OK"); crons de Meta corriendo desde el repo nuevo; smoke test de rutas OK. Leads de prueba en `discarded`.)
+  - [Ivan·S] Falta la prueba humana del **PDF del portal** con un usuario real tras la migración, y un dry-run del sync HabiHub desde /admin/sync.
+  - (✅ 22/09 — **Documento de entrega** para Atilio y Joan en `docs/entrega-assets-golden.md`.)
   - (✅ 22/09 — **clave de servidor de Supabase ROTADA**: secret key nueva en Production como Sensitive, validada antes de promover. Hubo un incidente de ~25 min en formularios el 21/09 por una clave de otro proyecto; ver DAILY_LOG 22/09.)
   - (✅ 22/09 — **Legacy API keys DESACTIVADAS** en Supabase (21/09 22:08 UTC). Verificado: la clave vieja devuelve "Legacy API keys are disabled"; web, formulario y scripts locales OK con las nuevas. El pipeline de reels (`../assets-golden`) usa la publishable key → no afectado.)
   - [CC·S] Pasar `SUPABASE_SERVICE_ROLE_KEY` de Preview a Sensitive.

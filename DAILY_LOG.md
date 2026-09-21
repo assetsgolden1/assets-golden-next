@@ -112,7 +112,10 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 - Tras un Instant Rollback, los deploys de producción NO toman el dominio solos hasta promover uno a mano.
 - Los leads de prueba (email `prueba-migracion@assetsgolden.com`) quedan `discarded` con nota; no se borran.
 
-**Archivos tocados:** MODIFIED `DAILY_LOG.md`, `PENDIENTES.md`, `ESTADO.md`, `.env.local` (no versionado). Vercel: `SUPABASE_SERVICE_ROLE_KEY` (Production = secret key nueva, Sensitive; Preview = misma clave, aún legible).
+- **E2E (Fase 5):** los 5 formularios restantes probados contra sus endpoints desde el navegador (BotID activo): `/api/demands`, `/api/collaborations` y `/api/leads` ×3 (activo, demanda, ficha) → 200, 5 leads en BD, y en los logs de producción `[Sheets] Lead añadido` + `append OK` para todos. Crons de Meta en verde todo el día desde `assetsgolden1/assets-golden-next`. Tras el último push, el deployment tomó el dominio solo (la promoción automática volvió tras el rollback).
+- **Documento de entrega** para Atilio y Joan: `docs/entrega-assets-golden.md` (cuentas, costes, automatizaciones, tareas habituales, qué hacer si falla, seguridad, pendientes).
+
+**Archivos tocados:** CREATED `docs/entrega-assets-golden.md`. MODIFIED `DAILY_LOG.md`, `PENDIENTES.md`, `ESTADO.md`, `.env.local` (no versionado). Vercel: `SUPABASE_SERVICE_ROLE_KEY` (Production = secret key nueva, Sensitive; Preview = misma clave, aún legible).
 
 **Commits:** este commit de docs.
 
