@@ -103,6 +103,7 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 - **Deploy automático desde el repo/team nuevos:** los 2 primeros pushes no dispararon build (la app de Vercel en GitHub aún no tenía el repo); tras revisar la conexión, `57d7a46` se desplegó solo → success, producción verificada (9 rutas 200).
 - **Google (Fase 4a):** proyecto GCP nuevo `eternal-coral-509218-b6` en la cuenta de AG, Sheets API habilitada, service account `assets-golden-sheets@eternal-coral-509218-b6.iam.gserviceaccount.com`; los 2 Sheets se COPIARON (Archivo → Hacer una copia) con la cuenta nueva y se compartieron con la SA como Editor; 3 variables cambiadas en Vercel por Iván (`GOOGLE_SHEETS_CREDENTIALS_JSON`, `GOOGLE_SHEETS_LEADS_ID`, `META_LEADS_SHEET_ID`). Primera prueba: lead en BD pero sin fila en el Sheet (JSON/compartido mal cargados); Iván los rehízo → segunda prueba OK, fila confirmada por Iván en el Sheet nuevo. Los 2 leads de prueba quedaron `discarded` con nota (regla: no borrar leads).
+- **Upstash (Fase 4b):** base Redis nueva en la cuenta de AG; Iván cambió `UPSTASH_REDIS_REST_URL/TOKEN` en Vercel y verificó el panel de admin tras el redeploy. **Resend:** Iván confirma que la cuenta ya es de Assets Golden → no se toca.
 - **Aprendido:** `appendLeadToSheets` y `readMetaSheetEmails` TRAGAN los errores de Google; un 200 del formulario o del sync de Meta NO prueba que el Sheet funcione. Hay que mirar el Sheet o los logs. El MCP de Supabase quedó en solo lectura para este proyecto tras el transfer; el MCP de Vercel da 403 en el team nuevo (sigue ligado a la cuenta vieja).
 - Vercel marca `SUPABASE_SERVICE_ROLE_KEY` como "Needs Attention" (guardada como variable normal, legible): cargarla como Sensitive al rotarla en la Fase 6.
 
@@ -110,7 +111,7 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 **Commits:** este commit de docs (sirve además de prueba del deploy automático desde el repo y team nuevos).
 
-**Próximo paso sugerido:** resto de la Fase 4 — Resend en cuenta nueva (DKIM en IONOS) y Upstash. Después Fase 5 (E2E de los 6 formularios, portal PDF, crons) y Fase 6 (rotar service role + JSON de la SA, documento de entrega, sacar el usuario personal de Iván del team de Vercel para no pagar asiento extra). Pendiente menor: borrar el repo vacío `assetsgolden1/Webassetgolden`; re-loguear el CLI de Vercel local contra el team nuevo.
+**Próximo paso sugerido:** Fase 5 (E2E) y Fase 6 (rotar clave de servidor de Supabase como Sensitive + JSON de la SA ya es nuevo; documento de entrega; sacar el usuario personal de Iván del team de Vercel). Después Fase 5 (E2E de los 6 formularios, portal PDF, crons) y Fase 6 (rotar service role + JSON de la SA, documento de entrega, sacar el usuario personal de Iván del team de Vercel para no pagar asiento extra). Pendiente menor: borrar el repo vacío `assetsgolden1/Webassetgolden`; re-loguear el CLI de Vercel local contra el team nuevo.
 
 ---
 

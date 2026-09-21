@@ -87,7 +87,8 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
   - (✅ 20/09 — **Fase 3 HECHA**: repo en `assetsgolden1/assets-golden-next` (secrets y workflows viajaron), proyecto Vercel transferido al team nuevo sin corte, Git reconectado.)
   - [Ivan·S] Borrar el repo vacío `assetsgolden1/Webassetgolden`; re-loguear el CLI de Vercel local; al final, sacar el usuario personal del team de Vercel (asiento de pago).
   - (✅ 20/09 — **Fase 4a Google HECHA**: GCP `eternal-coral-509218-b6` + service account nueva + 2 Sheets copiados a la cuenta de AG; fila de prueba confirmada.)
-  - [CC+Ivan·M] **Fase 4b**: Resend nuevo (DKIM en IONOS) y Upstash. Meta queda en el BM de Ivan (fuera de alcance).
+  - (✅ 20/09 — **Fase 4b HECHA**: Upstash nuevo en cuenta de AG (2 vars cambiadas, admin verificado por Iván). Resend: Iván confirma que la cuenta ya era de Assets Golden → sin cambios. Meta queda en el BM de Ivan, fuera de alcance.)
+  - [CC·S] Build de Vercel avisa `npm warn allow-scripts` (7 paquetes con install scripts: sharp, esbuild, puppeteer, @swc/core, @parcel/watcher, msw, unrs-resolver). Hoy es solo aviso; declarar `allowScripts` en package.json antes de que npm lo vuelva obligatorio.
   - [CC·S] `appendLeadToSheets` traga los errores de Google: valorar que al menos `/api/admin/test-sheets` devuelva el error real (hoy responde success aunque falle).
   - [CC·M] **Fase 5**: validación E2E (6 formularios, admin, portal PDF, crons, sitemap) + grep de restos.
   - [CC+Ivan·S] **Fase 6**: rotar service role + JSON de la SA; documento de entrega; bajar rol de Ivan.
