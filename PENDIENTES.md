@@ -5,7 +5,7 @@
 > - Al cerrar una sesión: tachar/quitar lo resuelto y agregar lo nuevo que surja.
 > - El detalle de CÓMO se hizo cada cosa va en DAILY_LOG.md, no acá.
 > - El estado actual del proyecto (números, stack) va en ESTADO.md, no acá.
-> Última actualización: 20/09/2026
+> Última actualización: 22/09/2026
 
 Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
@@ -91,7 +91,10 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
   - [CC·S] Build de Vercel avisa `npm warn allow-scripts` (7 paquetes con install scripts: sharp, esbuild, puppeteer, @swc/core, @parcel/watcher, msw, unrs-resolver). Hoy es solo aviso; declarar `allowScripts` en package.json antes de que npm lo vuelva obligatorio.
   - [CC·S] `appendLeadToSheets` traga los errores de Google: valorar que al menos `/api/admin/test-sheets` devuelva el error real (hoy responde success aunque falle).
   - [CC·M] **Fase 5**: validación E2E (6 formularios, admin, portal PDF, crons, sitemap) + grep de restos.
-  - [CC+Ivan·S] **Fase 6**: rotar service role + JSON de la SA; documento de entrega; bajar rol de Ivan.
+  - (✅ 22/09 — **clave de servidor de Supabase ROTADA**: secret key nueva en Production como Sensitive, validada antes de promover. Hubo un incidente de ~25 min en formularios el 21/09 por una clave de otro proyecto; ver DAILY_LOG 22/09.)
+  - [Ivan·S] **Desactivar las Legacy API keys** en Supabase (Project Settings → API Keys → Legacy → Disable). ANTES: comprobar que ninguna otra herramienta use la clave vieja (pipeline de reels en `../assets-golden`, scripts sueltos).
+  - [CC·S] Pasar `SUPABASE_SERVICE_ROLE_KEY` de Preview a Sensitive.
+  - [CC+Ivan·S] **Fase 6 resto**: documento de entrega; sacar a Ivan del team de Vercel; borrar `Webassetgolden`, proyecto Supabase sobrante de la org nueva (si existe), Upstash y service account viejos.
   - [Ivan·S] Confirmar acceso a IONOS (DNS) y si la cuenta nueva es Google (para GCP y Sheets).
 - (Aceptados, sin acción: buckets con listing, get_property_filters, pg_trgm, leads_public_insert.)
 

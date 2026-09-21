@@ -91,6 +91,35 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-09-22 — [MIGRACION-CUENTAS] Rotación de la clave de servidor de Supabase (con incidente de ~25 min en formularios)
+
+**Contexto:** Fase 6 de la migración. La `SUPABASE_SERVICE_ROLE_KEY` era un JWT legacy (vence 2036), vivía desde abril en el `.env.local` de Iván y estaba guardada en Vercel como variable legible ("Needs Attention").
+
+**Incidente (21/09 ~21:05–21:30 UTC):** Iván creó una secret key nueva y la pegó en Vercel Production; tras el redeploy, `/api/leads` devolvía 500 "Error al guardar" (Supabase: *Invalid API key*). Los 3 endpoints de formularios fallaron ~25 min hasta el Instant Rollback. Domingo 23 h España; no hay forma de saber si hubo intentos reales (el fallo era justamente al guardar). Páginas, fichas e imágenes no se vieron afectadas. **Causa:** las dos primeras claves se crearon en otro proyecto de la org (bien formadas, 41 chars, pero ajenas a `mromkwpqrxpxbbxhdofs`); además, al editar, la variable quedó asignada solo a Preview y desapareció de Production. **Error de proceso (mío):** se probó una credencial nueva directamente en producción sin validarla antes.
+
+**Procedimiento correcto aplicado después:**
+1. CLI de Vercel re-logueado contra el team `asset-golden` (`vercel link --scope asset-golden`).
+2. Clave vieja restaurada en Production para que ningún deploy pudiera romper nada.
+3. Iván creó la clave en el proyecto correcto (enlace directo con el ref) y la pegó SOLO en Preview.
+4. Validada desde local: REST, Auth admin y Storage → 200; y con supabase-js la operación exacta que falló (`insert().select('id').single()` en leads), `auth.admin.listUsers`, upload+remove en Storage → OK.
+5. Cargada en Production con `vercel env add … --sensitive` (ya no es legible). Push → build. Por el rollback previo, Vercel dejó la promoción en manual: el deployment quedó construido SIN tráfico, se probó con `vercel curl` (sync-meta 200) y recién entonces `vercel promote`.
+6. Formulario de contacto en producción → 200, lead en BD. Smoke test 9 rutas 200. `.env.local` actualizado; `npm run check-geo` OK con la clave nueva.
+
+**Aprendido / reglas:**
+- NUNCA probar una credencial nueva en producción: validar con curl/supabase-js → deployment sin tráfico → promote.
+- Git Bash reescribe rutas que empiezan con `/`: usar `MSYS_NO_PATHCONV=1` con `vercel curl /api/...`.
+- `vercel curl` generó un token de "Protection Bypass for Automation" en el proyecto (visible en Settings → Deployment Protection).
+- Tras un Instant Rollback, los deploys de producción NO toman el dominio solos hasta promover uno a mano.
+- Los leads de prueba (email `prueba-migracion@assetsgolden.com`) quedan `discarded` con nota; no se borran.
+
+**Archivos tocados:** MODIFIED `DAILY_LOG.md`, `PENDIENTES.md`, `ESTADO.md`, `.env.local` (no versionado). Vercel: `SUPABASE_SERVICE_ROLE_KEY` (Production = secret key nueva, Sensitive; Preview = misma clave, aún legible).
+
+**Commits:** este commit de docs.
+
+**Próximo paso sugerido:** (1) Iván desactiva las Legacy API keys en Supabase — ANTES revisar si otras herramientas suyas usan la clave vieja (p. ej. el pipeline de reels en `../assets-golden`). (2) Pasar la variable de Preview a Sensitive. (3) E2E de los 5 formularios restantes, PDF del portal, dry-run HabiHub. (4) Documento de entrega. (5) Limpieza: sacar a Iván del team de Vercel, borrar repo `Webassetgolden` y el proyecto Supabase sobrante de la org nueva (si existe), bajar la org personal a Free, borrar Upstash y service account viejos.
+
+---
+
 ### 2026-09-20 — [MIGRACION-CUENTAS] Fases 1–3: Supabase, GitHub y Vercel transferidos a las cuentas de Assets Golden
 
 **Contexto:** Iván creó las 3 cuentas nuevas (Supabase y Vercel en Pro) y fuimos ejecutando los transfers de a uno, verificando producción entre cada paso.

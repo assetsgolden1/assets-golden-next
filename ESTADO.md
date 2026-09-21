@@ -4,7 +4,7 @@
 > - Esta es la foto del estado VIGENTE. Leerla al arrancar para tener contexto.
 > - Se SOBRESCRIBE cuando algo cambia (no se acumula como un diario).
 > - El historial va en DAILY_LOG.md; el backlog en PENDIENTES.md.
-> Última actualización: 20/09/2026
+> Última actualización: 22/09/2026
 
 ## Qué es
 Web inmobiliaria internacional bilingüe (ES/EN), Next.js 15 App Router SSR sobre Vercel + Supabase Pro. Cliente: Atilio Montironi (+ socio Joan). Proveedor: IBott (Ivan). Marca: "Inmobiliaria Internacional de Propiedades Exclusivas".
@@ -31,7 +31,7 @@ Next.js 15 / React 19 / TypeScript · Tailwind v4 (config en @theme de globals.c
 - Destinos: 12 activos (auto-creación al cargar país nuevo). Carrusel dinámico en home.
 
 ## Migración de cuentas (en curso, desde 05/09/2026)
-Objetivo: entregar la web a Atilio y Joan sobre cuentas propias (una cuenta de email nueva creada por Ivan es titular de todo; Ivan conserva acceso con ella). Estrategia: **transfer** de proyecto Supabase y Vercel, no clonado. Fase 0 (código/datos) hecha 05/09. **Fase 2 hecha 20/09: el proyecto Supabase ya vive en la org de AG `ssgcgkjdcweuabyvswbq` (Pro)**; misma URL y claves. **Fase 3 hecha 20/09: repo en `assetsgolden1/assets-golden-next` y proyecto Vercel en el team nuevo (Pro), Git reconectado.** **Google hecho 20/09** (GCP `eternal-coral-509218-b6`, service account y 2 Sheets propios de AG). **Upstash migrado 20/09; Resend ya estaba en cuenta de AG.** Todos los servicios están en cuentas de Assets Golden salvo Meta (BM de Iván, fuera de alcance). Faltan E2E, rotación de claves y documento de entrega. Plan, decisiones y checklist en `docs/plan-migracion-cuentas-2026-09.md`. n8n eliminado del código el 05/09 (nunca se usó). Los 3 workflows de Actions apuntan a `https://assetsgolden.com`.
+Objetivo: entregar la web a Atilio y Joan sobre cuentas propias (una cuenta de email nueva creada por Ivan es titular de todo; Ivan conserva acceso con ella). Estrategia: **transfer** de proyecto Supabase y Vercel, no clonado. Fase 0 (código/datos) hecha 05/09. **Fase 2 hecha 20/09: el proyecto Supabase ya vive en la org de AG `ssgcgkjdcweuabyvswbq` (Pro)**; misma URL y claves. **Fase 3 hecha 20/09: repo en `assetsgolden1/assets-golden-next` y proyecto Vercel en el team nuevo (Pro), Git reconectado.** **Google hecho 20/09** (GCP `eternal-coral-509218-b6`, service account y 2 Sheets propios de AG). **Upstash migrado 20/09; Resend ya estaba en cuenta de AG.** Todos los servicios están en cuentas de Assets Golden salvo Meta (BM de Iván, fuera de alcance). **Clave de servidor de Supabase rotada el 22/09** (secret key nueva, Sensitive en Vercel). Faltan: desactivar las legacy keys, E2E, documento de entrega y limpieza. CLI de Vercel local enlazado al team `asset-golden`. Plan, decisiones y checklist en `docs/plan-migracion-cuentas-2026-09.md`. n8n eliminado del código el 05/09 (nunca se usó). Los 3 workflows de Actions apuntan a `https://assetsgolden.com`.
 
 ## Accesos / roles
 - Admin: Atilio + socio Joan (mismo nivel). Agentes: 4 reales activos + 1 de prueba (`demo.agente@assetsgolden.com`, creado 06/07 para validar el PDF; borrar cuando no se use). Acceso solo a /portal.
