@@ -10,7 +10,7 @@
 Web inmobiliaria internacional bilingüe (ES/EN), Next.js 15 App Router SSR sobre Vercel + Supabase Pro. Cliente: Atilio Montironi (+ socio Joan). Proveedor: IBott (Ivan). Marca: "Inmobiliaria Internacional de Propiedades Exclusivas".
 
 ## Stack
-Next.js 15 / React 19 / TypeScript · Tailwind v4 (config en @theme de globals.css, NO hay tailwind.config) · Supabase PostgreSQL (project mromkwpqrxpxbbxhdofs, Pro) · Vercel (project prj_7hJoYjOpivAhIlMdaioatTAlNl1X, team team_DTA5TQKA2NRoCwrnyLgeudcw) · PDF Puppeteer + chromium-min v143.0.4 · Leads a Google Sheets · Tipografía: Playfair Display (títulos) + DM Sans (cuerpo) vía next/font.
+Next.js 15 / React 19 / TypeScript · Tailwind v4 (config en @theme de globals.css, NO hay tailwind.config) · Supabase PostgreSQL (project **ecvaqiotrzdjokaevsrz**, org AssetGolden, Pro — reconstruido el 22/09 tras el borrado accidental de mromkwpqrxpxbbxhdofs) · Vercel (project prj_7hJoYjOpivAhIlMdaioatTAlNl1X, team team_DTA5TQKA2NRoCwrnyLgeudcw) · PDF Puppeteer + chromium-min v143.0.4 · Leads a Google Sheets · Tipografía: Playfair Display (títulos) + DM Sans (cuerpo) vía next/font.
 
 ## Producción
 - Web: https://assetsgolden.com (dominio conectado, en producción).
@@ -29,6 +29,9 @@ Next.js 15 / React 19 / TypeScript · Tailwind v4 (config en @theme de globals.c
 ## Contenido
 - Blog: 30 posts publicados (17 ES + 13 EN). Patrón: filas separadas por idioma (columnas _en son legacy, vacías). Categorías guías/guides, inversion/investment, zonas/locations.
 - Destinos: 12 activos (auto-creación al cargar país nuevo). Carrusel dinámico en home.
+
+## ⚠️ Incidente 21-22/09: proyecto Supabase borrado y reconstruido
+El proyecto de producción se borró por error el 21/09 (irreversible, confirmado por Supabase). Reconstruido el 22/09 desde el backup del 05/09 + fotos recuperadas de 6 fuentes. **Quedan 14 propiedades destacadas sin foto** (ver docs/fotos-pendientes.md), Ana Serrat sin foto y 5 destinos con imágenes rotas. Todos los usuarios deben restablecer contraseña. **Backup automático** diario (tablas) y semanal (Storage) en GitHub Actions desde el 22/09. Detalle en DAILY_LOG 22/09.
 
 ## Migración de cuentas (en curso, desde 05/09/2026)
 Objetivo: entregar la web a Atilio y Joan sobre cuentas propias (una cuenta de email nueva creada por Ivan es titular de todo; Ivan conserva acceso con ella). Estrategia: **transfer** de proyecto Supabase y Vercel, no clonado. Fase 0 (código/datos) hecha 05/09. **Fase 2 hecha 20/09: el proyecto Supabase ya vive en la org de AG `ssgcgkjdcweuabyvswbq` (Pro)**; misma URL y claves. **Fase 3 hecha 20/09: repo en `assetsgolden1/assets-golden-next` y proyecto Vercel en el team nuevo (Pro), Git reconectado.** **Google hecho 20/09** (GCP `eternal-coral-509218-b6`, service account y 2 Sheets propios de AG). **Upstash migrado 20/09; Resend ya estaba en cuenta de AG.** Todos los servicios están en cuentas de Assets Golden salvo Meta (BM de Iván, fuera de alcance). **Clave de servidor de Supabase rotada el 22/09** (secret key nueva, Sensitive en Vercel). **Legacy API keys desactivadas** (la clave vieja ya no sirve). Faltan: E2E del resto de formularios y PDF, documento de entrega y limpieza. CLI de Vercel local enlazado al team `asset-golden`. Plan, decisiones y checklist en `docs/plan-migracion-cuentas-2026-09.md`. n8n eliminado del código el 05/09 (nunca se usó). Los 3 workflows de Actions apuntan a `https://assetsgolden.com`.

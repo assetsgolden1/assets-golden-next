@@ -91,6 +91,36 @@ Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
 
+### 2026-09-22 — [INCIDENTE MAYOR] Proyecto Supabase de producción borrado por error → reconstruido desde backup + fotos recuperadas de 6 fuentes
+
+**Qué pasó (21/09 ~22:30 UTC):** durante la limpieza post-migración, Iván borró desde el dashboard el proyecto `mromkwpqrxpxbbxhdofs` (producción) creyendo que era el proyecto vacío sobrante de la org nueva. Supabase Support respondió que el borrado es irreversible y no restaura (ticket enviado desde la org AssetGolden). Causa raíz: la org nueva tenía DOS proyectos con nombres parecidos y no existía ninguna copia externa de Storage.
+
+**Impacto:** base de datos, 18 usuarios Auth y 4,2 GB de Storage (≈3.000 fotos propias) desaparecidos. La web pública siguió sirviéndose desde la caché ISR de Vercel (fichas ok, pero listado con filtros "0 propiedades"; formularios/admin/portal caídos). No había backup de Storage. Sí había backup de tablas del 05/09 (`../backups-migracion-2026-09/`).
+
+**Reconstrucción (mismo día):**
+1. Proyecto nuevo `ecvaqiotrzdjokaevsrz` (org AssetGolden, Pro, eu-west-1). Nueva secret key + publishable key.
+2. `supabase/rebuild/01_schema.sql` + `scripts/rebuildProject.ts`: 12 tablas, índices, 5 funciones (`get_property_filters`, `normalize_property_fields`, `assign_ref_code`…), triggers, RLS (policies reescritas a partir del uso en el código), secuencia de ref_code posicionada en 6752. Ejecutado por Iván con la contraseña de la BD (pooler `aws-1-eu-west-1`, usuario `postgres.<ref>`).
+3. Datos del backup 05/09: 3.784 propiedades, 30 posts, 17 team, 13 destinos, 71 meta_leads + tracking; 18 usuarios Auth recreados con el MISMO id (sin contraseña → reset); 6 buckets públicos.
+4. Vercel: 3 variables Supabase cambiadas en Preview → preview verificado → Production + Development. Código: host viejo → nuevo en `next.config.ts`, `layout.tsx`, `optimizedImage.ts`, `config.toml` (commit `6bc89a9`). URLs de imagen en BD reescritas al host nuevo. **Web operativa de nuevo** (formulario probado, lead en BD).
+5. Sync HabiHub (vía Actions): 85 nuevas, 2.546 actualizadas, 1.147 ocultas por no estar ya en el feed → 2.721 visibles.
+
+**Fotos recuperadas (de 169 propiedades afectadas):**
+- Bali 27/27 (728 fotos, carpetas locales) · Samaná 1/1 (Drive del correo de Atilio) · **Lovable 58 props + 18 posts + 12 equipo + 11 destinos** (el proyecto `wloneprkibfjioxwypaw` sigue vivo; re-host con concurrencia 2 por 429) · Cervera 62/62 (39 con renders de Dropbox, tope 10 GB; 32 con la imagen de la API; "Una" 28 GB queda con imagen API) · **Fotocasa 7** (AG-04336, 04484, 04486, 04518, 05180, 05181, 05395 — datos extraídos del `__NEXT_DATA__` de la página de agencia vía el Chrome de Iván; `static.fotocasa.es` no bloquea descargas). Idealista tiene los mismos 28 anuncios: nada nuevo.
+- `scripts/auditMissingPhotos.ts --prune` comprueba cada URL y depura las muertas de las galerías. Informe: `docs/fotos-pendientes.md`.
+- **Quedan 14 sin foto, todas destacadas y manuales de Atilio** (BCN Sants/centro/4 dorm, Porreres, 3 parkings/edificios Málaga, 4 negocios Miami, Luque, Gramado, Córdoba). No están en ningún portal. + Ana Serrat (equipo) + 5 destinos con 1-2 imágenes (AR, DO, BR, CR, EC).
+
+**Backup automático (nuevo):** `scripts/backupSupabase.ts` + `.github/workflows/backup-supabase.yml` — tablas+usuarios diario 02:30 UTC, Storage completo domingos 04:00 UTC, artefactos 90 días. Secrets `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` en el repo. Primera corrida completa lanzada.
+
+**Perdido definitivamente:** cambios de panel 05–21/09 (destacados/ocultas/leads), 24 leads web de ese período (están en el Sheet), contraseñas (reset), fotos de las 14 anteriores.
+
+**Aprendido:** (1) NUNCA borrar proyectos por nombre: verificar el ref en la URL; (2) Storage no tenía copia — ahora sí; (3) Supabase muestra el proyecto recién creado como "<usuario>'s Project", confuso; (4) los portales inmobiliarios bloquean curl pero no un Chrome real; sus CDN de imágenes sí se descargan directo.
+
+**Archivos:** CREATED `supabase/rebuild/01_schema.sql`, `scripts/rebuildProject.ts`, `scripts/uploadFolderPhotos.ts`, `scripts/auditMissingPhotos.ts`, `scripts/backupSupabase.ts`, `.github/workflows/backup-supabase.yml`, `docs/fotos-pendientes.md/.json`, `scripts/output/fotocasa-map.json`. MODIFIED `next.config.ts`, `src/app/layout.tsx`, `src/lib/utils/optimizedImage.ts`, `supabase/config.toml`, `tsconfig.json` (excluye rebuildProject del type-check), `.env.local`. Vercel: 3 vars ×3 entornos. GitHub: 2 secrets.
+
+**Próximo paso sugerido:** (1) Atilio: fotos de las 14 propiedades de `docs/fotos-pendientes.md` (+ Ana Serrat, 5 destinos) → subir con `scripts/uploadFolderPhotos.ts <ref> <carpeta> --confirm` o desde el panel. (2) Iván/Atilio/Joan: reset de contraseña en /admin/login y /portal/login; avisar a los 16 agentes. (3) Borrar el proyecto vacío sobrante de la org AssetGolden **verificando el ref** (el bueno es `ecvaqiotrzdjokaevsrz`). (4) Actualizar `docs/entrega-assets-golden.md` con el ref nuevo y el backup. (5) Descargar el primer artefacto de backup y guardarlo en Drive de AG.
+
+---
+
 ### 2026-09-22 — [MIGRACION-CUENTAS] Rotación de la clave de servidor de Supabase (con incidente de ~25 min en formularios)
 
 **Contexto:** Fase 6 de la migración. La `SUPABASE_SERVICE_ROLE_KEY` era un JWT legacy (vence 2036), vivía desde abril en el `.env.local` de Iván y estaba guardada en Vercel como variable legible ("Needs Attention").

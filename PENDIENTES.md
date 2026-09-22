@@ -11,6 +11,11 @@ Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
 
 ## 0. Lo más urgente
+- [Atilio·M] **14 propiedades destacadas sin foto** tras el borrado del proyecto (lista con refs en docs/fotos-pendientes.md) + foto de Ana Serrat + imágenes de 5 destinos (AR, DO, BR, CR, EC). Subir desde el panel o pasarle carpetas a Iván (scripts/uploadFolderPhotos.ts).
+- [Ivan+Atilio+Joan·S] **Restablecer contraseñas** de admin y portal (los 18 usuarios se recrearon sin contraseña). Avisar a los 16 agentes.
+- [Ivan·S] Borrar el proyecto vacío sobrante de la org AssetGolden **verificando en la URL que el ref NO sea ecvaqiotrzdjokaevsrz**.
+- [CC·S] Actualizar docs/entrega-assets-golden.md (ref nuevo, backups, incidente).
+- [Ivan·S] Descargar el primer artefacto del workflow Backup Supabase y guardarlo en un Drive de AG (los artefactos caducan a los 90 días).
 0. (RESUELTO 07/08: el deploy estaba BLOCKED por el límite de la cuenta; Iván lo desbloqueó y el build `da13a95` quedó READY. Atribución UTM **verificada en producción**. Ojo con ese límite a futuro.)
 0b. (✅ CERRADO — **`/mi-demanda`**: insertaba en una tabla `demands` inexistente y cada envío se perdía. Ahora va a `leads` con `source='demand_form'`. Validado end-to-end por Iván en producción el 30/08.)
 1. (✅ RESUELTO 27/08: Iván revisó GSC y exportó Coverage+Performance. **5.462 páginas indexadas** (era ~solo la home en junio); impresiones ×7 desde junio; el title nuevo ya rankea para "assets golden" en pos 1. Datos analizados en DAILY_LOG 27/08 y ESTADO. Nuevo pendiente: identificar las 878 URLs 404 — exportar el detalle del motivo "No se ha encontrado (404)" en GSC.)
