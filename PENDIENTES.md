@@ -11,11 +11,12 @@ Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
 
 ## 0. Lo más urgente
-- [Atilio·M] **14 propiedades destacadas sin foto** tras el borrado del proyecto (lista con refs en docs/fotos-pendientes.md) + foto de Ana Serrat + imágenes de 5 destinos (AR, DO, BR, CR, EC). Subir desde el panel o pasarle carpetas a Iván (scripts/uploadFolderPhotos.ts).
+- [Atilio·M] **11 propiedades destacadas sin foto** tras el borrado del proyecto (Excel en `../backups-migracion-2026-09/Fotos-pendientes-AssetsGolden-2026-09-22.xlsx`; refs en docs/fotos-pendientes.md) + foto de Ana Serrat. Destinos ya resueltos. Gramado, Luque y Córdoba llegaron por Drive de CFG y están publicadas. Subir desde el panel o pasarle carpetas a Iván (scripts/uploadFolderPhotos.ts).
 - [Ivan+Atilio+Joan·S] **Restablecer contraseñas**: ya existe "¿Olvidaste tu contraseña?" en /admin/login y /portal/login (desde 22/09). Avisar a los 16 agentes; o Atilio les envía el enlace desde Admin → Agentes.
 - [CC·S opcional] Conectar Resend como SMTP de Auth en Supabase (Authentication → Emails → SMTP) para que los correos de recuperación salgan desde @assetsgolden.com sin el límite del SMTP por defecto.
 - [Ivan·S] Borrar el proyecto vacío sobrante de la org AssetGolden **verificando en la URL que el ref NO sea ecvaqiotrzdjokaevsrz**.
 - [CC·S] Actualizar docs/entrega-assets-golden.md (ref nuevo, backups, incidente).
+- [CC·S] Confirmar que el backup completo (Storage) termina en verde tras el fix de paginación/reintentos (3 corridas fallaron el 22/09 por "Too many connections").
 - [Ivan·S] Descargar el primer artefacto del workflow Backup Supabase y guardarlo en un Drive de AG (los artefactos caducan a los 90 días).
 0. (RESUELTO 07/08: el deploy estaba BLOCKED por el límite de la cuenta; Iván lo desbloqueó y el build `da13a95` quedó READY. Atribución UTM **verificada en producción**. Ojo con ese límite a futuro.)
 0b. (✅ CERRADO — **`/mi-demanda`**: insertaba en una tabla `demands` inexistente y cada envío se perdía. Ahora va a `leads` con `source='demand_form'`. Validado end-to-end por Iván en producción el 30/08.)
