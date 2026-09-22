@@ -12,7 +12,8 @@ Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Clau
 
 ## 0. Lo más urgente
 - [Atilio·M] **14 propiedades destacadas sin foto** tras el borrado del proyecto (lista con refs en docs/fotos-pendientes.md) + foto de Ana Serrat + imágenes de 5 destinos (AR, DO, BR, CR, EC). Subir desde el panel o pasarle carpetas a Iván (scripts/uploadFolderPhotos.ts).
-- [Ivan+Atilio+Joan·S] **Restablecer contraseñas** de admin y portal (los 18 usuarios se recrearon sin contraseña). Avisar a los 16 agentes.
+- [Ivan+Atilio+Joan·S] **Restablecer contraseñas**: ya existe "¿Olvidaste tu contraseña?" en /admin/login y /portal/login (desde 22/09). Avisar a los 16 agentes; o Atilio les envía el enlace desde Admin → Agentes.
+- [CC·S opcional] Conectar Resend como SMTP de Auth en Supabase (Authentication → Emails → SMTP) para que los correos de recuperación salgan desde @assetsgolden.com sin el límite del SMTP por defecto.
 - [Ivan·S] Borrar el proyecto vacío sobrante de la org AssetGolden **verificando en la URL que el ref NO sea ecvaqiotrzdjokaevsrz**.
 - [CC·S] Actualizar docs/entrega-assets-golden.md (ref nuevo, backups, incidente).
 - [Ivan·S] Descargar el primer artefacto del workflow Backup Supabase y guardarlo en un Drive de AG (los artefactos caducan a los 90 días).
