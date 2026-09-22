@@ -52,7 +52,9 @@ async function listAll(bucket: string, prefix = ''): Promise<{ name: string; siz
   const out: { name: string; size: number }[] = []
   // Páginas de 100: con limit 1000 el list devuelve menos objetos de los que hay y offset>=1000 da undefined.
   for (let offset = 0; ; offset += 100) {
-    const { data, error } = await sb.storage.from(bucket).list(prefix, { limit: 100, offset, sortBy: { column: 'name', order: 'asc' } })
+    let data: { name: string; id: string | null; metadata?: Record<string, unknown> }[] | null = null, error: { message: string } | null = null
+      for (let t = 0; t < 6; t++) { ({ data, error } = await sb.storage.from(bucket).list(prefix, { limit: 100, offset, sortBy: { column: 'name', order: 'asc' } }) as never); if (!error) break; await new Promise(r => setTimeout(r, 1500 * (t + 1))) }
+      await new Promise(r => setTimeout(r, 120))
     if (error) throw new Error(`${bucket}/${prefix}: ${error.message}`)
     for (const e of data ?? []) {
       const full = prefix ? `${prefix}/${e.name}` : e.name

@@ -18,7 +18,9 @@ const PUB = `${URL_}/storage/v1/object/public/`
 const objects = new Map<string, Set<string>>()   // bucket -> paths
 async function loadBucket(bucket: string) {
   const out = new Set<string>()
-  const walk = async (p: string) => { for (let off = 0; ; off += 100) { const { data, error } = await sb.storage.from(bucket).list(p, { limit: 100, offset: off, sortBy: { column: 'name', order: 'asc' } }); if (error) throw new Error(`list ${bucket}/${p}: ${error.message}`); for (const e of data ?? []) { const f = p ? `${p}/${e.name}` : e.name; if (e.id) out.add(f); else await walk(f) } if (!data || data.length < 100) break } }
+  const walk = async (p: string) => { for (let off = 0; ; off += 100) { let data: { name: string; id: string | null; metadata?: Record<string, unknown> }[] | null = null, error: { message: string } | null = null
+      for (let t = 0; t < 6; t++) { ({ data, error } = await sb.storage.from(bucket).list(p, { limit: 100, offset: off, sortBy: { column: 'name', order: 'asc' } }) as never); if (!error) break; await new Promise(r => setTimeout(r, 1500 * (t + 1))) }
+      await new Promise(r => setTimeout(r, 120)); if (error) throw new Error(`list ${bucket}/${p}: ${error.message}`); for (const e of data ?? []) { const f = p ? `${p}/${e.name}` : e.name; if (e.id) out.add(f); else await walk(f) } if (!data || data.length < 100) break } }
   await walk(''); objects.set(bucket, out)
 }
 async function ok(u: string | null | undefined): Promise<boolean> {
