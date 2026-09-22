@@ -1,0 +1,55 @@
+name: Backup Supabase (tablas + Storage)
+
+# Copia de seguridad fuera de Supabase. Nació tras el borrado accidental del proyecto
+# de producción el 21/09/2026 (no existía ninguna copia de las 4 GB de fotos).
+#
+# - Tablas + usuarios: DIARIO (artefacto de 90 días).
+# - Storage completo (~4 GB): SEMANAL, domingo (artefacto de 90 días).
+# Secrets necesarios en el repo: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
+# Restauración: scripts/rebuildProject.ts (tablas/usuarios) + scripts/uploadFolderPhotos.ts (fotos).
+
+on:
+  schedule:
+    - cron: '30 2 * * *'   # diario 02:30 UTC — tablas
+    - cron: '0 4 * * 0'    # domingo 04:00 UTC — tablas + storage
+  workflow_dispatch:
+    inputs:
+      full:
+        description: 'Incluir Storage (fotos)'
+        type: boolean
+        default: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Decidir alcance
+        id: scope
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "0 4 * * 0" ]; then echo "full=true" >> "$GITHUB_OUTPUT";
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.full }}" = "true" ]; then echo "full=true" >> "$GITHUB_OUTPUT";
+          else echo "full=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Backup
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ "${{ steps.scope.outputs.full }}" = "true" ]; then
+            npx tsx scripts/backupSupabase.ts backup
+          else
+            npx tsx scripts/backupSupabase.ts backup --tables-only
+          fi
+      - name: Comprimir
+        run: tar -czf supabase-backup.tar.gz backup
+      - uses: actions/upload-artifact@v4
+        with:
+          name: supabase-backup-${{ github.run_id }}
+          path: supabase-backup.tar.gz
+          retention-days: 90

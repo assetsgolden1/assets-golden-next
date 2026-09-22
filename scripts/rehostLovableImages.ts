@@ -131,7 +131,7 @@ async function main() {
   // ── 3. Re-host con concurrencia limitada ───────────────────────
   const list = [...urls]
   let done = 0, failed = 0
-  const CONC = 6
+  const CONC = 2
   await Promise.all(Array.from({ length: CONC }, async () => {
     while (list.length) {
       const u = list.shift()!
