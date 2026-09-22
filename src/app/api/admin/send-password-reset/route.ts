@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${request.headers.get('host')}`
 
   const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
-    redirectTo: `${siteUrl}/portal/login`,
+    redirectTo: `${siteUrl}/auth/nueva-contrasena`,
   })
 
   if (error) {

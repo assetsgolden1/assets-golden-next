@@ -46,6 +46,7 @@ export async function proxy(request: NextRequest) {
     !pathname.startsWith('/api') &&
     !pathname.startsWith('/admin') &&
     !pathname.startsWith('/portal') &&
+    !pathname.startsWith('/auth') &&
     !pathname.startsWith('/property') &&
     !pathname.startsWith('/_next') &&
     !pathname.startsWith('/_vercel') &&
@@ -63,6 +64,6 @@ export const config = {
     '/admin/:path*',
     '/api/admin/:path*',
     // Public routes (i18n locale detection)
-    '/((?!_next|_vercel|api|admin|portal|property|.*\\..*).*)' ,
+    '/((?!_next|_vercel|api|admin|portal|auth|property|.*\\..*).*)' ,
   ],
 }

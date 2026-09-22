@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -82,7 +83,11 @@ export default function PortalLogin() {
           </button>
         </form>
 
-        <p className="text-xs text-muted-foreground text-center mt-6">
+        <p className="text-sm text-center mt-4">
+          <Link href="/auth/recuperar" className="text-primary hover:underline">¿Olvidaste tu contraseña?</Link>
+        </p>
+
+        <p className="text-xs text-muted-foreground text-center mt-4">
           ¿No tienes cuenta? Contacta a Assets Golden para solicitar acceso.
         </p>
       </div>

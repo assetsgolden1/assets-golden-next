@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -97,7 +98,13 @@ export default function AdminLoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-4 text-center">
+          <Link href="/auth/recuperar" className="text-sm text-[#0a1628] hover:underline">
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
+
+        <div className="mt-4 text-center">
           <a
             href="/"
             className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
