@@ -50,15 +50,16 @@ async function dumpTables(dir: string) {
 
 async function listAll(bucket: string, prefix = ''): Promise<{ name: string; size: number }[]> {
   const out: { name: string; size: number }[] = []
-  for (let offset = 0; ; offset += 1000) {
-    const { data, error } = await sb.storage.from(bucket).list(prefix, { limit: 1000, offset })
+  // Páginas de 100: con limit 1000 el list devuelve menos objetos de los que hay y offset>=1000 da undefined.
+  for (let offset = 0; ; offset += 100) {
+    const { data, error } = await sb.storage.from(bucket).list(prefix, { limit: 100, offset, sortBy: { column: 'name', order: 'asc' } })
     if (error) throw new Error(`${bucket}/${prefix}: ${error.message}`)
     for (const e of data ?? []) {
       const full = prefix ? `${prefix}/${e.name}` : e.name
       if (e.id === null) out.push(...await listAll(bucket, full))          // carpeta
       else out.push({ name: full, size: Number(e.metadata?.size ?? 0) })
     }
-    if (!data || data.length < 1000) break
+    if (!data || data.length < 100) break
   }
   return out
 }

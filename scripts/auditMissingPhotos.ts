@@ -1,7 +1,8 @@
 /**
  * Audita qué propiedades visibles (y equipo/blog/destinos) tienen fotos rotas tras la
  * reconstrucción del 22/09/2026: comprueba con HEAD cada image_url del proyecto y
- * emite un informe Markdown + JSON. No modifica nada.
+ * emite un informe Markdown + JSON. No modifica nada. OJO: un HEAD fallido puede ser un 500 transitorio
+ * de Storage (pasa cuando el backup semanal descarga 4 GB); no tomar decisiones destructivas a partir de este informe.
  *
  * Uso: npx tsx --env-file=.env.local scripts/auditMissingPhotos.ts <salida.md>
  */
@@ -11,14 +12,21 @@ import fs from 'node:fs'
 const URL_ = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const sb = createClient(URL_, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
 const OUT = process.argv[2] ?? 'docs/fotos-pendientes.md'
-const cache = new Map<string, boolean>()
+// Comprobación contra el LISTADO real de Storage (fuente de verdad). Antes se hacía con HEAD por URL,
+// pero Storage devuelve 500 transitorios bajo carga (p. ej. durante el backup semanal) y daba falsos negativos.
+const PUB = `${URL_}/storage/v1/object/public/`
+const objects = new Map<string, Set<string>>()   // bucket -> paths
+async function loadBucket(bucket: string) {
+  const out = new Set<string>()
+  const walk = async (p: string) => { for (let off = 0; ; off += 100) { const { data, error } = await sb.storage.from(bucket).list(p, { limit: 100, offset: off, sortBy: { column: 'name', order: 'asc' } }); if (error) throw new Error(`list ${bucket}/${p}: ${error.message}`); for (const e of data ?? []) { const f = p ? `${p}/${e.name}` : e.name; if (e.id) out.add(f); else await walk(f) } if (!data || data.length < 100) break } }
+  await walk(''); objects.set(bucket, out)
+}
 async function ok(u: string | null | undefined): Promise<boolean> {
   if (!u) return false
-  if (!u.includes('supabase.co')) return true                 // CDN externo (HabiHub): no afectado
-  if (cache.has(u)) return cache.get(u)!
-  let r = false
-  try { r = (await fetch(u, { method: 'HEAD' })).ok } catch { r = false }
-  cache.set(u, r); return r
+  if (!u.startsWith(PUB)) return true                         // CDN externo (HabiHub): no afectado
+  const [bucket, ...rest] = u.slice(PUB.length).split('/')
+  if (!objects.has(bucket)) await loadBucket(bucket)
+  return objects.get(bucket)!.has(decodeURIComponent(rest.join('/')))
 }
 async function pool<T, R>(items: T[], n: number, fn: (t: T) => Promise<R>): Promise<R[]> {
   const out: R[] = new Array(items.length); let i = 0
@@ -37,7 +45,8 @@ async function main() {
     if (!data || data.length < 1000) break
   }
   type P = { id: string; ref_code: string; title: string; slug: string; country: string | null; location: string | null; external_source: string | null; featured: boolean | null; image_url: string | null; gallery_urls: string[] | null; idealista_url: string | null; nestseekers_url: string | null }
-  const PRUNE = process.argv.includes('--prune')
+  // --prune fue retirado el 22/09: podaba URLs que devolvían 500 transitorios de Storage y borró fotos reales de las galerías.
+  const PRUNE = false
   const own = (props as unknown as P[]).filter((p) => String(p.image_url ?? '').includes('supabase.co') || JSON.stringify(p.gallery_urls ?? []).includes('supabase.co'))
   console.log(`visibles ${props?.length} · con fotos propias ${own.length}`)
   let pruned = 0
