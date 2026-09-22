@@ -47,8 +47,10 @@ jobs:
             npx tsx scripts/backupSupabase.ts backup --tables-only
           fi
       - name: Comprimir
+        if: always()
         run: tar -czf supabase-backup.tar.gz backup
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: supabase-backup-${{ github.run_id }}
           path: supabase-backup.tar.gz

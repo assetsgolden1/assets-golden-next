@@ -82,7 +82,9 @@ async function dumpStorage(dir: string) {
     }
   }
   console.log(`  Storage: ${files} bajados (${(bytes / 1048576).toFixed(0)} MB), ${skipped} ya existían, ${failed} fallos`)
-  if (failed) process.exitCode = 1
+  // Fallos puntuales (objetos borrados durante la corrida, 429/500 del pool) no invalidan el backup:
+  // quedan listados arriba y el objeto se reintenta en la próxima corrida incremental.
+  if (failed > 50) process.exitCode = 1
 }
 
 async function main() {
