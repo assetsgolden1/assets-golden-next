@@ -66,6 +66,89 @@ reordena si la prioridad cambió.
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
+### 2026-09-24 (cont. 2) — [ADMIN] Filtros del panel rehechos al estilo del filtro público
+
+**Contexto:** Iván probó el panel en producción y seguía igual (los cambios anteriores no estaban desplegados). Pidió imitar el filtro público de /propiedades: el del panel tenía mala experiencia y al elegir España seguía mostrando Buenos Aires.
+
+**Hecho:**
+- Nuevo `src/components/admin/AdminPropertyFilters.tsx`: panel lateral como el público. Cada clic aplica al instante (sin botón Filtrar). País (con recuento) → comunidad autónoma como botones → ciudades como botones con buscador interno y recuento. Tipo, rangos de precio y mín/máx libres. Filtros activos como etiquetas que se quitan con un clic, y "Limpiar todo".
+- La región sale de la provincia (`src/lib/admin/regions.ts`), no de la lista a mano del público (`spainZones.ts`), que no incluye Cataluña.
+- `PropiedadesTable` ya no tiene el formulario viejo. La página pone filtros a la izquierda y la tabla a la derecha, ancho máximo 1600 px. Se quitó el rango de precios del servidor, que ya no se usa.
+
+**Verificación:** con el panel real renderizado en una ruta local temporal (borrada después): España → Cataluña (25) → Sitges devuelve AG-04486, AG-00804, AG-00803 y AG-00014. Con España elegida no aparece Buenos Aires. Clic de ratón real en Comunidad Valenciana → 1.389. Sin errores de servidor ni de consola. tsc 0, eslint sin avisos nuevos.
+
+**Nota:** AG-00803 (Sitges) ya está oculta; el duplicado pendiente es solo AG-04486/AG-00804.
+
+**Archivos:** CREATED `src/components/admin/AdminPropertyFilters.tsx`. MODIFIED `src/app/admin/propiedades/page.tsx`, `src/components/admin/PropiedadesTable.tsx`.
+**Commits:** ninguno (pendiente de OK del usuario). Nada de esto está en producción todavía.
+
+**Riesgo evitado:** `scripts/output/` está en .gitignore, así que `inmoges-match.json` nunca habría llegado a GitHub y la primera corrida del workflow habría creado **12 fichas duplicadas**. Movido a `src/scripts/inmoges-match.json` (versionado). Además, `load --confirm` ahora aborta sin escribir nada si falta el archivo.
+
+---
+### 2026-09-24 (cont.) — [ADMIN] Filtro País → Región → Ciudad en el panel de propiedades + diagnóstico del CRM
+
+**Contexto:** Atilio cargó propiedades en Inmoges (ej. REF 161C9330, chalet en Sant Cugat) y no aparecen en la web. Además, en /admin/propiedades el listado de ciudades estaba incompleto, no había forma de filtrar por Cataluña y al elegir España no se acotaban las ciudades (Sitges no salía).
+
+**Diagnóstico del CRM:** la 161C9330 SÍ está en el feed (ahora 35 inmuebles; nuevos 161P9359 Planta Baja en Barcelona y 161C9361 Chalet en Begur). No está en la web porque **la sincronización nunca se activó**: la primera carga sigue sin ejecutarse y el script y el workflow siguen sin commitear, así que GitHub nunca los corrió. El problema es nuestro, no del CRM.
+
+**Causa del filtro:** Supabase devuelve como máximo 1.000 filas por consulta y el `.limit(5000)` se ignoraba en silencio. El desplegable mostraba **82 de 250 ciudades** (cortaba en Estepona). El mismo fallo hacía que el "precio máx" del filtro mostrara 352.000 € cuando el real es 36.000.000 €. Además el formulario era GET puro: las ciudades solo se acotaban tras pulsar Filtrar.
+
+**Hecho:**
+- `src/lib/admin/regions.ts` (nuevo): deriva la comunidad autónoma desde la provincia (la BD no la guarda), unifica variantes ("Malaga"/"Málaga", "Cordoba"/"Córdoba") y arma el índice (país, región, ciudad, recuento) + región → provincias crudas.
+- Página: el catálogo de ubicaciones se trae completo en páginas de 1.000 en paralelo. Nuevo parámetro `region` que filtra con `.in(province, ...)`. La búsqueda libre "cataluña" incluye sus provincias. Precio mín/máx con dos consultas directas.
+- Tabla: País → Región → Ciudad en cascada, con recuentos, recalculados al instante en el navegador. Cambiar de país limpia región y ciudad.
+- Sync Inmoges: "Planta Baja"/"Bajo" mapean a `apartment` (caían en `other`).
+
+**Verificación:** tsc 0 errores, eslint sin avisos nuevos. Consultas probadas contra la BD real: 250 ciudades; España → 6 regiones; Cataluña → 25 propiedades en 10 ciudades; Cataluña + Sitges → 4 (AG-00014, AG-00803, AG-04486, AG-00804); búsqueda "cataluña" → 25. **La interfaz no se probó con clics**: el panel pide login y el agente no introduce contraseñas.
+
+**Archivos:** CREATED `src/lib/admin/regions.ts`. MODIFIED `src/app/admin/propiedades/page.tsx`, `src/components/admin/PropiedadesTable.tsx`, `src/scripts/syncInmoges.ts`.
+**Commits:** ninguno (pendiente de OK del usuario).
+
+**Próximo paso sugerido:** commit + push de todo (sync Inmoges, workflow, manual, filtro) y ejecutar `npm run inmoges -- load --confirm`. Probar el filtro en producción con Cataluña → Sitges.
+
+---
+### 2026-09-24 — [CRM] Manual en PDF para publicar propiedades desde Inmoges
+
+**Contexto:** Iván pidió el manual de uso de Inmoges en PDF para pasárselo a Atilio.
+
+**Hecho:** PDF de 2 páginas con la marca de AG (portada, 5 pasos numerados, tabla de qué datos trae el CRM, cómo bajar un inmueble, qué revisar si no aparece, actualización manual). Se genera con el Chrome del sistema vía puppeteer-core; para regenerarlo tras cambiar el texto: `npx tsx scripts/pdf/buildManual.ts`.
+
+**Archivos:** CREATED `scripts/pdf/manual-inmoges.html`, `scripts/pdf/buildManual.ts`, `docs/Manual-Inmoges-AssetsGolden.pdf`.
+
+**Próximo paso sugerido:** sigue pendiente la primera carga `npm run inmoges -- load --confirm` (ver entrada del 22/09 cont.).
+
+---
+### 2026-09-22 (cont.) — [CRM] El CRM Inmoges ya alimenta la web: importador Kyero + sincronización diaria
+
+**Contexto:** Atilio dijo que buena parte de las propiedades que faltaban ya estaban cargadas en el CRM `expertosgestion.com/inmoges4`. Iván preguntó si ese CRM podía sincronizarse con la web para no volver a cargar nada a mano. En el CRM solo salían 3 inmuebles en la pasarela Kyero; Atilio marcó la casilla en las 34 fichas y publicó.
+
+**Hecho:**
+- El CRM publica los inmuebles marcados en un XML Kyero: `https://expertosgestion.com/XMLky/3440.xml` (3440 = nº de experto de AG). Verificado: HTTP 200, **33 inmuebles y 656 fotos**, `feed_version 3`.
+- Nuevo importador `src/scripts/syncInmoges.ts` con dos modos: `report` (dry-run, no escribe) y `load --confirm`. Bandera `--fotos` para completar galerías. `npm run inmoges`.
+- Convención: `external_source='inmoges'`, `external_id='im-<ref>'` (prefijo como el `cv-` de Cervera, porque `external_id` es UNIQUE y HabiHub usa ids numéricos).
+- **Las fichas que ya existían en la web NO se duplican ni se pisan.** El sync solo les actualiza el precio; título, descripción y fotos siguen siendo los editados a mano, que son mejores que los del CRM.
+- Mapeo de tipos del CRM (en español) a los de la web, incluidos los que no existían: Torre y Casa con terreno a `house`, Triplex y Loft a `apartment`, Bar y Local comercial a `business`.
+- Las fotos se re-hospedan en Supabase bajo `inmoges/<ref>/NN.jpg` (recomprimidas con sharp): la web no depende del servidor del CRM y las fotos entran en el backup.
+- Automatización `.github/workflows/sync-inmoges.yml`: diaria a las 05:00 UTC (07:00 España), con ejecución manual y casillas "Solo informe" y "Completar galerías".
+- Guía para el cliente en `docs/inmoges-crm-web.md`: marcar Kyero en la pestaña Publicidad, pulsar Publicar inmuebles en Pasarelas, y al día siguiente está en la web.
+
+**Emparejamiento con lo que ya estaba cargado:** el cruce por precio + ciudad + dormitorios + similitud de descripción dio 12 candidatos. Se verificaron **uno a uno** comparando ciudad, dormitorios, baños, metros, precio y número de fotos: los 12 son correctos y quedaron fijados en `scripts/output/inmoges-match.json`. Cuatro candidatos dudosos resultaron ser propiedades nuevas (uno de ellos, un falso positivo por coincidir el precio con una casa de Costa Rica).
+
+**Plan calculado (dry-run, aún NO ejecutado):** vincular 12 · crear 21 nuevas · el CRM tiene más fotos que la web en 4 fichas (AG-04296 +18, AG-00009 +9, AG-00006 +8, AG-00007 +7).
+
+**Hallazgos:**
+- **Duplicado en la web**: AG-04486 y AG-00804 son el mismo ático dúplex de Sitges (mismo precio, dormitorios, baños y metros), las dos activas y destacadas. Hay que ocultar una. Se suma al par AG-04385 / AG-04485 ya detectado.
+- Varias fichas tienen el precio desactualizado respecto al CRM: AG-00009 sube de 1.020.000 a 1.130.000, AG-00007 baja de 398.000 a 385.000, AG-04484 de 400.000 a 380.000, AG-04518 y AG-04336 bajan 5.000.
+- Entre las 21 nuevas hay un **bar en El Prat (65.000)** y un **local comercial en Barcelona (300.000)**. Atilio los marcó a propósito, pero no encajan con "propiedades exclusivas": conviene confirmar si se publican.
+- Ninguna de las 11 propiedades sin foto está en el CRM: ese pendiente sigue igual.
+- El feed no trae descripción en inglés. Las 21 fichas nuevas quedarán con `description_en` vacío.
+
+**Archivos:** CREATED `src/scripts/syncInmoges.ts`, `.github/workflows/sync-inmoges.yml`, `docs/inmoges-crm-web.md`, `scripts/output/inmoges-match.json`. MODIFIED `package.json` (script `inmoges`).
+**Verificación:** `tsc --noEmit` sin errores. Dry-run ejecutado contra el feed y la BD reales.
+
+**Próximo paso sugerido:** ejecutar `npm run inmoges -- load --confirm` (bloqueado en esta sesión por permisos de escritura en la BD compartida) y luego cargar los secrets del workflow en GitHub. Después decidir el bar y el local, y ocultar uno de los dos Sitges.
+
+---
 
 ### 2026-08-30 — [EQUIPO] Perfiles de fundadores + tarjetas clicables en las 3 páginas
 

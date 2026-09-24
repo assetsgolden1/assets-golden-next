@@ -11,6 +11,13 @@ Leyenda esfuerzo: S=minutos · M=una sesión · L=varias/continuo.
 Responsable: Ivan (panel/manual) · CC (Claude Code) · Atilio (cliente) · Claude (Claude.ai).
 
 ## 0. Lo más urgente
+- [Ivan+CC·S] **Activar la sincronización del CRM (Atilio ya está cargando y no ve nada en la web)**: (1) commit + push del script, el workflow `sync-inmoges.yml`, `src/scripts/inmoges-match.json` (imprescindible: sin él se duplican 12 fichas) y los filtros nuevos del panel (nada de eso está en GitHub todavía); (2) primera carga `npm run inmoges -- load --confirm`. Al 24/09 el feed tiene 35 inmuebles: 12 a vincular y 23 a crear, incluidas 161C9330 (Sant Cugat), 161P9359 y 161C9361 (Begur).
+- [Ivan·S] Probar en producción el filtro País → Región → Ciudad del panel (Cataluña → Sitges debe dar 4). AG-00803 ya está oculta; el duplicado pendiente es AG-04486/AG-00804.
+- [Ivan·S] **Ejecutar la primera carga del CRM Inmoges**: `npm run inmoges -- load --confirm` (vincula 12 fichas existentes, crea 21 nuevas). El dry-run está verificado; la escritura quedó bloqueada por permisos en la sesión del 22/09. Opcional después: `-- load --confirm --fotos` para completar 4 galerías (AG-04296 +18, AG-00009 +9, AG-00006 +8, AG-00007 +7).
+- [Ivan·S] **Secrets del workflow Sync Inmoges** en GitHub (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`) — son los mismos que ya usa el backup, así que si ya están, no hay nada que hacer.
+- [Atilio·S] **Decidir si se publican el bar de El Prat (65.000) y el local comercial de Barcelona (300.000)** que vienen del CRM: no encajan con "propiedades exclusivas".
+- [Ivan·S] **Duplicado en la web: AG-04486 y AG-00804** son el mismo ático dúplex de Sitges, las dos activas y destacadas. Ocultar una. (El otro par conocido sigue siendo AG-04385 / AG-04485.)
+- [Ivan·M] **Traducir al inglés las 21 fichas nuevas del CRM**: el feed Kyero solo trae español, quedan con `description_en` vacío. Patrón: `src/scripts/translateCerveraExcerpts.ts`.
 - [Atilio·M] **11 propiedades destacadas sin foto** tras el borrado del proyecto (Excel en `../backups-migracion-2026-09/Fotos-pendientes-AssetsGolden-2026-09-22.xlsx`; refs en docs/fotos-pendientes.md) + foto de Ana Serrat. Destinos ya resueltos. Gramado, Luque y Córdoba llegaron por Drive de CFG y están publicadas. Subir desde el panel o pasarle carpetas a Iván (scripts/uploadFolderPhotos.ts).
 - [Ivan+Atilio+Joan·S] **Restablecer contraseñas**: ya existe "¿Olvidaste tu contraseña?" en /admin/login y /portal/login (desde 22/09). Avisar a los 16 agentes; o Atilio les envía el enlace desde Admin → Agentes.
 - [CC·S opcional] Conectar Resend como SMTP de Auth en Supabase (Authentication → Emails → SMTP) para que los correos de recuperación salgan desde @assetsgolden.com sin el límite del SMTP por defecto.

@@ -66,8 +66,10 @@ Por qué no sirven los planes gratuitos: la web tiene unas 2.700 fichas que se r
 | Tarea | Cuándo | Qué hace |
 |---|---|---|
 | Actualización del catálogo de obra nueva | Lunes a las 5:00 (hora de España) | Lee el catálogo del proveedor (HabiHub), añade las propiedades nuevas, actualiza precios y **oculta** las que ya no están. Nunca borra. |
+| Alta de propiedades desde el CRM | Todos los días a las 7:00 (hora de España) | Lee los inmuebles que ustedes marcan con la casilla **Kyero** en Inmoges y los publica en la web con sus fotos. A los que ya estaban publicados solo les actualiza el precio: no toca el título, la descripción ni las fotos que se hayan editado en el panel. |
 | Recogida de contactos de Meta | Cada hora | Trae los contactos nuevos de los anuncios y los añade a la hoja "Leads Meta". No duplica. |
 | Secuencia de emails | Todos los días a las 11:00 | Envía el siguiente email a cada interesado de Meta. **Si en la pestaña CRM de la hoja el contacto figura como "en conversación", "visita", "ganado", "perdido", etc., deja de escribirle.** |
+| Copia de seguridad | Todas las noches (y los domingos, también las fotos) | Guarda una copia de la base de datos fuera de Supabase. Las copias se conservan 90 días. |
 | Publicación de cambios | Cuando Iván sube una mejora | La web se actualiza sola en unos 5 minutos, sin corte. |
 
 **Importante sobre las hojas de Google:** no cambien el nombre de las pestañas (`Hoja 1`, `LEADS`, `CRM`) ni el orden de las columnas. La web escribe en ellas por posición. Pueden añadir columnas a la derecha, filtrar, colorear y anotar sin problema.
@@ -81,6 +83,8 @@ Por qué no sirven los planes gratuitos: la web tiene unas 2.700 fichas que se r
 **Dar de alta a un agente colaborador:** `/admin` → Agentes → Nuevo agente. El panel genera una contraseña temporal que hay que pasarle al agente; con ella entra por `/portal`. Si la olvida, desde la misma pantalla se le envía un email para restablecerla. Desde ahí también se le puede desactivar.
 
 **Ver los contactos recibidos:** `/admin` → Leads, o directamente la hoja de Google "Contactos Web". La regla de la casa es **no borrar contactos**: se marcan como descartados.
+
+**Publicar en la web una propiedad del CRM:** en Inmoges, abrir la ficha → pestaña **Publicidad** → marcar **Kyero** → guardar. Después, menú **Pasarelas → Exportar fichero en formato Kyero** → **Publicar inmuebles**. A la mañana siguiente está en la web. El paso a paso completo, con qué datos se traen y qué hacer si algo no aparece, está en `docs/inmoges-crm-web.md`.
 
 **Ocultar una propiedad vendida:** editarla y marcar "Oculta" o "Vendida". No hace falta borrarla.
 

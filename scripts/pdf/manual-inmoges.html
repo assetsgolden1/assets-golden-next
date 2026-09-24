@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Manual Inmoges</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm 16mm; }
+  :root { --navy:#0a1628; --gold:#b08d4f; --ink:#1e2833; --soft:#5b6875; --line:#dfe4ea; --bg:#f6f7f9; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Georgia, "Times New Roman", serif; color: var(--ink); font-size: 10.6pt; line-height: 1.55; }
+  h1,h2,h3,.sans { font-family: "Segoe UI", Arial, Helvetica, sans-serif; }
+
+  .cover { background: var(--navy); color:#fff; margin:-18mm -16mm 12mm -16mm; padding: 26mm 16mm 16mm; text-align:center; }
+  .cover img { height: 58px; margin-bottom: 18px; }
+  .cover h1 { font-size: 25pt; margin:0 0 6px; font-weight:600; letter-spacing:.2px; }
+  .cover .sub { color:#c8d0da; font-size: 11pt; margin:0; }
+  .cover .rule { width:54px; height:2px; background:var(--gold); margin:16px auto 0; }
+
+  h2 { font-size: 13.5pt; color: var(--navy); margin: 22px 0 8px; padding-bottom:5px; border-bottom:1px solid var(--line); page-break-after: avoid; }
+  p { margin: 0 0 9px; }
+  strong { color: var(--navy); }
+
+  .lead { background: var(--bg); border-left:3px solid var(--gold); padding:11px 14px; margin: 0 0 16px; }
+  .lead p:last-child { margin-bottom:0; }
+
+  ol.steps { counter-reset: s; list-style:none; padding:0; margin: 10px 0 14px; }
+  ol.steps > li { counter-increment: s; position: relative; padding: 9px 0 9px 42px; border-bottom:1px solid var(--line); page-break-inside: avoid; }
+  ol.steps > li:last-child { border-bottom:0; }
+  ol.steps > li::before { content: counter(s); position:absolute; left:0; top:8px; width:26px; height:26px; border-radius:50%;
+    background: var(--navy); color:#fff; font-family:"Segoe UI",Arial,sans-serif; font-size:11pt; font-weight:600; text-align:center; line-height:26px; }
+  .path { font-family:"Segoe UI",Arial,sans-serif; font-size:9.4pt; color:var(--navy); background:#eef1f5; border:1px solid var(--line);
+    padding:1px 6px; border-radius:3px; white-space:nowrap; }
+
+  table { width:100%; border-collapse: collapse; margin: 8px 0 14px; font-size: 10pt; page-break-inside: avoid; }
+  th { background: var(--navy); color:#fff; font-family:"Segoe UI",Arial,sans-serif; font-weight:600; text-align:left; padding:7px 10px; font-size:9.6pt; }
+  td { padding:7px 10px; border-bottom:1px solid var(--line); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafbfc; }
+  td.yes { color:#1f7a3f; font-weight:600; white-space:nowrap; }
+  td.no  { color:#a33; font-weight:600; white-space:nowrap; }
+
+  .note { border:1px solid var(--line); border-left:3px solid var(--navy); background:#fff; padding:10px 13px; margin: 12px 0; page-break-inside: avoid; }
+  .note .t { font-family:"Segoe UI",Arial,sans-serif; font-size:9.4pt; font-weight:600; color:var(--navy); text-transform:uppercase; letter-spacing:.6px; margin-bottom:3px; }
+  .warn { border-left-color: var(--gold); background:#fdfaf4; }
+
+  ul.plain { margin:6px 0 12px; padding-left: 18px; }
+  ul.plain li { margin-bottom:5px; }
+
+  .foot { margin-top:22px; padding-top:9px; border-top:1px solid var(--line); color:var(--soft); font-size:8.8pt;
+    font-family:"Segoe UI",Arial,sans-serif; line-height:1.5; }
+</style></head>
+<body>
+
+<div class="cover">
+  <img src="LOGO_SRC" alt="Assets Golden">
+  <h1>Cómo publicar propiedades en la web</h1>
+  <p class="sub">Manual de uso del CRM Inmoges &middot; Assets Golden</p>
+  <div class="rule"></div>
+</div>
+
+<div class="lead">
+  <p>Desde ahora el CRM y la web están conectados. <strong>No hace falta volver a cargar a mano una propiedad que ya está en el CRM.</strong></p>
+  <p>El CRM publica un fichero con los inmuebles que ustedes marcan. La web lo lee <strong>todas las mañanas a las 7:00</strong> y se actualiza sola.</p>
+</div>
+
+<h2>Publicar un inmueble en la web</h2>
+
+<ol class="steps">
+  <li>Entrar en el CRM: <span class="path">expertosgestion.com/inmoges4</span></li>
+  <li>Abrir la ficha del inmueble que quieren publicar.</li>
+  <li>Ir a la pestaña <strong>Publicidad</strong>.</li>
+  <li>Marcar la casilla <strong>Kyero</strong> y guardar.</li>
+  <li>Ir al menú <strong>Pasarelas</strong> &rarr; <strong>Exportar fichero en formato Kyero</strong> y pulsar <strong>Publicar inmuebles</strong>.</li>
+</ol>
+
+<div class="note warn">
+  <div class="t">El paso 5 es el que más se olvida</div>
+  Marcar la casilla no basta. Hasta que no se pulsa <strong>Publicar inmuebles</strong> en Pasarelas, la web no se entera del cambio.
+</div>
+
+<p>A la mañana siguiente el inmueble está publicado. Si hace falta antes, se puede lanzar la actualización a mano: ver el último apartado.</p>
+
+<h2>Qué datos se lleva la web</h2>
+
+<table>
+  <tr><th>Dato</th><th style="width:26%">¿Lo trae del CRM?</th><th>Detalle</th></tr>
+  <tr><td>Precio</td><td class="yes">Sí</td><td>Y lo actualiza todos los días</td></tr>
+  <tr><td>Fotos</td><td class="yes">Sí</td><td>En el alta, todas las de la ficha</td></tr>
+  <tr><td>Ciudad y provincia</td><td class="yes">Sí</td><td></td></tr>
+  <tr><td>Dormitorios, baños, metros</td><td class="yes">Sí</td><td></td></tr>
+  <tr><td>Descripción en español</td><td class="yes">Sí</td><td>En el alta</td></tr>
+  <tr><td>Descripción en inglés</td><td class="no">No</td><td>El CRM no la tiene. Hay que escribirla en el panel de la web</td></tr>
+</table>
+
+<div class="note">
+  <div class="t">Lo que escriben en el panel de la web manda</div>
+  Si una propiedad ya estaba en la web y allí se mejoró el título, la descripción o el orden de las fotos, <strong>el CRM no lo pisa</strong>.
+  De esas fichas solo se actualiza el precio.
+</div>
+
+<h2>Bajar un inmueble de la web</h2>
+<p>Desmarcar la casilla <strong>Kyero</strong> en el CRM <strong>no</strong> lo quita de la web. Para retirarlo hay que ocultarlo desde el panel de administración de la web, como se ha hecho siempre: editar la propiedad y marcarla como <strong>Oculta</strong> o <strong>Vendida</strong>.</p>
+
+<h2>Si una propiedad no aparece</h2>
+<p>Repasar en este orden:</p>
+<ul class="plain">
+  <li>Que la casilla <strong>Kyero</strong> esté marcada en la pestaña Publicidad de esa ficha.</li>
+  <li>Que se pulsara <strong>Publicar inmuebles</strong> en Pasarelas <em>después</em> de marcarla.</li>
+  <li>Que haya pasado ya la actualización de las 7:00 de la mañana.</li>
+  <li>Abrir <span class="path">expertosgestion.com/XMLky/3440.xml</span> y buscar la referencia del inmueble. Si no está ahí, el problema está en el CRM y no en la web.</li>
+</ul>
+<p>Si está en ese fichero pero no en la web, avisar a Iván con la referencia del inmueble.</p>
+
+<h2>Lanzar la actualización a mano</h2>
+<p>Sirve cuando no se quiere esperar a la mañana siguiente. En GitHub, pestaña <strong>Actions</strong> &rarr; <strong>Sync Inmoges</strong> &rarr; botón <strong>Run workflow</strong>. Hay dos casillas opcionales:</p>
+<ul class="plain">
+  <li><strong>Solo informe:</strong> muestra lo que haría, sin tocar la web. Útil para comprobar antes.</li>
+  <li><strong>Completar galerías:</strong> añade a la web las fotos que el CRM tenga de más.</li>
+</ul>
+
+<div class="foot">
+  Assets Golden &middot; Manual de uso del CRM Inmoges &middot; FECHA_DOC<br>
+  Ficha técnica para el mantenimiento: fichero <span style="white-space:nowrap">expertosgestion.com/XMLky/3440.xml</span> (3440 = número de experto de AG) &middot;
+  proceso <span style="white-space:nowrap">syncInmoges.ts</span> &middot; automatización <span style="white-space:nowrap">sync-inmoges.yml</span>, diaria a las 05:00 UTC.
+  Las fotos se copian a Supabase, de modo que la web no depende del servidor del CRM y las imágenes entran en la copia de seguridad.
+</div>
+
+</body></html>
