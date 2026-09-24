@@ -66,6 +66,23 @@ reordena si la prioridad cambió.
 Append-only. Cada entrada nueva va ARRIBA (más reciente primero).
 
 ---
+### 2026-09-24 (cont. 3) — [PRODUCCIÓN] CRM Inmoges conectado y filtros del panel publicados
+
+**Contexto:** Iván dio el OK ("dale, quiero que quede listo hoy") para publicar y hacer la primera carga.
+
+**Hecho:**
+- Commits `2ab0f65` (sync Inmoges + workflow + vínculos), `44ff7b1` (filtros del panel), `a5c74c2` (docs), `c6bac56` (fotos por imagen). HomeSidebar.tsx y .gitignore quedaron fuera (cambios ajenos, sin commitear).
+- **El push de `a5c74c2` no disparó ningún build en Vercel** (sin estados en GitHub tras 5 min). Un commit vacío `8c9d2f7` lo destrabó: build OK y en producción.
+- **Primera carga ejecutada**: 35 fichas con `external_source=inmoges`: 23 nuevas (todas con fotos) y 12 vinculadas. Precios actualizados en AG-00009, AG-00007, AG-04484, AG-04518 y AG-04336. El chalet de Sant Cugat (REF 161C9330) es **AG-06874**.
+- Web pública verificada: la ficha de Sant Cugat responde 200 con sus fotos rehospedadas; las búsquedas "Sant Cugat" y "Begur" la encuentran.
+- Workflow `sync-inmoges.yml` probado en GitHub en modo "Solo informe" (run 35987003986): 35 en el feed, 35 sin cambios. Corre solo cada día a las 05:00 UTC.
+- **`--fotos` arreglado antes de usarlo**: comparaba por URL y habría duplicado todas las fotos (la web y el CRM guardan las mismas con URLs distintas). Ahora compara la imagen (dHash de 64 bits, distancia > 10). Fotos realmente nuevas: AG-04296 22, AG-00006 8, AG-00007 7, AG-00009 7. **No se aplicó todavía.**
+
+**No verificado:** el panel de admin en producción (pide login). Se probó en local con el panel real.
+
+**Próximo paso sugerido:** que Iván pruebe el panel en producción; decidir bar y local comercial; traducir al inglés las 23 fichas nuevas; si se quiere, `npm run inmoges -- load --confirm --fotos` para las 4 galerías.
+
+---
 ### 2026-09-24 (cont. 2) — [ADMIN] Filtros del panel rehechos al estilo del filtro público
 
 **Contexto:** Iván probó el panel en producción y seguía igual (los cambios anteriores no estaban desplegados). Pidió imitar el filtro público de /propiedades: el del panel tenía mala experiencia y al elegir España seguía mostrando Buenos Aires.
