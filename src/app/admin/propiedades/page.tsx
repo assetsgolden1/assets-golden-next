@@ -1,7 +1,41 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { PropiedadesTable, type PropertyRow } from '@/components/admin/PropiedadesTable'
+import { AdminPropertyFilters, type AdminFilterValues } from '@/components/admin/AdminPropertyFilters'
+import { buildLocationIndex, spainRegionFromText, type LocationIndex } from '@/lib/admin/regions'
 
 const PAGE_SIZE = 20
+/** Tope de filas que devuelve Supabase por consulta: un `.limit()` mayor se ignora en silencio. */
+const DB_PAGE = 1000
+
+/**
+ * Trae (país, provincia, ciudad) de TODO el catálogo para montar los desplegables.
+ * Antes se pedía con `.limit(5000)`, pero Supabase corta en 1.000 filas: el desplegable
+ * se quedaba en las ciudades hasta la "E" (82 de 250) y Sitges, por ejemplo, no salía.
+ */
+async function fetchLocationIndex(): Promise<LocationIndex> {
+  const { count } = await supabaseAdmin.from('properties').select('*', { count: 'exact', head: true })
+  const pages = Math.ceil((count ?? 0) / DB_PAGE)
+  const results = await Promise.all(
+    Array.from({ length: pages }, (_, i) =>
+      supabaseAdmin
+        .from('properties')
+        .select('country,province,location')
+        .order('id')
+        .range(i * DB_PAGE, (i + 1) * DB_PAGE - 1),
+    ),
+  )
+  return buildLocationIndex(results.flatMap((r) => r.data ?? []))
+}
+
+/** Valores crudos de `province` que forman una región ("Cataluña" → Barcelona, Girona...). */
+function provincesOf(index: LocationIndex, region: string, pais: string): string[] {
+  const byCountry = pais ? [index.provincesByRegion[pais] ?? {}] : Object.values(index.provincesByRegion)
+  const list = byCountry.flatMap((m) => m[region] ?? [])
+  return list.length ? list : [region]
+}
+
+/** Lista para `.or()` de PostgREST: comillas para admitir espacios y comas en los nombres. */
+const inList = (values: string[]) => `(${values.map((v) => `"${v.replace(/"/g, '')}"`).join(',')})`
 
 export default async function PropiedadesPage({
   searchParams,
@@ -10,6 +44,7 @@ export default async function PropiedadesPage({
     page?: string
     search?: string
     pais?: string
+    region?: string
     ciudad?: string
     tipo?: string
     precio_min?: string
@@ -21,6 +56,7 @@ export default async function PropiedadesPage({
   const page = Math.max(0, parseInt(params.page ?? '0') || 0)
   const search = params.search ?? ''
   const pais = params.pais ?? ''
+  const region = params.region ?? ''
   const ciudad = params.ciudad ?? ''
   const tipo = params.tipo ?? ''
   const precioMin = params.precio_min ?? ''
@@ -28,39 +64,20 @@ export default async function PropiedadesPage({
   const filter = params.filter ?? ''
   const offset = page * PAGE_SIZE
 
+  // Índice de ubicaciones: alimenta los desplegables y traduce "región" a provincias.
+  const locationsPromise = fetchLocationIndex()
+  const searchRegion = search ? spainRegionFromText(search) : null
+
   // Queries en paralelo: filtros vía RPC (DISTINCT server-side) + principal + counts para tabs
-  const [filtersResult, citiesResult, priceResult, mainResult, allCountResult, featuredCountResult] = await Promise.all([
+  const [filtersResult, locationIndex, mainResult, allCountResult, featuredCountResult] = await Promise.all([
     // Países y tipos únicos — GROUP BY en la DB, sin límite de rows
     supabaseAdmin.rpc('get_property_filters'),
 
-    // Ciudades filtradas por país si hay uno activo
-    pais
-      ? supabaseAdmin
-          .from('properties')
-          .select('location')
-          .not('location', 'is', null)
-          .not('location', 'eq', '')
-          .eq('country', pais)
-          .order('location')
-          .limit(5000)
-      : supabaseAdmin
-          .from('properties')
-          .select('location')
-          .not('location', 'is', null)
-          .not('location', 'eq', '')
-          .order('location')
-          .limit(5000),
+    locationsPromise,
 
-    // Rango de precios
-    supabaseAdmin
-      .from('properties')
-      .select('price')
-      .not('price', 'is', null)
-      .order('price', { ascending: true })
-      .limit(10000),
-
-    // Query principal con todos los filtros
-    (() => {
+    // Query principal con todos los filtros. Solo espera al índice si hay que traducir una región.
+    (async () => {
+      const index = region || searchRegion ? await locationsPromise : null
       let q = supabaseAdmin
         .from('properties')
         .select(
@@ -82,12 +99,17 @@ export default async function PropiedadesPage({
             // Formato AG-XXXX: normalizar y buscar en ref_code
             q = q.ilike('ref_code', `%${safe.toUpperCase()}%`)
           } else {
-            // Texto libre: buscar en título, ciudad, provincia
-            q = q.or(`title.ilike.%${safe}%,location.ilike.%${safe}%,province.ilike.%${safe}%`)
+            // Texto libre: buscar en título, ciudad, provincia. Si el texto es una comunidad
+            // ("cataluña"), incluir también sus provincias: en BD se guarda "Barcelona", no "Cataluña".
+            const regionClause = searchRegion && index
+              ? `,province.in.${inList(provincesOf(index, searchRegion, pais))}`
+              : ''
+            q = q.or(`title.ilike.%${safe}%,location.ilike.%${safe}%,province.ilike.%${safe}%${regionClause}`)
           }
         }
       }
       if (pais) q = q.eq('country', pais)
+      if (region && index) q = q.in('province', provincesOf(index, region, pais))
       if (ciudad) q = q.eq('location', ciudad)
       if (tipo) q = q.eq('property_type', tipo)
       if (precioMin) q = q.gte('price', parseInt(precioMin))
@@ -128,13 +150,7 @@ export default async function PropiedadesPage({
   const uniqueCountries: string[] = (rpcFilters?.countries ?? []).sort()
   const uniqueTypes: string[] = (rpcFilters?.types ?? []).sort()
 
-  const uniqueCities = [...new Set(
-    (citiesResult.data ?? []).map((p) => p.location as string).filter(Boolean)
-  )].sort()
-
-  const prices = (priceResult.data ?? []).map((p) => p.price as number)
-  const minPrice = prices[0] ?? 0
-  const maxPrice = prices[prices.length - 1] ?? 0
+  const filterValues: AdminFilterValues = { search, pais, region, ciudad, tipo, precioMin, precioMax, filter }
 
   const { data, count, error } = mainResult
 
@@ -159,7 +175,7 @@ export default async function PropiedadesPage({
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-[1600px] mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Propiedades</h1>
       </div>
@@ -170,6 +186,7 @@ export default async function PropiedadesPage({
           const p = new URLSearchParams()
           if (search) p.set('search', search)
           if (pais) p.set('pais', pais)
+          if (region) p.set('region', region)
           if (ciudad) p.set('ciudad', ciudad)
           if (tipo) p.set('tipo', tipo)
           if (precioMin) p.set('precio_min', precioMin)
@@ -199,24 +216,26 @@ export default async function PropiedadesPage({
         })}
       </div>
 
-      <PropiedadesTable
-        properties={(data as PropertyRow[]) ?? []}
-        totalCount={count ?? 0}
-        page={page}
-        pageSize={PAGE_SIZE}
-        filter={filter}
-        search={search}
-        pais={pais}
-        ciudad={ciudad}
-        tipo={tipo}
-        precioMin={precioMin}
-        precioMax={precioMax}
-        countries={uniqueCountries}
-        cities={uniqueCities}
-        types={uniqueTypes}
-        minPrice={minPrice}
-        maxPrice={maxPrice}
-      />
+      <div className="flex flex-col lg:flex-row gap-5 items-start">
+        <AdminPropertyFilters
+          // Se remonta en cada cambio de filtro para que los campos de texto reflejen la URL.
+          key={JSON.stringify(filterValues)}
+          values={filterValues}
+          countries={uniqueCountries}
+          locations={locationIndex.entries}
+          types={uniqueTypes}
+          totalCount={count ?? 0}
+        />
+        <div className="flex-1 min-w-0 w-full">
+          <PropiedadesTable
+            properties={(data as PropertyRow[]) ?? []}
+            totalCount={count ?? 0}
+            page={page}
+            pageSize={PAGE_SIZE}
+            {...filterValues}
+          />
+        </div>
+      </div>
     </div>
   )
 }

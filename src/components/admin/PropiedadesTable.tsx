@@ -37,15 +37,11 @@ export function PropiedadesTable({
   filter,
   search,
   pais,
+  region,
   ciudad,
   tipo,
   precioMin,
   precioMax,
-  countries,
-  cities,
-  types,
-  minPrice,
-  maxPrice,
 }: {
   properties: PropertyRow[]
   totalCount: number
@@ -54,15 +50,11 @@ export function PropiedadesTable({
   filter: string
   search: string
   pais: string
+  region: string
   ciudad: string
   tipo: string
   precioMin: string
   precioMax: string
-  countries: string[]
-  cities: string[]
-  types: string[]
-  minPrice: number
-  maxPrice: number
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [pending, startTransition] = useTransition()
@@ -74,6 +66,7 @@ export function PropiedadesTable({
     const p = new URLSearchParams()
     if (search) p.set('search', search)
     if (pais) p.set('pais', pais)
+    if (region) p.set('region', region)
     if (ciudad) p.set('ciudad', ciudad)
     if (tipo) p.set('tipo', tipo)
     if (precioMin) p.set('precio_min', precioMin)
@@ -131,125 +124,8 @@ export function PropiedadesTable({
     })
   }
 
-  const hasActiveFilters = search || pais || ciudad || tipo || precioMin || precioMax
-
   return (
     <div>
-      {/* Panel de filtros */}
-      <form
-        method="GET"
-        action="/admin/propiedades"
-        className="bg-white rounded-xl shadow-sm p-4 mb-4 flex flex-wrap gap-3 items-end"
-      >
-        <input type="hidden" name="filter" value={filter} />
-        <input type="hidden" name="page" value="0" />
-
-        {/* Búsqueda flexible */}
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-500 font-medium">Búsqueda libre</label>
-          <input
-            type="text"
-            name="search"
-            defaultValue={search}
-            placeholder="AG-1234, código HabiHub, ciudad..."
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
-          />
-        </div>
-
-        {/* País */}
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-500 font-medium">País</label>
-          <select
-            name="pais"
-            defaultValue={pais}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white w-44"
-          >
-            <option value="">Todos los países</option>
-            {countries.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Ciudad */}
-        {cities.length > 0 && (
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-500 font-medium">Ciudad</label>
-            <select
-              name="ciudad"
-              defaultValue={ciudad}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white w-44"
-            >
-              <option value="">Todas las ciudades</option>
-              {cities.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {/* Tipo */}
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-500 font-medium">Tipo</label>
-          <select
-            name="tipo"
-            defaultValue={tipo}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white w-44"
-          >
-            <option value="">Todos los tipos</option>
-            {types.map((t) => (
-              <option key={t} value={t}>{translatePropertyType(t)}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Precio mín */}
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-500 font-medium">
-            Precio mín {minPrice > 0 && <span className="text-gray-400">({minPrice.toLocaleString('es-ES')}€)</span>}
-          </label>
-          <input
-            type="number"
-            name="precio_min"
-            defaultValue={precioMin}
-            placeholder="Mínimo"
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-36"
-          />
-        </div>
-
-        {/* Precio máx */}
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-500 font-medium">
-            Precio máx {maxPrice > 0 && <span className="text-gray-400">({maxPrice.toLocaleString('es-ES')}€)</span>}
-          </label>
-          <input
-            type="number"
-            name="precio_max"
-            defaultValue={precioMax}
-            placeholder="Máximo"
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-36"
-          />
-        </div>
-
-        {/* Acciones */}
-        <div className="flex gap-2 items-end">
-          <button
-            type="submit"
-            className="bg-[#0a1628] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#1a2638] transition-colors"
-          >
-            Filtrar
-          </button>
-          {hasActiveFilters && (
-            <a
-              href={`/admin/propiedades${filter ? `?filter=${filter}` : ''}`}
-              className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm hover:bg-gray-200 transition-colors"
-            >
-              Limpiar
-            </a>
-          )}
-        </div>
-      </form>
-
       {/* Barra de acciones bulk / contador */}
       <div className={`flex items-center gap-3 mb-3 px-4 py-2.5 rounded-lg border text-sm ${
         selected.size > 0 ? 'bg-amber-50 border-amber-200' : 'bg-gray-50 border-gray-200'
