@@ -90,6 +90,29 @@ const featuresOf = (k: KyeroProp): string[] => {
   return (Array.isArray(f) ? f : [f]).map(String).map(s => s.trim()).filter(s => s && !/^\d+$/.test(s))
 }
 
+/**
+ * Huella visual de 64 bits (dHash, como cadena de 0/1): miniatura 9×8 en grises, un bit por cada par de
+ * píxeles vecinos. Dos fotos iguales con distinta compresión o tamaño dan huellas casi
+ * idénticas; se consideran la misma si difieren en ≤ DUP_DISTANCE bits.
+ */
+const DUP_DISTANCE = 10
+async function dHash(url: string): Promise<string | null> {
+  try {
+    const r = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } })
+    if (!r.ok) return null
+    const sharp = (await import('sharp')).default
+    const px = await sharp(Buffer.from(await r.arrayBuffer())).grayscale().resize(9, 8, { fit: 'fill' }).raw().toBuffer()
+    let h = ''
+    for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) h += px[y * 9 + x] > px[y * 9 + x + 1] ? '1' : '0'
+    return h
+  } catch { return null }
+}
+function hamming(a: string, b: string): number {
+  let n = 0
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) n++
+  return n
+}
+
 /** Sube una foto del CRM a Supabase Storage. Idempotente por nombre de archivo. */
 async function rehost(url: string, ref: string, idx: number): Promise<string | null> {
   const key = `inmoges/${ref}/${String(idx).padStart(2, '0')}.jpg`
@@ -152,11 +175,24 @@ async function main() {
       // reconstruyeron parciales). Solo se completan con --fotos y nunca se pisa lo que ya hay:
       // las de la web están ordenadas a mano y son la portada que ve el usuario.
       if (imgs.length > webPhotos) {
-        plan.photos.push(`${ref} → ${linked.ref_code}: web ${webPhotos} · CRM ${imgs.length} (+${imgs.length - webPhotos})`)
-        if (WITH_PHOTOS && CONFIRM && mode === 'load') {
-          const extra: string[] = []
-          for (const [i, u] of imgs.entries()) { const nu = await rehost(u, ref, i); if (nu && !(linked.gallery_urls ?? []).includes(nu)) extra.push(nu) }
-          if (extra.length) patch.gallery_urls = [...(linked.gallery_urls ?? []), ...extra]
+        if (WITH_PHOTOS) {
+          // La web y el CRM guardan muchas de las MISMAS fotos con URLs distintas: comparar
+          // por URL las duplicaría todas. Se compara la imagen (dHash) y solo se añaden las
+          // que no se parecen a ninguna de la galería actual.
+          const webHashes = (await Promise.all((linked.gallery_urls ?? []).map((u: string) => dHash(u)))).filter((h): h is string => h !== null)
+          const fresh: { url: string; i: number }[] = []
+          for (const [i, u] of imgs.entries()) {
+            const h = await dHash(u)
+            if (h !== null && webHashes.every((w) => hamming(w, h) > DUP_DISTANCE)) { fresh.push({ url: u, i }); webHashes.push(h) }
+          }
+          plan.photos.push(`${ref} → ${linked.ref_code}: web ${webPhotos} · CRM ${imgs.length} · fotos realmente nuevas ${fresh.length}`)
+          if (CONFIRM && mode === 'load' && fresh.length) {
+            const extra: string[] = []
+            for (const f of fresh) { const nu = await rehost(f.url, ref, f.i); if (nu) extra.push(nu) }
+            if (extra.length) patch.gallery_urls = [...(linked.gallery_urls ?? []), ...extra]
+          }
+        } else {
+          plan.photos.push(`${ref} → ${linked.ref_code}: web ${webPhotos} · CRM ${imgs.length}`)
         }
       }
 
@@ -201,7 +237,7 @@ async function main() {
   show('VINCULAR con ficha existente', plan.link)
   show('CREAR nuevas', plan.create)
   show('ACTUALIZAR precio', plan.price)
-  show(WITH_PHOTOS ? 'COMPLETAR fotos' : 'El CRM tiene MAS fotos (usar --fotos para completar)', plan.photos)
+  show(WITH_PHOTOS ? 'COMPLETAR fotos (comparadas por imagen)' : 'El CRM tiene MAS fotos (usar --fotos para ver cuántas son realmente nuevas)', plan.photos)
   console.log(`\nSin cambios: ${plan.skip.length}`)
   if (mode === 'report' || !CONFIRM) console.log('\n(dry-run — usar: npm run inmoges -- load --confirm)')
 }
