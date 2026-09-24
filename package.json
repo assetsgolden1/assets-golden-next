@@ -14,7 +14,8 @@
     "check-sheet-owner": "tsx scripts/checkSheetOwner.ts",
     "test-sheet-write": "tsx --env-file=.env.local scripts/testSheetWrite.ts",
     "cervera": "tsx --env-file=.env.local src/scripts/importCervera.ts",
-    "check-geo": "tsx --env-file=.env.local src/scripts/checkCountryMaps.ts"
+    "check-geo": "tsx --env-file=.env.local src/scripts/checkCountryMaps.ts",
+    "inmoges": "tsx --env-file=.env.local src/scripts/syncInmoges.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",

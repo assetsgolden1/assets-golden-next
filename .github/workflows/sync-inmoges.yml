@@ -1,0 +1,50 @@
+name: Sync Inmoges (CRM Expertos de Gestión)
+
+# Trae al catálogo los inmuebles que Atilio marca con la casilla "Kyero" en el CRM
+# (expertosgestion.com/inmoges4 → ficha → Publicidad) y publica desde Pasarelas.
+# El CRM expone esos inmuebles en un XML Kyero; este job lo lee y actualiza la web.
+#
+# - Da de alta los inmuebles nuevos (con sus fotos, rehospedadas en Supabase).
+# - Actualiza el precio de los que ya están en la web.
+# - NUNCA pisa título, descripción ni fotos de una ficha ya publicada: ese contenido
+#   está editado a mano y es mejor que el del CRM.
+#
+# Secrets necesarios: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
+# Ejecución manual: pestaña Actions → este workflow → "Run workflow".
+# Para ver qué haría sin tocar nada, marcar "Solo informe".
+
+on:
+  schedule:
+    - cron: '0 5 * * *'   # diario 05:00 UTC → 07:00 en España
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Solo informe (no escribe nada)'
+        type: boolean
+        default: false
+      fotos:
+        description: 'Completar galerías cuando el CRM tenga más fotos'
+        type: boolean
+        default: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Sincronizar
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            npx tsx src/scripts/syncInmoges.ts report
+          else
+            npx tsx src/scripts/syncInmoges.ts load --confirm ${{ inputs.fotos == true && '--fotos' || '' }}
+          fi

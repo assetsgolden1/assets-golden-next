@@ -1,0 +1,15 @@
+{
+  "_comment": "Vinculos entre el ref del CRM Inmoges y la ficha que YA existia en la web, cargada a mano antes de conectar el feed. Verificados uno a uno comparando ciudad, dormitorios, banos, m2, precio y nº de fotos (scripts/_chkInmoges.ts). Solo se usan la primera vez: despues el vinculo vive en properties.external_id.",
+  "150P9304": "AG-00007",
+  "161C9315": "AG-00005",
+  "161C9324": "AG-00009",
+  "161C9354": "AG-04296",
+  "161P9305": "AG-04484",
+  "161P9306": "AG-04518",
+  "161P9337": "AG-05395",
+  "161P9341": "AG-05180",
+  "161P9343": "AG-04336",
+  "161P9346": "AG-04486",
+  "161P9347": "AG-00006",
+  "161P9353": "AG-05181"
+}
